@@ -57,8 +57,9 @@ div#explanation .historyarrow, p{
 </style>
 <body>
 <h1>State transition explorer</h1>
+<div id="errors"></div>
 <svg id="graph"></svg>
-<div id="explanation">
+<div id="explanation"></div>
 <script src="d3.v3.min.js"></script>
 <script>
 
@@ -71,6 +72,11 @@ div#explanation .historyarrow, p{
 // http://bl.ocks.org/mbostock/3310323 line interpolation
 // http://bl.ocks.org/gka/5145845 circular graph of links
 // http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json explore a dag
+
+var matches = /f=([^&#=]*)/.exec(window.location.search);
+if (!matches || matches[1] === "")
+  document.getElementById("errors").innerHTML="Error: state-transition-data-file name not specified. Use an '&f=' parameter in the url.";
+var datafile = matches[1];
 
 var width = 1100 || d3.select("body")[0][0].scrollWidth || 1000,
     height = 700 || d3.select("body")[0][0].scrollHeight || 800;
@@ -371,7 +377,9 @@ function build_transitions_from_rows(state_data, csv_rows) {
   return transition_data;
 }
 
-d3.tsv("salsa_moves.txt", function(error, csv_rows) {      
+d3.tsv(datafile, function(error, csv_rows) {
+  if (error)
+    document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
   var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
   var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
   var states = d3.set(start_states.concat(end_states)).values();
