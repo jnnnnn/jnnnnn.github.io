@@ -1,0 +1,10 @@
+Start	Move	End	Week	Date
+Open hold	Basic	Open hold	Week 1
+Open hold	Basic forward	Open hold	Week 1
+Open hold	Girl turn	Open hold	Week 1
+Open hold	Boy hand-chest turn	Open hold	Week 1
+Open hold	Boy hand-chest turn	Crosshand	Week 1
+Open hold	Into control	Control hold	Week 1
+Control hold	Single steps	Control hold	Week 1
+Control hold	Out of control	Open hold	Week 1
+Crosshand	Let go	Open hold	Week 1
