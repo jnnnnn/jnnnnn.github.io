@@ -75,7 +75,7 @@ div#explanation .historyarrow, p{
 
 var matches = /f=([^&#=]*)/.exec(window.location.search);
 if (!matches || matches[1] === "")
-  document.getElementById("errors").innerHTML="Error: state-transition-data-file name not specified. Use an '&f=' parameter in the url.";
+  document.getElementById("errors").innerHTML="Error: state-transition-data-file name not specified. Use an '?f=' parameter in the url.";
 var datafile = matches[1];
 
 var width = 1100 || d3.select("body")[0][0].scrollWidth || 1000,
