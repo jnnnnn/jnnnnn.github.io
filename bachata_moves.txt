@@ -11,16 +11,16 @@ Open hold	Into hammerlock	Hammerlock	Week 2		Turn, keeping one hand low. Keep co
 Hammerlock	Unwind hammerlock	Open hold	Week 2		
 Hammerlock	Windmill	Hammerlock	Week 2		Boy half outside turn (outside hand over head), bring outside hand down, continue/repeat.
 Hammerlock	Crossover	Open hold	Week 2		Walk past each other, half turn.
-Hammerlock	Double unwind	Cuddle	Week 2		
-Cuddle	Free spin	Open hold	Week 2		Slight pressure with forearm, don't send follower flying.
-Open hold	Girl hesitation half-turn	Cuddle	Week 3		Leader must clearly stop on beat 2, gentle block with over hand.
-Cuddle	Basic	Cuddle	Week 3		
-Cuddle	Step forward + back	Cuddle	Week 3		Two steps forward, two steps back.
-Cuddle	Relax hands	Cuddle crosshand	Week 3		
-Cuddle crosshand	Unwind	Open hold	Week 3		
-Open hold	Boy hesitation outside half-turn	Boy cuddle	Week 3		Turn outside, swap hands.
-Boy cuddle	Relax hands	Boy cuddle crosshand	Week 3		
-Boy cuddle crosshand	Unwind + girl turn	Crosshand	Week 3		Prepare with clear contra. Leader half turn, follower full turn.
+Hammerlock	Double unwind	Wrap	Week 2		
+Wrap	Free spin	Open hold	Week 2		Slight pressure with forearm, don't send follower flying.
+Open hold	Girl hesitation half-turn	Wrap	Week 3		Leader must clearly stop on beat 2, gentle block with over hand.
+Wrap	Basic	Wrap	Week 3		
+Wrap	Step forward + back	Wrap	Week 3		Two steps forward, two steps back.
+Wrap	Relax hands	Wrap crosshand	Week 3		
+Wrap crosshand	Unwind	Open hold	Week 3		
+Open hold	Boy hesitation outside half-turn	Boy wrap	Week 3		Turn outside, swap hands.
+Boy wrap	Relax hands	Boy wrap crosshand	Week 3		
+Boy wrap crosshand	Unwind + girl turn	Crosshand	Week 3		Prepare with clear contra. Leader half turn, follower full turn.
 Crosshand	Throw one hand	Crosshand	Week 3		Lift the bottom hand slightly then throw downward firmly. Follower should travel thrown hand in complete circle.
 Crosshand	Throw two hands	Crosshand	Week 3		Lift both hands slightly then throw downward on beats. Thrown hands should travel in a complete circle.
 Crosshand	Double-handed turn	Crosshand	Week 3		Lead with top hand on one beat and bottom hand on next.
@@ -41,9 +41,9 @@ Close hold	Half turn	Close hold	Week 4	23/01/2014	Prepare with small contra, the
 Close hold	Full turn	Close hold	Week 4	23/01/2014	Prepare with large contra, then full turn fast.
 Close hold	Hip roll	Close hold	Week 4	23/01/2014	
 Close hold	Step back	Open hold	Week 4	23/01/2014	
-Open hold	Step back + walk around	Cuddle	Week 5	30/01/2014	
-Cuddle	Basic	Cuddle	Week 5	30/01/2014	
-Cuddle	Step back + kick forward	Cuddle	Week 5	30/01/2014	Left foot back, right knee pushes follower's leg into kick + step forward.
+Open hold	Step back + walk around	Wrap crosshand	Week 5	30/01/2014	Place right hand on hip, left hands extended (tango-style).
+Wrap crosshand	Basic	Wrap crosshand	Week 5	30/01/2014	
+Wrap crosshand	Step back + kick forward	Wrap crosshand	Week 5	30/01/2014	Left foot back, right knee pushes follower's leg into kick + step forward.
 Open hold	Girl turn 5/4	Cliffhanger	Week 6	06/02/2014	Girl turns, then both dancers do an extra quarter turn to end up facing the same way.
 Cliffhanger	Both half inside turn	Cliffhanger	Week 6	06/02/2014	Step forward + half inside turn turn
 Cliffhanger	Both outside turn	Open hold	Week 6	06/02/2014	
@@ -60,10 +60,10 @@ Stepped back	Walk past tangle	Hands double crossed	Week 7	13/02/2014	Standing to
 Hands double crossed	Girl two-handed turn	Open hold	Week 7	13/02/2014	
 Open hold	Girl turn 5/4	Cliffhanger	Week 7	13/02/2014	
 Cliffhanger	Boy walk behind + boy hand-chest quarter outside turn	Crosshand	Week 7	13/02/2014	???
-Crosshand	Drop hand, girl half turn	Cuddle crosshand	Week 7	13/02/2014	
-Cuddle crosshand	Girl half turn	Hammerlock crosshand	Week 7	13/02/2014	
+Crosshand	Drop hand, girl half turn	Mates hold	Week 7	13/02/2014	
+Mates hold	Girl half turn	Hammerlock crosshand	Week 7	13/02/2014	
 Hammerlock crosshand	Girl turn + boy haircomb	Close hold	Week 7	13/02/2014	
-Cuddle	Haircomb + extend	Cuddle crosshand	extra		Release both hands from seatbelted, then collect hand and extend out to side.
+Wrap	Haircomb + extend	Wrap crosshand	extra		Release both hands from seatbelted, then collect hand and extend out to side.
 Open hold	Boy turn	Crosshand	old Week 9		
 Crosshand	Girl two-handed + boy two-handed turn	Crosshand	old Week 9		
 Crosshand	Girl haircomb + hand edge down arm	Open hold	old Week 9		
@@ -71,21 +71,21 @@ Open hold	Girl turn + swap hand	Crosshand	old Week 9
 Crosshand	Girl two-handed + boy one-handed turn	Boy hammerlock	old Week 9		
 Boy hammerlock	Haircomb + arm sweep	Arm up	old Week 9		
 Arm up	Girl turn	Open hold	old Week 9		
-Open hold	Girl two-handed turn	Cuddle	old Week 9		
-Cuddle	Roll out girl	Cliffhanger	old Week 9		
+Open hold	Girl two-handed turn	Wrap	old Week 9		
+Wrap	Roll out girl	Cliffhanger	old Week 9		
 Cliffhanger	Free spin	Open hold	old Week 9		
 Open hold	Girl turn 5/4	Cliffhanger	old Week 10		
 Cliffhanger	Step forward + half turn	Cliffhanger	old Week 10		
 Cliffhanger	Girl spin + boy spin	Open hold	old Week 10		
 Cliffhanger	Girl spin + boy spin	Control hold	old Week 10		
 Open hold	Girl turn	Hammerlock	old Week 10		
-Hammerlock	Double turn into Cuddle	Cuddle	old Week 10		
-Cuddle	Free spin	Open hold	old Week 10		
+Hammerlock	Double turn	Wrap	old Week 10		
+Wrap	Free spin	Open hold	old Week 10		
 Crosshand	Boy turn	Boy hammerlock	old Week 11		Leader keeps one hand high, one hand low.
-Open hold	Girl two-handed turn	Cuddle	old Week 11		
-Cuddle	Cuddle swap sides + swap hands + half turn	Cliffhanger	old Week 11		
+Open hold	Girl two-handed turn	Wrap	old Week 11		
+Wrap	Swap sides + swap hands + half turn	Cliffhanger	old Week 11		
 Cliffhanger	Approach/retreat	Cliffhanger	old Week 11		
-Cuddle	Girl turn + boy hand to elbow + boy turn + haircomb	Circle walk	old Week 12		
+Wrap	Arm over girl + boy turn + haircomb	Circle walk	old Week 12		Arm over girl + boy hand to elbow + boy turn + haircomb
 Circle walk	Circle walk	Circle walk	old Week 12		
 Circle walk	Girl turn	Open hold	old Week 12		
 Control hold	Girl turn	Hammerlock	extra		
@@ -108,8 +108,8 @@ Crosshand	Girl turn	Hammerlock crosshand	Week 12	27/02/2014
 Hammerlock crosshand	Unwind + boy haircomb	Opened close hold	Week 12	27/02/2014	
 Opened close hold	Girl bodyroll twice	Opened close hold	Week 12	27/02/2014	
 Opened close hold	Girl step forward, half turn, head roll	Close hold	Week 12	27/02/2014	
-Opened close hold	Girl flare half turn	Cuddle	Week 12	27/02/2014	Girl step forward, half turn flare leg, quarter turn
-Cuddle	Bodyroll both	Cuddle	Week 12	27/02/2014	
+Opened close hold	Girl flare half turn	Wrap	Week 12	27/02/2014	Girl step forward, half turn flare leg, quarter turn
+Wrap	Bodyroll both	Wrap	Week 12	27/02/2014	
 Open hold	Basic	Open hold	Week 1	06/03/2014	
 Open hold	Basic forward	Control hold	Week 1	06/03/2014	
 Control hold	Step touch	Open hold	Week 1	06/03/2014	
@@ -138,11 +138,11 @@ Wrap	Girl half turn	Shoulder wrap	Week 4	27/03/2014
 Shoulder wrap	Girl turn + boy hand to elbow + boy turn + haircomb	Arm up	Week 4	27/03/2014	
 Shoulder wrap	Unwind	Open hold	Week 4	27/03/2014	
 Arm up	Girl turn	Open hold	Week 4	27/03/2014	
-Open hold	Girl turn	Cuddle	Week 4	27/03/2014	
-Cuddle	Push-pull	Cliffhanger	Week 4	27/03/2014	Push girl forward on count 1, step back. Pull back past on step 2. 3,4 go into cliffhanger behind you, then turn girl with other hand.
+Open hold	Girl turn	Wrap	Week 4	27/03/2014	
+Wrap	Push-pull	Cliffhanger	Week 4	27/03/2014	Push girl forward on count 1, step back. Pull back past on step 2. 3,4 go into cliffhanger behind you, then turn girl with other hand.
 Cliffhanger	Boy turn + trail	Arm up	Week 4	27/03/2014	Boy trails girl's hand around his torso
 Arm up	Girl turn	Close hold	Week 4	27/03/2014	
-Cliffhanger	Pull girl forward and boy walks behind	Cuddle	Week 4	27/03/2014	Boy places his hand on girl's front then half-turns into cuddle
+Cliffhanger	Pull girl forward and boy walks behind	Wrap	Week 4	27/03/2014	Boy places his hand on girl's front then walks behind her and half-turns into cuddle
 Basic	Girl turn + boy back scratch	Basic	Adv	02/04/2014	Girl turns on 1,2; boy outside half turn, lets girl's hand trail down his back to other hand. Boy throws girl's hand away to move her sideways and pulls other hand forwards for 1.5 turn.
 Basic	Girl two-handed turn	Catapult	Adv	02/04/2014	
 Catapult	Catapult + block + arm behind	Hammerlock	Adv	02/04/2014	
@@ -153,15 +153,15 @@ Close hold	Basic forward	Close hold	Week 6	11/04/2014	Push girl backwards using 
 Close hold	Spin	Close hold	Week 6	11/04/2014	Step, pivot, steppivot, start stopping on 7.
 Close hold	Half spin + drag	Close hold	Week 6	11/04/2014	On third count, pull girl forward by her lower back using your palm/wrist (fingers are unpleasant?)
 Close hold	Bodyroll + side dip	Close hold	Week 6	11/04/2014	Led using palm roll on girl's back. Head forward, shoulders forward, hips forward, sit back and down. Side roll is sit rotated then knee flick other leg to roll back up, head last.
-Control hold	Girl half turn	Cuddle	Adv	16/04/2014	Push hand into contra then turn (a bit late, and gently) and throw hand up, prevent full turn with hand on hip.
-Cuddle	Lunge	Cuddle	Adv	16/04/2014	Push hips forward, then shoulders, then pull hips back (girl sticks booty out backward). Boy to side, not behind!
-Cuddle	Titanic lunge	Cuddle	Adv	16/04/2014	Hands right out to side, push shoulders forward (girl lunges).
-Cuddle	Both half turn	Boy cuddle	Adv	16/04/2014	Girl half inside turn, boy half outside turn (hand stays high for outside turn (outside hand)).
-Boy cuddle	Boy half inside turn	Boy hammerlock	Adv	16/04/2014	Inside hand goes high.
+Control hold	Girl half turn	Wrap	Adv	16/04/2014	Push hand into contra then turn (a bit late, and gently) and throw hand up, prevent full turn with hand on hip.
+Wrap	Lunge	Wrap	Adv	16/04/2014	Push hips forward, then shoulders, then pull hips back (girl sticks booty out backward). Boy to side, not behind!
+Wrap	Titanic lunge	Wrap	Adv	16/04/2014	Hands right out to side, push shoulders forward (girl lunges).
+Wrap	Both half turn	Boy wrap	Adv	16/04/2014	Girl half inside turn, boy half outside turn (hand stays high for outside turn (outside hand)).
+Boy wrap	Boy half inside turn	Boy hammerlock	Adv	16/04/2014	Inside hand goes high.
 Boy hammerlock	four count basic	Boy hammerlock	Adv	16/04/2014	
 Boy hammerlock	Knock arm	Control hold	Adv	16/04/2014	Boy gently nudges girl's hammerlock forearm with elbow, and slides to the right for four counts.
-Control hold	Twists and turn	Cuddle	Adv	16/04/2014	Boy very strong, pushes girl using his frame. Girl twists on rightfoot for 2, then leftfoot for 2, then right one (contra) and turn into strong cuddle.
-Cuddle	Unwind	Cliffhanger	Adv	16/04/2014	
+Control hold	Twists and turn	Wrap	Adv	16/04/2014	Boy very strong, pushes girl using his frame. Girl twists on rightfoot for 2, then leftfoot for 2, then right one (contra) and turn into strong cuddle.
+Wrap	Unwind	Cliffhanger	Adv	16/04/2014	
 Cliffhanger	Wind up	Romantic hold	Adv	16/04/2014	Boy pulls girl back in and uses button on her back to get under her arm. Keeps free hand on hip so girl's free hand goes to chest or neck.
 Romantic hold	Basic	Romantic hold	Week 8	24/04/2014	Hands on each others' shoulderblades 
 Romantic hold	Horizontal sway	Romantic hold	Week 8	24/04/2014	Move girl's shoulderblades left and right. 
@@ -171,3 +171,131 @@ Close hold	Back away + girl turn	Close hold offset	Week 8	24/04/2014	Hand to sho
 Close hold offset	Tango	Close hold	Week 8	24/04/2014	Step back while turning with girl, then on third step put new inside foot behind girl, hold on 4 for her to kick between boy's legs.
 Close hold	Basic	Close hold offset	Week 8	24/04/2014	
 Close hold offset	Side lunge	Close hold	Week 8	24/04/2014	Holding girl very firmly against your side, perform a side lunge for 8 counts. Girl slowly drags outside foot to knee, keeping legs closed as always. 
+Basic	Boy turn, girl turn	Shoulder wrap	Adv	30/04/2014	
+Shoulder wrap	Unwind	Cliffhanger	Adv	30/04/2014	
+Cliffhanger	Walk through	Cliffhanger	Adv	30/04/2014	
+Cliffhanger	Girl bow; push forward + pull back	Wrap crosshand	Adv	30/04/2014	Pull girl's arm up and forward on 1, hand across waist on 2,she bows on 3 (dissipating momentum), boy mostly behind on 4. Push hip on 5, pull on 6, bodyroll 7&8.
+Wrap crosshand	Lazy sway	Wrap crosshand	Adv	30/04/2014	
+Wrap crosshand	Push pull	Close hold	Adv	30/04/2014	Push girl forward and step back on 5, pull on 6 and walk around, turn on 7.
+Close hold	Spin	Cliffhanger	Adv	30/04/2014	
+Cliffhanger	Pull-push	Cliffhanger	Adv	30/04/2014	Both step forward one foot after another on 1, back on 2, repeat. Lead with frame/hand. 
+Cliffhanger	Throw hand	Close hold	Adv	30/04/2014	
+Open hold	Girl double-handed + boy double-handed turn	Open hold	Week 9	01/05/2014	
+Open hold	Girl double-handed turn	Catapult	Week 9	01/05/2014	
+Open hold	Girl haircomb	Arm up	Week 9	01/05/2014	
+Arm up	Girl turn	Open hold	Week 9	01/05/2014	
+Arm up	Girl turn + swap hand	Crosshand	Week 9	01/05/2014	
+Open hold	Girl double-handed turn	Tangle	Week 9	01/05/2014	
+Crosshand	Boy hand-to-elbow + boy turn + girl haircomb	Circle walk	Week 9	01/05/2014	
+Tangle	Boy hesitation turn	Boy wrap	Week 9	01/05/2014	
+Boy wrap	Boy hands over head + girl trail down back	Boy wrap crosshand	Week 9	01/05/2014	
+Boy wrap crosshand	Girl turn + haircomb	Close hold	Week 9	01/05/2014	
+Boy wrap crosshand	Girl turn	Open hold	Week 9	01/05/2014	
+Open hold	Girl turn + boy turn	Open hold	Adv	07/05/2014	
+Open hold	Boy turn	Catapult	Adv	07/05/2014	
+Catapult	Catapult + block + slips	Catapult	Adv	07/05/2014	Catapult arm around for four counts. On the way back, slip arm through catapult (twice).
+Catapult	Catapult + block	Hammerlock	Adv	07/05/2014	Push arm behind girl's back when blocking.
+Hammerlock	Unwind	Control hold	Adv	07/05/2014	
+Control hold	Hesitation step	Stepped back	Adv	07/05/2014	
+Stepped back	Pull forward	Wrap	Adv	07/05/2014	Pull forward on 1, put hand to waist on 2 and pull back, walk behind into cuddle.
+Wrap	Horizontal sway	Wrap	Adv	07/05/2014	
+Wrap	Lead bodyrolls from side	Close hold	Adv	07/05/2014	Right hand on back to lead roll, left hand on far hip to prevent falling forward. 2 bodyrolls and then into close hold, all in four beats.
+Control hold	Step back 	Cliffhanger 	Week 10	08/05/2014	
+Cliffhanger 	Approaches	Open hold 	Week 10	08/05/2014	Pull & step forward on 1 and 2, back on 3 and 4 but tap last step (use same foot again for next beat) 
+Open hold	Boy turn swap hand 	Crosshand	Week 10	08/05/2014	
+Crosshand	Girl double handed turn + boy turn	Boy hammerlock 	Week 10	08/05/2014	
+Boy hammerlock 	Haircomb + bump arm	Open hold 	Week 10	08/05/2014	Boy bumps girl's wrist with free elbow to break hammerlock ; girl's arm travels in semicircle to top then grabs her booty
+Open hold 	Girl turn 5/4	Parade	Week 10	08/05/2014	To lead, sweep arm lowish and firmly forward, keep moving after girl turn
+Parade	Both half turn	Parade	Week 10	08/05/2014	Step forward for 2 then turn, 4 is a tap
+Parade	Both spin	Open hold	Adv	14/05/2014	
+Close hold	Wave hands around	Close hold	Adv	14/05/2014	
+Close hold	Step forward + spin	Control hold 	Adv	14/05/2014	
+Control hold 	Hesitation step	Control hold 	Adv	14/05/2014	
+Control hold 	Girl turn + boy turn; arm sweep 	Arm up	Adv	14/05/2014	
+Arm up	Girl turn 	Control hold 	Adv	14/05/2014	
+Control hold 	Coppa	Wrap	Adv	14/05/2014	
+Wrap	Basic	Wrap	Adv	14/05/2014	
+Wrap	Step back x2 + kick	Wrap	Adv	14/05/2014	Back, back, forward, kick & rise, down
+Wrap	Girl turn 	Crosshand	Adv	14/05/2014	
+Crosshand	Girl inside & boy outside turn	Boy hammerlock 	Adv	14/05/2014	
+Boy hammerlock 	Elbow bump for arm sweep	Open hold	Adv	14/05/2014	
+Open hold	Girl turn + dip 	Open hold	Adv	14/05/2014	
+Open hold	Girl turn	Wrap	Week 11	15/05/2014	
+Wrap	Push-pull, girl turn	Open hold	Week 11	15/05/2014	Push girl forward with body just before 1, step across to other side and pull back on 2, let her travel back further on 3,4, then present other hand for turn.
+Open hold	Crossover boy trail + swap hands + throw hand	Crosshand	Week 11	15/05/2014	
+Crosshand	Copa	Wrap crosshand	Week 11	15/05/2014	
+Wrap crosshand	Hesitation step	Wrap crosshand	Week 11	15/05/2014	Hands at shoulder height, step forward on 1 but keep back foot in place on 2. Repeat for 3, 4.
+Wrap crosshand	Bodyroll	Wrap crosshand	Week 11	15/05/2014	
+Wrap crosshand	Unwind + throw hand	Crosshand	Week 11	15/05/2014	
+Crosshand	Throw hands	Crosshand	Week 11	15/05/2014	
+Crosshand	Arm circles + hip turn + bodyroll	Close hold	Week 11	15/05/2014	
+ Open hold	Arm circles	Hands over head	Adv w/ Manuel	21/05/2014	
+Hands over head	Free spin	Hands on waist	Adv w/ Manuel	21/05/2014	
+Hands on waist	Pull-push to sides	Hands over head	Adv w/ Manuel	21/05/2014	
+Hands over head	Free spin	Open hold	Adv w/ Manuel	21/05/2014	
+Open hold	Girl turn + boy turn	Open hold	Adv w/ Manuel	21/05/2014	
+Open hold	Girl turn + boy outside turn & swap hand + throw hand	Reaching	Adv w/ Manuel	21/05/2014	
+Reaching	Free spin	Wrap	Adv w/ Manuel	21/05/2014	
+Wrap	Bamboleo	Wrap	Adv w/ Manuel	21/05/2014	Roll hips in a horizontal circle : left, then hip forward, then neutral 
+Wrap	Free spin	Embrace	Adv w/ Manuel	21/05/2014	Hands on shoulderblades
+Embrace	Scoop dip, bodyroll	Embrace	Adv w/ Manuel	21/05/2014	
+Crosshand	Girl turn + boy turn	Crosshand	Manuel	22/05/2014	
+Crosshand	Girl hesitation turn	Mates hold	Manuel	22/05/2014	Put right hand on girl's waist, left hands extended
+Mates hold	Girl turns around boy	Boy wrap	Manuel	22/05/2014	Led with left hand high
+Boy rwap	Left hand over, boy half turn	Crosshand	Manuel	22/05/2014	
+Close hold	Basic	Close hold	Week 13	28/05/2014	
+Close hold	Grind step	Close hold	Week 13	28/05/2014	Step forward on 1 and back on 2
+Close hold	Basic stop and bodyroll	Close hold	Week 13	28/05/2014	Basic on 1 but stop on 2 (no movement).
+Close hold	Step back + throw hand	Close cliffhanger	Week 13	28/05/2014	
+Close cliffhanger	Pivots	Close cliffhanger	Week 13	28/05/2014	Twitch hand so follower stiffens. Use hand to pivot follower.
+Close cliffhanger	Both free spin	Control hold	Week 13	28/05/2014	
+Control hold	Tango parade	Parade	Week 13	28/05/2014	Girl faces to side and walks forwards, boy walks backwards 
+Parade	Parade turn	Parade	Week 13	28/05/2014	Both forward on 1, 2, half turn inwards on 3 (swap hands) (led on 1), tap on 4.
+Parade	Both free spin	Open hold	Week 13	28/05/2014	
+Open hold	Girl turn	Hammerlock	Week 13	28/05/2014	
+Hammerlock	Hands low turn	Hammerlock	Week 13	28/05/2014	Keeping both hands very low, turn girl. Near the end of the turn, flick hand to allow completion.
+Open hold	Elbow break + boy turn 	Crosshand	Adv	18/06/2014	
+Crosshand	Girl turn + flick + boy outside turn	Boy hammerlock crosshand	Adv	18/06/2014	
+Boy hammerlock crosshand	Boy bow	Crosshand	Adv	18/06/2014	
+Crosshand	Girl turn 	Mates hold	Adv	18/06/2014	
+Mates hold	Girl double turn + flick	Crosshand	Adv	18/06/2014	
+Crosshand	Girl turn	Awkward wrap	Adv	18/06/2014	Turn the wrong way for which way up your hands are, resulting in an awkward wrap
+Awkward wrap	Unwind + girl turn	Hammerlock	Adv	18/06/2014	
+Hammerlock	Unwind + boy haircomb	Close hold	Adv	18/06/2014	
+Open hold	Girl turn	Wrap	Week 4	26/06/2014	
+Wrap	Girl half turn x2	Wrap	Week 4	26/06/2014	
+Wrap	Girl free spin	Open hold	Week 4	26/06/2014	
+Wrap	Push-pull	Cliffhanger	Week 4	26/06/2014	Push on 1, pull on 2, walk past on 3.
+Cliffhanger	Girl turn	Open hold	Week 4	26/06/2014	Girl turns under non-cliffhanger hand
+Wrap	Unwrap	Cliffhanger	Week 4	26/06/2014	
+Cliffhanger	Girl free spin	Open hold	Week 4	26/06/2014	Throw hand gently but like a frisbee
+Open hold	Girl turn	Close hold	Week 4	26/06/2014	
+Close hold	Dip	Close hold	Week 4	26/06/2014	Boy squats down without bending forward; girl leans back on her toes, knees and hips forward, head dropped
+Open hold	Elbow break + boy turn	Crosshand	Adv	02/07/2014	
+Crosshand	Girl turn + boy turn	Boy hammerlock	Adv	02/07/2014	
+Boy hammerlock	Knock arm	Close hold	Adv	02/07/2014	
+Close hold	Boy window	Embrace	Adv	02/07/2014	
+Embrace	Roll shoulder + twist sit, booty roll	Embrace	Adv	02/07/2014	Right shoulder goes 1. up, forward, down 2. up, back, down. On 3+4, twist shoulders so girl sits on left leg. On five, push her off with leg and let her booty roll to 8.
+Embrace	Booty rolls	Embrace	Adv	02/07/2014	Girl holds boy's legs with knees, boy rolls butt to non-stepping foot, pulling girl with him from the middle of her back
+Open hold	About turn 	Close hold	Project	08/07/2014	Girl turn, boy follows around with hand on back to switch sides
+Open hold	Shuffles 	Open hold	Project	08/07/2014	Arms move in circles: left on 1, right on 2, etc., skipping 4 and 8
+Close hold	360 360	Close hold	Project	08/07/2014	Right feet are the pivot point
+Crosshand	Walkaround	Open hold	Project	08/07/2014	Girl outside turn, as turn completes boy puts turning arm over girl's and wraps arm up so back of hand on girl's shoulderblade 
+Open hold	Double turn dip	Close hold	Project	08/07/2014	Led by turning arm very wide for contra; girl keeps feet together longer for quicker turns. 
+Romantic hold	Basic	Romantic hold	Adv	09/07/2014	
+Romantic hold	Girl body circles	Romantic hold	Adv	09/07/2014	Two counts per circle; hips stay mostly still. Boy leads with frame (boy's shoulders).
+Romantic hold	Girl slow body circle + bodyroll	Romantic hold	Adv	09/07/2014	Half circle on 1,2; boy hips back and gently pull shoulders.
+Romantic hold	Half-turn	Romantic hold	Adv	09/07/2014	
+Romantic hold	Step back	Open hold	Adv	09/07/2014	
+Open hold	Two-handed turn	Catapult	Adv	09/07/2014	
+Catapult	Catapult + boy double-handed turn	Catapult	Adv	09/07/2014	Catapult on 1, 2; boy catches hand high and turns under both hands.
+Catapult	Catapult + push arm	Hammerlock	Adv	09/07/2014	
+Hammerlock	Girl turn + boy half turn	Boy wrap	Adv	09/07/2014	
+Boy wrap	Hands to shoulders + let go	Boy wrap crosshand	Adv	09/07/2014	
+Boy wrap crosshand	Throw hands + side-to-side	Basic	Adv	09/07/2014	Throw hands down for four counts. Then reach behind to push girl's hips to the left on 1, right on 2, then left on 3, with boy going in the other direction to emphasise. Boy 3/4 outside turn at end.
+Embrace	Basic	Embrace	Adv	16/07/2014	
+Embrace	Slow steps	Embrace	Adv	16/07/2014	Lead with little whole-body shrug and then seesaw motion. Let girl feel rhythm.
+Embrace	half turn + open up	Opened close hold	Adv	16/07/2014	Slight contra for half turn and then allow girl to continue by pulling her back slightly and pushing hand.
+Opened close hold	Walk across + walk around	Close hold	Adv	16/07/2014	Girl walks across in front of boy then turns on 3,4. Then walk around each other clockwise for 4.
+Close hold	Boy turn + swap hand under	Crosshand	Adv	16/07/2014	
+Crosshand	Wrong-way turn	Crosshand	Adv	16/07/2014	Step once then push back on two and two-handed turn in the unexpected direction.
