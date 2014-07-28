@@ -61,7 +61,8 @@ div#explanation .historyarrow, p{
   <form id="fc" action="_" style="display:inline">
     <input type="button" value="Reset" onclick="init_states();"/>
     <input id="hideselftrans" type="checkbox" checked onchange="select_state(state_data_selected)"/>Hide self transitions
-    <input id="hideunrelatedtrans" type="checkbox" checked onchange="select_state(state_data_selected)"/>Hide unrelated transitions
+    <input id="hideunrelatedtrans" type="checkbox" checked onchange="select_state(state_data_selected)"/>Hide unrelated transitions<br />
+    <input id="trimhistory" type="checkbox" checked onchange="move_history=[];"/>Trim history
   </form>
 </div>
 <div id="errors"></div>
@@ -146,7 +147,8 @@ function add_history(new_move_td) {
     "td": new_move_td
   };
 
-  if (move_history.length > 5) move_history.pop();
+  if (move_history.length > 5 && document.getElementById("trimhistory").checked) 
+    move_history.pop();
   move_history.unshift(hd);
 
   var history_elements = d3.selectAll("div#explanation").selectAll("div")

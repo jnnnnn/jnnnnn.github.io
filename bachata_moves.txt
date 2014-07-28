@@ -5,10 +5,10 @@ Arm up	Girl turn + swap hand	Crosshand	Week 9	01/05/2014		186
 Arm up	Girl turn	Open hold	old Week 9			72
 Arm up	Girl turn	Open hold	Week 4	27/03/2014		139
 Arm up	Girl turn	Open hold	Week 9	01/05/2014		185
-Arms up	Double clock	Close hold	Week 2	13/03/2014		126
-Arms up	Free spin	Hands on waist	Adv w/ Manuel	21/05/2014		232
-Arms up	Free spin	Open hold	Adv w/ Manuel	21/05/2014		234
-Arms up	Waist flick, boy+girl turn	Open hold	Week 9	20/02/2014		96
+Hands up	Double clock	Close hold	Week 2	13/03/2014		126
+Arms up	Free turn	Hands on waist	Adv w/ Manuel	21/05/2014		232
+Arms up	Free turn	Open hold	Adv w/ Manuel	21/05/2014		234
+Arms up	Free turn	Open hold	Week 9	20/02/2014		96
 Awkward wrap	Unwind + girl turn	Hammerlock	Adv	18/06/2014		262
 Boy haircombed	Basic	Boy haircombed	Adv	23/07/2014		307
 Boy haircombed	Boy unwind	Crosshand	Adv	23/07/2014		308
@@ -188,7 +188,7 @@ Hammerlock crosshand	Unwind + boy haircomb	Close hold opened	Week 12	27/02/2014	
 Hammerlock crosshand	Unwind + boy haircomb	Close hold opened	Week 2	13/03/2014		128
 Hands on waist	Pull-push to sides	Arms up	Adv w/ Manuel	21/05/2014		233
 Hands up	Girl free turn	Close hold	Week 1	06/03/2014		118
-Hands up	Double arm sweep	Hands up	Week 1	06/03/2014		117
+Hands up	Double arm sweep	Arms up	Week 1	06/03/2014		117
 Mates hold	Girl turns around boy	Boy wrap	Manuel	22/05/2014	Led with left hand high	243
 Mates hold	Both half turn	Boy wrap crosshand	Adv	16/04/2014	Girl half inside turn, boy half outside turn (hand stays high for outside turn (outside hand)).	158
 Mates hold	Push pull	Close hold	Adv	30/04/2014	Push girl forward and step back on 5, pull on 6 and walk around, turn on 7.	178
