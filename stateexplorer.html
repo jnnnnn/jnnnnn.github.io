@@ -124,20 +124,17 @@ function strong_gravity(alpha) {
 
 // a function that pushes pre-transitions to the left and post-transitions to the right.
 function separate_gravity(alpha) {
-  if (!filterback.checked || !filterforward.checked)
-    return function(d) {};
-  else 
-    return function(d) {
-      if (d == state_data_selected) 
-        return; // otherwise jiggle
+  return function(d) {
+    if (d == state_data_selected) 
+      return; // otherwise jiggle
 
-      d.x += d.selected_next * alpha;  // bool coerced to 0 or 1
-      d.x -= d.selected_prev * alpha;  // bool coerced to 0 or 1
+    d.x += d.selected_next * alpha;  // bool coerced to 0 or 1
+    d.x -= d.selected_prev * alpha;  // bool coerced to 0 or 1
 
-      // push to vertical edges
-      if (d.selected_prev && d.selected_next)
-        d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / 0.03;
-    };
+    // push to vertical edges
+    if (d.selected_prev && d.selected_next)
+      d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / 0.03;
+  };
 }
 
 
