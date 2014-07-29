@@ -112,7 +112,7 @@ function strong_gravity(alpha) {
 
 // a function that pushes pre-transitions to the left and post-transitions to the right.
 function separate_gravity(alpha) {
-  if (!filterback || !filterforward)
+  if (!filterback.checked || !filterforward.checked)
     return function(d) {};
   else 
     return function(d) {
@@ -143,8 +143,8 @@ var move_history = [];
 var move_history_current; // undo/redo pointer
 var move_history_next_id = 0;
 
-var filterback = document.getElementById("backlinks").checked;
-var filterforward = document.getElementById("forwardlinks").checked;
+var filterback = document.getElementById("backlinks");
+var filterforward = document.getElementById("forwardlinks");
 
 function get_link_color(d) {
   if (d.selected_next && d.selected_prev) return "#000";
@@ -301,9 +301,6 @@ function select_state(sdsel) {
 function on_filter_transitions() {
   if (d3.event)
     d3.event.stopPropagation();
-
-  filterback = document.getElementById("backlinks").checked;
-  filterforward = document.getElementById("forwardlinks").checked;
 
   select_state(state_data_selected); // filters transitions
 }
