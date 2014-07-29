@@ -58,10 +58,16 @@ div#explanation .historyarrow, p{
 <body>
 <h1 style="display:inline">State transition explorer</h1>
 <div id="controls" style="float:right">
-  <form id="fc" action="_" style="display:inline">
+  <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
     <input type="button" value="Reset" onclick="init_states();"/>
-    <input id="hideselftrans" type="checkbox" checked onchange="select_state(state_data_selected)"/>Hide self transitions
-    <input id="hideunrelatedtrans" type="checkbox" checked onchange="select_state(state_data_selected)"/>Hide unrelated transitions<br />
+    <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide unrelated transitions
+    
+    <input id="filter" type="search" placeholder="regex (filter)"/><br />
+
+    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/>Self links
+    <input id="backlinks" type="checkbox" checked onchange="on_filter_transitions();"/>Back links
+    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/>Forward links
+
     <input id="trimhistory" type="checkbox" checked onchange="move_history=[];"/>Trim history
   </form>
 </div>
@@ -81,12 +87,14 @@ div#explanation .historyarrow, p{
 // http://bl.ocks.org/gka/5145845 circular graph of links
 // http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json explore a dag
 
-var width = 1100 || d3.select("body")[0][0].scrollWidth || 1000,
-    height = 700 || d3.select("body")[0][0].scrollHeight || 800;
+var width = d3.select("body")[0][0].scrollWidth || 1100,
+    height = 700 || d3.select("body")[0][0].scrollHeight || 700;
 
 var color = d3.scale.category20();
 
 var gravity = 0.01;
+
+var startdelay = 100;
 
 var force = d3.layout.force()
     .charge(-50)
@@ -104,17 +112,20 @@ function strong_gravity(alpha) {
 
 // a function that pushes pre-transitions to the left and post-transitions to the right.
 function separate_gravity(alpha) {
-  return function(d) {
-    if (d == state_data_selected) 
-      return; // otherwise jiggle
+  if (!filterback || !filterforward)
+    return function(d) {};
+  else 
+    return function(d) {
+      if (d == state_data_selected) 
+        return; // otherwise jiggle
 
-    d.x += d.selected_next * alpha;  // bool coerced to 0 or 1
-    d.x -= d.selected_prev * alpha;  // bool coerced to 0 or 1
+      d.x += d.selected_next * alpha;  // bool coerced to 0 or 1
+      d.x -= d.selected_prev * alpha;  // bool coerced to 0 or 1
 
-    // push to vertical edges
-    if (d.selected_prev && d.selected_next)
-      d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / 0.03;
-  }
+      // push to vertical edges
+      if (d.selected_prev && d.selected_next)
+        d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / 0.03;
+    };
 }
 
 
@@ -131,6 +142,9 @@ var transition_data; // transitions between states (provide a path between nodes
 var move_history = [];
 var move_history_current; // undo/redo pointer
 var move_history_next_id = 0;
+
+var filterback = document.getElementById("backlinks").checked;
+var filterforward = document.getElementById("forwardlinks").checked;
 
 function get_link_color(d) {
   if (d.selected_next && d.selected_prev) return "#000";
@@ -212,22 +226,24 @@ function select_state(sdsel) {
   var current_pos_node = d3.select(new_state_element);
   current_pos_node.classed("posnodeselected", true);
 
-  // clear markers on current state
-  state_data.forEach(function(sd) {
-    sd.selected_next = false;
-    sd.selected_prev = false;
-  })
-
   // update data indicating selected state and transition
   transition_data.forEach(function(td) {
     td.selected_next = td.physics_start.source == sdsel;
     td.selected_prev = td.physics_end  .target == sdsel;
-    if (td.selected_prev) { td.physics_start.source.selected_prev = true; }
-    if (td.selected_next) { td.physics_end  .target.selected_next = true; }
   });
 
   var transition_data_visible = get_visible_transition_data();
 
+  // set which states are next and/or previous, for physics
+  state_data.forEach(function(sd) {
+    sd.selected_next = false;
+    sd.selected_prev = false;
+  });
+  transition_data_visible.forEach(function(td) {
+    if (td.selected_prev) { td.physics_start.source.selected_prev = true; }
+    if (td.selected_next) { td.physics_end  .target.selected_next = true; }
+  });
+  
   var transition_nodes = layer0.selectAll("g.linkgroup")
       .data(transition_data_visible, function(td) { return td.key; })      
       .classed("linknext", function(td) { return td.selected_next; })
@@ -267,8 +283,8 @@ function select_state(sdsel) {
       .text(function(td) { return td.name; });
   
   var fade = layer0.transition()
-      .delay(500)
-      .duration(250);
+      .delay(startdelay)
+      .duration(1000);
   fade.selectAll("path.link")
       .style("opacity", .3)
       .style("stroke", get_link_color);
@@ -279,18 +295,34 @@ function select_state(sdsel) {
   // slow down any existing physics so the initial transitions are easier to spot
   force.alpha(0.01);
   // don't start physics straight away so we can see which move gets selected
-  setTimeout(start_physics, 500);
+  setTimeout(start_physics, startdelay);
+}
+
+function on_filter_transitions() {
+  if (d3.event)
+    d3.event.stopPropagation();
+
+  filterback = document.getElementById("backlinks").checked;
+  filterforward = document.getElementById("forwardlinks").checked;
+
+  select_state(state_data_selected); // filters transitions
 }
 
 function get_visible_transition_data() {
-  var hideselftrans = document.getElementById("hideselftrans").checked;
+  var selflinks = document.getElementById("selflinks").checked;
   var hideunrelatedtrans = document.getElementById("hideunrelatedtrans").checked;
+  var backlinks = document.getElementById("backlinks").checked;
+  var forwardlinks = document.getElementById("forwardlinks").checked;
 
-  return transition_data.filter(
-    function(td) {
-      return !((td.start === td.end) && hideselftrans) && !(!(td.selected_prev || td.selected_next) && hideunrelatedtrans);
-    }
-  );
+  var re_filter = new RegExp(document.getElementById("filter").value, "i"); // i for case-insensitive
+
+  return transition_data.filter( function(td) {
+          return (selflinks || !(td.start === td.end)) 
+              && !(hideunrelatedtrans && !(td.selected_prev || td.selected_next))
+              && (backlinks || td.selected_next)
+              && (forwardlinks || td.selected_prev)
+              && (re_filter.test(td.key));
+      });
 }
 
 function start_physics() {  
@@ -469,28 +501,65 @@ function transition_node_click(td)
   add_history(td);
 }
 
+function togglecheckbox(id)
+{
+  document.getElementById(id).checked = !document.getElementById(id).checked;
+  select_state(state_data_selected);
+  if (d3.event)
+    d3.event.stopPropagation();
+}
+
 function onkeypress()
 {
   // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
   // finding keyCodes: http://jsfiddle.net/qAHC2/292/
   switch(d3.event.keyCode) {        
-    case 39: // right
+    case 39: // right arrow
+    case 78: // n
       var possible_transitions = svg.selectAll("g.linknext")[0]; // all "next" transition groups
       var random_index = Math.floor(Math.random() * possible_transitions.length);
       var random_transition_data = possible_transitions[random_index].__data__;      
       select_transition(random_transition_data);
       add_history(random_transition_data);
+      d3.event.stopPropagation();
+      break;
+    case 85: // u
+      togglecheckbox("hideunrelatedtrans");
+      break;
+    case 83: // s
+      togglecheckbox("selflinks");
+      break;
+    case 66: // b
+      togglecheckbox("backlinks");
+      break;
+    case 70: // s
+      togglecheckbox("forwardlinks");
+      break;
+    case 84: // s
+      togglecheckbox("trimhistory");
       break;
     // case 37: // left
     // case 38: // up
     // case 40: // down
+    case 220: // backslash
+    case 191: // forward slash
+      document.getElementById("filter").focus();
+      d3.event.stopPropagation();
     default:
-      break; 
+      console.log(d3.event.keyCode);
+      break;
   };
 }
 
 d3.select("body")
-    .on("keydown", onkeypress);
+    .on("keyup", onkeypress);
+
+d3.select("input#filter")
+    .on("keyup", function(keyevent) {
+      on_filter_transitions();
+      if (keyevent)
+        keyevent.stopPropagation();
+    });
 
 init_states();
 
