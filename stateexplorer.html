@@ -50,6 +50,10 @@ Original Author: Jonathan Newnham
   font-variant: normal;
 }
 
+.shortkey {
+  font-weight: bold;
+}
+
 div#explanation h3 {
   display:inline;
 }
@@ -72,15 +76,15 @@ div#explanation .historyarrow, p{
 <div id="controls" style="float:right">
   <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
     <input type="button" value="Reset" onclick="init_states();"/>
-    <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide unrelated transitions
+    <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated transitions
     
     <input id="filter" type="search" placeholder="regex (filter)"/><br />
 
-    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/>Self links
-    <input id="backlinks" type="checkbox" checked onchange="on_filter_transitions();"/>Back links
-    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/>Forward links
+    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
+    <input id="backlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
+    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
 
-    <input id="trimhistory" type="checkbox" checked onchange="move_history=[];"/>Trim history
+    <input id="trimhistory" type="checkbox" onchange="move_history=[];"/><span class="shortkey">T</span>rim history
   </form>
 </div>
 <div id="errors"></div>
@@ -99,14 +103,14 @@ div#explanation .historyarrow, p{
 // http://bl.ocks.org/gka/5145845 circular graph of links
 // http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json explore a dag
 
-var width = d3.select("body")[0][0].scrollWidth || 1100,
+var width = 1100 || d3.select("body")[0][0].scrollWidth || 1100,
     height = 700 || d3.select("body")[0][0].scrollHeight || 700;
 
 var color = d3.scale.category20();
 
 var gravity = 0.01;
 
-var startdelay = 100;
+var startdelay = 0;
 
 var force = d3.layout.force()
     .charge(-50)
@@ -293,7 +297,7 @@ function select_state(sdsel) {
   
   var fade = layer0.transition()
       .delay(startdelay)
-      .duration(1000);
+      .duration(300);
   fade.selectAll("path.link")
       .style("opacity", .3)
       .style("stroke", get_link_color);
@@ -365,9 +369,9 @@ function start_physics() {
       var end_node        = td.physics_end.target;
       var points = [
           [start_node.x, start_node.y],
-          [transition_node.x - 3*td.name.length, transition_node.y],
-          [transition_node.x                   , transition_node.y],
-          [transition_node.x + 3*td.name.length, transition_node.y],          
+          [transition_node.x - 2.3*td.name.length, transition_node.y],
+          [transition_node.x                     , transition_node.y],
+          [transition_node.x + 2.3*td.name.length, transition_node.y],          
           [end_node.x, end_node.y],
       ];      
       return d3.svg.line()
