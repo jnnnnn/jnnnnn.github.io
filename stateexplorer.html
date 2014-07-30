@@ -401,8 +401,7 @@ function build_transitions_from_rows(state_data, csv_rows) {
     var key = row.Start + "->" + row.Move + "->" + row.End;
     if (!build_transitions[key])
     {
-      // here is where we construct a new transitionnode data object:
-      var newtransitionnodedatum = {
+      var newtransitionnodedatum = { // td
         "key": key,
         "start": row.Start,
         "name": row.Move,
@@ -456,7 +455,11 @@ function init_states() {
     var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
     var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
     var states = d3.set(start_states.concat(end_states)).values();
-    state_data = states.map(function(state, index){ return {name: state, x:width / 2, y:20 + 20*index}; }); 
+    state_data = states.map(function(state, index){ return { // sd
+        name: state, 
+        x:width / 2, 
+        y:20 + 20*index
+      }; }); 
     
     color.domain(states);
 
