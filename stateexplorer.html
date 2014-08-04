@@ -461,7 +461,11 @@ function init_states() {
         y:20 + 20*index
       }; }); 
     
-    color.domain(states);
+    color = d3.scale.ordinal()
+        .domain(states)
+        .range(["#6cbc85", "#bd16fd", "#ec1701", "#2e78cc", "#d13c84", "#d6a401", "#13c613", "#9e6b50", "#1fbbda", "#d88efa", "#b9a4c3", "#698006", "#4869fc", "#fc8e51", "#d518bd", "#5c7e77", "#eb074f", "#fa8a95", "#b4ad6e", "#028b1b", "#84bc04", "#a1609f", "#a06d11", "#a34ddf", "#c85041", "#447ca4", "#2eb5ff", "#a8a2f4", "#b9a899", "#01c472", "#a26678", "#fc80d1", "#5e8148", "#7e66cd", "#cc4f01", "#05c0b0", "#78bc58", "#db9e69", "#afb11f", "#fc9010", "#17866b", "#b54cb6", "#8cb1bd", "#e392be", "#8a7537", "#c64e68", "#7a7488", "#0b8947", "#7870aa", "#c7a846", "#fd77f5", "#dd9b8e", "#95b392", "#e0079b", "#3ec349", "#de3631", "#7c785b", "#90ace1", "#b5612d", "#108392", "#1f73ea", "#e6106f", "#a3b353", "#e79b39", "#9848fc", "#c425df", "#b65783", "#f78f77", "#b25f5c", "#dc91dc", "#63b9b6", "#89770c"]);
+
+    //color = d3.scale.category20().domain(states);
 
     transition_data = build_transitions_from_rows(state_data, csv_rows); 
 
