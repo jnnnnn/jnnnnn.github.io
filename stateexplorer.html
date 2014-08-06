@@ -88,7 +88,9 @@ div#explanation .historyarrow, p{
   </form>
 </div>
 <div id="errors"></div>
-<svg id="graph"></svg>
+<div id="graphdiv" style="width:1100; margin:auto">
+  <svg id="graph"></svg>
+</div>
 <div id="explanation"></div>
 <script src="d3.v3.min.js"></script>
 <script>
@@ -108,12 +110,12 @@ var width = 1100 || d3.select("body")[0][0].scrollWidth || 1100,
 
 var color = d3.scale.category20();
 
-var gravity = 0.01;
+var gravity = 0.02;
 
 var startdelay = 0;
 
 var force = d3.layout.force()
-    .charge(-50)
+    .charge(-100)
     .linkDistance(80)
     .linkStrength(0.3)
     // .gravity(0.5) // set later on
@@ -137,7 +139,7 @@ function separate_gravity(alpha) {
 
     // push to vertical edges
     if (d.selected_prev && d.selected_next)
-      d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / 1.;
+      d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / .1;
   };
 }
 
@@ -345,6 +347,7 @@ function start_physics() {
   });
 
   var all_nodes = state_data.concat(transition_data_visible);
+
   force
     .nodes(all_nodes)
     .gravity(gravity * (1 + 0.02 * all_nodes.length))
