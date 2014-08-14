@@ -316,11 +316,11 @@ Close hold	Throw hand over shoulder + spin	Embrace	Close hold V	31/07/2014		318
 Embrace	Basic	Embrace	Close hold V	31/07/2014	Can be made more interesting by dropping low (squat) on 1 then coming back up slowly on next three beats.	319
 Embrace	Shoulder roll + side dip + neck roll	Embrace	Close hold V	31/07/2014	Boy's frame rotates so that girl's left shoulder goes back, then right. Then twist and sit and flick back upright with knee, frame, then head. Cup her neck with back of wrist for roll.	320
 Close hold	Spin + arm flick	Crosshand	Project 4/5	05/08/2014		321
-Crosshand	Awkward wrap	Close hold	Project 4/5	05/08/2014	Turn girl the wrong way without letting go of either hand. Once facing the wrong direction, unwind slightly, then boy keeps turning, then girl keeps turning.	322
+Crosshand	Awkward wrap	Close hold	Project 4/5	05/08/2014	Turn girl the wrong way without letting go of either hand. Once facing in opposite directions, unwind slightly, then boy keeps turning, then girl keeps turning.	322
 Close hold	About turn	Close hold	Project 4/5	05/08/2014	Leader steps back on 5 for spring (extending arms), then across and past (swapping sides) on 6, 7, then together on 8.	323
 Close hold	Basic with hesitation	Close hold	Project 4/5	05/08/2014	Lift frame up to delay so that second step is a half-beat late.	324
 Close hold	Girl two-handed turn	Catapult	Project 4/5	05/08/2014		325
-Catapult	Boy outside turn + girl haircomb + girl turn	Close hold	Project 4/5	05/08/2014	Hands go over boy's head one after the other (top hand first)	326
+Catapult	Boy outside turn + girl turn	Close hold	Project 4/5	05/08/2014	Hands go over boy's head one after the other (top hand first). Haircomb the girl then turn her.	326
 Open hold	Double-handed turn + hand throw	Open hold	Adv	06/08/2014		327
 Open hold	Double-handed turn + hand throw + boy outside turn + arm sweep	Arm up	Adv	06/08/2014		328
 Arm up	Wrong-way turn	Open hold	Adv	06/08/2014	Hold girl's wrist so she knows to keep her frame strong. Start a normal turn, then bounce back on 6 and turn the other way.	329
@@ -330,3 +330,36 @@ Close hold opened	Girl walks across	Cliffhanger	Adv	06/08/2014		332
 Cliffhanger	Pull girl forward and boy walks behind	Mates hold	Adv	06/08/2014	Pull girl forward on 1, hand to waist on 2 to block, walk behind on 3, together on 4	333
 Mates hold	Wave arms around	Mates hold	Adv	06/08/2014	Put arm next to hip, then around to above head; down past head and then out in front (total 8 counts)	334
 Mates hold	Hesitation steps	Mates hold	Adv	06/08/2014	Step diagonally forward, leading with frame (not legs). Repeat on other diagonal.	335
+Open hold	Basic	Open hold	Week 9	07/08/2014		
+Open hold	Girl two-handed turn	Catapult	Week 9	07/08/2014		
+Catapult	Girl two-handed turn	Open hold	Week 9	07/08/2014		
+Open hold	Both turn + both haircomb 	Crosshand	Week 9	07/08/2014	Starting on 5, two counts for girl turn, two for boy turn, two for girl haircomb and two for boy haircomb. Slide hand down arm to crosshand. 	
+Crosshand	Girl turn + boy turn	Boy hammerlock	Week 9	07/08/2014		
+Boy hammerlock	Boy bow	Crosshand	Week 9	07/08/2014	Girl's hips do an anticlockwise circle, boy goes under his hammerlocked arm.	
+Crosshand	Girl haircomb	Open hold	Week 9	07/08/2014		
+Close hold	Girl turn	Wrap	Project 2/3	12/08/2014		
+Wrap	Girl turn	Open hold	Project 2/3	12/08/2014		
+Open hold	Boy turn	Crosshand	Project 2/3	12/08/2014		
+Crosshand	Girl turn	Sweetheart	Project 2/3	12/08/2014		
+Sweetheart	Push pull	Crosshand	Project 2/3	12/08/2014	Push pull to hammerlock then unwind, 8 counts total	
+Crosshand	Boy double-handed turn	Crosshand	Project 2/3	12/08/2014		
+Crosshand	Girl turn	Close hold	Project 2/3	12/08/2014		
+Open hold	Girl turn + boy turn	Crosshand	Project 4/5	12/08/2014		
+Crosshand	Girl turn + boy turn	Close hold	Project 4/5	12/08/2014		
+Close hold	Spin	Close hold	Project 4/5	12/08/2014		
+Close hold	Grind step	Close hold	Project 4/5	12/08/2014		
+Close hold	Girl turn	Stepped back	Project 4/5	12/08/2014		
+Stepped back	Boy outside turn + blocked turn	Open hold	Project 4/5	12/08/2014	Boy turns and swaps hand behind back, throws girl hand on 3 and grabs other arm to stop turn, then uses girl's frame to turn her a normal outside turn on 5.	
+Open hold	Basic	Crosshand	Project 4/5	12/08/2014		
+Crosshand	Girl turn	Crosshand	Project 4/5	12/08/2014		
+Crosshand	Boy walk-through	Open hold	Project 4/5	12/08/2014	Boy starts stepped back slightly and to the side. Walks past girl, she turns to keep facing him as he walks past. Boy half outside turn to face girl then flick hand and do the one-way-then-the-other turn using her frame.	
+Open hold	Girl turn 5/4	Side-by-side	Adv	13/08/2014		
+Side-by-side	About turn	Side-by-side	Adv	13/08/2014	Step forward then both half inside turn.	
+Side-by-side	Lead across	Control hold	Adv	13/08/2014	Girl gets pulled diagonally forward for double turn; boy outside turn on 7,8.	
+Control hold	Wrong-way turn	Open hold	Adv	13/08/2014	One step of basic then girl inside turn the other way. Basic continues in the SAME direction after.	
+Open hold	Basic	Open hold	Adv	13/08/2014		
+Open hold	Girl two-handed + boy two-handed turn	Boy haircombed	Adv	13/08/2014		
+Boy haircombed	Boy outside turn	Hammerlock	Adv	13/08/2014	Boy throws girl's hand behind her back then does his outside turn	
+Hammerlock	Wrong-way turn	Open hold	Adv	13/08/2014	A.K.A. an "outside basic". 	
+Open hold	Boy window	Close hold	Adv	13/08/2014		
+Close hold	Knee roll	Close hold	Adv	13/08/2014	Boy's knee/thigh applies pressure, rotates from 6 o'clock through 9 to 12 o'clock on 1,2, then does two full circles anticlockwise on 3,4. Girl will do booty rolls as a result.	s
