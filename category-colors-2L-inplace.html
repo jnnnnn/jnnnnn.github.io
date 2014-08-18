@@ -34,20 +34,13 @@ p { max-width: 40em; }
     Grid:<input id="gridstep" type="range" min="6" max="60" value="20" step="1" oninput="initcolors();" />
     <br />
     <input type="button" value="Reset" onclick="initcolors();"/>
-    <input type="button" value="Sort" onclick="startsort();"/>
+    <input type="button" value="Start" onclick="startsort();"/>
     <input type="button" value="Pause" onclick="sorting=false;"/>
   </form>  
   <div id="status" class="mo"></div>
 </div>
 <svg id="graph" style="display:inline"></svg>
 <div id="sortedlist" class="mo"></div>
-<div id="about" style="display:inline">
-<h3>About</h3>
-<p>This page is for generating a set of colours to use for representing categories of graphs.</p>
-<p>It is based on a <span style="font-weight:bold">Lab color space</span>, as implemented by d3js. The special thing about this color space is that colours are separated by perceptual distance -- read more in the wikipedia article. This allows us to easily choose colours that are a large perceptual distance apart. It also allows us to choose many colours that are the <span style="font-family:italic">same</span> distance apart, for consistent contrast with a background, or colors that are all the same lightness, for pleasing consistency and avoiding distraction.
-</p>
-</div>
-
 
 <script src="d3.v3.min.js"></script>
 
@@ -235,3 +228,32 @@ layer0.on("mousemove", function() {
 initcolors();
 
 </script>
+
+<div id="about" style="display:inline">
+
+<h3>About</h3>
+<p>
+Generate a continuous sequence of distinct random colours for diagrams.
+</p><p>
+Sampling is done in the Lab color space so that perceptually different colours are generated for the given lightnesses.
+</p><p>
+Further work: 
+Instead of taking flat slices of lightness, take all samples to be the same distance (in Lab-space) from a given point (i.e. the background color). This should give a more consistent and pleasing amount of contrast.  
+</p><p>
+Bibliography:
+<ol><li>
+<a href="http://bl.ocks.org/mbostock/310c99e53880faec2434">bl.ocks.org/mbostock/310c99e53880faec2434</a><br />
+For introducing the idea of perceptual color
+</li><li>
+<a href="http://tools.medialab.sciences-po.fr/iwanthue/theory.php">medialab: iwanthue</a><br />
+Generating fixed-size palettes of optimal colours using the LAB colour space. 
+Spacing done with repulsive forces or kNN clustering.
+</li><li>
+<a href="http://www.colorcodehex.com/color-model.html">colorcodehex</a> and <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> for the description of the LAB color space.
+</li><li>
+<a href="http://en.wikipedia.org/wiki/Low-discrepancy_sequence">Low-discrepancy sequence</a>
+Methods for nice multidimensional sampling
+</li>
+</ol>
+</p>
+</div>
