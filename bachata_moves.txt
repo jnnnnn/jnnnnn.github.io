@@ -330,36 +330,51 @@ Close hold opened	Girl walks across	Cliffhanger	Adv	06/08/2014		332
 Cliffhanger	Pull girl forward and boy walks behind	Mates hold	Adv	06/08/2014	Pull girl forward on 1, hand to waist on 2 to block, walk behind on 3, together on 4	333
 Mates hold	Wave arms around	Mates hold	Adv	06/08/2014	Put arm next to hip, then around to above head; down past head and then out in front (total 8 counts)	334
 Mates hold	Hesitation steps	Mates hold	Adv	06/08/2014	Step diagonally forward, leading with frame (not legs). Repeat on other diagonal.	335
-Open hold	Basic	Open hold	Week 9	07/08/2014		
-Open hold	Girl two-handed turn	Catapult	Week 9	07/08/2014		
-Catapult	Girl two-handed turn	Open hold	Week 9	07/08/2014		
-Open hold	Both turn + both haircomb 	Crosshand	Week 9	07/08/2014	Starting on 5, two counts for girl turn, two for boy turn, two for girl haircomb and two for boy haircomb. Slide hand down arm to crosshand. 	
-Crosshand	Girl turn + boy turn	Boy hammerlock	Week 9	07/08/2014		
-Boy hammerlock	Boy bow	Crosshand	Week 9	07/08/2014	Girl's hips do an anticlockwise circle, boy goes under his hammerlocked arm.	
-Crosshand	Girl haircomb	Open hold	Week 9	07/08/2014		
-Close hold	Girl turn	Wrap	Project 2/3	12/08/2014		
-Wrap	Girl turn	Open hold	Project 2/3	12/08/2014		
-Open hold	Boy turn	Crosshand	Project 2/3	12/08/2014		
-Crosshand	Girl turn	Sweetheart	Project 2/3	12/08/2014		
-Sweetheart	Push pull	Crosshand	Project 2/3	12/08/2014	Push pull to hammerlock then unwind, 8 counts total	
-Crosshand	Boy double-handed turn	Crosshand	Project 2/3	12/08/2014		
-Crosshand	Girl turn	Close hold	Project 2/3	12/08/2014		
-Open hold	Girl turn + boy turn	Crosshand	Project 4/5	12/08/2014		
-Crosshand	Girl turn + boy turn	Close hold	Project 4/5	12/08/2014		
-Close hold	Spin	Close hold	Project 4/5	12/08/2014		
-Close hold	Grind step	Close hold	Project 4/5	12/08/2014		
-Close hold	Girl turn	Stepped back	Project 4/5	12/08/2014		
-Stepped back	Boy outside turn + blocked turn	Open hold	Project 4/5	12/08/2014	Boy turns and swaps hand behind back, throws girl hand on 3 and grabs other arm to stop turn, then uses girl's frame to turn her a normal outside turn on 5.	
-Open hold	Basic	Crosshand	Project 4/5	12/08/2014		
-Crosshand	Girl turn	Crosshand	Project 4/5	12/08/2014		
-Crosshand	Boy walk-through	Open hold	Project 4/5	12/08/2014	Boy starts stepped back slightly and to the side. Walks past girl, she turns to keep facing him as he walks past. Boy half outside turn to face girl then flick hand and do the one-way-then-the-other turn using her frame.	
-Open hold	Girl turn 5/4	Side-by-side	Adv	13/08/2014		
-Side-by-side	About turn	Side-by-side	Adv	13/08/2014	Step forward then both half inside turn.	
-Side-by-side	Lead across	Control hold	Adv	13/08/2014	Girl gets pulled diagonally forward for double turn; boy outside turn on 7,8.	
-Control hold	Wrong-way turn	Open hold	Adv	13/08/2014	One step of basic then girl inside turn the other way. Basic continues in the SAME direction after.	
-Open hold	Basic	Open hold	Adv	13/08/2014		
-Open hold	Girl two-handed + boy two-handed turn	Boy haircombed	Adv	13/08/2014		
-Boy haircombed	Boy outside turn	Hammerlock	Adv	13/08/2014	Boy throws girl's hand behind her back then does his outside turn	
-Hammerlock	Wrong-way turn	Open hold	Adv	13/08/2014	A.K.A. an "outside basic". 	
-Open hold	Boy window	Close hold	Adv	13/08/2014		
-Close hold	Knee roll	Close hold	Adv	13/08/2014	Boy's knee/thigh applies pressure, rotates from 6 o'clock through 9 to 12 o'clock on 1,2, then does two full circles anticlockwise on 3,4. Girl will do booty rolls as a result.	s
+Open hold	Basic	Open hold	Week 9	07/08/2014		336
+Open hold	Girl two-handed turn	Catapult	Week 9	07/08/2014		337
+Catapult	Girl two-handed turn	Open hold	Week 9	07/08/2014		338
+Open hold	Both turn + both haircomb 	Crosshand	Week 9	07/08/2014	Starting on 5, two counts for girl turn, two for boy turn, two for girl haircomb and two for boy haircomb. Slide hand down arm to crosshand. 	339
+Crosshand	Girl turn + boy turn	Boy hammerlock	Week 9	07/08/2014		340
+Boy hammerlock	Boy bow	Crosshand	Week 9	07/08/2014	Girl's hips do an anticlockwise circle, boy goes under his hammerlocked arm.	341
+Crosshand	Girl haircomb	Open hold	Week 9	07/08/2014		342
+Close hold	Girl turn	Wrap	Project 2/3	12/08/2014		343
+Wrap	Girl turn	Open hold	Project 2/3	12/08/2014		344
+Open hold	Boy turn	Crosshand	Project 2/3	12/08/2014		345
+Crosshand	Girl turn	Sweetheart	Project 2/3	12/08/2014		346
+Sweetheart	Push pull	Crosshand	Project 2/3	12/08/2014	Push pull to hammerlock then unwind, 8 counts total	347
+Crosshand	Boy double-handed turn	Crosshand	Project 2/3	12/08/2014		348
+Crosshand	Girl turn	Close hold	Project 2/3	12/08/2014		349
+Open hold	Girl turn + boy turn	Crosshand	Project 4/5	12/08/2014		350
+Crosshand	Girl turn + boy turn	Close hold	Project 4/5	12/08/2014		351
+Close hold	Spin	Close hold	Project 4/5	12/08/2014		352
+Close hold	Grind step	Close hold	Project 4/5	12/08/2014		353
+Close hold	Girl turn	Stepped back	Project 4/5	12/08/2014		354
+Stepped back	Boy outside turn + blocked turn	Open hold	Project 4/5	12/08/2014	Boy turns and swaps hand behind back, throws girl hand on 3 and grabs other arm to stop turn, then uses girl's frame to turn her a normal outside turn on 5.	355
+Open hold	Basic	Crosshand	Project 4/5	12/08/2014		356
+Crosshand	Girl turn	Crosshand	Project 4/5	12/08/2014		357
+Crosshand	Boy walk-through	Open hold	Project 4/5	12/08/2014	Boy starts stepped back slightly and to the side. Walks past girl, she turns to keep facing him as he walks past. Boy half outside turn to face girl then flick hand and do the one-way-then-the-other turn using her frame.	358
+Open hold	Girl turn 5/4	Side-by-side	Adv	13/08/2014		359
+Side-by-side	About turn	Side-by-side	Adv	13/08/2014	Step forward then both half inside turn.	360
+Side-by-side	Lead across	Control hold	Adv	13/08/2014	Girl gets pulled diagonally forward for double turn; boy outside turn on 7,8.	361
+Control hold	Wrong-way turn	Open hold	Adv	13/08/2014	One step of basic then girl inside turn the other way. Basic continues in the SAME direction after.	362
+Open hold	Basic	Open hold	Adv	13/08/2014		363
+Open hold	Girl two-handed + boy two-handed turn	Boy haircombed	Adv	13/08/2014		364
+Boy haircombed	Boy outside turn	Hammerlock	Adv	13/08/2014	Boy throws girl's hand behind her back then does his outside turn	365
+Hammerlock	Wrong-way turn	Open hold	Adv	13/08/2014	A.K.A. an "outside basic". 	366
+Open hold	Boy window	Close hold	Adv	13/08/2014		367
+Close hold	Knee roll	Close hold	Adv	13/08/2014	Boy's knee/thigh applies pressure, rotates from 6 o'clock through 9 to 12 o'clock on 1,2, then does two full circles anticlockwise on 3,4. Girl will do booty rolls as a result.	368
+Open hold	Basic	Control hold	Adv	27/08/2014		369
+Control hold	Delayed basic	Open hold	Adv	27/08/2014	Delay second step to third beat: Step on 1, 3, 3.5, and 4.	370
+Open hold	Inside turn + push back	Close hold	Adv	27/08/2014	Inside turn on 5 then elbow inside to pin girl's arm against boy's side. Push arm and hip on 1, arm circle starting down into close hold.	371
+Close hold	Rising basic	Close hold	Adv	27/08/2014	Drop frame low on 1 then sway back upwards for three counts, x2.	372
+Close hold	Walk back body rolls	Close hold	Adv	27/08/2014	Hand in middle of back to pull girl with you. Roll x4 for total 8 counts. Boy rolls as well, torsos don't touch.	373
+Close hold	Spin with flare	Close hold	Adv	27/08/2014	Half basic, then slight contra and spin on right foot, only placing left down for a tap on 8.	374
+Close hold	Basic	Stepped back	Adv	27/08/2014		375
+Stepped back	Push pull fast	Arm up	Adv	27/08/2014	Stepping every half beat, step forward-together-back-together.	376
+Arm up	Girl turn	Open hold	Adv	27/08/2014		377
+Open hold	Double-handed turn + flick	Open hold	Week 12	28/08/2014		378
+Open hold	Boy turn	Crosshand	Week 12	28/08/2014		379
+Crosshand	Girl turn + flick	Crosshand	Week 12	28/08/2014		380
+Crosshand	Throw two hands	Crosshand	Week 12	28/08/2014		381
+Crosshand	Girl turn + boy outside turn	Boy hammerlock crosshand	Week 12	28/08/2014		382
+Boy hammerlock crosshand	Haircomb + arm sweep	Close hold	Week 12	28/08/2014		383
