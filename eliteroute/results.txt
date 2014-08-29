@@ -1,0 +1,47 @@
+
+
+
+Possible trades from Asellus Primus to LHS 3262: 
+[]
+Best trades between Asellus Primus and LHS 3262 via a third system: 
+1006 avg. profit via CM Draco (15.7818 + 16.9562 Ly) -- carry Personal Weapons and Palladium
+964 avg. profit via Acihaut (16.7268 + 12.3452 Ly) -- carry Resonating Separators and Beryllium
+852 avg. profit via LHS 2887 (22.8881 + 18.5816 Ly) -- carry Resonating Separators and Tantalum
+597 avg. profit via Surya (16.1047 + 24.9481 Ly) -- carry Resonating Separators and nothing
+574 avg. profit via i Bootis (8.2081 + 16.1209 Ly) -- carry Auto Fabricators and Fish
+528 avg. profit via Wyrd (15.6726 + 19.8855 Ly) -- carry Personal Weapons and Tea
+500 avg. profit via LP 98-132 (5.7813 + 20.6904 Ly) -- carry Personal Weapons and Gold
+500 avg. profit via LFT 880 (19.4916 + 26.4594 Ly) -- carry Resonating Separators and nothing
+480 avg. profit via LHS 3006 (11.9505 + 12.3936 Ly) -- carry Consumer Technology and Gallite
+458 avg. profit via Naraka (18.3164 + 16.2083 Ly) -- carry Terrain Enrichment Systems and Animal Meat
+452 avg. profit via Keries (20.1509 + 12.5089 Ly) -- carry Personal Weapons and Gallite
+448 avg. profit via Magec (19.6433 + 22.1023 Ly) -- carry Consumer Technology and Animal Meat
+442 avg. profit via Dahan (4.6643 + 24.7139 Ly) -- carry Advanced Catalysers and nothing
+426 avg. profit via Eranin (4.4821 + 18.7516 Ly) -- carry Personal Weapons and Tea
+418 avg. profit via Ross 1051 (14.2605 + 30.4806 Ly) -- carry Advanced Catalysers and nothing
+392 avg. profit via Bolg (17.5195 + 22.8648 Ly) -- carry Auto Fabricators and nothing
+390 avg. profit via Nang Ta-khian (16.2034 + 14.8669 Ly) -- carry Auto Fabricators and nothing
+390 avg. profit via Tilian (21.952 + 6.782 Ly) -- carry Auto Fabricators and nothing
+390 avg. profit via Rakapila (15.6116 + 17.924 Ly) -- carry Auto Fabricators and nothing
+390 avg. profit via Ovid (17.6279 + 19.4868 Ly) -- carry Auto Fabricators and nothing
+388 avg. profit via h Draconis (19.6862 + 20.9674 Ly) -- carry Auto Fabricators and nothing
+337 avg. profit via G 239-25 (16.0311 + 13.6031 Ly) -- carry nothing and Gallite
+335 avg. profit via Ross 1015 (21.625 + 21.0127 Ly) -- carry nothing and Gallite
+273 avg. profit via LHS 2819 (13.9525 + 27.676 Ly) -- carry Personal Weapons and nothing
+273 avg. profit via LFT 992 (16.5898 + 29.2605 Ly) -- carry Personal Weapons and nothing
+264 avg. profit via Ithaca (18.1805 + 33.7516 Ly) -- carry Personal Weapons and nothing
+262 avg. profit via Morgor (8.8374 + 23.621 Ly) -- carry Personal Weapons and nothing
+261 avg. profit via Aulin (11.0558 + 14.5384 Ly) -- carry nothing and Progenitor Cells
+257 avg. profit via Aganippe (18.1647 + 28.7471 Ly) -- carry Personal Weapons and nothing
+253 avg. profit via Pi-fang (21.2269 + 14.7363 Ly) -- carry Personal Weapons and nothing
+244 avg. profit via LP 64-194 (17.3609 + 25.1247 Ly) -- carry Personal Weapons and nothing
+234 avg. profit via LHS 5287 (14.4658 + 32.3146 Ly) -- carry Consumer Technology and nothing
+226 avg. profit via Ross 1057 (20.2221 + 20.5371 Ly) -- carry Consumer Technology and nothing
+222 avg. profit via Aulis (12.9861 + 31.1134 Ly) -- carry Consumer Technology and nothing
+222 avg. profit via Opala (12.1232 + 17.0351 Ly) -- carry Terrain Enrichment Systems and nothing
+222 avg. profit via Chi Herculis (15.7246 + 23.2738 Ly) -- carry Consumer Technology and nothing
+212 avg. profit via LHS 417 (24.1956 + 5.8494 Ly) -- carry nothing and Silver
+0 avg. profit via LHS 3262 (22.9014 + 0.0 Ly) -- carry nothing and nothing
+0 avg. profit via LHS 2884 (8.3809 + 29.8031 Ly) -- carry nothing and nothing
+0 avg. profit via BD+47 2112 (11.8139 + 18.1499 Ly) -- carry nothing and nothing
+0 avg. profit via Asellus Primus (0.0 + 22.9014 Ly) -- carry nothing and nothing
