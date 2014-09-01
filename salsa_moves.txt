@@ -32,9 +32,9 @@ Basic	Girl spin	Hammerlock	Hammerlock	30/04/2014	Prepare by swinging guiding han
 Hammerlock	Turn	Basic	Hammerlock	30/04/2014	Stand side on to girl, then step out of her way on 5 6 (she turns on 6)	68
 Basic	Double girl window + bodyroll	Basic	Hammerlock	30/04/2014	Guide girl's left forearm over her head, then same with right. Hold her shoulderblades and roll palm down her back to lead bodyroll. Girl should have hands on boy's shoulders.	69
 Hammerlock	Copa + inside turn	Basic	Hammerlock	07/05/2014	Boy springs girl but doesn't step back himself (don't pull locked hand). Buy walks past for good offset.	70
-Basic	Boy turn + girl turn	Hammerlock	Hammerlock	07/05/2014	Boy turns (hand starts low!) then just before girl turns he takes her hand. Can signal this by trailing around her waist (even before she starts turning).	71
+Basic	Boy spin + girl spin	Hammerlock	Hammerlock	07/05/2014	Boy turns (hand starts low!) then just before girl turns he takes her hand. Can signal this by trailing around her waist (even before she starts turning).	71
 Hammerlock	Tunnel box step 	Hammerlock	Hammerlock	14/05/2014	Boy steps spot on 1,forward on 2,3, brushes backs on 4 (arm comes down, then other arm goes up). Enter reverse hammerlock to 8. Rock back to start reverse. 	72
-Basic	Boy turn	Boy hammerlock	Hammerlock	21/05/2014	Boy goes under right arm, stands to the side	73
+Basic	Boy spin	Boy hammerlock	Hammerlock	21/05/2014	Boy goes under right arm, stands to the side	73
 Boy hammerlock	Outside turn	Basic	Hammerlock	21/05/2014	Outside turn, led with inside (right) hand	74
 Hammerlock	Turn	Basic	Hammerlock	21/05/2014	Boy starts to the side	75
 Hammerlock	Hands low turn + RH flick	Reverse hammerlock	Hammerlock	28/05/2014	Keep both hands very low while girl does an outside turn, prepare on 8, flick down on 1 so hand does a little circle, catch on 3.	76
