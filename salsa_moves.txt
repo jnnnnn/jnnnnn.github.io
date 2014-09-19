@@ -33,7 +33,7 @@ Hammerlock	Turn	Basic	Hammerlock	30/04/2014	Stand side on to girl, then step out
 Basic	Double girl window + bodyroll	Basic	Hammerlock	30/04/2014	Guide girl's left forearm over her head, then same with right. Hold her shoulderblades and roll palm down her back to lead bodyroll. Girl should have hands on boy's shoulders.	69
 Hammerlock	Copa + inside turn	Basic	Hammerlock	07/05/2014	Boy springs girl but doesn't step back himself (don't pull locked hand). Buy walks past for good offset.	70
 Basic	Boy spin + girl spin	Hammerlock	Hammerlock	07/05/2014	Boy turns (hand starts low!) then just before girl turns he takes her hand. Can signal this by trailing around her waist (even before she starts turning).	71
-Hammerlock	Tunnel box step 	Hammerlock	Hammerlock	14/05/2014	Boy steps spot on 1,forward on 2,3, brushes backs on 4 (arm comes down, then other arm goes up). Enter reverse hammerlock to 8. Rock back to start reverse. 	72
+Hammerlock	Tunnel box step	Hammerlock	Hammerlock	14/05/2014	Boy steps spot on 1,forward on 2,3, brushes backs on 4 (arm comes down, then other arm goes up). Enter reverse hammerlock to 8. Rock back to start reverse.	72
 Basic	Boy spin	Boy hammerlock	Hammerlock	21/05/2014	Boy goes under right arm, stands to the side	73
 Boy hammerlock	Outside turn	Basic	Hammerlock	21/05/2014	Outside turn, led with inside (right) hand	74
 Hammerlock	Turn	Basic	Hammerlock	21/05/2014	Boy starts to the side	75
@@ -41,13 +41,13 @@ Hammerlock	Hands low turn + RH flick	Reverse hammerlock	Hammerlock	28/05/2014	Ke
 Reverse hammerlock	S turn	Hammerlock	Hammerlock	28/05/2014	Just like a girl outside turn	77
 Basic	Girl turn	Waltz hold	Inside turns	04/06/2014	Half way through girl's turn, place hand between shoulderblades	78
 Waltz hold	Girl turn	Waltz hold	Inside turns	04/06/2014		79
-Waltz hold	Cross body lead 	Cliffhanger	Inside turns	04/06/2014		80
+Waltz hold	Cross body lead	Cliffhanger	Inside turns	04/06/2014		80
 Cliffhanger	Inside turn	Basic	Inside turns	11/06/2014		81
 Basic	Elbow break + inside turn	Crosshand	Inside turns	11/06/2014		82
 Crosshand	Haircomb + shoulder-led inside turn	Basic	Inside turns	11/06/2014		83
 Basic	Double-handed inside turn	Catapult	Inside turns	19/06/2014		84
 Catapult	Boy turn to side, girl inside turn	Cliffhanger	Inside turns	19/06/2014	Boy keeps his right hand on his left shoulder for turn. Left hand over head. Then keeps right hand at back of his neck and lets go. After girl turn, feed hand a little to open up.	85
-Cliffhanger	Inside turn	Basic	Inside turns	19/06/2014	Turning hand makes contact on 5, after girl has travelled most of the way. 	86
+Cliffhanger	Inside turn	Basic	Inside turns	19/06/2014	Turning hand makes contact on 5, after girl has travelled most of the way.	86
 Basic	Girl spot turn + boy under arm	Crosshand	Inside turns	26/06/2014	Elbow inside to lift girl's arm slightly then boy bends at hips to slide body under, keeping back straight and head up/back	87
 Crosshand	Double-handed turn	Crosshand	Inside turns	26/06/2014		88
 Crosshand	Double-handed spot turn	Crosshand	Inside turns	26/06/2014	Prepare by doing a large anticlockwise circle (starting and ending at the top) with both hands for first measure, then turn girl on 6 as usual (dropping arms slightly on 5 if necessary)	89
@@ -86,15 +86,15 @@ Crosshand	Girl double-handed turn	Crosshand	Cross Hold	27/08/2014		121
 Crosshand	Inside turn	Reverse hammerlock	Cross Hold	27/08/2014	Contra in the T position - left hands extended forwards, boy's right arm across in front of girl's tummy.	122
 Reverse hammerlock	Hands low turn	Hammerlock	Cross Hold	27/08/2014	Flip both pancakes (hands) at the same time, in the same direction	123
 Hammerlock	Girl turn	Basic	Cross Hold	27/08/2014		124
-Basic	Outside turn	Basic blocked 	Outside turns	04/09/2014	Forearms collide at end of turn (while facing each other)	125
-Basic blocked	Haircomb + bodyroll 	Basic	Outside turns	04/09/2014	Prevent turn when haircombing by tilting head the other way. Choose a side to roll on and tilt head to that side. Spread hand wide in middle of back for clear lead. 	126
+Basic	Outside turn	Basic blocked	Outside turns	04/09/2014	Forearms collide at end of turn (while facing each other)	125
+Basic blocked	Haircomb + bodyroll	Basic	Outside turns	04/09/2014	Prevent turn when haircombing by tilting head the other way. Choose a side to roll on and tilt head to that side. Spread hand wide in middle of back for clear lead.	126
 Basic	RH girl window + outside turn	Catapult	Outside turns	11/09/2014		127
 Catapult	Girl turn	Shoulder wrap	Outside turns	11/09/2014		128
 Shoulder wrap	Outside turn	Basic	Outside turns	11/09/2014	Hand to girl's far hip then across in front. Keep boy's body well ahead and to the side of girl.	129
 Basic	Boy bodyroll	Basic	Outside turns	11/09/2014	Boy haircombs himself then girl draws S on boy's chest.	130
 Basic	Outside turn	Basic blocked	Outside turns	11/09/2014		131
 Basic blocked	Clock + swap hand + girl spot turn	Crosshand	Outside turns	11/09/2014		132
-Crosshand	Haircomb + boy drop + bodyroll 	Basic	Outside turns	11/09/2014		133
+Crosshand	Haircomb + boy drop + bodyroll	Basic	Outside turns	11/09/2014		133
 Basic	Outside turn + trail	Hammerlock	Outside turns	17/09/2014		134
 Hammerlock	Copa + bodyroll	Boy wrap	Outside turns	17/09/2014		135
 Boy wrap	Boy half spin	Basic	Outside turns	17/09/2014		136
