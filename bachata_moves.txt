@@ -4,7 +4,7 @@ Open hold	Basic forward	Open hold	Week 1		Push on the follower's palms with the 
 Open hold	Girl turn	Open hold	Week 1		Prepare by lifting pivot hand and pointing the direction of the turn with it.	3
 Open hold	Boy turn	Open hold	Week 1		Put one hand on chest, out of the way. Use other hand to place follower's hand on waist for trailing.	4
 Open hold	Boy turn	Crosshand	Week 1		Put one hand on chest, out of the way. Use this hand to grab the follower's trailing hand.	5
-Open hold	Basic	Control hold	Week 1		Palms face partner, hands 70cm apart.	6
+Open hold	Basic	Control hold	Week 1		Palms face partner, hands 70cm apart. Hold her wrists firmly.	6
 Control hold	Single steps	Control hold	Week 1		Step left, feet together, step right, feet together. Repeat	7
 Control hold	Basic	Open hold	Week 1			8
 Open hold	Girl turn	Hammerlock	Week 2		Turn, keeping one hand low. Keep contact with both hands.	9
@@ -83,7 +83,7 @@ Hammerlock	Double turn	Wrap	old Week 10			81
 Wrap	Free spin	Open hold	old Week 10			82
 Crosshand	Boy turn	Boy hammerlock	old Week 11		Leader keeps one hand high, one hand low.	83
 Open hold	Girl two-handed turn	Wrap	old Week 11			84
-Wrap	Swap sides + swap hands + half turn	Cliffhanger	old Week 11			85
+Wrap	Push-pull	Cliffhanger	old Week 11			85
 Cliffhanger	Approach/retreat	Cliffhanger	old Week 11			86
 Wrap	Circle walk	Open hold	old Week 12		Arm over girl + boy hand to elbow + boy turn + haircomb + circle walk + girl turn	87
 Control hold	Girl turn	Hammerlock	extra			90
@@ -227,7 +227,7 @@ Crosshand	Throw two hands	Crosshand	Week 11	15/05/2014		229
 Crosshand	Arm circles + hip turn + bodyroll	Close hold	Week 11	15/05/2014		230
 Open hold	Arm circles	Arms up	Adv w/ Manuel	21/05/2014		231
 Arms up	Free turn	Hands on waist	Adv w/ Manuel	21/05/2014		232
-Hands on waist	Pull-push to sides	Arms up	Adv w/ Manuel	21/05/2014	Girl goes to one side, boy to the other. Keep shoulders horizontal. Take arms on fourth beat.	233
+Hands on waist	Hip pinball	Arms up	Adv w/ Manuel	21/05/2014	Girl goes to one side, boy to the other. Keep shoulders horizontal. Take arms on fourth beat.	233
 Arms up	Free turn	Open hold	Adv w/ Manuel	21/05/2014		234
 Open hold	Girl turn + boy turn	Open hold	Adv w/ Manuel	21/05/2014		235
 Open hold	Girl turn + boy outside turn & swap hand + throw hand	Side-by-side	Adv w/ Manuel	21/05/2014		236
@@ -370,7 +370,7 @@ Close hold	Rising basic	Close hold	Adv	27/08/2014	Drop frame low on 1 then sway 
 Close hold	Walk back body rolls	Close hold	Adv	27/08/2014	Hand in middle of back to pull girl with you. Roll x4 for total 8 counts. Boy rolls as well, torsos don't touch.	373
 Close hold	Spin with flare	Close hold	Adv	27/08/2014	Half basic, then slight contra and spin on right foot, only placing left down for a tap on 8.	374
 Close hold	Basic	Stepped back	Adv	27/08/2014		375
-Stepped back	Push pull fast	Arm up	Adv	27/08/2014	Stepping every half beat, step forward-together-back-together.	376
+Stepped back	Approach/retreat (double time)	Arm up	Adv	27/08/2014	Stepping every half beat, step forward-together-back-together.	376
 Arm up	Girl turn	Open hold	Adv	27/08/2014		377
 Open hold	Double-handed turn + flick	Open hold	Week 12	28/08/2014		378
 Open hold	Boy turn	Crosshand	Week 12	28/08/2014		379
@@ -378,3 +378,71 @@ Crosshand	Girl turn + flick	Crosshand	Week 12	28/08/2014		380
 Crosshand	Throw two hands	Crosshand	Week 12	28/08/2014		381
 Crosshand	Girl turn + boy outside turn	Boy hammerlock crosshand	Week 12	28/08/2014		382
 Boy hammerlock crosshand	Haircomb + arm sweep	Close hold	Week 12	28/08/2014		383
+Open hold	Girl turn	Open hold	Altona	08/09/2014		384
+Open hold	Boy turn	Crosshand	Altona	08/09/2014		385
+Crosshand	Girl turn	Sweetheart	Altona	08/09/2014		386
+Sweetheart	Walk	Sweetheart	Altona	08/09/2014		387
+Sweetheart	Girl turn	Crosshand	Altona	08/09/2014		388
+Crosshand	Hand throw	Close hold	Altona	08/09/2014		389
+Close hold	Basic	Open hold	Project 2/3	09/09/2014		390
+Open hold	Girl turn	Hammerlock	Project 2/3	09/09/2014		391
+Hammerlock	Circle walk	Hammerlock	Project 2/3	09/09/2014	Hold wrist, walk around each other.	392
+Hammerlock	Unwind	Open hold	Project 2/3	09/09/2014		393
+Open hold	Smooth sweep	Close hold	Project 2/3	09/09/2014		394
+Close hold	Slide	Close hold	Project 2/3	09/09/2014	Slide to the side and upwards, drop on fourth beat. Drop by relaxing knees for a second.	395
+Close hold	Basic	Open hold	Project 2/3	09/09/2014		396
+Open hold	Girl turn	Wrap	Project 2/3	09/09/2014		397
+Wrap	Girl half turn	Shoulder wrap	Project 2/3	09/09/2014		398
+Shoulder wrap	Girl turn	Open hold	Project 2/3	09/09/2014		399
+Open hold	Boy turn	Crosshand	Project 2/3	09/09/2014		400
+Crosshand	Girl double-handed turn	Crosshand	Project 2/3	09/09/2014		401
+Crosshand	Boy turn	Girl haircombed	Project 2/3	09/09/2014		402
+Girl haircombed	Fake haircomb	Mates hold	Project 2/3	09/09/2014	Haircomb but then undo it and boy turn through basic to haircomb on the other side. 	403
+Mates hold	Swap sides	Close hold	Project 2/3	09/09/2014	Girl walks a half turn around boy, led with gentle push at top of back.	404
+Close hold	Dip	Close hold	Project 2/3	09/09/2014		405
+Open hold	Basic	Control hold	Adv	10/09/2014		406
+Control hold	Outside basic	Control hold	Adv	10/09/2014	Step one step of basic then step the other way.	407
+Control hold	Girl spot turn	Close hold	Adv	10/09/2014		408
+Close hold	Swaying squat	Close hold	Adv	10/09/2014	Prepare on previous count by lifting girl's frame, then drop and sway on the way back up. Don't make bachata face, be happy.	409
+Close hold	Basic	Open hold	Adv	10/09/2014		410
+Open hold	Girl turn + about turn	Wrap	Adv	10/09/2014	Girl turns into wrap as boy walks around her front to the other side.	411
+Wrap	Girl turn	Cliffhanger	Adv	10/09/2014		412
+Cliffhanger	Girl walk	Side-by-side	Adv	10/09/2014	Lead by tugging slightly (relies on girl keeping tension in arm). Boy half turn.	413
+Side-by-side	Walk	Side-by-side	Adv	10/09/2014		414
+Side-by-side	Boy outside turn	Embrace	Adv	10/09/2014	Keep arm low until putting it on your shoulder so that girl doesn't turn. Put girl's other arm on your shoulder if she goes for close hold.	415
+Embrace	Swaying squat	Embrace	Adv	10/09/2014		416
+Embrace	Body roll(s)	Embrace	Adv	10/09/2014	Gently roll wrists down shoulderblade to lead, don't force it.	417
+Close hold	Hair brush	Arm up	Untested	14/09/2014	Be careful, probably too intimate. Starting with hand on back of her head, let her hair run through your fingers, applying slight tension. 	418
+Open hold	Girl hesitation step	Wrap	Altona	15/09/2014	Girl turns half way round during four beats. Step, tap, step, tap. Block a full turn with non-turning hand on hip asap! 	419
+Close hold	Half spin	Close hold	Project 2/3 technique	16/09/2014	Boy steps back with right foot on 1; no contra apparently.	420
+Close hold	Half spin	Close hold opened	Project 2/3 technique	16/09/2014		421
+Close hold opened	Slow spin	Close hold	Project 2/3 technique	16/09/2014	Full 360, total 8 counts.	422
+Close hold	Grind step	Close hold	Project 2/3 technique	16/09/2014		423
+Close hold	Fast spin	Close hold	Project 2/3 technique	16/09/2014		424
+Close hold	Basic	Open hold	Project 2/3 technique	16/09/2014		425
+Open hold	Girl turn	Crosshand	Project 2/3 technique	16/09/2014		426
+Crosshand	Girl double-handed turn + flick	Crosshand	Project 2/3 technique	16/09/2014		427
+Crosshand	Boy turn	Boy hammerlock crosshand	Project 2/3 technique	16/09/2014		428
+Boy hammerlock crosshand	Both turn	Hammerlock crosshand	Project 2/3 technique	16/09/2014	Amazing move. Both inside inside turn, keeping hammerlocked arm low.	429
+Hammerlock crosshand	Girl half turn	Sweetheart	Project 2/3 technique	16/09/2014		430
+Sweetheart	Girl double-handed turn	Crosshand	Project 2/3 technique	16/09/2014		431
+Crosshand	Girl double-handed turn	Hands up	Project 2/3 technique	16/09/2014		432
+Hands up	Double clock	Close hold	Project 2/3 technique	16/09/2014		433
+Close hold	Shuffle step	Close hold	Project 4/5 technique	16/09/2014	Step or tap on every half beat. LRRLLRRR RLLRRLLL.	434
+Close hold	Rondez basic	Close hold	Project 4/5 technique	16/09/2014	Delay second step by half a beat, instead sweeping leg around behind your load-bearing leg.	435
+Open hold	Girl turn 5/4	Wrap	Project 4/5 technique	16/09/2014		436
+Wrap	Girl half turn	Shoulder wrap	Project 4/5 technique	16/09/2014		437
+Shoulder wrap	Girl spin + boy spin	Open hold	Project 4/5 technique	16/09/2014	Two hand changes at the end of the spin	438
+Open hold	Stop turn	Open hold	Project 4/5 technique	16/09/2014	Throw her right arm left, then on 2, grab her left arm and spin her the other way. Boy can spin too.. Requires a lot of frame from the girl.	439
+Open hold	Girl walk around	Open hold	Project 4/5 technique	16/09/2014	Girl walks under boy's right arm, dragging her hand around his torso. Boy steps forward, across, and back (without stepping on girl's heels).	440
+Stepped back	Approach/retreat	Stepped back	Adv	17/09/2014	Both step forward, together, back, tap together, and repeat with opposite feet.	441
+Stepped back	Pivots	Control hold	Adv	17/09/2014	Holding girl's right wrist with left hand, steer her frame from side to side, using wide rotational movements. Beats L1, R2, L3, pause, R5, L6, R7, control hold.	442
+Control hold	Walk forward	Open hold	Adv	17/09/2014	Push girl back using the backs of your hands on her palms.	443
+Stepped back	Walk past tangle	Catapult	Adv	17/09/2014	Boy walks forward past girl on his left, half spin left on third beat. Goes under both hands.	444
+Catapult	Girl double-handed turn	Open hold	Adv	17/09/2014		445
+Open hold	Girl turn	Wrap	Adv	17/09/2014	Start with arm raised, as is usual for a girl turn.	446
+Wrap	Walk forward	Wrap	Adv	17/09/2014		447
+Wrap	Girl bow + boy half turn	Boy wrap	Adv	17/09/2014	Push girl under your arm with her extended hand. Roll wrapped arm up shoulders and then lift so she doesn't have to duck too much.	448
+Boy wrap	Basic	Boy wrap	Adv	17/09/2014		449
+Boy wrap	Boy hesitation step	Close hold	Adv	17/09/2014		450
+Close hold	Slow dip	Close hold	Adv	17/09/2014	Boy places girl's right arm behind his back (under his arm) then puts left arm on her shoulder. Other arm supporting her in middle of back. Step past girl and squat without leaning forward, be very solid. Lowest point of dip on fourth beat.	451
