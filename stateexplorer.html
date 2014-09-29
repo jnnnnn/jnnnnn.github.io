@@ -151,8 +151,9 @@ var svg = d3.select("svg#graph")
     .attr("width", width)
     .attr("height", height);
 
-var layer0 = svg.append("g").attr("id", "layer0"); // for background stuff (link paths, text)
-var layer1 = svg.append("g").attr("id", "layer1"); // for everything else (nodes)
+var layerP = svg.append("g").attr("id", "layerP"); // for link paths (background)
+var layer0 = svg.append("g").attr("id", "layer0"); // other background stuff (link text)
+var layer2 = svg.append("g").attr("id", "layer2"); // for everything else (nodes)
 
 var state_data; // states (graph nodes)
 var state_data_selected; // the currently-selected state
@@ -303,7 +304,11 @@ function select_state(sdsel) {
       .classed("linkprev", function(td) { return td.selected_prev; })
       .on("click", transition_node_click);
 
-  new_transitions.append("path")
+  var paths = layerP.selectAll("path")
+      .data(transition_data_visible, function(td) { return td.key; });
+
+  paths.exit().remove();
+  paths.enter().append("path")
       .attr("class", "link")
       .style("stroke-width", function(td) { return td.count; })
       .style("opacity", 0)
@@ -318,7 +323,7 @@ function select_state(sdsel) {
       .attr("title", function(td) { return td.description })
       .text(function(td) { return td.name; });
   
-  var fade = layer0.transition()
+  var fade = svg.transition()
       .delay(startdelay)
       .duration(300);
   fade.selectAll("path.link")
@@ -466,7 +471,7 @@ function init_states() {
   force.stop();
 
   layer0.selectAll('*').remove();
-  layer1.selectAll('*').remove();
+  layer2.selectAll('*').remove();
 
   var matches = /f=([^&#=]*)/.exec(window.location.search);
   if (!matches || matches[1] === "")
@@ -501,7 +506,7 @@ function init_states() {
         .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
         .classed("axis", true);
 
-    var state_node = layer1.selectAll(".posnode")
+    var state_node = layer2.selectAll(".posnode")
         .data(state_data)
       .enter().append("g")
         .classed("posnode", true)
