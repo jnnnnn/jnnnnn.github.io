@@ -35,16 +35,17 @@ Original Author: Jonathan Newnham
 
 .transitionnode {
   text-anchor: middle;
-  font-size: 8pt;
+  font-size: 11pt;
   font-family: Calibri, Sans, sans-serif;
 }
 
 .transitionnodeselected {
   fill: #00B;
-  font-size: 20pt;
+  font-size: 18pt;
 }
 
 .posnode {
+  font-size: 14pt;
   font-weight: bold;
   font-family: Times New Roman, Times, Calibri, Sans, sans-serif;
   font-variant: normal;
@@ -67,7 +68,7 @@ div#explanation .historyarrow, p{
 }
 
 .posnodeselected {
-  font-size: 20pt;
+  font-size: 18pt;
 }
 
 </style>
@@ -105,8 +106,8 @@ div#explanation .historyarrow, p{
 // http://bl.ocks.org/gka/5145845 circular graph of links
 // http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json explore a dag
 
-var width = 1100 || d3.select("body")[0][0].scrollWidth || 1100,
-    height = 700 || d3.select("body")[0][0].scrollHeight || 700;
+var width = 1200 || d3.select("body")[0][0].scrollWidth || 1100,
+    height = 800 || d3.select("body")[0][0].scrollHeight || 700;
 
 var color = d3.scale.category20();
 
@@ -115,12 +116,13 @@ var gravity = 0.02;
 var startdelay = 0;
 
 var force = d3.layout.force()
-    .charge(-100)
-    .linkDistance(80)
-    .linkStrength(0.3)
+    .charge(-150)
+    .linkDistance(180)
+    .linkStrength(0.5)
     // .gravity(0.5) // set later on
     .size([width, height]);
 
+// this is used for the central node
 function strong_gravity(alpha) {
   return function(d) {
     d.x += (width/2 - d.x) * 0.1;
@@ -281,7 +283,7 @@ function select_state(sdsel) {
     .filter(function(td) { return td.selected_next && !td.selected_prev; })
     .sort(function(td1, td2) { return td1.end.strcmp(td2.end); }));
 
-  // create/update the visible transition elements..
+  // create/update the visible transition elements
   var transition_nodes = layer0.selectAll("g.linkgroup")
       .data(transition_data_visible, function(td) { return td.key; })      
       .classed("linknext", function(td) { return td.selected_next; })
@@ -378,7 +380,7 @@ function start_physics() {
 
   force
     .nodes(all_nodes)
-    .gravity(gravity * (1 + 0.02 * all_nodes.length))
+    .gravity(gravity * (1 + 0.03 * all_nodes.length))
     .links(transition_link_data)
     .start();
 
