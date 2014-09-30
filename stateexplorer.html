@@ -346,6 +346,7 @@ function on_filter_transitions() {
   select_state(state_data_selected); // filters transitions
 }
 
+// apply filtering to the list of all transitions to choose which ones should be visible.
 function get_visible_transition_data() {
   var selflinks = document.getElementById("selflinks").checked;
   var hideunrelatedtrans = document.getElementById("hideunrelatedtrans").checked;
@@ -422,15 +423,15 @@ function build_transitions_from_rows(state_data, csv_rows) {
 
   // map state name -> full data entry
   var state_map = {};  
-  state_data.forEach(function(state_datum) { 
-    state_map[state_datum.name] = state_datum; 
+  state_data.forEach(function(sd) { 
+    state_map[sd.name] = sd; 
   });
   
   csv_rows.forEach(function(row) {
     var key = row.Start + "->" + row.Move + "->" + row.End;
     if (!build_transitions[key])
     {
-      var newtransitionnodedatum = { // td
+      var td = { // td
         "key": key,
         "start": row.Start,
         "name": row.Move,
@@ -441,12 +442,12 @@ function build_transitions_from_rows(state_data, csv_rows) {
       };
 
       // for physics simulation (start and end link are independent)
-      newtransitionnodedatum.physics_start = {
+      td.physics_start = {
         source: state_map[row.Start],
-        target: newtransitionnodedatum // yep, circular reference
+        target: td // yep, circular reference
       };
-      newtransitionnodedatum.physics_end = {
-        source: newtransitionnodedatum, // yep, circular reference
+      td.physics_end = {
+        source: td, // yep, circular reference
         target: state_map[row.End]
       };
 
@@ -454,7 +455,7 @@ function build_transitions_from_rows(state_data, csv_rows) {
           throw "Undefined state lol";
 
       // finished construction, save it for returning (or counting)
-      build_transitions[key] = newtransitionnodedatum;
+      build_transitions[key] = td;
     } else {
       // this row is a duplicate; increase count instead.
       build_transitions[key].count += 1;
@@ -490,11 +491,10 @@ function init_states() {
         y:20 + 20*index
       }; }); 
     
+    // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
     color = d3.scale.ordinal()
         .domain(states)
         .range(["#30c514", "#9321ff", "#d31911", "#0d7396", "#fb83c5", "#c2a962", "#3162db", "#3cc091", "#8e5e60", "#fc9010", "#46770e", "#ae2fba", "#fc8c71", "#cc1e58", "#98a7f4", "#9eafab", "#8c5697", "#aab31e", "#607049", "#9a5c17", "#33bcc2", "#69bf51", "#2f56ff", "#ca9fb8", "#cb0783", "#dc8df4", "#296bb9", "#d4a424", "#3cb6f3", "#756c12", "#157a48", "#b94335", "#af466c", "#da9d88", "#656b75", "#137775", "#f28ea1", "#93b486", "#8c41dc", "#83653e", "#96adcf", "#b34a07", "#e39c56", "#93b760", "#8254b9", "#ae408d", "#fd77f5", "#74be19", "#9e583f", "#696597", "#b9aa87", "#d01b37", "#ae0edc", "#d696d0", "#19c46b", "#f8914a", "#42c341", "#bcac46", "#a35356", "#50716a", "#4864c4", "#1fbbda", "#6eb9aa", "#5b7230", "#8c5a81", "#be3b4c", "#7c50d0", "#7fb3c3", "#027c2f", "#736a54", "#63afff", "#be9de8", "#9f44ae", "#69bd79", "#a9b06e", "#fd7ddd", "#bca79f", "#8fb932", "#725eae"]);
-
-    //color = d3.scale.category20().domain(states);
 
     transition_data = build_transitions_from_rows(state_data, csv_rows); 
 
@@ -578,10 +578,10 @@ function onkeypress()
     case 66: // b
       togglecheckbox("backlinks");
       break;
-    case 70: // s
+    case 70: // f
       togglecheckbox("forwardlinks");
       break;
-    case 84: // s
+    case 84: // t
       togglecheckbox("trimhistory");
       break;
     // case 37: // left
