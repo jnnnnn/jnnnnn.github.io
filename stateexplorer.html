@@ -93,7 +93,7 @@ div#explanation .historyarrow, p{
 <div id="graphdiv" style="width:1100; margin:auto">
   <svg id="graph">
     <defs>
-      <filter id="glow" x="-10%" y="-10%" width="110%" height="110%">
+      <filter id="glow" x="-40%" y="-40%" width="300%" height="300%">
         <feGaussianBlur stdDeviation="2 2" result="glow" />
         <feMerge>
           <feMergeNode in="glow" />
@@ -501,7 +501,7 @@ function init_states() {
     state_data = states.map(function(state, index){ return { // sd
         name: state, 
         x:width / 2, 
-        y:20 + 20*index
+        y:22 + 22*index
       }; }); 
     
     // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
@@ -526,28 +526,32 @@ function init_states() {
         .attr("transform", function(d, i) { return "translate(" + d.x + "," + d.y + ")"; })
         .on("click", posnodeclick)      
         .call(force.drag);
-/*
+
     state_node.append("circle")
         .attr("cx", 0)
         .attr("cy", 0)
-        .attr("r", 10)
-        .style("stroke", function(sd, i) { return color(sd.name); })
-        .style("stroke-width", 2)
-        .style("fill", "white")
-*/
+        .attr("r", 12)
+        .style("fill", function(sd, i) { return color(sd.name); })
+        //.style("stroke-width", 2)
+        //.style("fill", "white")
+        .style("filter", "url(#glow)")
+        .style("opacity", 0.5)
+        ;
+/*
     state_node.append("text")
         .attr("dy", ".35em")
         .attr("class", "posnode")
         .text(function(sd) { return sd.name; })
         .style("filter", "url(#glow)")
         .style("fill", function(sd) { return color(sd.name); });
-
+*/
     state_node.append("text")
         //.attr("dx", 12)
         .attr("dy", ".35em")
         .attr("class", "posnode")        
         .text(function(sd) { return sd.name; })
-        .style("fill", "black");
+        .style("fill", "black")
+        ;
         //.style("fill", function(sd) { return color(sd.name); });
 
     //select_state(state_node.node().__data__); // select the first state to start things off
