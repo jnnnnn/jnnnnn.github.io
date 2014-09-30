@@ -475,6 +475,7 @@ function build_transitions_from_rows(state_data, csv_rows) {
 function init_states() {  
   force.stop();
 
+  layerP.selectAll('*').remove();
   layer0.selectAll('*').remove();
   layer2.selectAll('*').remove();
 
@@ -527,7 +528,7 @@ function init_states() {
         ;
 
     state_node.append("text")
-        .attr("dy", ".35em")
+        .attr("dy", "4pt")
         .attr("class", "posnode")        
         .text(function(sd) { return sd.name; })
         .style("fill", "black")
