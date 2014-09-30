@@ -117,7 +117,7 @@ var startdelay = 0;
 
 var force = d3.layout.force()
     .charge(-150)
-    .linkDistance(180)
+    .linkDistance(70)
     .linkStrength(0.5)
     // .gravity(0.5) // set later on
     .size([width, height]);
@@ -125,7 +125,7 @@ var force = d3.layout.force()
 // this is used for the central node
 function strong_gravity(alpha) {
   return function(d) {
-    d.x += (width/2 - d.x) * 0.1;
+    d.x += (width/2 - d.x) * (0.1 + .1/(.1 + alpha));
     d.y += (height/2 - d.y) * 0.1;
   }
 }
@@ -136,15 +136,11 @@ function separate_gravity(alpha) {
     if (d == state_data_selected) 
       return; // otherwise jiggle
 
-    d.x += d.selected_next * alpha;  // bool coerced to 0 or 1
-    d.x -= d.selected_prev * alpha;  // bool coerced to 0 or 1
+    d.x += d.selected_next * alpha * 3;  // bool coerced to 0 or 1
+    d.x -= d.selected_prev * alpha * 3;  // bool coerced to 0 or 1
 
     if (d.target_height) 
       d.y += (d.target_height - d.y) * .1 * alpha;
-
-    // push to vertical edges
-    if (d.selected_prev && d.selected_next)
-      d.y += (((d.y > (height / 2)) * 2) - 1) * alpha * force.gravity() / .1;
   };
 }
 
@@ -234,7 +230,7 @@ function select_transition(new_td) {
 function layout_transitions(tds)
 {
   var default_spacing = 50; // vertical distance between transitions, unless too many and squeezing happens
-  var spacing = Math.min(default_spacing, (height *.7) / tds.length); // only use 70% of available height
+  var spacing = Math.min(default_spacing, (height *.9) / tds.length); // only use 80% of available height
   var first_node_height = height/2 - spacing*(tds.length-1)/2;
   tds.forEach(function(td, i) { td.target_height = first_node_height + spacing * i; });
 }
