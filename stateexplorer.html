@@ -232,8 +232,8 @@ function select_transition(new_td) {
 function layout_transitions(tds)
 {
   var default_spacing = 50; // vertical distance between transitions, unless too many and squeezing happens
-  var spacing = Math.min(default_spacing, (height *.7) / tds.length);
-  var first_node_height = height / 2 - spacing * (tds.length-1) / 2;
+  var spacing = Math.min(default_spacing, (height *.7) / tds.length); // only use 70% of available height
+  var first_node_height = height/2 - spacing*(tds.length-1)/2;
   tds.forEach(function(td, i) { td.target_height = first_node_height + spacing * i; });
 }
 
@@ -281,6 +281,7 @@ function select_state(sdsel) {
     .filter(function(td) { return td.selected_next && !td.selected_prev; })
     .sort(function(td1, td2) { return td1.end.strcmp(td2.end); }));
 
+  // create/update the visible transition elements..
   var transition_nodes = layer0.selectAll("g.linkgroup")
       .data(transition_data_visible, function(td) { return td.key; })      
       .classed("linknext", function(td) { return td.selected_next; })
