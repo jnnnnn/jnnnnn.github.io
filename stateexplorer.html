@@ -77,16 +77,16 @@ div#explanation .historyarrow, p{
 <h1 style="display:inline">State transition explorer</h1>
 <div id="controls" style="float:right">
   <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
+    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
+    <input id="backlinks" type="checkbox" onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
+    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
+    
+    <input id="trimhistory" type="checkbox" onchange="move_history=[];"/><span class="shortkey">T</span>rim history
+    <br />
     <input type="button" value="Reset" onclick="init_states();"/>
     <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated transitions
     
-    <input id="filter" type="search" placeholder="regex (filter)"/><br />
-
-    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
-    <input id="backlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
-    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
-
-    <input id="trimhistory" type="checkbox" onchange="move_history=[];"/><span class="shortkey">T</span>rim history
+    <input id="filter" type="search" placeholder="regex (filter)"/>
   </form>
 </div>
 <div id="errors"></div>
