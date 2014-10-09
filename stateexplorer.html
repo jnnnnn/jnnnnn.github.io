@@ -94,6 +94,7 @@ div#explanation .historyarrow, p{
   <svg id="graph"></svg>
 </div>
 <div id="explanation"></div>
+Press <span class="shortkey">N</span> or <span class="shortkey">→</span> to randomly choose a transition.
 <script src="d3.v3.min.js"></script>
 <script>
 
@@ -534,7 +535,7 @@ function init_states() {
         .style("fill", "black")
         ;
 
-    //select_state(state_node.node().__data__); // select the first state to start things off
+    select_state(state_node.node().__data__); // select the first state to start things off
   });
 }
 
