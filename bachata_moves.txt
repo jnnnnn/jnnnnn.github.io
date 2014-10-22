@@ -219,10 +219,10 @@ Open hold	Girl turn + dip	Open hold	turn, fun	Adv	2014-05-14		221
 Open hold	Girl turn	Wrap	easy, turn	Week 11	2014-05-15		222	
 Wrap	Push-pull	Cliffhanger	easy, fun, swap	Week 11	2014-05-15	Push girl forward with body just before 1, step across to other side and pull back on 2, let her travel back further on 3,4, then present other hand for turn.	223	
 Open hold	Crossover boy trail + swap hands + throw hand	Crosshand	hard	Week 11	2014-05-15		224	
-Crosshand	Copa	Wrap crosshand	turn	Week 11	2014-05-15		225	
-Wrap crosshand	Hesitation step	Wrap crosshand	body	Week 11	2014-05-15	Hands at shoulder height, step forward on 1 but keep back foot in place on 2. Repeat for 3, 4.	226	
-Wrap crosshand	Bodyroll	Wrap crosshand	body	Week 11	2014-05-15		227	
-Wrap crosshand	Unwind + throw hand	Crosshand	easy, turn	Week 11	2014-05-15		228	
+Crosshand	Copa	Sweetheart	turn	Week 11	2014-05-15		225	
+Sweetheart	Hesitation step	Sweetheart	body	Week 11	2014-05-15	Hands at shoulder height, step forward on 1 but keep back foot in place on 2. Repeat for 3, 4.	226	
+Sweetheart	Bodyroll	Sweetheart	body	Week 11	2014-05-15		227	
+Sweetheart	Unwind + throw hand	Crosshand	easy, turn	Week 11	2014-05-15		228	
 Crosshand	Throw two hands	Crosshand	basic	Week 11	2014-05-15		229	
 Crosshand	Arm circles + hip turn + bodyroll	Close hold	easy, fun, body	Week 11	2014-05-15		230	
 Open hold	Arm circles	Arms up	easy, basic	Adv w/ Manuel	2014-05-21		231	
@@ -510,4 +510,4 @@ Open hold	Girl free turn + boy free turn	Open hold	turn	Altona	2014-10-20	Led fr
 Open hold	Girl turn	Crosshand	easy, turn	Altona	2014-10-20	Boy haircomb at the end of this one, then sleepy bodyroll basic	513	
 Crosshand	Girl turn	Hammerlock crosshand	turn	Altona	2014-10-20		514	
 Hammerlock crosshand	Girl turn	Close hold opened	easy, turn	Altona	2014-10-20		515	
-Close hold opened	Bodyroll	Close hold	body	Altona	2014-10-20	Boy stands rigid, supporting girl under shoulderblade/arm and with other hand.	516	
+Close hold opened	Bodyroll	Close hold	body	Altona	2014-10-20	Boy stands rigid, supporting girl under shoulderblade/arm and with other hand.	516
