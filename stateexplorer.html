@@ -576,7 +576,6 @@ function onkeypress()
       var random_transition_data = possible_transitions[random_index].__data__;      
       select_transition(random_transition_data);
       add_history(random_transition_data);
-      d3.event.stopPropagation();
       break;
     case 85: // u
       togglecheckbox("hideunrelatedtrans");
@@ -599,22 +598,27 @@ function onkeypress()
     case 220: // backslash
     case 191: // forward slash
       document.getElementById("filter").focus();
-      d3.event.stopPropagation();
     default:
       console.log(d3.event.keyCode);
       break;
   };
+  d3.event.stopPropagation();
 }
 
 d3.select("body")
-    .on("keyup", onkeypress);
+    .on("keydown", onkeypress);
 
 d3.select("input#filter")
     .on("keyup", function(keyevent) {
       on_filter_transitions();
-      if (keyevent)
-        keyevent.stopPropagation();
+      d3.event.stopPropagation();
     });
+
+d3.select("input#filter")
+    .on("keydown", function(keyevent) {
+      d3.event.stopPropagation();
+    });
+
 
 String.prototype.strcmp = function(s) {
     if (this < s) return -1;
