@@ -94,7 +94,7 @@ div#explanation .historyarrow, p{
   <svg id="graph"></svg>
 </div>
 <div id="explanation"></div>
-Press <span class="shortkey">N</span> or <span class="shortkey">→</span> to randomly choose a transition. Hi Guys
+Press <span class="shortkey">N</span> or <span class="shortkey">→</span> to randomly choose a transition.
 <script src="d3.v3.min.js"></script>
 <script>
 
@@ -180,9 +180,10 @@ function add_history(new_move_td) {
     "td": new_move_td
   };
 
-  if (move_history.length > 5 && document.getElementById("trimhistory").checked) 
-    move_history.pop();
+  if (document.getElementById("trimhistory").checked) 
+    move_history = move_history.slice(0, 5);
   move_history.unshift(hd);
+  move_history_current = hd;
 
   var history_elements = d3.selectAll("div#explanation").selectAll("div")
       .data(move_history, function(hd) { return hd.key; });
@@ -206,6 +207,7 @@ function add_history(new_move_td) {
       .text(function(hd) { return hd.td.description; });
   new_history.on("click", function(hd) {
     select_transition(hd.td);
+    move_history_current = hd;
   });
   history_elements
     .exit()
@@ -213,6 +215,41 @@ function add_history(new_move_td) {
       .duration(300)
       .style("opacity", 0)
       .remove();
+}
+
+function history_next() {
+  // if we're at the top of the stack, choose at random
+  if (move_history.indexOf(move_history_current) < 1) {
+    var possible_transitions = svg.selectAll("g.linknext")[0]; // all "next" transition groups
+    var random_index = Math.floor(Math.random() * possible_transitions.length);
+    var random_transition_data = possible_transitions[random_index].__data__;      
+    select_transition(random_transition_data);
+    add_history(random_transition_data);  
+  } else {
+    // otherwise step forward
+    var current_index = move_history.indexOf(move_history_current);
+    var next_index = current_index - 1;
+    move_history_current = move_history[next_index];
+    select_transition(move_history_current.td);
+  }  
+}
+
+function history_prev() {
+  var current_index = move_history.indexOf(move_history_current);
+
+  // if we're at the bottom of the stack, choose at random
+  if (current_index === -1 || current_index === move_history.length-1) {
+    var possible_transitions = svg.selectAll("g.linkprev")[0]; // all "prev" transitions groups
+    var random_index = Math.floor(Math.random() * possible_transitions.length);
+    var random_td = possible_transitions[random_index].__data__;
+    select_state(random_td.physics_start.source);
+  } else {
+    // otherwise step backward
+    var current_index = move_history.indexOf(move_history_current);
+    var prev_index = current_index + 1;
+    move_history_current = move_history[prev_index];
+    select_transition(move_history_current.td);
+  }
 }
 
 // focus on the given transition (and associated end state)
@@ -543,7 +580,7 @@ function posnodeclick (sd)
 { 
   if (d3.event.defaultPrevented)
     return; // don't "click" if dragged.
-
+  move_history_current = undefined;
   select_state(sd);
 }
 
@@ -552,6 +589,7 @@ function transition_node_click(td)
   if (d3.event.defaultPrevented)
     return; // don't "click" if dragged.  
 
+  move_history_current = undefined;
   select_transition(td);
   add_history(td);
 }
@@ -571,11 +609,11 @@ function onkeypress()
   switch(d3.event.keyCode) {        
     case 39: // right arrow
     case 78: // n
-      var possible_transitions = svg.selectAll("g.linknext")[0]; // all "next" transition groups
-      var random_index = Math.floor(Math.random() * possible_transitions.length);
-      var random_transition_data = possible_transitions[random_index].__data__;      
-      select_transition(random_transition_data);
-      add_history(random_transition_data);
+      history_next();
+      break;
+    case 37: // left arrow
+    case 80: // p
+      history_prev();
       break;
     case 85: // u
       togglecheckbox("hideunrelatedtrans");
