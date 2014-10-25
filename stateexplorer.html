@@ -87,6 +87,8 @@ div#explanation .historyarrow, p{
     <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated transitions
     
     <input id="filter" type="search" placeholder="regex (filter)"/>
+    <br />
+    History: <span class="shortkey">N</span> <span class="shortkey">→</span> and <span class="shortkey">P</span> <span class="shortkey">←</span>; <span class="shortkey">R</span>andom state.
   </form>
 </div>
 <div id="errors"></div>
@@ -276,6 +278,12 @@ function layout_transitions(tds)
 
 // Move a new State node to the centre of the graph, and add links in and out of it.
 function select_state(sdsel) {
+  if (!sdsel)
+  {
+    var random_index = Math.floor(Math.random() * state_data.length);
+    sdsel = state_data[random_index];
+  }
+
   var new_state_element = d3
     .selectAll(".posnode")
     .filter(function(sd) { return sd == sdsel; })
@@ -572,7 +580,7 @@ function init_states() {
         .style("fill", "black")
         ;
 
-    select_state(state_node.node().__data__); // select the first state to start things off
+    select_state(); // select a state at random to start things off
   });
 }
 
@@ -627,6 +635,8 @@ function onkeypress()
     case 70: // f
       togglecheckbox("forwardlinks");
       break;
+    case 82: // r
+      select_state(); // choose a random state
     case 84: // t
       togglecheckbox("trimhistory");
       break;
