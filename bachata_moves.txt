@@ -1,4 +1,4 @@
-Start	Move	End	Tags	Week	Date	Description	Index
+Start	Move	End	Tags	Origin	Date	Description	Index
 Open hold	Basic	Open hold	easy, basic	Week 1		Step to the side, bring other foot together. Repeat in same direction for total of four counts.	1
 Open hold	Basic forward	Open hold	easy, basic	Week 1		Push on the follower's palms with the back of your hands.	2
 Open hold	Girl turn	Open hold	easy, turn	Week 1		Prepare by lifting pivot hand and pointing the direction of the turn with it.	3
@@ -412,7 +412,7 @@ Side-by-side	Walk	Side-by-side	easy	Adv	2014-09-10		414
 Side-by-side	Boy outside turn	Embrace		Adv	2014-09-10	Keep arm low until putting it on your shoulder so that girl doesn't turn. Put girl's other arm on your shoulder if she goes for close hold.	415
 Embrace	Swaying squat	Embrace	easy, fun	Adv	2014-09-10		416
 Embrace	Body roll(s)	Embrace	hard, body	Adv	2014-09-10	Gently roll wrists down shoulderblade to lead, don't force it. Keep space between your bodies; boy's hips can go back to make room.	417
-Close hold	Hair brush	Arm up		Untested	2014-09-14	Be careful, probably too intimate. Starting with hand on back of her head, let her hair run through your fingers, applying slight tension. 	418
+Close hold	Hair brush	Arm up	original, bad	original	2014-09-14	Be careful, probably too intimate. Starting with hand on back of her head, let her hair run through your fingers, applying slight tension. 	418
 Open hold	Girl hesitation half-turn	Wrap	hard	Altona	2014-09-15	Girl turns half way round during four beats. Step, tap, step, tap. Block a full turn with non-turning hand on hip asap! Leader must clearly stop on beat 2, gentle block with over hand (pulling upward).	419
 Close hold	Half spin	Close hold	easy, swap	Project 2/3 technique	2014-09-16	Boy steps back with right foot on 1; no contra apparently.	420
 Close hold	Half spin	Close hold opened	easy, swap	Project 2/3 technique	2014-09-16		421
@@ -518,7 +518,7 @@ Open hold	Girl turn with boy outside turn	Hammerlock	turn	TSF Level 2	2014-10-22
 Hammerlock	Girl turn + boy back scratch	Open hold	hard, turn, swap	TSF Level 2	2014-10-22	Girl turns on 5. Boy half turn on 7, 8, leaves hand on shoulder. Girl's right hand trails down back on 1, 2, boy catches on 2, throws out on three to catch left arm and lead forward with turn.	521
 Open hold	Double turn dip	Close hold	fast, turn, fun	TSF Level 2	2014-10-22		522
 Close hold	Walk forward	Close hold	easy, basic	Project 4/5	2014-10-21		523
-Close hold	Slow walk backward	Close hold	easy, basic	Project 4/5	2014-10-21	Walk backwards, one step every two beats.	524
+Close hold	Slow walk backward	Close hold	easy, basic, fun	Project 4/5	2014-10-21	Walk backwards, one step every two beats.	524
 Open hold	Boy outside turn	Side-by-side	hard, fast	Project 4/5	2014-10-21	Swap hands behind back then throw hand away and grab other hand	525
 Side-by-side	Girl double turn	Open hold	fast, turn	Project 4/5	2014-10-21		526
 Close hold	Basic	Close hold opened	easy, basic	Project 4/5	2014-10-21	Open out frame to opened-close-hold over four beats	527
@@ -535,3 +535,30 @@ Boy hammerlock	Release	Crosshand	easy, basic	Altona	2014-10-27		537
 Crosshand	Girl turn	Hammerlock crosshand	easy, turn	Altona	2014-10-27		538
 Hammerlock crosshand	Girl turn	Close hold	easy, turn	Altona	2014-10-27		539
 Close hold	Dip	Close hold	fun	Altona	2014-10-27	Girl supports her own weight. Girl's right arm around boy's waist, left around shoulder. Boy's left on girl's shoulder, right supporting torso centre-of-mass. Boy must NOT bend forward; squat vertically only.	540
+Embrace	Basic	Close hold	easy, basic	original	2014-10-27		541
+Embrace	Basic	Open hold	easy, basic	original	2014-10-27		542
+Open hold	Girl hesitation half-turn	Wrap		Project 2/3	2014-10-28	Girl's footwork is Step-tap-step-tap.	543
+Wrap	Girl turn	Open hold	easy, turn	Project 2/3	2014-10-28	Girl's footwork is Step-tap-step-tap.	544
+Open hold	Boy hesitation turn	Boy wrap		Project 2/3	2014-10-28	Step-tap-step-tap.	545
+Boy wrap	Boy hesitation turn	Open hold		Project 2/3	2014-10-28	Step-tap-step-tap.	546
+Open hold	Boy outside turn	Boy hammerlock	easy, fun	Project 2/3	2014-10-28		547
+Boy hammerlock	Basic	Close hold	easy, basic	Project 2/3	2014-10-28	Flick locking arm upward with elbow slightly.	548
+Close hold	Basic	Open hold	easy, basic	Project 4/5	2014-10-28		549
+Open hold	About turn	Open hold	easy, swap	Project 4/5	2014-10-28	Contra by stepping backward slightly, then pull girl forward to swap sides.	550
+Open hold	Girl turn	Catapult	easy, turn	Project 4/5	2014-10-28		551
+Catapult	Boy walk-through	Open hold	fun	Project 4/5	2014-10-28	Boy walks forward under right arm, leaves left at neck (let go)	552
+Open hold	Girl turn	Hammerlock	easy, turn	Project 4/5	2014-10-28		553
+Hammerlock	Hands low turn	Hammerlock	fun, turn	Project 4/5	2014-10-28	Very light contact with hands here, don't hold tightly. Make sure elbows stay slightly bent, keep hands very low. Guide elbow so it doesn't get stuck.	554
+Hammerlock	Girl turn	Girl haircombed	turn, fun	Project 4/5	2014-10-28	Contra as for a normal unwind, but instead of putting turning hand over her head, put it on her shoulder next to her neck and leave it there while she turns.	555
+Girl haircombed	Sunrise	Mates hold	fun	Project 4/5	2014-10-28	Girl half turn. Boy keeps girl's elbows inside his elbows. lifts hands above head, then brings right arm down using wrist contact.	556
+Mates hold	Basic	Mates hold	easy, basic	Project 4/5	2014-10-28		557
+Mates hold	Girl turn	Open hold	easy, turn	Project 4/5	2014-10-28		558
+Close hold	Grind step	Embrace	body	TSF Level 2	2014-10-30	Using your left wrist, push girl's right wrist in a big circle: down, behind her, then up to your shoulder. Her arm should be straight, and her hand trails behind her wrist.	559
+Embrace	Knee roll	Embrace	body	TSF Level 2	2014-10-30	Start by pulling knee back, then push it around in a circle. Girl should maintain leg contact and do a booty roll as a result. Can be cheekily enhanced by lifting her frame slightly to straighten her knee at the apoapsis of the roll.	560
+Embrace	Basic	Open hold	easy, basic	TSF Level 2	2014-10-30		561
+Open hold	Girl turn + boy turn	Boy haircombed	turn, fast	TSF Level 2	2014-10-30		562
+Boy haircombed	Arm sweep	Arm up	easy, basic	TSF Level 2	2014-10-30	Sweep arm from chest in nearly two full circles over four beats, starting down.	563
+Arm up	Girl turn	Control hold	easy, turn	TSF Level 2	2014-10-30		564
+Control hold	Grind step	Mates hold		TSF Level 2	2014-10-30		565
+Mates hold	Lazy sway	Mates hold	easy, body	TSF Level 2	2014-10-30	Lean away from the direction of sway (spring into it)	566
+Mates hold	Body rolls	Mates hold	body	TSF Level 2	2014-10-30	Either two two-beat rolls then a slow one or vice versa.	567
