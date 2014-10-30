@@ -56,6 +56,12 @@ Original Author: Jonathan Newnham
   font-weight: bold;
 }
 
+p.setting {
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}
+
 div#explanation h3 {
   display:inline;
 }
@@ -63,7 +69,8 @@ div#explanation .historystate {
   display:inline;
   color: #888;
 }
-div#explanation .historyarrow, p{
+div#explanation .historyarrow,
+div#explanation p {
   display:inline;
   padding: .5em;
 }
@@ -77,26 +84,45 @@ div#explanation .historyarrow, p{
 <h1 style="display:inline">State transition explorer</h1>
 <div id="controls" style="float:right">
   <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
-    <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
-    <input id="backlinks" type="checkbox" onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
-    <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
-    
-    <input id="trimhistory" type="checkbox" onchange="move_history=[];"/><span class="shortkey">T</span>rim history
+    <p class="setting" title="Show transitions out of the currently selected state">
+      <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
+    </p>
+    <p class="setting" title="Show transitions leading into the currently selected state">
+      <input id="backlinks" type="checkbox" onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
+    </p>
+    <p class="setting" title="Show transitions looping to/from the currently selected state">
+      <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
+    </p>
     <br />
-    <input type="button" value="Reset" onclick="init_states();"/>
-    <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated transitions
-    
-    <input id="filter" type="search" placeholder="regex (filter)"/>
+    <input type="button" value="Reload" onclick="init_states();" title="Reload the data file if it has changed."/>
+    <p class="setting" title="Hide transitions not connected to the current state. Forward and Back must be checked to show unrelated transitions.">
+      <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated
+    </p>    
+    <p class="setting" title="Only show transitions that match this regular expression">
+      <input id="filter" type="search" placeholder="regex (filter)"/>
+    </p>
     <br />
-    History: <span class="shortkey">N</span> <span class="shortkey">→</span> and <span class="shortkey">P</span> <span class="shortkey">←</span>; <span class="shortkey">R</span>andom state.
+    History: 
+    <span class="shortkey" onclick="for (i = 0; i < 10; i++) { history_next(); }">N</span>
+    <span class="shortkey" onclick="history_next();">→</span>
+    and
+    <span class="shortkey">P</span>
+    <span class="shortkey">←</span>
+    ;
+    <span class="shortkey">R</span>andom.    
+    <p class="setting" title="Only show 5 items in the history (deleting older ones)">
+      <input id="trimhistory" type="checkbox"/><span class="shortkey">T</span>rim
+    </p>
+    <p class="setting" title="Omit descriptions from the history.">
+      <input id="shorthistory" type="checkbox" onchange="move_history=[];"/>Brief
+    </p>
   </form>
 </div>
 <div id="errors"></div>
 <div id="graphdiv" style="width:1100; margin:auto">
   <svg id="graph"></svg>
 </div>
-<div id="explanation"></div>
-Press <span class="shortkey">N</span> or <span class="shortkey">→</span> to randomly choose a transition.
+<div id="explanation" style="min-height: 500px"></div>
 <script src="d3.v3.min.js"></script>
 <script>
 
@@ -181,21 +207,29 @@ function add_history(new_move_td) {
     "key": move_history_next_id++,
     "td": new_move_td
   };
-
+  var shortHistory = document.getElementById("shorthistory").checked;
   if (document.getElementById("trimhistory").checked) 
     move_history = move_history.slice(0, 5);
   move_history.unshift(hd);
   move_history_current = hd;
 
   var history_elements = d3.selectAll("div#explanation").selectAll("div")
-      .data(move_history, function(hd) { return hd.key; });
+      .data(shortHistory?move_history.slice().reverse():move_history, function(hd) { return hd.key; });
 
   var new_history = history_elements
     .enter()
     .insert("div");
+  if (shortHistory)
+    new_history.style("display", "inline");
+  if (shortHistory)
+    new_history.append("h3")
+      .classed("historystate", true)
+      .classed("historyarrow", true)
+      .text("→");
   new_history.append("h3")
       .classed("historymove", true)
-      .text(function(hd) { return hd.td.name; });
+      .text(function(hd) { return hd.td.name; })
+      .attr("title", function(hd) { return hd.td.description; });
   new_history.append("h3")
       .classed("historystate", true)
       .classed("historyarrow", true)
@@ -204,18 +238,21 @@ function add_history(new_move_td) {
       .classed("historystate", true)
       .style("color", color(hd.td.end))
       .text(function(hd) { return hd.td.end; });
-  new_history.append("p")
+  if (!shortHistory) {
+    new_history.append("p")
       .classed("historyextra", true)
       .text(function(hd) { return hd.td.description; });
+  }
   new_history.on("click", function(hd) {
     select_transition(hd.td);
     move_history_current = hd;
   });
+
   history_elements
     .exit()
-    .transition()
-      .duration(300)
-      .style("opacity", 0)
+ // .transition()
+ //   .duration(300)
+ //   .style("opacity", 0)
       .remove();
 }
 
