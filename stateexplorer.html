@@ -82,6 +82,7 @@ div#explanation p {
 </style>
 <body>
 <h1 style="display:inline">State transition explorer</h1>
+<p style="display:inline; pad-left:0.5em"><a href="stateexplorer-instructions.html">Instructions: Click things!</a></p>
 <div id="controls" style="float:right">
   <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
     <p class="setting" title="Show transitions out of the currently selected state">
@@ -103,7 +104,7 @@ div#explanation p {
     </p>
     <br />
     History: 
-    <span class="shortkey" onclick="for (i = 0; i < 10; i++) { history_next(); }">N</span>
+    <span class="shortkey" onclick="for (i = 0; i < 100; i++) { history_next(); }">N</span>
     <span class="shortkey" onclick="history_next();">→</span>
     and
     <span class="shortkey">P</span>

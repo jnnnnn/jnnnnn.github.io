@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+License: Released as Public Domain.
+Original Author: Jonathan Newnham
+-->
+<style>
+h1,h2,h3 { color: #004; }
+h1 { font-size: 1.3em; }
+h2 { font-size: 1.1em; }
+h3 { font-size: 1.0em; }
+/* Links */
+a {
+    text-decoration: none;
+    color: #002bb8;
+    background: none;
+}
+a:visited { color: #36b; }
+a:active { color: #faa700; }
+a:hover { text-decoration: underline; }
+</style>
+<body>
+<h1>State transition explorer: Instructions</h1>
+Try the following:
+<ol>
+  <li>Click on a coloured circle to select that state.</li>
+  <li>Click on the green text of a transition to select that link.</li>
+  <li>Press B or check "Back Links" to show links leading to the current state</li>
+  <li>Press "N" to select a link at random</li>
+  <li>Wave the mouse over the controls to see hints about what that control does.</li>
+</ol>
+
+Less useful controls:
+<ol>
+  <li>Turn off "Hide unrelated" to show _all_ links (must have Forward and Back links turned on).</li>
+  <li>Type a regular expression into the filter box to filter which links are displayed.</li>
+  <li>Press P to traverse back through the history of moves</li>
+  <li>Press R to select a random state.
+  <li>The Trim checkbox will keep the history short, and "Brief" hides the descriptive text.</li>
+</ol>
+
+Secret controls:
+Click "Brief" and then click on the bold N to generate a long list of transitions!
+
+<h2>How it works</h2>
+
+Most of the work is done by the marvellous <a href="http://bl.ocks.org/mbostock">d3js library</a>.
+<p>The diagrams are loaded from Tab-Separated-Value files containing at least three columns: Start, Move, and End.</p>
+<p>
+Start is the starting state of a transition. <br />
+Move is some text describing the transition. <br />
+End is the final state of the transition.</p>
+<p>You can also have a Description column giving some extra information about the transition, that will appear as hovertext and in the move history.</p>
