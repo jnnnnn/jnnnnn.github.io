@@ -1,0 +1,48 @@
+Start	Move	End	Tags	Origin	Date	Description	Index	Parent
+Open hold	Basic	Open hold	easy, basic	Week 1		Step to the side, bring other foot together. Repeat in same direction for total of four counts.	1	
+Open hold	Basic forward	Open hold	easy, basic	Week 1		Push on the follower's palms with the back of your hands.	2	1
+Open hold	Girl turn	Open hold	easy, turn	Week 1		Prepare by lifting pivot hand and pointing the direction of the turn with it.	3	
+Open hold	Boy turn	Open hold	easy, boy	Week 1		Put one hand on chest, out of the way. Use other hand to place follower's hand on waist for trailing.	4	
+Open hold	Boy turn	Crosshand	easy, boy	Week 1		Put one hand on chest, out of the way. Use this hand to grab the follower's trailing hand.	5	4
+Open hold	Basic	Control hold	easy, basic	Week 1		Palms face partner, hands 70cm apart. Hold her wrists firmly.	6	1
+Control hold	Single steps	Control hold	easy, basic	Week 1		Step left, feet together, step right, feet together. Repeat	7	1
+Control hold	Basic	Open hold	easy, basic	Week 1			8	1
+Open hold	Girl turn	Hammerlock	easy, turn	Week 2		Turn, keeping one hand low. Keep contact with both hands.	9	3
+Hammerlock	Unwind	Open hold	easy, turn	Week 2			10	3
+Hammerlock	Windmill	Hammerlock	fun, hard, turn	Week 2		Boy half outside turn (outside hand over head), bring outside hand down, continue/repeat.	11	10
+Hammerlock	Crossover	Open hold	easy, swap	Week 2		Walk past each other, half turn.	12	10
+Hammerlock	Double turn	Wrap	turn, fast	Week 2			13	10
+Wrap	Free spin	Open hold	easy, turn	Week 2		Slight pressure with forearm, don't send follower flying.	14	3
+Open hold	Girl hesitation half-turn	Wrap	hard	Week 3		Girl turns half way round during four beats. Step, tap, step, tap. Block a full turn with non-turning hand on hip asap! Leader must clearly stop on beat 2, gentle block with over hand.	15	3
+Wrap	Basic	Wrap	easy, basic	Week 3			16	1
+Wrap	Step forward + back	Wrap	basic	Week 3		Two steps forward, two steps back.	17	16
+Wrap	Relax hands	Mates hold	easy, basic	Week 3			18	16
+Mates hold	Unwind	Open hold	turn	Week 3			19	3
+Open hold	Boy hesitation outside half-turn	Boy wrap	easy, test	Week 3		Turn outside, swap hands.	20	4
+Boy wrap	Relax hands	Boy wrap	basic	Week 3			21	1
+Boy wrap	Unwind + girl turn	Crosshand	turn	Week 3		Prepare with clear contra. Leader half turn, follower full turn.	22	3
+Crosshand	Throw one hand	Crosshand	basic	Week 3		Lift the bottom hand slightly then throw downward firmly on first beat of a bar. Follower should travel thrown hand in complete circle over four counts.	23	1
+Crosshand	Throw two hands	Crosshand	basic	Week 3		Lift both hands slightly then throw downward on beats. Thrown hands should travel in a complete circle.	24	23
+Crosshand	Girl double-handed turn	Crosshand	easy, turn	Week 3		Lead with top hand on one beat and bottom hand on next.	25	3
+Crosshand	Girl haircomb	Open hold	easy, basic	Week 3		Boy's wrist goes just over girl's head and places her hand on her neck. Side of hand runs down arm as a guide.	26	1
+Crosshand	Boy haircomb	Close hold	basic	Week 3		Leader pulls follower's hands over leader's head.	27	1
+Close hold	Dip	Close hold	fun, body	Week No Mark		Boy squats down without bending forward; girl leans back on her toes, knees up and hips forward, head drops last	28	
+Close hold	Basic	Close hold	easy, basic	Week 4	2014-01-23	Hands on each others' shoulderblades, boy's left and girl's right hands extended -- girl's elbow cupped in boy's elbow. Feet interleaved, right knees making contact. 	29	1
+Close hold	Single step	Close hold	basic	Week 4	2014-01-23	Leader blocks basic with outside knee.	30	7
+Close hold	Bodyroll + side dip	Close hold	body	Week 4	2014-01-23	Led using palm roll on girl's back. Head forward, then shoulders forward, then hips forward, then sit back and down. Side roll is sit rotated then knee flick other leg to roll back up, head last.	31	
+Close hold	Shoulder roll + body roll	Close hold	body	Week 4	2014-01-23		32	31
+Close hold	Basic forward	Close hold	easy, basic	Week 4	2014-01-23	Push girl backwards using frame	33	29
+Close hold	Basic backward	Close hold	basic	Week 4	2014-01-23		34	29
+Close hold	Single step forward	Close hold	basic	Week 4	2014-01-23		35	33
+Close hold	Single step backward	Close hold	basic	Week 4	2014-01-23		36	35
+Close hold	Box step	Close hold	basic	Week 4	2014-01-23	First four beats are to side then forward, second four complete the box.	37	33
+Close hold	Lunge	Close hold	basic	Week 4	2014-01-23	Step forward on one, down on two, step back on three	38	33
+Close hold	Half spin	Close hold	easy, swap	Week 4	2014-01-23	Prepare with small contra, then half turn.	39	29
+Close hold	Spin	Close hold	easy, swap	Week 4	2014-01-23	Prepare with large contra, then full turn fast. Foot should be turned at least 90 degress for first step. Boy's and girl's right feet are the pivot point -- boy on 1, girl on 2, boy on 3, use fourth beat to stop turning (start stopping on 3)	40	39
+Close hold	Hip roll	Close hold	body	Week 4	2014-01-23		41	29
+Close hold	Step back	Open hold	easy, basic	Week 4	2014-01-23		42	1
+Open hold	Step back + walk around	Mates hold	easy	Week 5	2014-01-30	Place right hand on hip, left hands extended (tango-style).	43	1
+Mates hold	Basic	Mates hold	easy, basic	Week 5	2014-01-30	Mates hold is when both are facing the same way, boy's right hand on girl's hip and left hands extended outward. Boy is offset to avoid awkwardness. Booty rolls optional.	44	16
+Mates hold	Step back + kick forward	Mates hold	hard	Week 5	2014-01-30	Left foot back, right knee touches back of follower's thigh to push follower's leg into kick + step forward. Lead with frame to avoid foot collisions. Can also do back-back-forward-thighpush.	45	17
+Open hold	Girl turn 5/4	Side-by-side	turn	Week 6	2014-02-06	Girl turns, then both dancers do an extra quarter turn to end up facing the same way.	46	3
+Side-by-side	About turn	Side-by-side		Week 6	2014-02-06	Both forward on 1, 2, half turn inwards on 3 (swap hands) (led on 1), tap on 4.	47	

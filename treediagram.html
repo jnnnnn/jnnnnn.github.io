@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+stateexplorer.html: an HTML page that allows exploring state transition diagrams.
+
+The diagrams are loaded from Tab-Separated-Value files containing at least three columns: Start, Move, and End.
+Start is the starting state of a transition. 
+Move is some text describing the transition. 
+End is the final state of the transition.
+You can also have a Description column giving some extra information about the transition, that will appear as hovertext and in the move history.
+
+License: Released as Public Domain.
+Original Author: Jonathan Newnham
+-->
+<style>
+
+.nodepos {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+  fill-opacity: 0;
+  stroke-width: 3;
+}
+
+.axis {
+  stroke: #999;
+  stroke-opacity: .5;
+  fill-opacity: 0;
+  stroke-width: 1;
+}
+
+.transitionnode {
+  text-anchor: middle;
+  font-size: 11pt;
+  font-family: Calibri, Sans, sans-serif;
+}
+
+.transitionnodeselected {
+  fill: #00B;
+  font-size: 18pt;
+}
+
+.posnode {
+  font-size: 14pt;
+  font-weight: bold;
+  font-family: Times New Roman, Times, Calibri, Sans, sans-serif;
+  font-variant: normal;
+  text-anchor: middle;
+}
+
+.shortkey {
+  font-weight: bold;
+}
+
+p.setting {
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}
+
+div#explanation h3 {
+  display:inline;
+}
+div#explanation .historystate {
+  display:inline;
+  color: #888;
+}
+div#explanation .historyarrow,
+div#explanation p {
+  display:inline;
+  padding: .5em;
+}
+
+.posnodeselected {
+  font-size: 18pt;
+}
+
+</style>
+<body>
+<div id="graphdiv" style="width:1100; margin:auto">
+  <svg id="graph"></svg>
+</div>
+<div id="errors"></div>
+<div id="tree"></div>
+<script src="d3.v3.min.js"></script>
+<script>
+
+var width = 1200 || d3.select("body")[0][0].scrollWidth || 1100,
+    height = 800 || d3.select("body")[0][0].scrollHeight || 700;
+
+var svg = d3.select("svg#graph")
+    .attr("width", width)
+    .attr("height", height);
+
+var moves = {};
+var move_tree = { "key":"Bachata", "children":[], "id":"0", "x":100, "y":100}
+move_tree.upper = move_tree;
+var move_stack = [];
+function load_graph() {  
+  d3.tsv("bachata_moves_unique.txt", function(error, csv_rows) {
+    if (error) {
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      return;
+    }
+
+    // construct tree from rows so we can display it
+    for (i in csv_rows) {
+      var row = csv_rows[i];
+      var key = row.Start + " → " + row.Move + " → " + row.End;
+      var node = { // 
+        "key": key,
+        "children": [],
+        "id": row.Index,
+        "x": 0,
+        "y": 0    
+      };
+      moves[row.Index] = node;
+      var parent = row.Parent ? moves[row.Parent] : move_tree;
+      parent.children.push(node);
+      node.upper = parent;
+    }
+    move_stack = [move_tree];
+    layout_tree();
+  });
+}
+
+function layout_tree() {
+
+  var current_node = move_stack[move_stack.length-1];
+  var old_position_x = current_node.x;
+  var old_position_y = current_node.y;
+  move_stack.forEach(function(n, i) { n.x = width / 4; });  
+  current_node.children.forEach(function(n, i) { n.x = width * 2 / 4; });
+
+  space_out_from_top(move_stack);
+  space_out_from_middle(current_node.children);
+
+  // draw the stack..
+  var tree = d3.select("svg#graph");
+  var nodes = tree.selectAll("g")
+    .data(move_stack.concat(current_node.children), function(n) { return n.key; });  
+  nodes.transition()   
+      .duration(1000) 
+      .attr("transform", function(n, i) { return "translate(" + n.x + "," + n.y + ")"; })
+  var enter = nodes.enter().append("g");
+  enter
+      .attr("transform", function(n, i) { return "translate(" + (old_position_x+200) + "," + old_position_y + ")"; })
+      .style("opacity", 0)
+      .on("click", node_click)
+  enter.append("text")
+      .text(function(n) { return n.key; });
+  enter.append("text")
+      .text(function(n) { return n.id; })
+      .attr("transform", "translate(-30, 0)");
+  enter.transition()
+      .duration(1000) 
+      .attr("transform", function(n, i) { return "translate(" + n.x + "," + n.y + ")"; })
+      .style("opacity", 1);
+  nodes.exit().transition()
+      .duration(1000) 
+      .attr("transform", function(n, i) { return "translate(" + (n.upper.x+200) + "," + n.upper.y + ")"; })
+      .style("opacity", 0)
+      .remove();
+
+  tree.selectAll("g")
+      .classed("stack", function(n, i) { return move_stack.indexOf(n) >= 0; });
+}
+
+function node_click(n) {
+  if (d3.select(this).classed("stack")){
+    if (move_stack.length > 1)
+      move_stack.pop();
+  } else {
+    move_stack.push(n);
+  }
+  layout_tree();
+}
+
+function format_translate(n) {
+  return "translate(" + n.x + "," + n.y + ")";
+}
+
+function space_out_from_middle(ns)
+{
+  var default_spacing = 50; // vertical distance between transitions, unless too many and squeezing happens
+  var spacing = Math.min(default_spacing, (height *.9) / ns.length); // only use 80% of available height
+  var first_node_height = height/2 - spacing*(ns.length-1)/2;
+  ns.forEach(function(n, i) { n.y = first_node_height + spacing * i; });
+}
+
+function space_out_from_top(ns)
+{
+  var default_spacing = 50; // vertical distance between transitions, unless too many and squeezing happens
+  var spacing = Math.min(default_spacing, (height *.9) / ns.length); // only use 80% of available height
+  var first_node_height = height * .1;
+  ns.forEach(function(n, i) { n.y = first_node_height + spacing * i; });
+}
+
+
+load_graph();
+</script>
