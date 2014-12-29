@@ -84,7 +84,7 @@ Wrap	Free spin	Open hold	easy, turn	old Week 10			82	dup
 Crosshand	Boy turn	Boy hammerlock	easy	old Week 11		Leader keeps one hand high, one hand low.	83	5
 Open hold	Girl double-handed turn	Wrap	easy, turn	old Week 11			84	dup
 Wrap	Push-pull	Cliffhanger	easy, fun, swap	old Week 11			85	17
-Cliffhanger	Approach/retreat	Cliffhanger		old Week 11			86	85
+Cliffhanger	Approach/retreat	Cliffhanger		old Week 11			86	144
 Wrap	Circle walk	Open hold	fun	old Week 12		Arm over girl + boy hand to elbow + boy turn + haircomb + circle walk + girl turn	87	-
 Control hold	Girl turn	Hammerlock	easy, turn	extra			90	-
 Open hold	Boy turn	Crosshand	easy, boy	Week 9	2014-02-20		91	dup
@@ -168,14 +168,14 @@ Close hold	Back away + girl turn	Close hold offset	easy, turn	Week 8	2014-04-24	
 Close hold offset	Tango	Close hold	hard, fun	Week 8	2014-04-24	Step back while turning with girl, then on third step put new inside foot behind girl, hold on 4 for her to kick between boy's legs.	170	34
 Close hold	Basic	Close hold offset	easy, basic	Week 8	2014-04-24		171	-
 Close hold offset	Side lunge	Close hold	easy, fun, body	Week 8	2014-04-24	Holding girl very firmly against your side, perform a side lunge for 8 counts. Girl slowly drags outside foot to knee, keeping legs closed as always. Boy's torso must remain vertical; girl must use core strength to stay straight. Girl also pushes against boy's left hand for support if needed, boy must keep this tensed.	172	28
-Open hold	Boy turn, girl turn	Shoulder wrap	fast, turn	Adv	2014-04-30		173	-
-Shoulder wrap	Unwind	Cliffhanger	easy, turn	Adv	2014-04-30		174	-
-Cliffhanger	Walk through	Cliffhanger	hard	Adv	2014-04-30		175	-
-Cliffhanger	Girl bow; push forward + pull back	Mates hold	hard, fun, body	Adv	2014-04-30	Pull girl's arm up and forward on 1, hand across waist on 2,she bows on 3 (dissipating momentum), boy mostly behind on 4. Push hip on 5, pull on 6, bodyroll 7&8. Might be easier to lead with a walk through first.	176	-
-Mates hold	Lazy sway	Mates hold	easy, basic, body	Adv	2014-04-30		177	-
-Mates hold	Push-pull	Close hold	easy, fun	Adv	2014-04-30	Push girl forward and step back on 5, pull on 6 and walk around, boy half turn on 7.	178	-
-Close hold	Spin	Cliffhanger	hard, turn	Adv	2014-04-30		179	-
-Cliffhanger	Approach/retreat (double time)	Cliffhanger	fast	Adv	2014-04-30	Both step forward one foot after another on 1, back on 2, repeat. Lead with frame/hand.	180	-
+Open hold	Boy turn, girl turn	Shoulder wrap	fast, turn	Adv	2014-04-30		173	135
+Shoulder wrap	Unwind	Cliffhanger	easy, turn	Adv	2014-04-30		174	138
+Cliffhanger	Walk through	Cliffhanger	hard	Adv	2014-04-30		175	164
+Cliffhanger	Girl bow; push forward + pull back	Mates hold	hard, fun, body	Adv	2014-04-30	Pull girl's arm up and forward on 1, hand across waist on 2,she bows on 3 (dissipating momentum), boy mostly behind on 4. Push hip on 5, pull on 6, bodyroll 7&8. Might be easier to lead with a walk through first.	176	175
+Mates hold	Lazy sway	Mates hold	easy, basic, body	Adv	2014-04-30		177	166
+Mates hold	Push-pull	Close hold	easy, fun	Adv	2014-04-30	Push girl forward and step back on 5, pull on 6 and walk around, boy half turn on 7.	178	85
+Close hold	Spin	Cliffhanger	hard, turn	Adv	2014-04-30		179	40
+Cliffhanger	Approach/retreat (double time)	Cliffhanger	fast	Adv	2014-04-30	Both step forward one foot after another on 1, back on 2, repeat. Lead with frame/hand.	180	86
 Cliffhanger	Throw hand	Close hold	easy, basic	Adv	2014-04-30		181	-
 Open hold	Girl double-handed + boy double-handed turn	Open hold	fast	Week 9	2014-05-01		182	-
 Open hold	Girl double-handed turn	Catapult	easy, turn	Week 9	2014-05-01		183	dup

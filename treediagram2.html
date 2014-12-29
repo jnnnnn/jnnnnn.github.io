@@ -51,6 +51,11 @@
 <h3>Pleasing Variation</h3>
 <svg></svg>
 <div id="detail"></div>
+<div id="controls">  
+  <button type="button" onclick="expandall(); update(root);">Expand</button>
+  <button type="button" onclick="collapseall(); update(root);">Collapse</button>
+</div>
+
 <!-- load the d3.js library --> 
 <script src="http://d3js.org/d3.v3.min.js"></script>
   
@@ -229,17 +234,7 @@ function load_graph() {
     }
 
     // minimize every node..
-    var collapse = function(d) { 
-      for (var i in d.children) {
-        var c = d.children[i];
-        if (c.children.length) {
-          collapse(c);
-          c._children = c.children;
-          c.children = null;
-        }
-      }
-    }
-    collapse(root);
+    collapseall();
     update(root);
   });
 }
@@ -269,6 +264,35 @@ function mouseover(d) {
     .classed("description", true)
     .text(d.tsv.Description);
 }
+
+function expandall() {
+  var expand = function(d) { 
+    for (var i in d.children) {
+      var c = d.children[i];
+      if (c._children && c._children.length) {        
+        c.children = c._children;
+        c._children = null;
+      }      
+      expand(c);
+    }
+  }
+  expand(root);
+}
+
+function collapseall() {
+  var collapse = function(d) { 
+    for (var i in d.children) {
+      var c = d.children[i];
+      collapse(c);
+      if (c.children && c.children.length) {        
+        c._children = c.children;
+        c.children = null;
+      }
+    }
+  }
+  collapse(root);
+}
+
 
 
 </script>
