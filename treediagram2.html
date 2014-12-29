@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Pleasing Variation</title>
+
+    <style>
+  
+  .node {
+    cursor: pointer;
+  }
+
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 2px;
+  }
+
+  .node text {
+    font: 12pt sans-serif;
+  }
+
+  p.detail {
+    font: 16pt sans-serif;
+  }
+
+  p.description {
+    font: 12pt serif;
+  }
+
+  .link {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 2px;
+  }
+
+  tspan.state {
+    fill-opacity: .5;
+
+  }
+  tspan.move {
+  }
+  
+    </style>
+
+  </head>
+
+  <body>
+
+<h3>Pleasing Variation</h3>
+<svg></svg>
+<div id="detail"></div>
+<!-- load the d3.js library --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+  
+<script>
+
+// ************** Generate the tree diagram  *****************
+var margin = {top: 20, right: 300, bottom: 20, left: 20},
+  width = 1200 - margin.right - margin.left,
+  height = 700 - margin.top - margin.bottom;
+  
+var i = 0,
+  duration = 750,
+  root;
+
+var tree = d3.layout.tree()
+  .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+  .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("svg")
+  .attr("width", width + margin.right + margin.left)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+  
+d3.select(self.frameElement).style("height", "500px");
+
+// globals are: root, duration, svg, tree, diagonal
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+    links = tree.links(nodes);
+
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+    .data(nodes, function(d) { return d.id });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+    .on("click", click)
+    .on("mouseover", mouseover);
+
+  nodeEnter.append("circle")
+    .attr("r", 1e-6)
+    .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  var text = nodeEnter.append("text")
+    .attr("x", 13)//function(d) { return d.children || d._children ? -13 : 13; })    
+    //.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+    .style("fill-opacity", 1e-6);
+  text.append("tspan")
+    .classed("move", true)
+    .classed("state", true)
+    .text(function(d) { return d.tsv.Start; });
+  text.append("tspan")
+    .classed("move", true)
+    .attr("x", 13)
+    .attr("y", 13)
+    .text(function(d) { return d.tsv.Move; });
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+    .duration(duration)
+    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeUpdate.select("circle")
+    .attr("r", 4)
+    .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeUpdate.select("text")
+    .style("fill-opacity", 1)
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+    .duration(duration)
+    .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+    .remove();
+
+  nodeExit.select("circle")
+    .attr("r", 1e-6);
+
+  nodeExit.select("text")
+    .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = svg.selectAll("path.link")
+    .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+    .attr("class", "link")
+    .attr("d", function(d) {
+    var o = {x: source.x0, y: source.y0};
+    return diagonal({source: o, target: o});
+    });
+
+  // Transition links to their new position.
+  link.transition()
+    .duration(duration)
+    .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+    .duration(duration)
+    .attr("d", function(d) {
+    var o = {x: source.x, y: source.y};
+    return diagonal({source: o, target: o});
+    })
+    .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+  d.x0 = d.x;
+  d.y0 = d.y;
+  });
+}
+
+var moves = {};
+var moves_list = [];
+root = { //
+    "key": "Bachata",
+    "parent": "null",
+    "children": [],
+    "tsv": { 
+      "Start": "",
+      "Move": "",
+      "End": "",
+      "Description": "",
+      "Index": "",
+      "Parent": ""
+    }
+  };
+root.x0 = height / 2;
+root.y0 = 0;
+
+function load_graph() {  
+  d3.tsv("bachata_moves.txt", function(error, csv_rows) {
+    if (error) {
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      return;
+    }
+    csv_rows.sort(function(a, b) { return d3.ascending(parseInt(a.Parent), parseInt(b.Parent)); });
+
+    // construct tree from rows so we can display it
+    for (i in csv_rows) {
+      var row = csv_rows[i];
+      if (row.Parent === '-' || row.Parent === "dup")
+        continue;
+      var key = row.Start + " → " + row.Move + " → " + row.End;
+      var node = { // 
+        "key": key,
+        "children": [],
+        "id": row.Index,
+        "x": 0,
+        "y": 0,
+        "tsv": row
+      };
+      moves[row.Index] = node;
+      moves_list.push(node);
+    }
+
+    // second pass is separate in case parent is after child
+    for (i in moves_list) {
+      var node = moves_list[i];
+      var parent = node.tsv.Parent ? moves[node.tsv.Parent] : root;
+      if (!parent)
+        console.log("error:", node);
+      else
+        parent.children.push(node);
+    }
+
+    // minimize every node..
+    var collapse = function(d) { 
+      for (var i in d.children) {
+        var c = d.children[i];
+        if (c.children.length) {
+          collapse(c);
+          c._children = c.children;
+          c.children = null;
+        }
+      }
+    }
+    collapse(root);
+    update(root);
+  });
+}
+
+load_graph();
+
+// Toggle children on click.
+function click(d) {
+  if (d.children) {
+  d._children = d.children;
+  d.children = null;
+  } else {
+  d.children = d._children;
+  d._children = null;
+  }
+  update(d);
+}
+
+function mouseover(d) {
+  var detdiv = document.getElementById("detail");
+  detdiv.innerHTML = "";
+  var detail = d3.select(detdiv);
+  detail.append("p")  
+    .classed("detail", true)
+    .text(d.id + " " + d.key);
+  detail.append("p")
+    .classed("description", true)
+    .text(d.tsv.Description);
+}
+
+
+</script>
+  
+  </body>
+</html>

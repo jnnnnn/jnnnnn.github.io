@@ -38,14 +38,16 @@ def select_fun():
 def select_unique():
     with open(r"D:\drop\jnnnnn.github.io\bachata_moves.txt", newline='') as infile:
         inrows = csv.reader(infile, delimiter='\t')
-        with open(r"D:\drop\jnnnnn.github.io\bachata_moves_unique.txt", 'w', newline='') as outfile:
+        with open(r"D:\drop\jnnnnn.github.io\bachata_moves_dupmarked.txt", 'w', newline='') as outfile:
             outrows = csv.writer(outfile, delimiter='\t')
             outrows.writerow(inrows.__next__()) # copy header
             seen_keys = set()
             for row in inrows:  
-                key = row[0] + " -> " + row[1] + " -> " + row[2]            
-                if key not in seen_keys:
-                    outrows.writerow(row)
+                key = row[0] + " -> " + row[1] + " -> " + row[2]                
+                if key in seen_keys:
+                    row[8] = "dup"
+                else:
                     seen_keys.add(key)
+                outrows.writerow(row)               
 
 select_unique()
