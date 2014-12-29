@@ -100,18 +100,20 @@ var moves = {};
 var move_tree = { "key":"Bachata", "children":[], "id":"0", "x":100, "y":100}
 move_tree.upper = move_tree;
 var move_stack = [];
+
 function load_graph() {  
-  d3.tsv("bachata_moves_unique.txt", function(error, csv_rows) {
+  d3.tsv("bachata_moves.txt", function(error, csv_rows) {
     if (error) {
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
       return;
     }
     csv_rows.sort(function(a, b) { return d3.ascending(parseInt(a.Parent), parseInt(b.Parent)); });
 
+    var moves_list = [];
     // construct tree from rows so we can display it
     for (i in csv_rows) {
       var row = csv_rows[i];
-      if (row.Parent == '-')
+      if (row.Parent === '-' || row.Parent === "dup")
         continue;
       var key = row.Start + " → " + row.Move + " → " + row.End;
       var node = { // 
@@ -120,12 +122,22 @@ function load_graph() {
         "id": row.Index,
         "x": 0,
         "y": 0,
-        "data": row
+        "tsv": row
       };
       moves[row.Index] = node;
-      var parent = row.Parent ? moves[row.Parent] : move_tree;
-      parent.children.push(node);
-      node.upper = parent;
+      moves_list.push(node);
+    }
+
+    // second pass is separate in case parent is after child
+    for (i in moves_list) {
+      var node = moves_list[i];
+      var parent = node.tsv.Parent ? moves[node.tsv.Parent] : move_tree;
+      if (!parent)
+        console.log("error:", node);
+      else {
+        parent.children.push(node);
+        node.upper = parent;
+      }
     }
     move_stack = [move_tree];
     layout_tree();

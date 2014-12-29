@@ -6,7 +6,7 @@ Open hold	Boy turn	Open hold	easy, boy	Week 1		Put one hand on chest, out of the
 Open hold	Boy turn	Crosshand	easy, boy	Week 1		Put one hand on chest, out of the way. Use this hand to grab the follower's trailing hand.	5	4
 Open hold	Basic	Control hold	easy, basic	Week 1		Palms face partner, hands 70cm apart. Hold her wrists firmly.	6	-
 Control hold	Single steps	Control hold	easy, basic	Week 1		Step left, feet together, step right, feet together. Repeat	7	8
-Control hold	Basic	Open hold	easy, basic	Week 1			8	6
+Control hold	Basic	Open hold	easy, basic	Week 1			8	-
 Open hold	Girl turn	Hammerlock	easy, turn	Week 2		Turn, keeping one hand low. Keep contact with both hands.	9	3
 Hammerlock	Unwind	Open hold	easy, turn	Week 2			10	9
 Hammerlock	Windmill	Hammerlock	fun, hard, turn	Week 2		Boy half outside turn (outside hand over head), bring outside hand down, continue/repeat.	11	10
