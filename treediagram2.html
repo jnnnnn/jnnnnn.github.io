@@ -52,8 +52,8 @@
 <svg></svg>
 <div id="detail"></div>
 <div id="controls">  
-  <button type="button" onclick="expandall(); update(root);">Expand</button>
-  <button type="button" onclick="collapseall(); update(root);">Collapse</button>
+  <button type="button" onclick="expand(root); update(root);">Expand</button>
+  <button type="button" onclick="collapse(root); update(root);">Collapse</button>
 </div>
 
 <!-- load the d3.js library --> 
@@ -196,6 +196,7 @@ root = { //
   };
 root.x0 = height / 2;
 root.y0 = 0;
+var current_move = root;
 
 function load_graph() {  
   d3.tsv("bachata_moves.txt", function(error, csv_rows) {
@@ -234,7 +235,7 @@ function load_graph() {
     }
 
     // minimize every node..
-    collapseall();
+    collapse(root);
     update(root);
   });
 }
@@ -254,6 +255,7 @@ function click(d) {
 }
 
 function mouseover(d) {
+  current_move = d;
   var detdiv = document.getElementById("detail");
   detdiv.innerHTML = "";
   var detail = d3.select(detdiv);
@@ -265,35 +267,51 @@ function mouseover(d) {
     .text(d.tsv.Description);
 }
 
-function expandall() {
-  var expand = function(d) { 
-    for (var i in d.children) {
-      var c = d.children[i];
-      if (c._children && c._children.length) {        
-        c.children = c._children;
-        c._children = null;
-      }      
-      expand(c);
-    }
+function expand(d) { 
+  if (d._children && d._children.length) {        
+      d.children = d._children;
+      d._children = null;
   }
-  expand(root);
+  for (var i in d.children) {
+    var c = d.children[i];
+    expand(c);
+  }
 }
 
-function collapseall() {
-  var collapse = function(d) { 
-    for (var i in d.children) {
-      var c = d.children[i];
-      collapse(c);
-      if (c.children && c.children.length) {        
-        c._children = c.children;
-        c.children = null;
-      }
-    }
+function collapse(d) {  
+  if (d.children && d.children.length) {        
+      d._children = d.children;
+      d.children = null;
   }
-  collapse(root);
+  for (var i in d._children) {
+    var c = d._children[i];
+    collapse(c);    
+  }
 }
 
 
+function onkeypress()
+{
+  // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
+  // finding keyCodes: http://jsfiddle.net/qAHC2/292/
+  switch(d3.event.keyCode) {    
+    case 69: // e
+      expand(current_move);
+      update(current_move);
+      break;
+    case 67: // c
+      collapse(current_move);
+      update(current_move);
+      break;
+    default:
+      console.log(d3.event.keyCode);
+      break;
+  };
+  d3.event.stopPropagation();
+}
+
+d3.select("body")
+    .on("keydown", onkeypress);
 
 </script>
   
