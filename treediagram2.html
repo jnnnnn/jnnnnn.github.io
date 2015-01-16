@@ -234,8 +234,11 @@ function load_graph() {
         parent.children.push(node);
     }
 
-    // minimize every node..
-    collapse(root);
+    // minimize everything..
+    for (var i in root.children) {
+      var c = root.children[i];
+      collapse(c);
+    }
     update(root);
   });
 }
