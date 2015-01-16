@@ -40,14 +40,14 @@ Close hold	Lunge	Close hold	basic	Week 4	2014-01-23	Step forward on one, down on
 Close hold	Half spin	Close hold	easy, swap	Week 4	2014-01-23	Prepare with small contra, then half turn.	39	29
 Close hold	Spin	Close hold	easy, swap	Week 4	2014-01-23	Prepare with large contra, then full turn fast. Foot should be turned at least 90 degress for first step. Boy's and girl's right feet are the pivot point -- boy on 1, girl on 2, boy on 3, use fourth beat to stop turning (start stopping on 3)	40	39
 Close hold	Hip roll	Close hold	body	Week 4	2014-01-23		41	29
-Close hold	Step back	Open hold	easy, basic	Week 4	2014-01-23		42	1
+Close hold	Step back	Open hold	easy, basic	Week 4	2014-01-23		42	-
 Open hold	Step back + walk around	Mates hold	easy	Week 5	2014-01-30	Place right hand on hip, left hands extended (tango-style).	43	1
 Mates hold	Basic	Mates hold	easy, basic	Week 5	2014-01-30	Mates hold is when both are facing the same way, boy's right hand on girl's hip and left hands extended outward. Boy is offset to avoid awkwardness. Booty rolls optional.	44	16
 Mates hold	Step back + kick forward	Mates hold	hard	Week 5	2014-01-30	Left foot back, right knee touches back of follower's thigh to push follower's leg into kick + step forward. Lead with frame to avoid foot collisions. Can also do back-back-forward-thighpush.	45	17
 Open hold	Girl turn 5/4	Side-by-side	turn	Week 6	2014-02-06	Girl turns, then both dancers do an extra quarter turn to end up facing the same way.	46	3
 Side-by-side	About turn	Side-by-side		Week 6	2014-02-06	Both forward on 1, 2, half turn inwards on 3 (swap hands) (led on 1), tap on 4.	47	414
 Side-by-side	Girl spin + boy spin	Open hold	fast, turn	Week 6	2014-02-06		48	414
-Open hold	Girl double-handed + boy double-handed turn	Boy haircombed	fast, turn	Week 6	2014-02-06	????	49	52
+Open hold	Girl + boy double-handed turn	Boy haircombed	fast, turn	Week 6	2014-02-06	????	49	182
 Boy haircombed	Girl haircomb	Open hold	basic	Week 6	2014-02-06		50	-
 Open hold	Girl turn	Open hold	easy, turn	Week 6	2014-02-06		51	dup
 Open hold	Girl double-handed turn	Catapult	easy, turn	Week 6	2014-02-06		52	3
@@ -65,14 +65,14 @@ Mates hold	Girl half turn	Hammerlock crosshand	fun	Week 7	2014-02-13		63	62
 Hammerlock crosshand	Girl turn + boy haircomb	Close hold	easy, turn	Week 7	2014-02-13		64	-
 Wrap	Haircomb	Mates hold	fun, body, basic	extra		Release both hands from seatbelted, then collect hand and extend out to side.	65	16
 Open hold	Boy turn	Crosshand	easy, boy	old Week 9			66	dup
-Crosshand	Girl double-handed + boy double-handed turn	Crosshand	fast, turn	old Week 9			67	25
+Crosshand	Girl + boy double-handed turn	Crosshand	fast, turn	old Week 9			67	25
 Crosshand	Girl haircomb	Open hold	easy, basic	old Week 9			68	dup
 Open hold	Girl turn + swap hand	Crosshand	easy, turn	old Week 9			69	-
 Crosshand	Girl double-handed + boy turn	Boy hammerlock	fast, turn	old Week 9			70	25
 Boy hammerlock	Haircomb + arm sweep	Arm up	fun	old Week 9			71	-
 Arm up	Girl turn	Open hold	easy, turn	old Week 9			72	-
 Open hold	Girl double-handed turn	Wrap	easy, turn	old Week 9			73	52
-Wrap	Roll out girl	Cliffhanger	easy, turn	old Week 9			74	3
+Wrap	Roll out girl	Cliffhanger	easy, turn	old Week 9			74	135
 Cliffhanger	Free spin	Open hold	easy, turn	old Week 9			75	-
 Open hold	Girl turn 5/4	Side-by-side	turn	old Week 10			76	dup
 Side-by-side	About turn	Side-by-side		old Week 10			77	dup
@@ -129,7 +129,7 @@ Hammerlock	Unwind	Open hold	easy, turn	Week 3	2014-03-20		130	dup
 Hammerlock	Crossover	Open hold	easy, swap	Week 3	2014-03-20	Walk past each other, half turn.	131	dup
 Hammerlock	Windmill	Hammerlock	fun, hard, turn	Week 3	2014-03-20		132	dup
 Open hold	Boy turn	Boy hammerlock	easy, boy	Week 3	2014-03-20		133	4
-Boy hammerlock	Boy bow	Open hold	boy	Week 3	2014-03-20	Holding hammerlock hand but dropping the other, leader bows / slides under follower's arm.	134	1
+Boy hammerlock	Boy bow	Open hold	boy	Week 3	2014-03-20	Holding hammerlock hand but dropping the other, leader bows / slides under follower's arm.	134	160
 Open hold	Girl turn	Wrap	easy, turn	Week 4	2014-03-27		135	3
 Wrap	Girl half turn	Shoulder wrap	easy	Week 4	2014-03-27		136	123
 Shoulder wrap	Girl turn + boy hand to elbow + boy turn + haircomb	Arm up	turn	Week 4	2014-03-27		137	-
@@ -176,31 +176,31 @@ Mates hold	Lazy sway	Mates hold	easy, basic, body	Adv	2014-04-30		177	166
 Mates hold	Push-pull	Close hold	easy, fun	Adv	2014-04-30	Push girl forward and step back on 5, pull on 6 and walk around, boy half turn on 7.	178	85
 Close hold	Spin	Cliffhanger	hard, turn	Adv	2014-04-30		179	40
 Cliffhanger	Approach/retreat (double time)	Cliffhanger	fast	Adv	2014-04-30	Both step forward one foot after another on 1, back on 2, repeat. Lead with frame/hand.	180	86
-Cliffhanger	Throw hand	Close hold	easy, basic	Adv	2014-04-30		181	-
-Open hold	Girl double-handed + boy double-handed turn	Open hold	fast	Week 9	2014-05-01		182	-
+Cliffhanger	Throw hand	Close hold	easy, basic	Adv	2014-04-30		181	170
+Open hold	Girl + boy double-handed turn	Open hold	fast	Week 9	2014-05-01		182	52
 Open hold	Girl double-handed turn	Catapult	easy, turn	Week 9	2014-05-01		183	dup
 Arm up	Girl turn	Open hold	easy, turn	Week 9	2014-05-01		185	dup
-Arm up	Girl turn + swap hand	Crosshand	easy, turn	Week 9	2014-05-01		186	-
+Arm up	Girl turn + swap hand	Crosshand	easy, turn	Week 9	2014-05-01		186	3
 Open hold	Girl double-handed turn	Catapult	easy, turn	Week 9	2014-05-01		187	dup
-Crosshand	Circle walk	Open hold	hard, swap	Week 9	2014-05-01	Window each other (hands over head) so each has a hand behind the other's neck. Walk around each other in a circle.	188	-
-Catapult	Boy hesitation turn	Boy wrap	easy	Week 9	2014-05-01		189	-
-Boy wrap	Boy hands over head + girl trail down back	Boy wrap	easy	Week 9	2014-05-01		190	-
+Crosshand	Circle walk	Open hold	hard, swap	Week 9	2014-05-01	Window each other (hands over head) so each has a hand behind the other's neck. Walk around each other in a circle.	188	414
+Catapult	Boy hesitation turn	Boy wrap	easy	Week 9	2014-05-01		189	20
+Boy wrap	Boy hands over head + girl trail down back	Boy wrap	easy	Week 9	2014-05-01		190	21
 Boy wrap	Girl turn + haircomb	Close hold	easy, turn	Week 9	2014-05-01		191	-
-Boy wrap	Girl turn	Open hold	easy, turn	Week 9	2014-05-01		192	-
-Open hold	Girl turn + boy turn	Open hold	fast, turn	Adv	2014-05-07		193	-
-Open hold	Boy turn	Catapult	easy, boy	Adv	2014-05-07		194	-
+Boy wrap	Girl turn	Open hold	easy, turn	Week 9	2014-05-01		192	22
+Open hold	Girl turn + boy turn	Open hold	fast, turn	Adv	2014-05-07		193	3
+Open hold	Boy turn	Catapult	easy, boy	Adv	2014-05-07		194	4
 Catapult	Catapult + block + slips	Catapult	basic, hard	Adv	2014-05-07	Catapult arm around for four counts. On the way back, slip arm through catapult (twice).	195	dup
 Catapult	Catapult + block + arm behind	Hammerlock	hard	Adv	2014-05-07	Push arm behind girl's back when blocking.	196	dup
 Hammerlock	Unwind	Control hold	easy, turn	Adv	2014-05-07		197	-
 Control hold	Hesitation step	Stepped back	easy, basic	Adv	2014-05-07		198	-
 Stepped back	Pull forward	Wrap	body	Adv	2014-05-07	Pull forward on 1, put hand to waist on 2 and pull back, walk behind into cuddle.	199	-
-Wrap	Horizontal sway	Wrap	body	Adv	2014-05-07		200	-
-Wrap	Lead bodyrolls from side	Close hold	body, fun	Adv	2014-05-07	Right hand on back to lead roll, left hand on far hip to prevent falling forward. 2 bodyrolls and then into close hold, all in four beats.	201	-
+Wrap	Horizontal sway	Wrap	body	Adv	2014-05-07		200	16
+Wrap	Lead bodyrolls from side	Close hold	body, fun	Adv	2014-05-07	Right hand on back to lead roll, left hand on far hip to prevent falling forward. 2 bodyrolls and then into close hold, all in four beats.	201	111
 Control hold	Step back	Cliffhanger	easy, basic	Week 10	2014-05-08		202	-
-Cliffhanger	Approach/retreat	Open hold		Week 10	2014-05-08	Pull & step forward on 1 and 2, back on 3 and 4 but tap last step (use same foot again for next beat)	203	-
+Cliffhanger	Approach/retreat	Open hold		Week 10	2014-05-08	Pull & step forward on 1 and 2, back on 3 and 4 but tap last step (use same foot again for next beat)	203	2
 Open hold	Boy turn	Crosshand	easy, boy	Week 10	2014-05-08		204	dup
 Crosshand	Girl double-handed + boy turn	Boy hammerlock	fast, turn	Week 10	2014-05-08		205	dup
-Boy hammerlock	Haircomb + bump arm	Open hold	easy, basic	Week 10	2014-05-08	Boy bumps girl's wrist with free elbow to break hammerlock ; girl's arm travels in semicircle to top then grabs her booty	206	-
+Boy hammerlock	Haircomb + bump arm	Open hold	easy, basic	Week 10	2014-05-08	Boy bumps girl's wrist with free elbow to break hammerlock ; girl's arm travels in semicircle to top then grabs her booty	206	160
 Open hold	Girl turn 5/4	Side-by-side	turn	Week 10	2014-05-08	To lead, sweep arm lowish and firmly forward, keep moving after girl turn	207	dup
 Side-by-side	About turn	Side-by-side		Week 10	2014-05-08	Step forward for 2 then turn, 4 is a tap	208	dup
 Side-by-side	Girl spin + boy spin	Open hold	fast, turn	Adv	2014-05-14		209	dup
@@ -235,7 +235,7 @@ Cliffhanger	Free spin	Wrap	easy, turn	Adv w/ Manuel	2014-05-21		237	-
 Wrap	Bamboleo	Wrap	body	Adv w/ Manuel	2014-05-21	Roll hips in a horizontal circle : left, then hip forward, then neutral 	238	-
 Wrap	Free spin	Embrace	easy, turn	Adv w/ Manuel	2014-05-21	Hands on shoulderblades	239	-
 Embrace	Scoop dip, bodyroll	Embrace	body	Adv w/ Manuel	2014-05-21		240	-
-Crosshand	Girl double-handed + boy double-handed turn	Crosshand	fast, turn	Manuel	2014-05-22		241	dup
+Crosshand	Girl + boy double-handed turn	Crosshand	fast, turn	Manuel	2014-05-22		241	dup
 Crosshand	Girl hesitation turn	Mates hold	hard	Manuel	2014-05-22	Put right hand on girl's waist, left hands extended	242	dup
 Mates hold	Girl turns around boy	Boy wrap	fun	Manuel	2014-05-22	Led with left hand high	243	-
 Boy wrap	Left hand over, boy half turn	Crosshand	easy	Manuel	2014-05-22		244	-
@@ -269,11 +269,11 @@ Open hold	Girl turn	Close hold	easy, turn	Week 4	2014-06-26		271	-
 Close hold	Dip	Close hold	fun, body	Week 4	2014-06-26		272	dup
 Open hold	Elbow break + boy turn	Crosshand	easy	Adv	2014-07-02		273	dup
 Crosshand	Girl turn + boy outside turn	Boy hammerlock	hard, turn	Adv	2014-07-02		274	dup
-Boy hammerlock	Haircomb + bump arm	Close hold	easy	Adv	2014-07-02	Boy gently nudges girl's hammerlock forearm with elbow, and slides to the right for four counts.	275	-
-Close hold	Boy window	Embrace	easy	Adv	2014-07-02	Boy puts free elbow across and then (reverse) haircombs himself.	276	-
-Embrace	Roll shoulder + twist sit, booty roll	Embrace	hard, body, fun	Adv	2014-07-02	Right shoulder goes 1. up, forward, down 2. up, back, down. On 3+4, twist shoulders so girl sits on left leg. On five, push her off with leg and let her booty roll to 8.	277	-
-Embrace	Booty rolls	Embrace	body, fun	Adv	2014-07-02	Girl holds boy's legs with knees, boy rolls hips to non-stepping foot, pulling girl with him from the middle of her back	278	-
-Open hold	About turn	Close hold	turn	Project	2014-07-08	Girl turn, boy follows around with hand on back to switch sides (like a close hold 180)	279	-
+Boy hammerlock	Haircomb + bump arm	Close hold	easy	Adv	2014-07-02	Boy gently nudges girl's hammerlock forearm with elbow, and slides to the right for four counts.	275	206
+Close hold	Boy window	Embrace	easy	Adv	2014-07-02	Boy puts free elbow across and then (reverse) haircombs himself.	276	29
+Embrace	Roll shoulder + twist sit, booty roll	Embrace	hard, body, fun	Adv	2014-07-02	Right shoulder goes 1. up, forward, down 2. up, back, down. On 3+4, twist shoulders so girl sits on left leg. On five, push her off with leg and let her booty roll to 8.	277	32
+Embrace	Booty rolls	Embrace	body, fun	Adv	2014-07-02	Girl holds boy's legs with knees, boy rolls hips to non-stepping foot, pulling girl with him from the middle of her back	278	41
+Open hold	About turn	Close hold	turn	Project	2014-07-08	Girl turn, boy follows around with hand on back to switch sides (like a close hold 180)	279	46
 Open hold	Shuffles	Open hold	easy, fun, basic	Project	2014-07-08	Arms move in circles: left on 1, right on 2, etc., skipping 4 and 8	280	-
 Close hold	Spin	Close hold	easy, swap	Project	2014-07-08		281	dup
 Crosshand	Walkaround	Open hold	turn, fun	Project	2014-07-08	Girl outside turn, as turn completes boy puts turning arm over girl's and back of hand on girl's shoulderblade (do not elbow her in the face)	282	-
@@ -358,7 +358,7 @@ Side-by-side	About turn	Side-by-side		Adv	2014-08-13		360	dup
 Side-by-side	Lead across	Control hold	fast, turn	Adv	2014-08-13	Girl gets pulled diagonally forward for double turn; boy outside turn on 7,8.	361	-
 Control hold	Wrong-way turn	Open hold	hard, turn	Adv	2014-08-13	One step of basic then girl inside turn the other way. Basic continues in the SAME direction after.	362	-
 Open hold	Basic	Open hold	easy, basic	Adv	2014-08-13		363	dup
-Open hold	Girl double-handed + boy double-handed turn	Boy haircombed	fast, turn	Adv	2014-08-13		364	dup
+Open hold	Girl + boy double-handed turn	Boy haircombed	fast, turn	Adv	2014-08-13		364	dup
 Boy haircombed	Boy outside turn	Hammerlock	hard, fun	Adv	2014-08-13	Boy throws girl's hand behind her back then does his outside turn	365	-
 Hammerlock	Wrong-way turn	Open hold	hard	Adv	2014-08-13	also called an "outside basic". 	366	-
 Open hold	Boy window	Close hold	easy, basic	Adv	2014-08-13		367	-
@@ -408,7 +408,7 @@ Close hold	Basic	Open hold	easy, basic	Adv	2014-09-10		410	dup
 Open hold	Girl turn 5/4	Wrap	turn	Adv	2014-09-10	Girl turns into wrap as boy walks around her front to the other side.	411	-
 Wrap	Roll out girl	Cliffhanger	easy, turn	Adv	2014-09-10		412	dup
 Cliffhanger	Girl walk	Side-by-side		Adv	2014-09-10	Lead by tugging slightly (relies on girl keeping tension in arm). Boy half turn.	413	-
-Side-by-side	Walk	Side-by-side	easy	Adv	2014-09-10		414	682
+Side-by-side	Walk	Side-by-side	easy	Adv	2014-09-10		414	1
 Side-by-side	Boy outside turn	Embrace		Adv	2014-09-10	Keep arm low until putting it on your shoulder so that girl doesn't turn. Put girl's other arm on your shoulder if she goes for close hold.	415	-
 Embrace	Swaying squat	Embrace	easy, fun	Adv	2014-09-10		416	-
 Embrace	Body roll(s)	Embrace	hard, body	Adv	2014-09-10	Gently roll wrists down shoulderblade to lead, don't force it. Keep space between your bodies; boy's hips can go back to make room.	417	-
@@ -518,7 +518,7 @@ Open hold	Girl turn with boy outside turn	Hammerlock	turn	TSF Level 2	2014-10-22
 Hammerlock	Girl turn + boy back scratch	Open hold	hard, turn, swap	TSF Level 2	2014-10-22	Girl turns on 5. Boy half turn on 7, 8, leaves hand on shoulder. Girl's right hand trails down back on 1, 2, boy catches on 2, throws out on three to catch left arm and lead forward with turn.	521	-
 Open hold	Double turn dip	Close hold	fast, turn, fun	TSF Level 2	2014-10-22		522	dup
 Close hold	Walk forward	Close hold	easy, basic	Project 4/5	2014-10-21		523	-
-Close hold	Slow walk backward	Close hold	easy, basic, fun	Project 4/5	2014-10-21	Walk backwards, one step every two beats.	524	-
+Close hold	Slow walk backward	Close hold	easy, basic, fun	Project 4/5	2014-10-21	Walk backwards, one step every two beats.	524	34
 Open hold	Boy outside turn	Side-by-side	hard, fast	Project 4/5	2014-10-21	Swap hands behind back then throw hand away and grab other hand	525	-
 Side-by-side	Girl double turn	Open hold	fast, turn	Project 4/5	2014-10-21		526	-
 Close hold	Basic	Close hold opened	easy, basic	Project 4/5	2014-10-21	Open out frame to opened-close-hold over four beats	527	-
@@ -677,23 +677,18 @@ Sweetheart	Girl turn	Crosshand		Project 4/5	2014-12-16		679	dup
 Crosshand	Double arm sweep	Close hold		Project 4/5	2014-12-16		680	dup
 Crosshand	Basic	Crosshand		filler			681	1
 Control hold	Basic	Control hold		filler			682	1
-							683	-
-							684	-
-							685	-
-							686	-
-							687	-
-							688	-
-							689	-
-							690	-
-							691	-
-							692	-
-							693	-
-							694	-
-							695	-
-							696	-
-							697	-
-							698	-
-							699	-
-							700	-
-							701	-
-							702	-
+Open hold	Girl haircomb	Neck hold	nice	Sharon	2015-01-08	Lead can hold haircomb hand with both hands for more intimacy. Rest your hand on the back of her neck.	683	26
+Neck hold	Lazy sway	Neck hold	easy, basic, body	Sharon	2015-01-08	Lift girl's frame just before starting sway so she knows that something is up. Drag head to indicate slower move.	684	166
+Neck hold	Relax hands	Open hold	easy, basic	Sharon	2015-01-08		685	-
+Open hold	Boy turn + flick	Arms up		Sharon	2015-01-08		686	4
+Arms up	Lazy sway	Embrace	easy, basic, body	Sharon	2015-01-08	Hold the girl's ribcage firmly (not forcefully) and have a strong posture (feet apart, head up, shoulders back and down). Slide it side to side, moving your own torso as well.	687	166
+Open hold	Slow walk forward	Neck hold	basic	Sharon	2015-01-08	This is a good one to do at the start of a dance. Stop girl so she goes back with her left foot first. Step on 1, 3, 5, 7. Then do a very slow sway (four beats per side).	688	2
+Neck hold	Lazy sway	Neck hold	easy, basic, body	Sharon	2015-01-08		689	dup
+Neck hold	Walk around girl	Open hold		Sharon	2015-01-08	Walk all the way around over 8 counts, windowing her with her right hand.	690	4
+Crosshand	Girl turn	Sweetheart	turn	Sharon	2015-01-08	Girl 1.5 turn	691	62
+Sweetheart	Lazy sway	Sweetheart	easy, basic, body	Sharon	2015-01-08	Hand resting on her left shoulder (upper arm) to lead	692	177
+Sweetheart	Boy walks around	Close hold	body, nice	Sharon	2015-01-08	Lift her left elbow and walk under it. Most girls really like this move. 	693	690
+Close hold	Slow walk backward	Close hold	body, nice	Sharon	2015-01-08	Step back on boy's left, leading girl forward on her right. Contra before doing this so she knows it's coming. Then step back on boy's right. On third step back, you can bend over as though whispering in her ear and flick her leg upward slightly (make contact just above the knee, on the back of her leg).	694	dup
+Close hold	Body rolls	Close hold	body	Sharon	2015-01-08	Both lean back before starting roll. Lead with suggestion only, two or three fingers on spine behind sternum. End by lifting (hip first, then shoulders) back to standard close hold.	695	29
+Cliffhanger	Boy orbit	Boy haircombed		Project 4/5	2015-01-06	Lead girl to walk forward then walk behind her, holding her in place using her shoulder. Complete the orbit and haircomb yourself.	696	-
+Boy haircombed	Flick hand	Hammerlock crosshand		Project 4/5	2015-01-06	Girl's hand is on your neck -- flick it down and behind her and then grab it.	697	-
