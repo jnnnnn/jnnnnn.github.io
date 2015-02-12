@@ -55,6 +55,62 @@
   <button type="button" onclick="expand(root); update(root);">Expand</button>
   <button type="button" onclick="collapse(root); update(root);">Collapse</button>
 </div>
+Don't forget about these possible variations:
+<ul>
+<li>Timing (triple step, reverse, hesitation, double-time, slow-quick-quick, quick-quick-slow, wrong way)</li>
+<li>Translation up/forward/sideways (squat, offset, lean back, slide, sway, flick, close/open hold)</li>
+<li>Rotation around/forward/sideways (close/wrap, spinning, dips, twisted)</li>
+<li>Body part (frame/feet/knees/hips/butt/chest/shoulders/head/hands)</li>
+</ul>
+<button type="button" onclick="random_variation()">Random variation</button>
+<button type="button" onclick="vary()">Alter variation</button>
+<div id="randvar"></div>
+<div style="height:300px;"></div> <!-- padding at the bottom to allow scrolling past the end -->
+
+<script>
+function chooseAtRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+var random_moves = ",,,,single step,boy turn,girl turn,walk,both turn".split(",");
+var timings = ",,,,,triple step,reverse,hesitation,double-time,slow-quick-quick,quick-quick-slow".split(",");
+var directions = ",,,,up,down,forward,back,sideways,wrong way".split(",");
+var translations = ",,,,squat,offset,lean back,slide,sway,flick".split(",");
+var rotations = ",,,,wrap,circling,dipped,twisted".split(",");
+var bodyparts = ",,,,frame,feet,knees,hips,butt,chest,shoulders,head,hands".split(",");
+
+var variant = {move: "", timing: "", direction:"", translation:"", rotation:"", bodypart:""};
+
+function vary() {  
+  var thing_to_vary = Math.floor(Math.random() * 5);
+  if (thing_to_vary === 0)
+    variant.timing = chooseAtRandom(timings);
+  if (thing_to_vary === 1)
+    variant.direction = chooseAtRandom(directions);
+  if (thing_to_vary === 2)
+    variant.translation = chooseAtRandom(translations);
+  if (thing_to_vary === 3)
+    variant.rotation = chooseAtRandom(rotations);
+  if (thing_to_vary === 4)
+    variant.bodypart = chooseAtRandom(bodyparts);  
+  update_screen();  
+}
+
+function random_variation() {
+  variant.move = chooseAtRandom(random_moves);
+  variant.timing = chooseAtRandom(timings);
+  variant.direction = chooseAtRandom(directions);
+  variant.translation = chooseAtRandom(translations);
+  variant.rotation = chooseAtRandom(rotations);
+  variant.bodypart = chooseAtRandom(bodyparts);
+  update_screen();
+}
+
+function update_screen() {
+  var div = document.getElementById("randvar");
+  div.innerHTML = variant.move + " (" + variant.timing + ") " + variant.direction + " " + variant.translation + " " + variant.rotation + " " + variant.bodypart;
+}
+</script>
 
 <!-- load the d3.js library --> 
 <script src="http://d3js.org/d3.v3.min.js"></script>
