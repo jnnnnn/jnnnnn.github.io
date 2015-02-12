@@ -62,6 +62,7 @@ Don't forget about these possible variations:
 <li>Rotation around/forward/sideways (close/wrap, spinning, dips, twisted)</li>
 <li>Body part (frame/feet/knees/hips/butt/chest/shoulders/head/hands)</li>
 </ul>
+<h3>Variation generator</h3>
 <button type="button" onclick="random_variation()">Random variation</button>
 <button type="button" onclick="vary()">Alter variation</button>
 <div id="randvar"></div>
@@ -72,7 +73,7 @@ function chooseAtRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-var random_moves = ",,,,single step,boy turn,girl turn,walk,both turn".split(",");
+var random_moves = ",,,,single step,with boy turn,with girl turn,walking,both turn".split(",");
 var timings = ",,,,,triple step,reverse,hesitation,double-time,slow-quick-quick,quick-quick-slow".split(",");
 var directions = ",,,,up,down,forward,back,sideways,wrong way".split(",");
 var translations = ",,,,squat,offset,lean back,slide,sway,flick".split(",");
