@@ -49,7 +49,9 @@
   <body>
 
 <h3>Pleasing Variation</h3>
+<div id="svgcontainer" style="width: 100%; height: 660px; overflow-y: scroll; overflow-x: scroll">
 <svg></svg>
+</div>
 <div id="detail"></div>
 <div id="controls">  
   <button type="button" onclick="expand(root); update(root);">Expand</button>
@@ -90,12 +92,36 @@ var svg = d3.select("svg")
   
 d3.select(self.frameElement).style("height", "500px");
 
+function childCount(level, n, levelwidths) {
+  if(n.children && n.children.length > 0) {
+    if(levelwidths.length <= level + 1) levelwidths.push(0);
+
+    levelwidths[level+1] += n.children.length;
+    n.children.forEach(function(d) {
+      childCount(level + 1, d, levelwidths);
+    });
+  }
+}
+
 // globals are: root, duration, svg, tree, diagonal
 function update(source) {
 
   // Compute the new tree layout.
-  var nodes = tree.nodes(root).reverse(),
-    links = tree.links(nodes);
+  var levelwidths = [1];
+  childCount(0, root, levelwidths);  
+  var newHeight = d3.max(levelwidths) * 50; // 20 pixels per line  
+  tree = tree.size([newHeight, width]);
+
+  var nodes = tree.nodes(root).reverse();
+  var links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  var newWidth = 0;
+  nodes.forEach(function(d) { d.y = d.depth * 200; if (newWidth<d.depth*200) newWidth = d.depth*200;});
+  
+  d3.select("svg")
+    .attr("width", newWidth + margin.right + margin.left)
+    .attr("height", newHeight + margin.top + margin.bottom);
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
