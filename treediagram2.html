@@ -283,11 +283,9 @@ load_graph();
 // Toggle children on click.
 function click(d) {
   if (d.children) {
-  d._children = d.children;
-  d.children = null;
+    expand(d);
   } else {
-  d.children = d._children;
-  d._children = null;
+    collapse(d);
   }
   update(d);
 }
