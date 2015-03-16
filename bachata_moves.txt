@@ -170,7 +170,7 @@ Close hold	Basic	Close hold offset	easy, basic	Week 8	2014-04-24		171	-
 Close hold offset	Side lunge	Close hold	easy, fun, body	Week 8	2014-04-24	Holding girl very firmly against your side, perform a side lunge for 8 counts. Girl slowly drags outside foot to knee, keeping legs closed as always. Boy's torso must remain vertical; girl must use core strength to stay straight. Girl also pushes against boy's left hand for support if needed, boy must keep this tensed.	172	28
 Open hold	Boy turn, girl turn	Shoulder wrap	fast, turn	Adv	2014-04-30		173	135
 Shoulder wrap	Unwind	Cliffhanger	easy, turn	Adv	2014-04-30		174	74
-Cliffhanger	Walk through	Cliffhanger	hard	Adv	2014-04-30		175	164
+Cliffhanger	Walk through	Cliffhanger	hard	Adv	2014-04-30		175	414
 Cliffhanger	Girl bow; push forward + pull back	Mates hold	hard, fun, body	Adv	2014-04-30	Pull girl's arm up and forward on 1, hand across waist on 2,she bows on 3 (dissipating momentum), boy mostly behind on 4. Push hip on 5, pull on 6, bodyroll 7&8. Might be easier to lead with a walk through first.	176	175
 Mates hold	Lazy sway	Mates hold	easy, basic, body	Adv	2014-04-30		177	166
 Mates hold	Push-pull	Close hold	easy, fun	Adv	2014-04-30	Push girl forward and step back on 5, pull on 6 and walk around, boy half turn on 7.	178	85
@@ -298,16 +298,16 @@ Crosshand	Wrong-way turn	Crosshand	turn, fun	Adv	2014-07-16	Step once then push 
 Open hold	Girl double-handed + boy half turn	Boy wrap	fast, turn	Adv	2014-07-23		301	-
 Boy wrap	Boy hands to shoulders	Boy wrap	easy, basic	Adv	2014-07-23	Bring hands to shoulders then drop to waist; pull girl's arms forward so small gap between you	302	303
 Boy wrap	Small steps	Boy wrap	body	Adv	2014-07-23	Torso moves side to side; transfer weight between legs with a slight dipping motion; keep shoulders horizontal.	303	1
-Boy wrap	Girl turn & block	Shoulder blocked	hard, body	Adv	2014-07-23	Boy contras girl and then half turns himself while girl turns. Boy reaches out for girl's shoulder to block last quarter turn.	304	-
-Shoulder blocked	Hesitation step + bodyroll	Shoulder blocked	easy, basic	Adv	2014-07-23		305	-
+Boy wrap	Girl turn & block	Shoulder blocked	hard, body	Adv	2014-07-23	Boy contras girl and then half turns himself while girl turns. Boy reaches out for girl's shoulder to block last quarter turn.	304	22
+Shoulder blocked	Hesitation step + bodyroll	Shoulder blocked	easy, basic	Adv	2014-07-23		305	17
 Shoulder blocked	Girl outside turn + boy haircomb	Boy haircombed	turn	Adv	2014-07-23		306	-
-Boy haircombed	Basic	Boy haircombed	easy, basic	Adv	2014-07-23		307	-
-Boy haircombed	Boy unwind	Crosshand	easy	Adv	2014-07-23		308	-
+Boy haircombed	Basic	Boy haircombed	easy, basic	Adv	2014-07-23		307	1
+Boy haircombed	Boy unwind	Crosshand	easy	Adv	2014-07-23		308	5
 Crosshand	Girl turn	Hammerlock crosshand	easy, turn	Adv	2014-07-23		309	dup
-Hammerlock crosshand	Unwind + about turn	Cliffhanger	turn, fast	Adv	2014-07-23	Boy steps across in front of girl so she completes a 5/4 turn then he gently flings her forward	310	-
-Open hold	Arm circle + girl blocked inside turn + bodyroll	Mates hold	hard, turn, body	Adv	2014-07-30	Push forearm around in two full circles and away so she turns out on 4; stop her at a quarter turn with hand on hip. Turn her back on 5 but get behind on 6; bodyroll 7 and 8.	311	-
+Hammerlock crosshand	Unwind + about turn	Cliffhanger	turn, fast	Adv	2014-07-23	Boy steps across in front of girl so she completes a 5/4 turn then he gently flings her forward	310	10
+Open hold	Arm circle + girl blocked inside turn + bodyroll	Mates hold	hard, turn, body	Adv	2014-07-30	Push forearm around in two full circles and away so she turns out on 4; stop her at a quarter turn with hand on hip. Turn her back on 5 but get behind on 6; bodyroll 7 and 8.	311	162
 Mates hold	Basic	Mates hold	easy, basic	Adv	2014-07-30		312	dup
-Mates hold	Body roll down + body roll up	Mates hold	easy, body, fun	Adv	2014-07-30	2 counts down and 2 up. Remember to "sit" at the bottom.  Head, shoulders, hips, sit, hips, shoulders, head.	313	-
+Mates hold	Body roll down + body roll up	Mates hold	easy, body, fun	Adv	2014-07-30	2 counts down and 2 up. Remember to "sit" at the bottom.  Head, shoulders, hips, sit, hips, shoulders, head.	313	695
 Mates hold	Backstroke + bodyroll	Close hold opened	hard, fun, body	Adv	2014-07-30	Lift arm using upper arm and make it do a backstroke motion. Do the same on the other side but get underneath to get into close hold.	314	-
 Close hold opened	Basic	Open hold	easy, basic	Adv	2014-07-30		315	-
 Open hold	Double elbow break	Embrace	fun, basic	Adv	2014-07-30	Boy's elbows up inside then down outside. Keep your elbows close to hers so you don't get near her face. Back break on 5, pull together on 6, hand on back on 7.	316	-
