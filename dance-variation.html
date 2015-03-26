@@ -4,8 +4,12 @@
     <meta charset="utf-8">
 
     <title>Pleasing Variation</title>
+<style>
+button { font-size:14pt; }
+</style>
+
 </head>
-<body>
+<body style="width:100% padding:0pt margin:0pt">
 
 Don't forget about these possible variations:
 <ul>
@@ -16,10 +20,11 @@ Don't forget about these possible variations:
 </ul>
 
 <h3>Variation generator</h3>
+<div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
 <button type="button" onclick="random_variation()">Random variation</button>
 <button type="button" onclick="vary()">Alter variation</button>
-<div id="randvar"></div>
-<div style="height:300px;"></div> <!-- padding at the bottom to allow scrolling past the end -->
+
+<div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
 
 <script>
 function chooseAtRandom(arr) {
