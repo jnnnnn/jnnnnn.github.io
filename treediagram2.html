@@ -76,6 +76,8 @@
 var margin = {top: 20, right: 300, bottom: 20, left: 20},
   width = 1200 - margin.right - margin.left,
   height = 700 - margin.top - margin.bottom;
+
+var newWidth, newHeight; // keep these during animation and only set at end in case they are shrinking...
   
 var i = 0,
   duration = 750,
@@ -114,19 +116,17 @@ function update(source) {
   // Compute the new tree layout.
   var levelwidths = [1];
   childCount(0, root, levelwidths);  
-  var newHeight = d3.max(levelwidths) * 50; // 20 pixels per line  
+  newHeight = d3.max(levelwidths) * 50; // 20 pixels per line  
   tree = tree.size([newHeight, width]);
-
+  newHeight += margin.top + margin.bottom;
+  
   var nodes = tree.nodes(root).reverse();
   var links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  var newWidth = 0;
+  newWidth = 0;
   nodes.forEach(function(d) { d.y = d.depth * 200; if (newWidth<d.depth*200) newWidth = d.depth*200;});
-  
-  d3.select("svg")
-    .attr("width", newWidth + margin.right + margin.left)
-    .attr("height", newHeight + margin.top + margin.bottom);
+  newWidth += margin.right + margin.left;
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -156,6 +156,11 @@ function update(source) {
     .attr("x", 13)
     .attr("y", 13)
     .text(function(d) { return d.tsv.Move; });
+
+  var svgUpdate = d3.select("svg").transition()
+    .duration(duration)
+    .attr("width", newWidth)
+    .attr("height", newHeight);
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
