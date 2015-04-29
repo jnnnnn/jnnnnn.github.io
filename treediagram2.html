@@ -6,14 +6,15 @@
     <title>Pleasing Variation</title>
 
     <style>
-  
+
   .node {
     cursor: pointer;
   }
 
   .node circle {
-    fill: #fff;
-    stroke: steelblue;
+    fill: #bbb;
+    fill-opacity: 1;
+    stroke: #bbb;
     stroke-width: 2px;
   }
 
@@ -29,6 +30,9 @@
     font: 12pt serif;
   }
 
+  div.taggy { 
+    display:inline; 
+  }
   .link {
     fill: none;
     stroke: #eee;
@@ -59,6 +63,7 @@
 <div id="svgcontainer" style="width: 100%; height: 80%; overflow-y: scroll; overflow-x: scroll">
 <svg></svg>
 </div>
+<div id="tags">taggies:</div>
 <div id="detail"></div>
 <div id="controls">  
   <button type="button" onclick="expand(root); update(root);">Expand</button>
@@ -100,8 +105,8 @@ var svg = d3.select("svg")
 d3.select(self.frameElement).style("height", "500px");
 
 function childCount(level, n, levelwidths) {
-  if(n.children && n.children.length > 0) {
-    if(levelwidths.length <= level + 1) levelwidths.push(0);
+  if (n.children && n.children.length > 0) {
+    if (levelwidths.length <= level + 1) levelwidths.push(0);
 
     levelwidths[level+1] += n.children.length;
     n.children.forEach(function(d) {
@@ -141,7 +146,7 @@ function update(source) {
 
   nodeEnter.append("circle")
     .attr("r", 1e-6)
-    .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+    .style("fill", function(d) { return d._children ? d.color : "#fff"; });
 
   var text = nodeEnter.append("text")
     .attr("x", 13)//function(d) { return d.children || d._children ? -13 : 13; })    
@@ -169,7 +174,8 @@ function update(source) {
 
   nodeUpdate.select("circle")
     .attr("r", 4)
-    .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; })
+    .attr("class", function(d) { return d.tsv.Tags ? d.tsv.Tags.toLowerCase().replace(/,/g," ") : ""; });
 
   nodeUpdate.select("text")
     .style("fill-opacity", 1)
@@ -238,17 +244,46 @@ root.x0 = height / 2;
 root.y0 = 0;
 var current_move = root;
 
+function getColor(tags) {
+  return 'red'; 
+  if (tags.search(/elite/i) != -1)
+    return '#F88'; // light red  
+  if (tags.search(/hard/i) != -1)
+    return '#FA6'; // orange
+  if (tags.search(/fun/i) != -1)
+    return '#4C4'; // light green
+  if (tags.search(/body/i) != -1)
+    return '#88F'; // light blue
+  return 'red'; 
+}
+
+function highlight_tag(tagdiv) {
+  var tag = tagdiv.innerHTML;
+  if (document.styleSheets[1])
+    document.body.removeChild(document.styleSheets[1].ownerNode);
+  var sheet = document.createElement('style')
+  sheet.innerHTML = "circle."+tag+" {stroke: "+getColor(tag)+"; fill: "+getColor(tag)+" }";
+  document.body.appendChild(sheet);
+}
+
+function set_tags_list(tags) {
+  for (tag of tags)
+  {
+    document.getElementById("tags").innerHTML += " <div class=\"taggy\" onclick=\"highlight_tag(this)\" onmouseover=\"highlight_tag(this)\">"+tag+"</div>";
+  }
+}
+
 function load_graph() {  
   d3.tsv("bachata_moves.txt", function(error, csv_rows) {
     if (error) {
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
       return;
     }
-    csv_rows.sort(function(a, b) { return d3.ascending(parseInt(a.Parent), parseInt(b.Parent)); });
+    // csv_rows.sort(function(a, b) { return d3.ascending(parseInt(a.Parent), parseInt(b.Parent)); });
 
+    var all_tags = d3.set();
     // construct tree from rows so we can display it
-    for (i in csv_rows) {
-      var row = csv_rows[i];
+    for (row of csv_rows) {      
       if (row.Parent === '-' || row.Parent === "dup")
         continue;
       var key = row.Start + " → " + row.Move + " → " + row.End;
@@ -262,11 +297,15 @@ function load_graph() {
       };
       moves[row.Index] = node;
       moves_list.push(node);
+      if (row.Tags)
+        for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(','))
+          all_tags.add(tag);
     }
 
+    set_tags_list(all_tags.values().sort());
+
     // second pass is separate in case parent is after child
-    for (i in moves_list) {
-      var node = moves_list[i];
+    for (node of moves_list) {      
       var parent = node.tsv.Parent ? moves[node.tsv.Parent] : root;
       if (!parent)
         console.log("error:", node);
@@ -275,10 +314,9 @@ function load_graph() {
     }
 
     // minimize everything..
-    for (var i in root.children) {
-      var c = root.children[i];
-      collapse(c);
-    }
+    for (child of root.children)
+      collapse(child);
+
     update(root);
   });
 }
@@ -313,10 +351,9 @@ function expand(d) {
       d.children = d._children;
       d._children = null;
   }
-  for (var i in d.children) {
-    var c = d.children[i];
-    expand(c);
-  }
+  if (d.children)
+    for (child of d.children)     
+      expand(child);
 }
 
 function collapse(d) {  
@@ -324,10 +361,9 @@ function collapse(d) {
       d._children = d.children;
       d.children = null;
   }
-  for (var i in d._children) {
-    var c = d._children[i];
-    collapse(c);    
-  }
+  if (d._children)
+    for (child of d._children) 
+      collapse(child);    
 }
 
 
