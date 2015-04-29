@@ -142,11 +142,12 @@ function update(source) {
     .attr("class", "node")
     .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
     .on("click", click)
-    .on("mouseover", mouseover);
+    .on("mouseover", mouseover)
+    .on("dblclick", dblclick);
 
   nodeEnter.append("circle")
     .attr("r", 1e-6)
-    .style("fill", function(d) { return d._children ? d.color : "#fff"; });
+    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; });
 
   var text = nodeEnter.append("text")
     .attr("x", 13)//function(d) { return d.children || d._children ? -13 : 13; })    
@@ -325,11 +326,14 @@ load_graph();
 
 // Toggle children on click.
 function click(d) {
-  if (d._children) {
-    expand(d);
-  } else {
-    collapse(d);
-  }
+  expand(d);
+  for (cd of d.children)
+    collapse(cd);
+  update(d);
+}
+
+function dblclick(d) {
+  expand(d);
   update(d);
 }
 
