@@ -46,7 +46,6 @@
   tspan.move {
   }
 
-
   html, body {
     padding: 0;
     margin: 0;
@@ -77,12 +76,9 @@
   
 <script>
 
-// ************** Generate the tree diagram  *****************
 var margin = {top: 20, right: 300, bottom: 20, left: 20},
   width = 1200 - margin.right - margin.left,
   height = 700 - margin.top - margin.bottom;
-
-var newWidth, newHeight; // keep these during animation and only set at end in case they are shrinking...
   
 var i = 0,
   duration = 750,
@@ -123,13 +119,13 @@ function update(source) {
   childCount(0, root, levelwidths);  
   newHeight = d3.max(levelwidths) * 50; // 20 pixels per line  
   tree = tree.size([newHeight, width]);
-  newHeight += margin.top + margin.bottom;
+  var newHeight += margin.top + margin.bottom;
   
   var nodes = tree.nodes(root).reverse();
   var links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  newWidth = 0;
+  var newWidth = 0;
   nodes.forEach(function(d) { d.y = d.depth * 200; if (newWidth<d.depth*200) newWidth = d.depth*200;});
   newWidth += margin.right + margin.left;
 
@@ -138,8 +134,8 @@ function update(source) {
     .data(nodes, function(d) { return d.id });
 
   // Enter any new nodes at the parent's previous position.
-  var nodeEnter = node.enter().append("g")
-    .attr("class", "node")
+  var nodeEnter = node.enter().append("g")    
+    .attr("class", function(d) { return "node " + (d.tsv.Tags ? d.tsv.Tags.toLowerCase().replace(/,/g," ") : ""); })
     .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
     .on("click", click)
     .on("mouseover", mouseover)
@@ -175,8 +171,7 @@ function update(source) {
 
   nodeUpdate.select("circle")
     .attr("r", 4)
-    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; })
-    .attr("class", function(d) { return d.tsv.Tags ? d.tsv.Tags.toLowerCase().replace(/,/g," ") : ""; });
+    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; })    
 
   nodeUpdate.select("text")
     .style("fill-opacity", 1)
@@ -238,7 +233,8 @@ root = { //
       "End": "",
       "Description": "",
       "Index": "",
-      "Parent": ""
+      "Parent": "",
+      "Tags": ""
     }
   };
 root.x0 = height / 2;
@@ -263,7 +259,7 @@ function highlight_tag(tagdiv) {
   if (document.styleSheets[1])
     document.body.removeChild(document.styleSheets[1].ownerNode);
   var sheet = document.createElement('style')
-  sheet.innerHTML = "circle."+tag+" {stroke: "+getColor(tag)+"; fill: "+getColor(tag)+" }";
+  sheet.innerHTML = "."+tag+" circle"+" {stroke: "+getColor(tag)+"; fill: "+getColor(tag)+" }"
   document.body.appendChild(sheet);
 }
 
@@ -280,8 +276,7 @@ function load_graph() {
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
       return;
     }
-    // csv_rows.sort(function(a, b) { return d3.ascending(parseInt(a.Parent), parseInt(b.Parent)); });
-
+    
     var all_tags = d3.set();
     // construct tree from rows so we can display it
     for (row of csv_rows) {      
@@ -315,8 +310,8 @@ function load_graph() {
     }
 
     // minimize everything..
-    for (child of root.children)
-      collapse(child);
+    //for (child of root.children)
+    //  collapse(child);
 
     update(root);
   });
@@ -325,14 +320,14 @@ function load_graph() {
 load_graph();
 
 // Toggle children on click.
-function click(d) {
+function dblclick(d) {
   expand(d);
   for (cd of d.children)
     collapse(cd);
   update(d);
 }
 
-function dblclick(d) {
+function click(d) {
   expand(d);
   update(d);
 }
