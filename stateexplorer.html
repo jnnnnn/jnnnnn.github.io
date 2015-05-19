@@ -242,7 +242,7 @@ function add_history(new_move_td) {
   if (!shortHistory) {
     new_history.append("p")
       .classed("historyextra", true)
-      .text(function(hd) { return hd.td.description; });
+      .text(function(hd) { return hd.td.description + " ("+hd.td.ind+")"; });
   }
   new_history.on("click", function(hd) {
     select_transition(hd.td);
@@ -356,10 +356,15 @@ function select_state(sdsel) {
   });
   
   // allocate a vertical position to all the transitions (for physics)
-  layout_transitions(transition_data_visible.filter(function(td) { return td.selected_next && td.selected_prev; }));
+  // self links
+  layout_transitions(transition_data_visible
+    .filter(function(td) { return td.selected_next && td.selected_prev; })
+    .sort(function(td1, td2) { return td1.key.strcmp(td2.key); }));
+  // backward links
   layout_transitions(transition_data_visible
     .filter(function(td) { return !td.selected_next && td.selected_prev; })
-    .sort(function(td1, td2) { return td1.start.strcmp(td2.start); }));
+    .sort(function(td1, td2) { return td1.key.strcmp(td2.key); }));
+  // forward links
   layout_transitions(transition_data_visible
     .filter(function(td) { return td.selected_next && !td.selected_prev; })
     .sort(function(td1, td2) { return td1.end.strcmp(td2.end); }));
@@ -526,7 +531,8 @@ function build_transitions_from_rows(state_data, csv_rows) {
         "end": row.End,        
         "description": row.Description,
         "count": 1,
-        "nochange": row.Start === row.End
+        "nochange": row.Start === row.End,
+        "ind": row.Index
       };
 
       // for physics simulation (start and end link are independent)
