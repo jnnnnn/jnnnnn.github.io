@@ -234,7 +234,8 @@ root = { //
       "Description": "",
       "Index": "",
       "Parent": "",
-      "Tags": ""
+      "Tags": "",
+      "Video": ""
     }
   };
 root.x0 = height / 2;
@@ -343,6 +344,10 @@ function mouseover(d) {
   detail.append("p")
     .classed("description", true)
     .text(d.tsv.Description);
+  if (d.tsv.Video)
+    detail.append("p").append("a")
+      .text("image/video")
+      .attr("href", d.tsv.Video);
 }
 
 function expand(d) { 
