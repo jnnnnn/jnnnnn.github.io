@@ -1,103 +1,200 @@
 Start	Move	End	Week	Date	Description	Index
-Basic	Cross body lead	Basic	Intro		Lead with body positioning; stand well in front and to side. Stretch to avoid twisting girl.	38
-Basic	Walk through	Basic	Intro		Half an outside turn; lead with slight brush on back of inside shoulder. Arm stays down until 5.5 then up on 6 for her to walk under. 	39
-Basic	Walk through	Hammerlock	Intro			40
-Hammerlock	Turn	Basic	Intro			41
-Basic	Double-handed turn	Catapult	Intro			42
-Catapult	Back-to-back pass + free spin	Basic	Intro		Pull girl past into back-to-back position with hands extended to sides, then free spin girl.	43
-Basic	RH girl window + outside turn	Catapult	Outside turns	13/03/2014		44
-Catapult	Inside turn	Shoulder wrap	Outside turns	13/03/2014		45
-Shoulder wrap	Outside turn + block	Basic blocked	Outside turns	13/03/2014		46
-Basic	Outside turn + block	Basic blocked	Outside turns	06/03/2014	Block: Elbows and forearms collide (gently)	47
-Basic blocked	Clock + swap hand + girl spot turn	Crosshand	Outside turns	06/03/2014		48
-Crosshand	Haircomb + boy drop, bodyroll	Basic	Outside turns	06/03/2014		49
-Basic	Outside turn + trail	Hammerlock	Outside turns	20/03/2014	Boy trails his hand around girl's waist, to allow extra turn before collecting hand again for hammerlock	50
-Hammerlock	Copa + bodyroll	Boy wrap	Outside turns	20/03/2014	Pull girl past to the right and through a half turn to unwind, then half turn under boy's right arm and pull girl in for bodyroll	51
-Boy wrap	Girl turn	Basic	Outside turns	20/03/2014		52
-Basic	Cross body lead, boy swap hands behind back	Crosshand	Outside turns	27/03/2014		53
-Crosshand	Haircomb + shoulder-led outside turn	Basic	Outside turns	27/03/2014	Light pressure with LH on her Lshoulder, right arm around her shoulders to catch her right shoulder for contra on 3. Boy behind, not to side or in front. Start early to make sure you get into the right position on 3.	54
-Basic	Copa	Wrap	Copa	02/04/2014	Hands up slightly on 7, fake push on 8 (keep arms well bent, not straight), pull quite hard on 1, girl half turn on 2, cuddle on 3 (contact is right manboob to left shoulderblade and front of hip to butt). 	55
-Wrap	Cross body lead	Basic	Copa	02/04/2014	Lead with hand low, and out in front; release other hand	56
-Basic	Copa	Wrap	Copa	02/04/2014		57
-Wrap	Inside turn	Basic	Copa	02/04/2014	Be sure to do a strong contra (wind-up) before this (anti-clockwise) turn.	58
-Basic	Copa	Wrap	Copa	09/04/2014		59
-Wrap	Outside turn	Catapult	Copa	09/04/2014	Lead this with a strong contra (keep hand low)	60
-Catapult	Throw wrists down + free inside turn	Basic	Copa	09/04/2014	Let go, grab wrists, throw down on 1, hands on waist on 2, contra on 3	61
-Wrap	Squat + bodyroll	Wrap	Copa	16/04/2014	Sink down for one bar (boy's knees apart, girl's together) then lead rising bodyroll with torso.	62
-Wrap	Fold girl	Catapult	Copa	16/04/2014	Fold girl on 5 (pull hip and push shoulder), step forward on 2, half turn on 3.	63
-Catapult	Back-to-back pass + free spin	Basic	Copa	16/04/2014	Pull girl past into back-to-back position with hands extended to sides, then free spin girl.	64
-Wrap	Flare + inside or outside turn	Basic	Copa	23/04/2014	To flare, prepare (lift frame) on 8 then drop frame and twist/stick out foot on 1. Contra for turn on 3.	65
-Basic	Copa + walk back	Wrap	Copa	23/04/2014	During copa, do not rotate frame (to indicate that we're not stopping). Chest should touch girl's shoulder on 3, then walk back with WRONG FEET (LRL) on 5,6,7.	66
-Basic	Girl spin	Hammerlock	Hammerlock	30/04/2014	Prepare by swinging guiding hand to left on 1 2, then up on 3 for turn on 6. Keep locking hand low.	67
-Hammerlock	Turn	Basic	Hammerlock	30/04/2014	Stand side on to girl, then step out of her way on 5 6 (she turns on 6)	68
-Basic	Double girl window + bodyroll	Basic	Hammerlock	30/04/2014	Guide girl's left forearm over her head, then same with right. Hold her shoulderblades and roll palm down her back to lead bodyroll. Girl should have hands on boy's shoulders.	69
-Hammerlock	Copa + inside turn	Basic	Hammerlock	07/05/2014	Boy springs girl but doesn't step back himself (don't pull locked hand). Buy walks past for good offset.	70
-Basic	Boy spin + girl spin	Hammerlock	Hammerlock	07/05/2014	Boy turns (hand starts low!) then just before girl turns he takes her hand. Can signal this by trailing around her waist (even before she starts turning).	71
-Hammerlock	Tunnel box step	Hammerlock	Hammerlock	14/05/2014	Boy steps spot on 1,forward on 2,3, brushes backs on 4 (arm comes down, then other arm goes up). Enter reverse hammerlock to 8. Rock back to start reverse.	72
-Basic	Boy spin	Boy hammerlock	Hammerlock	21/05/2014	Boy goes under right arm, stands to the side	73
-Boy hammerlock	Outside turn	Basic	Hammerlock	21/05/2014	Outside turn, led with inside (right) hand	74
-Hammerlock	Turn	Basic	Hammerlock	21/05/2014	Boy starts to the side	75
-Hammerlock	Hands low turn + RH flick	Reverse hammerlock	Hammerlock	28/05/2014	Keep both hands very low while girl does an outside turn, prepare on 8, flick down on 1 so hand does a little circle, catch on 3.	76
-Reverse hammerlock	S turn	Hammerlock	Hammerlock	28/05/2014	Just like a girl outside turn	77
-Basic	Girl turn	Waltz hold	Inside turns	04/06/2014	Half way through girl's turn, place hand between shoulderblades	78
-Waltz hold	Girl turn	Waltz hold	Inside turns	04/06/2014		79
-Waltz hold	Cross body lead	Cliffhanger	Inside turns	04/06/2014		80
-Cliffhanger	Inside turn	Basic	Inside turns	11/06/2014	Collect hand on 5, turn on 6.	81
-Basic	Elbow break + inside turn	Crosshand	Inside turns	11/06/2014		82
-Crosshand	Haircomb + shoulder-led inside turn	Basic	Inside turns	11/06/2014		83
-Basic	Double-handed turn	Catapult	Inside turns	19/06/2014		84
-Catapult	Boy turn to side, girl inside turn	Cliffhanger	Inside turns	19/06/2014	Boy keeps his right hand on his left shoulder for turn. Left hand over head. Then keeps right hand at back of his neck and lets go. After girl turn, feed hand a little to open up.	85
-Cliffhanger	Inside turn	Basic	Inside turns	19/06/2014	Turning hand makes contact on 5, after girl has travelled most of the way.	86
-Basic	Girl spot turn + boy under arm	Crosshand	Inside turns	26/06/2014	Elbow inside to lift girl's arm slightly then boy bends at hips to slide body under, keeping back straight and head up/back	87
-Crosshand	Double-handed turn	Crosshand	Inside turns	26/06/2014		88
-Crosshand	Double-handed spot turn	Crosshand	Inside turns	26/06/2014	Prepare by doing a large anticlockwise circle (starting and ending at the top) with both hands for first measure, then turn girl on 6 as usual (dropping arms slightly on 5 if necessary)	89
-Crosshand	Sombrero	Basic	Inside turns	26/06/2014	Start left hand on top, boy to side. Haircomb boy then girl. On 3, take girl's outside hand using inside arm (under her inside arm), then inside turn	90
-Basic	Boy spin + girl spin	Crosshand	Blocks	02/07/2014	Swap hands after boy turn	91
-Crosshand	Inside turn + block	RH blocked	Blocks	02/07/2014	Lead the turn with contra only, no force. Left hand to shoulder as soon as possible, keep distant hand between shoulder and waist to prevent turn or hammerlock.	92
-RH blocked	Unwind + haircomb	Crosshand	Blocks	02/07/2014	Block is soft, doesn't quite stop. Boy rocks back on one to absorb remaining momentum, half-turns girl on 2, then full spot turn for second measure	93
-Crosshand	Inside turn + block	LH blocked	Blocks	02/07/2014	Lead with contra only, no fource. Stop full turn with hand on shoulder.	94
-LH blocked	Unwind	Crosshand	Blocks	02/07/2014		95
-Basic	Boy+girl haircomb	Crosshand	Blocks	09/07/2014	Boy haircombs himself with left hand and then girl with right hand; right arms slide down each other to handshake. AKA "Valentine's Special".	96
-Crosshand	Double-handed turn + block	Titanic	Blocks	09/07/2014	Lead with 90-degree contra (block girl with forearm, other hand straight out in front of girl). Hands high on 6, down on 7 keeping girl's arms straight-ish.	97
-Titanic	Parade	Titanic	Blocks	09/07/2014	Girl walks on the spot, crossing over legs. Lead with up-down motion of hands; good inward pressure to allow girl to push out for frame. Keep girl's elbows bent at 60 degrees or so.	98
-Titanic	Spot turn	Crosshand	Blocks	09/07/2014	Complete most of a parade but on last bar, unwind to basic (girl forward away from boy on 5, half-turn on 6, forward towards boy on 7). Pause and then continue a spot turn in the same direction.	99
-Crosshand	Double haircomb + bodyroll	Basic	Blocks	09/07/2014		100
-Basic	Girl turn	Wrap	Blocks	16/07/2014	Lead with contra	101
-Wrap	Shadow turn + spot turn	Catapult	Blocks	16/07/2014	Shadow turn is both together: girl forward on 1 (contra), turn on 2, forward the other way on 3. Boy does a back-rock on 1 to lead.	102
-Catapult	Throw wrists down + free inside turn	Basic	Blocks	16/07/2014	Girl's arms go down on 1, up on 2, straight out on 3 with boy contraing her hips. Boy pulls gently to lead her to step cross-body on 5, free turn on 6.	103
-Crosshand	Hands on shoulders blocked free turn	Basic	Blocks	23/07/2014		104
-Basic	Straight dip	Basic	Bonus	30/07/2014	Back break and throw hands up for butt-cheeks-touching hug. Boy pushes slightly with pectoral then squats without leaning forward. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	105
-Basic	Hands up dip	Basic	Bonus	30/07/2014	Back break and keep hands at her eye level with strong grip. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	106
-Basic	Neck dip	Basic	Bonus	30/07/2014	Back break and hand to neck (under hair to avoid slipping). Boy pushes slightly with pectoral and squats without leaning forward. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	107
-Basic	Double-handed spot turn	Catapult	Cross Hold	06/08/2014	Draw a J with both hands to prepare (ending on 3); girl should be half way through her turn on 6	108
-Catapult	Inside turn	Shoulder wrap	Cross Hold	06/08/2014	Slide your right hand up her left arm during this turn. End with hand next to neck, not around shoulder.	109
-Shoulder wrap	Outside turn	Basic	Cross Hold	06/08/2014	Rock back on 1, contra on 3	110
-Basic	Double-handed spot turn	Arms up	Beginner	13/08/2014		111
-Arms up	Boy drop	Basic	Beginner	13/08/2014	Girl's hips sway (up and down, not side to side) while boy does 8-beat squat	112
-Basic	Double-handed spot turn	Catapult	Cross Hold	13/08/2014		113
-Catapult	Catapult	Crosshand	Cross Hold	13/08/2014	Catapult (flick girl's arm down so it travels in a circle -- apply pressure 2/3 of the way from the wrist to elbow) then haircomb to crosshand.	114
-Crosshand	Walk through outside	Hammerlock crosshand	Cross Hold	13/08/2014	Girl only half turns	115
-Hammerlock crosshand	Shoulder-led inside turn	Basic	Cross Hold	13/08/2014		116
-Basic	Double-handed spot turn	Catapult	Cross Hold	20/08/2014		117
-Catapult	Catapult	Crosshand	Cross Hold	20/08/2014		118
-Crosshand	Girl turn	Crosshand	Cross Hold	20/08/2014		119
-Crosshand	Pizza turn	Crosshand	Cross Hold	20/08/2014	Boy half turn, girl spot turn, boy turns back.	120
-Basic	Boy spin	Crosshand	Cross Hold	27/08/2014	Swap hands behind back	121
-Crosshand	Girl double-handed turn	Crosshand	Cross Hold	27/08/2014		122
-Crosshand	Inside turn	Reverse hammerlock	Cross Hold	27/08/2014	Contra in the T position - left hands extended forwards, boy's right arm across in front of girl's tummy.	123
-Reverse hammerlock	Hands low turn	Hammerlock	Cross Hold	27/08/2014	Flip both pancakes (hands) at the same time, in the same direction	124
-Hammerlock	Girl turn	Basic	Cross Hold	27/08/2014		125
-Basic	Outside turn	Basic blocked	Outside turns	04/09/2014	Forearms collide at end of turn (while facing each other)	126
-Basic blocked	Haircomb + bodyroll	Basic	Outside turns	04/09/2014	Prevent turn when haircombing by tilting head the other way. Choose a side to roll on and tilt head to that side. Spread hand wide in middle of back for clear lead.	127
-Basic	RH girl window + outside turn	Catapult	Outside turns	11/09/2014		128
-Catapult	Girl turn	Shoulder wrap	Outside turns	11/09/2014		129
-Shoulder wrap	Outside turn	Basic	Outside turns	11/09/2014	Hand to girl's far hip then across in front. Keep boy's body well ahead and to the side of girl.	130
-Basic	Boy bodyroll	Basic	Outside turns	11/09/2014	Boy haircombs himself then girl draws S on boy's chest.	131
-Basic	Outside turn	Basic blocked	Outside turns	11/09/2014		132
-Basic blocked	Clock + swap hand + girl spot turn	Crosshand	Outside turns	11/09/2014		133
-Crosshand	Haircomb + boy drop + bodyroll	Basic	Outside turns	11/09/2014		134
-Basic	Outside turn + trail	Hammerlock	Outside turns	17/09/2014		135
-Hammerlock	Copa + bodyroll	Boy wrap	Outside turns	17/09/2014		136
-Boy wrap	Boy half spin	Basic	Outside turns	17/09/2014		137
-Basic	Cross body lead	Crosshand	Outside turns	24/09/2014		138
-Crosshand	Haircomb + shoulder-led outside turn	Basic	Outside turns	24/09/2014	Light pressure with LH on her Lshoulder, right arm around her shoulders to catch her right shoulder for contra on 3. Boy behind, not to side or in front. Start early to make sure you get into the right position on 3.	139
+Open hold	Cross body lead	Open hold	Intro		Lead with body positioning; stand well in front and to side. Stretch to avoid twisting girl. It's also helpful to give a very slight "stop" (push) on 3 with the backs of your hands -- this helps make sure you don't move your hands until giving a firm tug on 5. Step firmly in place on ball of foot on 5.	38
+Open hold	Walk through	Open hold	Intro		Half an outside turn; lead with slight brush on back of inside shoulder. Arm stays down until 5.5 then up on 6 for her to walk under. 	39
+Open hold	Walk through	Hammerlock	Intro		Don't forget sneaky low pancake flip with locking hand to avoid twisting girl's arm	40
+Hammerlock	Turn	Open hold	Intro			41
+Open hold	Double-handed turn	Catapult	Intro			42
+Catapult	Back-to-back pass + free spin	Open hold	Intro		Pull girl past into back-to-back position with hands extended to sides, then free spin girl.	43
+Open hold	RH girl window + outside turn	Catapult	Outside turns	2014-03-13		44
+Catapult	Inside turn	Shoulder wrap	Outside turns	2014-03-13		45
+Shoulder wrap	Outside turn + block	Basic blocked	Outside turns	2014-03-13		46
+Open hold	Outside turn + block	Basic blocked	Outside turns	2014-03-06	Block: Elbows and forearms collide (gently)	47
+Basic blocked	Clock + swap hand + girl spot turn	Crosshand	Outside turns	2014-03-06		48
+Crosshand	Haircomb + boy drop + bodyroll	Open hold	Outside turns	2014-03-06		49
+Open hold	Outside turn + trail	Hammerlock	Outside turns	2014-03-20	Boy trails his hand around girl's waist, to allow extra turn before collecting hand again for hammerlock	50
+Hammerlock	Copa + bodyroll	Boy wrap	Outside turns	2014-03-20	Pull girl past to the right and through a half turn to unwind, then half turn under boy's right arm and pull girl in for bodyroll	51
+Boy wrap	Girl turn	Open hold	Outside turns	2014-03-20		52
+Open hold	Cross body lead	Crosshand	Outside turns	2014-03-27		53
+Crosshand	Haircomb + shoulder-led outside turn	Open hold	Outside turns	2014-03-27	Light pressure with LH on her Lshoulder, right arm around her shoulders to catch her right shoulder for contra on 3. Boy behind, not to side or in front. Start early to make sure you get into the right position on 3.	54
+Open hold	Copa	Wrap	Copa	2014-04-02	Hands up slightly on 7, fake push on 8 (keep arms well bent, not straight), pull quite hard on 1, girl half turn on 2, cuddle on 3 (contact is right manboob to left shoulderblade and front of hip to butt). 	55
+Wrap	Cross body lead	Open hold	Copa	2014-04-02	Lead with hand low, and out in front; release other hand	56
+Open hold	Copa	Wrap	Copa	2014-04-02		57
+Wrap	Inside turn	Open hold	Copa	2014-04-02	Be sure to do a strong contra (wind-up) before this (anti-clockwise) turn.	58
+Open hold	Copa	Wrap	Copa	2014-04-09		59
+Wrap	Outside turn	Catapult	Copa	2014-04-09	Lead this with a strong contra (keep hand low)	60
+Catapult	Throw wrists down + free inside turn	Open hold	Copa	2014-04-09	Let go, grab wrists, throw down on 1, hands on waist on 2, contra on 3	61
+Wrap	Squat + bodyroll	Wrap	Copa	2014-04-16	Sink down for one bar (boy's knees apart, girl's together) then lead rising bodyroll with torso.	62
+Wrap	Fold girl	Catapult	Copa	2014-04-16	Uplift on four, step in place on 5.Fold girl on 5 (pull hip and roll arm up her back to shoulder), step forward on 2, half turn on 3.	63
+Catapult	Back-to-back pass + free spin	Open hold	Copa	2014-04-16	Pull girl past into back-to-back position with hands extended to sides, then free spin girl.	64
+Wrap	Flare + inside or outside turn	Open hold	Copa	2014-04-23	To flare, prepare (lift frame) on 8 then drop frame and twist/stick out foot on 1. Contra for turn on 3.	65
+Open hold	Copa + walk back	Wrap	Copa	2014-04-23	During copa, do not rotate frame (to indicate that we're not stopping). Chest should touch girl's shoulder on 3, then walk back with WRONG FEET (LRL) on 5,6,7.	66
+Open hold	Girl spin	Hammerlock	Hammerlock	2014-04-30	Prepare by swinging guiding hand to left on 1 2, then up on 3 for turn on 6. Keep locking hand low.	67
+Hammerlock	Turn	Open hold	Hammerlock	2014-04-30	Stand side on to girl, then step out of her way on 5 6 (she turns on 6)	68
+Open hold	Double girl window + bodyroll	Open hold	Hammerlock	2014-04-30	Guide girl's left forearm over her head, then same with right. Hold her shoulderblades and roll palm down her back to lead bodyroll. Girl should have hands on boy's shoulders.	69
+Hammerlock	Copa + inside turn	Open hold	Hammerlock	2014-05-07	Boy springs girl but doesn't step back himself (don't pull locked hand). Boy walks past for good offset.	70
+Open hold	Boy spin + girl spin	Hammerlock	Hammerlock	2014-05-07	Boy turns (hand starts low!) then just before girl turns he takes her hand. Can signal this by trailing around her waist (even before she starts turning).	71
+Hammerlock	Tunnel box step	Hammerlock	Hammerlock	2014-05-14	Boy steps spot on 1,forward on 2,3, brushes backs on 4 (arm comes down, then other arm goes up). Enter reverse hammerlock to 8. Rock back to start reverse.	72
+Open hold	Boy spin	Boy hammerlock	Hammerlock	2014-05-21	Boy goes under right arm, stands to the side	73
+Boy hammerlock	Outside turn	Open hold	Hammerlock	2014-05-21	Outside turn, led with inside (right) hand	74
+Hammerlock	Turn	Open hold	Hammerlock	2014-05-21	Boy starts to the side	75
+Hammerlock	Hands low turn + RH flick	Reverse hammerlock	Hammerlock	2014-05-28	Keep both hands very low while girl does an inside turn, prepare on 8, flick down on 1 so hand does a little circle, catch on 3.	76
+Reverse hammerlock	S turn	Hammerlock	Hammerlock	2014-05-28	Just like a girl outside turn	77
+Open hold	Girl turn	Waltz hold	Inside turns	2014-06-04	Half way through girl's turn, place hand between shoulderblades	78
+Waltz hold	Girl turn	Waltz hold	Inside turns	2014-06-04		79
+Waltz hold	Cross body lead	Cliffhanger	Inside turns	2014-06-04		80
+Cliffhanger	Inside turn	Open hold	Inside turns	2014-06-11	Collect hand on 5, turn on 6.	81
+Open hold	Elbow break + inside turn	Crosshand	Inside turns	2014-06-11		82
+Crosshand	Haircomb + shoulder-led inside turn	Open hold	Inside turns	2014-06-11		83
+Open hold	Double-handed turn	Catapult	Inside turns	2014-06-19		84
+Catapult	Boy turn to side, girl inside turn	Cliffhanger	Inside turns	2014-06-19	Boy keeps his right hand on his left shoulder for turn. Left hand over head. Then keeps right hand at back of his neck and lets go. After girl turn, feed hand a little to open up.	85
+Cliffhanger	Inside turn	Open hold	Inside turns	2014-06-19	Turning hand makes contact on 5, after girl has travelled most of the way.	86
+Open hold	Girl spot turn + boy under arm	Crosshand	Inside turns	2014-06-26	Elbow inside to lift girl's arm slightly then boy bends at hips to slide body under, keeping back straight and head up/back	87
+Crosshand	Double-handed turn	Crosshand	Inside turns	2014-06-26		88
+Crosshand	Double-handed spot turn	Crosshand	Inside turns	2014-06-26	Prepare by doing a large anticlockwise circle (starting and ending at the top) with both hands for first measure, then turn girl on 6 as usual (dropping arms slightly on 5 if necessary)	89
+Crosshand	Sombrero	Open hold	Inside turns	2014-06-26	Start left hand on top, boy to side. Haircomb boy then girl. On 3, take girl's outside hand using inside arm (under her inside arm), then inside turn	90
+Open hold	Boy spin + girl spin	Crosshand	Blocks	2014-07-02	Swap hands after boy turn	91
+Crosshand	Inside turn + block	RH blocked	Blocks	2014-07-02	Lead the turn with contra only, no force. Left hand to shoulder as soon as possible, keep distant hand between shoulder and waist to prevent turn or hammerlock.	92
+RH blocked	Unwind + haircomb	Crosshand	Blocks	2014-07-02	Block is soft, doesn't quite stop. Boy rocks back on one to absorb remaining momentum, half-turns girl on 2, then full spot turn for second measure	93
+Crosshand	Inside turn + block	LH blocked	Blocks	2014-07-02	Lead with contra only, no force. Stop full turn with hand on shoulder.	94
+LH blocked	Unwind	Crosshand	Blocks	2014-07-02		95
+Open hold	Boy+girl haircomb	Crosshand	Blocks	2014-07-09	Boy haircombs himself with left hand and then girl with right hand; right arms slide down each other to handshake. AKA "Valentine's Special".	96
+Crosshand	Double-handed turn + block	Titanic	Blocks	2014-07-09	Lead with 90-degree contra (block girl with forearm, other hand straight out in front of girl). Hands high on 6, down on 7 keeping girl's arms straight-ish.	97
+Titanic	Parade	Titanic	Blocks	2014-07-09	Girl walks on the spot, crossing over legs. Lead with up-down motion of hands; good inward pressure to allow girl to push out for frame. Keep girl's elbows bent at 60 degrees or so.	98
+Titanic	Spot turn	Crosshand	Blocks	2014-07-09	Complete most of a parade but on last bar, unwind to basic (girl forward away from boy on 5, half-turn on 6, forward towards boy on 7). Pause and then continue a spot turn in the same direction.	99
+Crosshand	Double haircomb + bodyroll	Open hold	Blocks	2014-07-09		100
+Open hold	Girl turn	Wrap	Blocks	2014-07-16	Lead with contra	101
+Wrap	Shadow turn + spot turn	Catapult	Blocks	2014-07-16	Shadow turn is both together: girl forward on 1 (contra), turn on 2, forward the other way on 3. Boy does a back-rock on 1 to lead.	102
+Catapult	Throw wrists down + free inside turn	Open hold	Blocks	2014-07-16	Girl's arms go down on 1, up on 2, straight out on 3 with boy contraing her hips. Boy pulls gently to lead her to step cross-body on 5, free turn on 6.	103
+Crosshand	Hands on shoulders blocked free turn	Open hold	Blocks	2014-07-23		104
+Open hold	Straight dip	Open hold	Bonus	2014-07-30	Back break and throw hands up for butt-cheeks-touching hug. Boy pushes slightly with pectoral then squats without leaning forward. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	105
+Open hold	Hands up dip	Open hold	Bonus	2014-07-30	Back break and keep hands at her eye level with strong grip. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	106
+Open hold	Neck dip	Open hold	Bonus	2014-07-30	Back break and hand to neck (under hair to avoid slipping). Boy pushes slightly with pectoral and squats without leaning forward. Girl supports her own weight, bending knees first, then up on toes, then head, and finally even her back. Half turn to finish.	107
+Open hold	Double-handed spot turn	Catapult	Cross Hold	2014-08-06	Draw a J with both hands to prepare (ending on 3); girl should be half way through her turn on 6	108
+Catapult	Inside turn	Shoulder wrap	Cross Hold	2014-08-06	Slide your right hand up her left arm during this turn. End with hand next to neck, not around shoulder.	109
+Shoulder wrap	Outside turn	Open hold	Cross Hold	2014-08-06	Rock back on 1, contra on 3	110
+Open hold	Double-handed spot turn	Arms up	Beginner	2014-08-13		111
+Arms up	Boy drop	Open hold	Beginner	2014-08-13	Girl's hips sway (up and down, not side to side) while boy does 8-beat squat	112
+Open hold	Double-handed spot turn	Catapult	Cross Hold	2014-08-13		113
+Catapult	Catapult	Crosshand	Cross Hold	2014-08-13	Catapult (flick girl's arm down so it travels in a circle -- apply pressure 2/3 of the way from the wrist to elbow) then haircomb to crosshand.	114
+Crosshand	Walk through outside	Hammerlock crosshand	Cross Hold	2014-08-13	Girl only half turns	115
+Hammerlock crosshand	Shoulder-led inside turn	Open hold	Cross Hold	2014-08-13		116
+Open hold	Double-handed spot turn	Catapult	Cross Hold	2014-08-20		117
+Catapult	Catapult	Crosshand	Cross Hold	2014-08-20		118
+Crosshand	Girl turn	Crosshand	Cross Hold	2014-08-20		119
+Crosshand	Pizza turn	Crosshand	Cross Hold	2014-08-20	Boy half turn, girl spot turn, boy turns back. Also known as a "Waiter's turn", because the boy's hand looks like he is holding a plate over his head.	120
+Open hold	Boy spin	Crosshand	Cross Hold	2014-08-27	Swap hands behind back	121
+Crosshand	Double-handed turn	Crosshand	Cross Hold	2014-08-27		122
+Crosshand	Inside turn	Reverse hammerlock crosshand	Cross Hold	2014-08-27	Contra in the T position - left hands extended forwards, boy's right arm across in front of girl's tummy.	123
+Reverse hammerlock crosshand	Hands low spot turn	Hammerlock crosshand	Cross Hold	2014-08-27	Flip both pancakes (hands) at the same time, in the same direction. Slight contra with non-locked hand.	124
+Hammerlock crosshand	Girl outside turn	Crosshand	Cross Hold	2014-08-27	Contra using shoulder, keep hold of locking hand	125
+Open hold	Outside turn	Basic blocked	Outside turns	2014-09-04	Tai chi lead (push/pull alternately with both hands, left pushes on 1 the pulls on 3). Forearms collide at end of turn (while facing each other)	126
+Basic blocked	Haircomb + bodyroll	Open hold	Outside turns	2014-09-04	Prevent turn when haircombing by tilting head the other way. Choose a side to roll on and tilt head to that side. Spread hand wide in middle of back for clear lead.	127
+Open hold	RH girl window + outside turn	Catapult	Outside turns	2014-09-11		128
+Catapult	Girl turn	Shoulder wrap	Outside turns	2014-09-11		129
+Shoulder wrap	Outside turn	Open hold	Outside turns	2014-09-11	Hand to girl's far hip then across in front. Keep boy's body well ahead and to the side of girl.	130
+Open hold	Boy bodyroll	Open hold	Outside turns	2014-09-11	Boy haircombs himself then girl draws S on boy's chest.	131
+Open hold	Outside turn	Basic blocked	Outside turns	2014-09-11		132
+Basic blocked	Clock + swap hand + girl spot turn	Crosshand	Outside turns	2014-09-11		133
+Crosshand	Haircomb + boy drop + bodyroll	Open hold	Outside turns	2014-09-11		134
+Open hold	Outside turn + trail	Hammerlock	Outside turns	2014-09-17		135
+Hammerlock	Copa + bodyroll	Boy wrap	Outside turns	2014-09-17		136
+Boy wrap	Boy half spin	Open hold	Outside turns	2014-09-17		137
+Open hold	Cross body lead	Crosshand	Outside turns	2014-09-24		138
+Crosshand	Haircomb + shoulder-led outside turn	Open hold	Outside turns	2014-09-24	Light pressure with LH on her Lshoulder, right arm around her shoulders to catch her right shoulder for contra on 3. Boy behind, not to side or in front. Start early to make sure you get into the right position on 3.	139
+Open hold	Boy spin + girl spin	Crosshand	Altona	2014-09-29		140
+Crosshand	Girl turn	Crosshand	Altona	2014-09-29		141
+Crosshand	Boy half turn + walk-through	Crosshand	Altona	2014-09-29	Boy copas himself off to the side (out of girl's way)	142
+Crosshand	Haircomb + cross body lead	Crosshand	Altona	2014-09-29	Hold shoulder after haircomb, lead with inside hand	143
+Crosshand	Boy haircomb + cross body lead	Open hold	Altona	2014-09-29	Boy haircomb to waltz hold then lead across.	144
+Crosshand	Boy hammerlock cross body lead	Crosshand	Altona	2014-10-13	Boy hammerlocks himself to side in first bar, then outside turn to follow girl across.	145
+Crosshand	Girl spin	Hammerlock crosshand	Altona	2014-10-13	Lead by swinging hands to the left on 1 then upper hand to the up right on 3.	146
+Hammerlock crosshand	Girl turn	Crosshand	Altona	2014-10-13		147
+Crosshand	Boy spin + girl free turn	Open hold	Altona	2014-10-13	Boy starts turn on 7, completes by 3 on other side of hot dog. Has switched to holding wrist in prepare by 3 too (not crosshand)	148
+Crosshand	Boy spin + girl double-handed turn	Crosshand	Altona	2014-10-13	Boy starts turn on 7, completes by 3 on other side of hot dog. Has switched to holding wrist in prepare by 3 too (not crosshand)	149
+Open hold	Copa + squat + roll + girl spin	Open hold	Copa	2014-10-22	Do not squeeze girl or touch shoulder on copa	150
+Open hold	Copa + fold	Catapult	Copa	2014-10-22	Squeeze girl tightly, big lift/upward-shrug on 4, step in place on right foot on 5 while pulling hip and rolling arm up her back if she hasn't already folded herself	151
+Open hold	Outside spot turn	Open hold	Altona	2014-10-27	Push girl around by her right hand on 6 (with a clean prep on 4+). Girl steps away from you on 7 and finishes turn on 1.	152
+Open hold	Double-handed inside turn	Open hold	Altona	2014-10-27		153
+Open hold	Outside turn	Hammerlock	Altona	2014-10-27		154
+Hammerlock	Inside turn	Open hold	Altona	2014-10-27		155
+Open hold	Boy spin + haircomb	Crosshand	Altona	2014-10-27		156
+Crosshand	Walk through	Crosshand	Altona	2014-10-27		157
+Crosshand	Girl free turn	Open hold	Altona	2014-10-27	Led by holding wrist	158
+Crosshand	Copa	Wrap crosshand	Altona	2014-12-09		159
+Open hold	Elbow break	Crosshand	Altona	2014-12-09		160
+Crosshand	Spot turn	Crosshand	Altona	2014-12-09		161
+Crosshand	Inside turn	LH Blocked	Altona	2014-12-09		162
+LH blocked	Girl walks backward	Crosshand	Altona	2014-12-09	Girl steps back (starting on 1 with her right foot across in front of her left) and then boy half turns either way	163
+Crosshand	Haircomb	Crosshand	Altona	2014-12-09		164
+Crosshand	Inside turn	Wrap crosshand	Altona	2014-12-09	One hand only	165
+Wrap crosshand	Half turn unwind + free inside turn	Open hold	Altona	2014-12-09		166
+Open hold	Inside turn	Open hold	Blocks 3	2015-01-07		167
+Open hold	Spot turn	Hammerlock	Blocks 3	2015-01-07		168
+Hammerlock	Copa	Wrap	Blocks 3	2015-01-07		169
+Wrap	Walk around	Wrap	Blocks 3	2015-01-07	Girl steps back past boy's left hand side, boy steps across in front of her, then girl turns forward into wrap again. Boy footwork: Right foot out wide on 7, back-rock on 1 as girl goes back, across on 2, 3 then pivot to face girl on 4, allowing large step back behind girl on 5. I found it helps me to tap my right foot on 4.	170
+Wrap	Girl turn	Arms up	Blocks 3	2015-01-07		171
+Arms up	Girl free turn	Crosshand	Blocks 3	2015-01-07	Sweep her left arm down, around, up, and forward past your left shoulder, lead turn from waist.	172
+Crosshand	Walk around	Titanic	Blocks 3	2015-01-07		173
+Cross hand 	Girl turn walk around	Wrap	Blocks 3	2015-01-14	Girl double-handed inside turn cross body, then pull her around you (forward on 1 while boy steps out of her way to his right (behind with left foot; half turn on 3 so girl is facing boy's back, boy gets out of way to other side, normal turn on 7.	174
+Wrap 	Girl steps back walk around	Crosshand	Blocks 3	2015-01-21	Pull girl back past your left hand side (or step forward), then step across in front of her and bring her forward again.	175
+Crosshand	Girl hesitation hammer lock walk around	Open hold	Blocks 3	2015-01-28	???	176
+Catapult	Double spot turn + flick	Open hold	Cross hold 3	2015-02-05	Prepare by putting paddle brakes on at end of previous move. Turn on five and seven, flick on seven as well by creating tension with lead's left hand then letting go.	177
+Open hold	Boy turn + girl turn	Shoulder wrap	Cross hold 3	2015-02-05	Boy turns into cross-body-lead with catapult hands during 1-3, then girl turns to unwind.	178
+Open hold	Girl wrong-side turn + boy turn	Open hold	Cross hold 3	2015-02-05	Boy rocks back on 1, then pulls girl past on his left side, haircombing her with his right hand. She then turns under his left (with him watching her) then he unwinds one hand at a time.	179
+Open hold	Spot turn + flick	Crosshand	Cross hold 3	2015-02-12		180
+Crosshand	Outside turn	Hammerlock crosshand	Cross hold 3	2015-02-12		181
+Hammerlock crosshand	Boy turn on 1 + girl turn	Waltz hold	Cross hold 3	2015-02-12	Boy prepares for turn on 8/1 by stepping right foot across himself on 7. Lead girl's turn by holding her left wrist in right hand. 	182
+Waltz hold	360	Open hold	Cross hold 3	2015-02-12		183
+Crosshand	Touch and go	Crosshand	Cross hold 3	2015-02-19	Double spin, led with right hand. Left hands break briefly to let right hand through.	184
+Crosshand	Pizza turn	Hammerlock crosshand	Cross hold 3	2015-02-19	Like a normal pizza turn but keep hold of girl's other hand, keeping it VERY LOW. Boy half turn, girl turn, then boy turns back, following girl's locking hand.	185
+Hammerlock crosshand	Girl turn	Shoulder wrap	Cross hold 3	2015-02-19		186
+Open hold	Double spin	Open hold	Cross hold 3	2015-02-26	Put on the brakes on the previous step, just after 5 (use paddles, some girls like tension too). Girl's feet will come together so she can do the 1-3 prep footwork. Turn on 5 and 7. Boy keeps elbow high so his turning hand describes a very horizontal circle.	187
+Crosshand	Girl spot turn	Hammerlock crosshand	Warmup 3	2015-03-12		188
+Hammerlock crosshand	Inside turn	Titanic	Warmup 3	2015-03-12		189
+Titanic	Girl spot turn + haircomb	Open hold	Warmup 3	2015-03-12		190
+Open hold	Girl turn + boy spin	Open hold	Warmup 3	2015-03-12	Lead by cross body positioning then take her left wrist and shoulder so that you are out of the way. Be careful of elbow.	191
+Open hold	Outside turn	Open hold	Warmup 3	2015-03-12		192
+Open hold	Copa + bodyroll	Open hold	Warmup 3	2015-03-12		193
+Open hold	Double spot turn + haircomb	Shoulder wrap	Outside 3	2015-03-12	Keep elbow high (perhaps by tilting boy's shoulders) so that girl is not scared of hitting elbow while spinning	194
+Shoulder wrap	Outside cross-body lead	Catapult	Outside 3	2015-03-12		195
+Catapult	Inside turn	Shoulder wrap	Outside 3	2015-03-12		196
+Shoulder wrap	Girl outside turn + boy spin	Crosshand	Outside 3	2015-03-12	Boy steps right foot behind left on 6, across with left on 7 to get back in front of girl (while she is finishing her turn), then pivots on 8. Also places her hand on his rib on 7.	197
+Crosshand	Inside turn + grab shoulder	Shadow hold	Outside 3	2015-03-12	Grab her shoulder early so she has time to style with her right hand	198
+Shadow hold	Over-under outside turn	Hammerlock crosshand	Outside 3	2015-03-12	Boy's hand goes to girl's right hip while she is still turning (on boy's right), then she pulls it across. Keep it low early so as not to twist her arm badly.	199
+Hammerlock crosshand	Girl half unwind	Waltz hold	Outside 3	2015-03-12	Boy unwinds girl halfway and steps in front of her and turns to his left. 	200
+Open hold	Cross body lead with boy right turn	Crosshand	Outside 3	2015-03-20		201
+Crosshand	Pizza turn	Crosshand	Outside 3	2015-03-20	aka Waiter's turn	202
+Crosshand	Touch-and-go outside turn with flick and boy turn	Boy hammerlock	Outside 3	2015-03-20	Start with left underneath. On 3, boy is in cross body lead position, right palm facing girl (thumb down) to start her turning, arm/elbow high. Boy steps in front of girl (who has finished her turn) on 7 as he flicks her arm down. Catch her hand on 1.	203
+Boy hammerlock	Girl haircomb + boy turn	Crosshand	Outside 3	2015-03-20	Sweep her locking hand out of the way and turn under it.	204
+Crosshand	Boy turn + inside turn	Open hold	Outside 3	2015-03-20	Boy turns under girl's arm on 1, then girl turns on 6 as usual	205
+Open hold	Outside turn	Hammerlock	Outside 3	2015-03-27		206
+Hammerlock	Pull-push	Catapult	Outside 3	2015-03-27	Walk past girl to unwind her, then pull her right hand to your left hip to travel her forward. Continue to move around outside her to complete the circle, going under your right arm on 6 and under your left on 7, then twisting to face her on 8 without moving your feet. 	207
+Catapult	Double spot turn, over-under	Hammerlock	Outside 3	2015-03-27		208
+Hammerlock	Cross-body lead	Boy hammerlocked	Outside 3	2015-03-27	Girl cross-body lead to unwind. Then boy turns to his left (facing away from girl) and goes under his left arm to lock it.	209
+Boy hammerlock	Release locking hand and turn her under the other.	Open hold	Outside 3	2015-03-27	Lead her forward with the locking hand (lift it on 7, like a copa) before letting go 	210
+Open hold	Spot turn with boy ninja turn	Open hold	Sharon	2015-03-30	Lift left hand for girl to turn under. Boy steps out to right on six, starts turning on 7 (left foot rotated almost pointing backward)	211
+Open hold	Double spot turn	Open hold	Sharon	2015-03-31	Lead with smiley face to twist girl correctly. 9..12..3 on 6..7, then complete circle to 9 on 1 and the smile past 6 to 3 on 3.	212
+Open hold	Cross body lead	Open hold	Sharon	2015-04-01	Move in toward girl on 1, in to her side on 2, then a big lead ahead of her on 3. As she goes past on five, pull your right shoulder (frame) back behind you to keep girl close, also boy's right hand tries to punch his own ribcage. She can be ninja and almost hit boy's junk with her hip as she goes past.	213
+Open hold	Outside cross body lead	Open hold	Sharon	2015-04-02	In-in-out as before; boy moves his left hand close to his crotch on 4.  Left hand down on 5 then up on 6 for girl to go under.	214
+Open hold	Inside turn	Open hold	Sharon	2015-04-03	In in out as before. Keep leading hand (left) low and let her walk into it on 4. Girl twists back, almost presenting her butt to boy on 5. then almost punch yourself in the ear on 6 to whip her through the turn	215
+Open hold	Outside turn	Open hold	Sharon	2015-04-04	In in out as before. Left hand to left ear on 3, girl keeps front leg under her nose, no lunge. Boy almost hits his own nose twice as girl turns. 	216
+Open hold	Around the world	Open hold	Sharon	2015-04-05	Open break on 1. Boy applies more tension (no push first). Girl is almost next to boy on 2. Lean back as you complete a full 360 together.	217
+Crosshand	Girl spin	Crosshand	Copa 3	2015-04-08		218
+Crosshand	Copa + left spin + wrap	Hammerlock crosshand	Copa 3	2015-04-08	Girl doesn't travel during this pattern. Copa is only a half turn, then continue turning her anticlockwise, wind her up into wrap with her facing away from you. Do not step forward on 1 as you bring right hand down to mark time. Keep boy's left hand low as she unwinds into hammerlock.	219
+Hammerlock crosshand	Haircomb + unwind + shoulder turn	Open hold	Copa 3	2015-04-08		220
+Open hold	Copa + right spin + arm circles + 360	Open hold	Copa 3	2015-04-08		221
+Open hold	Blocked spot turn	Hammerlock	Copa 3	2015-04-08	Led with arms going wide to begin with	222
+Hammerlock	Copa + both turn	Open hold	Copa 3	2015-04-08	Girl turns first, under both hands. Boy keeps his right hand on his left elbow/shoulder for his turn on 7..8.	223
+Open hold	Copa + girl bow walk back	Hands double crossed	Copa 3	2015-04-15	Roll arm up girl's back so that she bows (timing is syncopated)	224
+Hands double crossed	Boy turn + boy unwind cross body lead	Open hold	Copa 3	2015-04-15	Right hand to left elbow then turn under left hand; lead girl across and turn away from her, letting go of boy's left hand to unwind on 8.	225
+Open hold	Copa + switch	Open hold	Copa 3	2015-04-15	Boy's left palm faces ceiling on 3, higher than girl's shoulder. Switch direction on 4 by pulling on her hip with right hand. Girl half turn + boy turn on 8 to finish.	226
+Open hold	Copa + drag	Hands double crossed	Copa 3	2015-04-23	Copa then drag her backwards past you to flare on 1. Lead girl back across and right turn.	227
+Open hold	Copa + inside turn + two boy turns	Crosshand	Copa 3	2015-04-23	Copa to wrap then turn her anticlockwise (left), releasing BRH. Boy turns under BLH on 1 then continues with hand low for another turn to swap hands on 5.	228
+Crosshand	Copa + walk back	Hammerlock crosshand	Copa 3	2015-04-23	Copa to sweetheart, walk back, flare on 1. Walk her forward, GLF on 2 and GRF on 3. GLF on 5 but block GLH to turn her left. Both facing same way, drop right hands on 1 then unwind.	229
+Hammerlock crosshand	Gunshot + drop-catch	Shoulder wrap	Copa 3	2015-04-23	Pull girl to boy's right / move past her on 1, BRA bicep flexed, palm up. Once past her, move right hands "through" left hands by drop-catching right hands. Inside turn to shoulder wrap.	230
+Hammerlock	GTTL on 5, BTR on 7,8.	Boy hammerlock	Hammerlock 3	2015-05-06	Scoop BRH to give girl more momentum. Both turn under BRH / GLH.	231
+Boy hammerlock	GTTL blocked	Open hold	Hammerlock 3	2015-05-06	Haircomb girl and release boy hammerlock. Lead inside turn with BRH/GLH but keep it low so she doesn't complete last half of her turn. Allow her to step forward away from you on 1 then half turn her back to open hold to continue next move.	232
+Open hold	GTTRR	Hammerlock crosshand	Hammerlock 3	2015-05-06	3 turns total including half turn on 1. Swap hands as she goes into hammerlock.	233
+Hammerlock crosshand	Copa + BTL	Close hold	Hammerlock 3	2015-05-06	Boy steps past girl and turns under BLH. Use a hand on her waist if she goes too far or not far enough.	234
+Hammerlock	GTTL + fold	Hands double crossed	Hammerlock 3	2015-05-13	End travelling turn in wrap but instead of easing around her, pull right hand over her head (nicely).	235
+Hands double crossed	Boy blocked turn + flick; s turn	Hammerlock	Hammerlock 3	2015-05-13	BTR (half) into boy wrap then BLH throws GRH behind her and BTL (half) and take GRH in reverse hammerlock.	236
