@@ -21,6 +21,8 @@ Original Author: Jonathan Newnham
 
 p { max-width: 40em; }
 
+.invalid { color: red; }
+
 </style>
 <body>
 <h1 style="display:inline">Category Color Generator</h1>
@@ -31,7 +33,7 @@ p { max-width: 40em; }
     <br />
     L2:<input id="lrange2" type="range" min="0" max="100" value="45" step="1" oninput="initcolors();" />
     <br />
-    Grid:<input id="gridstep" type="range" min="6" max="60" value="20" step="1" oninput="initcolors();" />
+    Grid:<input id="gridstep" type="range" min="6" max="60" value="12" step="1" oninput="initcolors();" />
     <br />
     <input type="button" value="Reset" onclick="initcolors();"/>
     <input type="button" value="Start" onclick="startsort();"/>
@@ -217,12 +219,17 @@ layer0.on("mousemove", function() {
   status += "L=" + lab.l + ", a=" + Math.floor(lab.a) + ", b=" + Math.floor(lab.b);
   
   status += "<br />";
-  status += "R="+rgb.r + " G=" + rgb.g + " B=" + rgb.b;
-  if (!validcolor(lab))
-    status += " invalid";
+  status += "R="+ printColorValue(rgb.r) + " G=" + printColorValue(rgb.g) + " B=" + printColorValue(rgb.b);
 
   document.getElementById("status").innerHTML = status;
 });
+
+function printColorValue(v) {
+  if (v < 0 || v > 255)
+    return "<span class=\"invalid\">" + v + "</span>";
+  else
+    return "" + v
+}
 
 
 initcolors();
