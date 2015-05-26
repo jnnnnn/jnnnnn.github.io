@@ -58,7 +58,10 @@
 
   <body>
 
-<h3>Pleasing Variation</h3>
+<h3 style="display:inline">Pleasing Variation</h3>
+<div id="data" style="display:inline">
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow:none; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+</div>
 <div id="svgcontainer" style="width: 100%; height: 80%; overflow-y: scroll; overflow-x: scroll">
 <svg></svg>
 </div>
@@ -71,7 +74,7 @@
 
 <a href="dance-variation.html">More variations</a>
 
-<!-- load the d3.js library --> 
+<!-- load the d3.js library (for layout/animation) --> 
 <script src="http://d3js.org/d3.v3.min.js"></script>
   
 <script>
@@ -221,10 +224,8 @@ function update(source) {
   });
 }
 
-var moves = {};
-var moves_list = [];
 root = { //
-    "key": "Bachata",
+    "key": "root",
     "parent": "null",
     "children": [],
     "tsv": { 
@@ -265,60 +266,75 @@ function highlight_tag(tagdiv) {
 }
 
 function set_tags_list(tags) {
+  var tagelem = document.getElementById("tags");
+  tagelem.innerHTML = "taggies: ";
   for (tag of tags)
   {
-    document.getElementById("tags").innerHTML += " <div class=\"taggy\" onclick=\"highlight_tag(this)\" onmouseover=\"highlight_tag(this)\">"+tag+"</div>";
+    tagelem.innerHTML += " <div class=\"taggy\" onclick=\"highlight_tag(this)\" onmouseover=\"highlight_tag(this)\">"+tag+"</div>";
   }
 }
 
-function load_graph() {  
+function init() {  
   d3.tsv("bachata_moves.txt", function(error, csv_rows) {
     if (error) {
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
       return;
     }
     
-    var all_tags = d3.set();
-    // construct tree from rows so we can display it
-    for (row of csv_rows) {      
-      if (row.Parent === '-' || row.Parent === "dup")
-        continue;
-      var key = row.Start + " → " + row.Move + " → " + row.End;
-      var node = { // 
-        "key": key,
-        "children": [],
-        "id": row.Index,
-        "x": 0,
-        "y": 0,
-        "tsv": row
-      };
-      moves[row.Index] = node;
-      moves_list.push(node);
-      if (row.Tags)
-        for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(','))
-          all_tags.add(tag);
-    }
-
-    set_tags_list(all_tags.values().sort());
-
-    // second pass is separate in case parent is after child
-    for (node of moves_list) {      
-      var parent = node.tsv.Parent ? moves[node.tsv.Parent] : root;
-      if (!parent)
-        console.log("error:", node);
-      else
-        parent.children.push(node);
-    }
-
-    // minimize everything..
-    //for (child of root.children)
-    //  collapse(child);
-
-    update(root);
+    load_rows(csv_rows)
   });
 }
 
-load_graph();
+function load_text_data() {
+  var raw = document.getElementById("textdata").value;
+  var csv_rows = d3.tsv.parse(raw);
+  load_rows(csv_rows);
+}
+
+function load_rows(csv_rows) {
+  var moves = {};
+  var moves_list = [];
+  root.children = [];
+  var all_tags = d3.set();
+  // construct tree from rows so we can display it
+  for (row of csv_rows) {      
+    if (row.Parent === '-' || row.Parent === "dup")
+      continue;
+    var key = row.Start + " → " + row.Move + " → " + row.End;
+    var node = { // 
+      "key": key,
+      "children": [],
+      "id": row.Index,
+      "x": 0,
+      "y": 0,
+      "tsv": row
+    };
+    moves[row.Index] = node;
+    moves_list.push(node);
+    if (row.Tags)
+      for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(','))
+        all_tags.add(tag);
+  }
+
+  set_tags_list(all_tags.values().sort());
+
+  // second pass is separate in case parent is after child
+  for (node of moves_list) {      
+    var parent = node.tsv.Parent ? moves[node.tsv.Parent] : root;
+    if (!parent)
+      console.log("error:", node);
+    else
+      parent.children.push(node);
+  }
+
+  // minimize everything..
+  //for (child of root.children)
+  //  collapse(child);
+
+  update(root);
+}
+
+init();
 
 // Toggle children on click.
 function dblclick(d) {
@@ -329,11 +345,14 @@ function dblclick(d) {
 }
 
 function click(d) {
+  display_detail(d);
   expand(d);
   update(d);
 }
 
-function mouseover(d) {
+function mouseover(d) {}
+
+function display_detail(d) {
   current_move = d;
   var detdiv = document.getElementById("detail");
   detdiv.innerHTML = "";
