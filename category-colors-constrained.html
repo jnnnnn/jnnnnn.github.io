@@ -36,12 +36,11 @@ p { max-width: 40em; }
 <div id="controls" style="float:right; padding:1em">
   <form id="fc" onsubmit="force.start(); return false;" style="display:inline">   
     Allowed colors:
-    <textarea class="side" id="constrainttext">function constraint(l, a, b) { 
-  return l > 45 && l < 70;
+    <textarea class="side" id="constrainttext">function constraint(lab) {
+  return lab.l > 45 && lab.l < 70;
 }</textarea>
-    <input type="button" value="Prepare" onclick="initcolors();"/>
-    <input type="button" value="Start" onclick="startsort();"/>
-    <input type="button" value="Pause" onclick="sorting=false;"/>
+    <input type="button" value="Start" onclick="initcolors();"/>
+    <input type="button" value="Pause" onclick="if(sorting) sorting=false; else sortcolors();"/>
     <input type="checkbox" checked id="goslowcheck">Start slowly
   </form>  
   <div id="status" class="mo side"></div>
@@ -49,21 +48,25 @@ p { max-width: 40em; }
   Some example constraints:
   <pre>
 // All colours with integer L.a.b. values
-function constraint(l, a, b) { 
+function constraint(lab) { 
   return true;
 }
 
-
 // Constant distance to a given colour:
-function constraint(l, a, b) { 
-  var c = d3.lab("#ddffdd");
-
-  sq = function(x) { return Math.pow(x, 2); }  
-  var dist = Math.sqrt(
-    sq(l-c.l) + sq(a-c.a) + sq(b-c.b));
-
-  return (dist > 65 && dist < 66);
+function constraint(lab) {   
+  var centre = d3.lab("#ddffdd");
+  var dist = lab_dist(centre, lab);
+  return (65 < dist && dist < 66);
 }
+
+// other functions..
+return 30*30 < lab.a*lab.a+lab.b*lab.b ; // No greys
+return lab.a + lab.b < 10; // no red
+return lab.l < 30; // dark
+return 80 < lab.l; // light
+return lab_dist(lab, d3.lab("blue")) < 50; // blues
+return lab_dist(lab, d3.lab("red")) < 50; // reds
+return lab_dist(lab, d3.lab("green")) > 70; // no greens
   </pre>
   </div>
 </div>
@@ -89,7 +92,7 @@ var y0 = height / 2;
 
 var sorting = false;
 
-var scalefactor = 4; // distance on screen vs. change in color
+var scalefactor = 3.5; // distance on screen vs. change in color
 var mindist = 0; // distance between adjacent color points
 
 // set up axes
@@ -137,15 +140,16 @@ function initcolors() {
 // should probably use a web worker here but don't want a separate file. Use SetTimeout instead.
 function innerloop(L) {
   if (L > 100) {
-    document.getElementById("status").innerHTML = "Initialized. " + ds.length + " colours prepared."; 
+    document.getElementById("status").innerHTML = "Initialized. " + ds.length + " colours prepared.";
+    setTimeout(startsort, 1000);
     return;
   }
-  document.getElementById("status").innerHTML = "Initializing, please wait. L="+L;
-  for (b = -100; b < 100; b+=1) {
+  document.getElementById("status").innerHTML = "Initializing, please wait. L="+L+", N="+ds.length;
+  for (b = -110; b < 100; b+=1) {
     for (a = -100; a < 100; a+=1) {
       var lab = d3.lab(L, a, b);
       if (validcolor(lab)) {
-        if (constraint(L, a, b)) {
+        if (constraint(lab)) {
           ds.push({ 
             lab: lab, // the color
             x: a * scalefactor + x0, // screen coord
@@ -168,10 +172,15 @@ function startsort() {
   sortcolors();
 }
 
+function lab_dist(lab_1, lab_2) {
+  return Math.sqrt(
+    (lab_1.l-lab_2.l)*(lab_1.l-lab_2.l) +
+    (lab_1.a-lab_2.a)*(lab_1.a-lab_2.a) +
+    (lab_1.b-lab_2.b)*(lab_1.b-lab_2.b));
+}
+
 // Order colours by greatest distance from all other selected colors.
 function sortcolors() {
-  // faster ways of doing this include
-  //  - a quadtree of d_sorteds for the nearest-neighbour search
   var d_new = select_distant_node();
   if (!sorting)
     return;
@@ -195,7 +204,7 @@ function create_node(d, i) {
       .classed("posnode", true)
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", function(d) { return d.lab.l * 0.07 + 3; }) // rudimentary perspective lol
+      .attr("r", function(d) { return d.lab.l * 0.11 + 3; }) // rudimentary perspective
       .style("fill", function(d) { return d.lab; })
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
@@ -204,7 +213,7 @@ function add_to_sorted_list(lab)
 {
   var newelem = "<span style=\"background-color: "+lab.rgb()+"\">"+lab.rgb()+"</span>"
   document.getElementById("sortedlist").innerHTML += "\"" + newelem + "\", ";
-  document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length
+  document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length + " / " + ds.length
       +"<br />Distance: "+Math.floor(Math.sqrt(mindist))
 }
 
@@ -219,6 +228,7 @@ function select_distant_node()
 
   var selected_node = ds[0];
   // find the node with the highest "nearest" value (full scan)
+  // -- in other words, the most distant one
   ds.forEach(function(d) {
     if (d.nearest > selected_node.nearest)
       selected_node = d;
@@ -229,7 +239,7 @@ function select_distant_node()
   var index = ds.indexOf(selected_node);
   ds.splice(index, 1);
   
-  // update the "nearest" value for all the other nodes
+  // update the "nearest" value for all the other (nearby) nodes
   var sq = function(x) { return x * x; }
 
   ds.forEach(function(d) {
