@@ -48,13 +48,6 @@ p { max-width: 40em; }
   <div id="commentary" class="side">
   Some example constraints:
   <pre>
-// Constant distance to a given colour:
-function constraint(l, a, b) { 
-  var c = d3.lab("#ffffff");
-  sq = function(x) { return Math.pow(x, 2); }  
-  var dist = sq(l-c.l) + sq(a-c.a) + sq(b-c.b);
-  return (dist > sq(20) && dist < sq(50));
-}
 
 // Two lightnesses:
 function constraint(l, a, b) { 
@@ -64,6 +57,17 @@ function constraint(l, a, b) {
 // All colours with integer L.a.b. values
 function constraint(l, a, b) { 
   return true;
+}
+
+// Constant distance to a given colour:
+function constraint(l, a, b) { 
+  var c = d3.lab("#ddffdd");
+
+  sq = function(x) { return Math.pow(x, 2); }  
+  var dist = Math.sqrt(
+    sq(l-c.l) + sq(a-c.a) + sq(b-c.b));
+
+  return (dist > 65 && dist < 66);
 }
   </pre>
   </div>
