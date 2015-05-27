@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+
+
+License: Public Domain.
+Original Author: Jonathan Newnham
+-->
+<style>
+
+.axis {
+  stroke: #999;
+  stroke-opacity: .5;
+  fill-opacity: 0;
+  stroke-width: 1;
+}
+
+.mo {
+  font-family: Consolas, Inconsolata, "Courier New", Courier, monospace;
+}
+
+.side {
+  display: block; 
+  width: 25em; 
+  min-height: 5em;
+}
+
+p { max-width: 40em; }
+
+.invalid { color: red; }
+
+</style>
+<body>
+<h1 style="display:inline">Category Color Generator</h1>
+<div></div>
+<div id="controls" style="float:right; padding:1em">
+  <form id="fc" onsubmit="force.start(); return false;" style="display:inline">   
+    Allowed colors:
+    <textarea class="side" id="constrainttext">function constraint(l, a, b) { 
+    return l == 50; 
+}</textarea>
+    <input type="button" value="Prepare" onclick="initcolors();"/>
+    <input type="button" value="Start" onclick="startsort();"/>
+    <input type="button" value="Pause" onclick="sorting=false;"/>
+    <input type="checkbox" checked id="goslowcheck">Start slowly
+  </form>  
+  <div id="status" class="mo side"></div>
+  <div id="commentary" class="side">
+  Some example constraints:
+  <pre>
+// Constant distance to a given colour:
+function constraint(l, a, b) { 
+  var c = d3.lab("#ffffff");
+  sq = function(x) { return Math.pow(x, 2); }  
+  var dist = sq(l-c.l) + sq(a-c.a) + sq(b-c.b);
+  return (dist > sq(20) && dist < sq(50));
+}
+
+// Two lightnesses:
+function constraint(l, a, b) { 
+  return l == 45 || l == 70;
+}
+
+// All colours with integer L.a.b. values
+function constraint(l, a, b) { 
+  return true;
+}
+  </pre>
+  </div>
+</div>
+<svg id="graph" style="display:inline"></svg>
+<div id="sortedlist" class="mo"></div>
+
+<script src="d3.v3.min.js"></script>
+
+<script>
+
+var width = 800;
+var height = 800;
+
+var svg = d3.select("svg#graph")
+    .attr("width", width)
+    .attr("height", height);
+
+var layer0 = svg.append("g").attr("id", "layer0"); // for background stuff (link paths, text)
+var layer1 = svg.append("g").attr("id", "layer1"); // for background stuff (link paths, text)
+
+var x0 = width / 2;
+var y0 = height / 2;
+
+var sorting = false;
+
+var scalefactor = 4; // distance on screen vs. change in color
+var mindist = 0; // distance between adjacent color points
+
+// set up axes
+layer0.selectAll(".backrect").data([0]).enter().append("rect")
+      .classed("backgrect", true)
+      .attr("height", height)
+      .attr("width", width)
+      .style("fill", "white");
+layer0.selectAll(".axis").data([
+          [[0, height/2],[width, height/2]],
+          [[width/2, 0],[width/2, height]],
+      ])
+      .enter().append("path")
+        .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
+        .style("stroke-width", "1")
+        .classed("axis", true);
+
+var ds = []; // data array: list of (x,y) pairs and d3js internals
+var d_sorteds = [];
+
+function validcolor(lab) {
+  var rugub = lab.rgb();
+  return ((0 < rugub.r) && (rugub.r < 256) 
+      && (0 < rugub.g) && (rugub.g < 256) 
+      && (0 < rugub.b) && (rugub.b < 256));
+}
+
+function coord_to_labcolor(L, x, y) {
+  return d3.lab(L, (x-x0)/scalefactor, (y-y0)/scalefactor);
+}
+
+function initcolors() {
+  sorting = false;  
+  document.getElementById("sortedlist").innerHTML = "";
+  (1, eval)(document.getElementById("constrainttext").value); // creates the constraint function
+  ds = [];
+  d_sorteds = [];
+
+  layer1.selectAll(".posnode").remove();
+
+  // the world's slowest loop:
+  innerloop(0);
+}
+
+// should probably use a web worker here but don't want a separate file. Use SetTimeout instead.
+function innerloop(L) {
+  if (L > 100) {
+    document.getElementById("status").innerHTML = "Initialized. " + ds.length + " colours prepared."; 
+    return;
+  }
+  document.getElementById("status").innerHTML = "Initializing, please wait. L="+L;
+  for (b = -100; b < 100; b+=1) {
+    for (a = -100; a < 100; a+=1) {
+      var lab = d3.lab(L, a, b);
+      if (validcolor(lab)) {
+        if (constraint(L, a, b)) {
+          ds.push({ 
+            lab: lab,
+            x: a * scalefactor + x0,
+            y: b * scalefactor + y0,
+            nearest: 1000000 // way bigger than any possible "real" value
+          });
+        }
+      }
+    }
+  }
+  setTimeout(function() { innerloop(L+1); }, 0);
+}
+
+
+function startsort() {
+  sorting = true;
+  if (0 === d_sorteds.length) {
+    layer1.selectAll(".posnode").remove()     
+  }
+  sortcolors();
+}
+
+// Order colours by greatest distance from all other selected colors.
+function sortcolors() {
+  // faster ways of doing this include
+  //  - a quadtree of d_sorteds for the nearest-neighbour search
+  var d_new = select_distant_node();
+  if (!sorting)
+    return;
+  if(d_new.nearest > 0)
+  {        
+    d_new.sorted = true;
+    var i = d_sorteds.length;
+    d_sorteds.push(d_new);
+    create_node(d_new, i);
+    add_to_sorted_list(d_new.lab);
+    var delay = 500 * d3.ease("quad")(1-i/50);
+    var goSlow = document.getElementById("goslowcheck").checked;
+    setTimeout(sortcolors, goSlow?delay:0);
+  }
+}
+
+function create_node(d, i) {
+  var nodes = layer1.selectAll(".posnode")
+      .data(d_sorteds)
+    .enter().append("circle")
+      .classed("posnode", true)
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", 5)
+      .style("fill", function(d) { return d.lab; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+function add_to_sorted_list(lab)
+{
+  document.getElementById("sortedlist").innerHTML += "\""+lab.rgb()+"\", ";
+  document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length
+      +"<br />Distance: "+Math.floor(Math.sqrt(mindist))
+}
+
+// find the node that is furthest away from all the currently selected (sorted) nodes.
+function select_distant_node()
+{
+  var selected_node = ds[0];
+  // find the node with the highest "nearest" value
+  ds.forEach(function(d) {
+    if (d.nearest > selected_node.nearest)
+      selected_node = d;
+  });
+  mindist = selected_node.nearest; // for UI
+
+  // remove it from candidates list
+  var index = ds.indexOf(selected_node);
+  ds.splice(index, 1);
+  
+  // update the "nearest" value for all the other nodes
+  var sq = function(x) { return x * x; }
+  
+  ds.forEach(function(d) {
+    dist = (sq(d.lab.a - selected_node.lab.a)
+            + sq(d.lab.b - selected_node.lab.b)
+            + sq(d.lab.l - selected_node.lab.l));
+    if (dist < d.nearest)
+      d.nearest = dist;
+  });
+  
+  return selected_node;
+}
+
+layer0.on("mousemove", function() {
+  var x = d3.mouse(this)[0];
+  var y = d3.mouse(this)[1];
+  var lab = coord_to_labcolor(50, x, y);
+  var rgb = lab.rgb();
+  var status = "x=" + x + ", y=" + y;
+
+  status += "<br />";
+  status += "L=" + lab.l + ", a=" + Math.floor(lab.a) + ", b=" + Math.floor(lab.b);
+  
+  status += "<br />";
+  status += "R="+ printColorValue(rgb.r) + " G=" + printColorValue(rgb.g) + " B=" + printColorValue(rgb.b);
+
+  document.getElementById("status").innerHTML = status;
+});
+
+function printColorValue(v) {
+  if (v < 0 || v > 255)
+    return "<span class=\"invalid\">" + v + "</span>";
+  else
+    return "" + v
+}
+
+</script>
+
+<div id="about" style="display:inline">
+
+<h3>About</h3>
+<p>
+Generate a continuous sequence of distinct random colours for diagrams.
+</p><p>
+Sampling is done in the Lab color space so that perceptually different colours are generated for the given lightnesses.
+</p><p>
+Further work: 
+Instead of taking flat slices of lightness, take all samples to be the same distance (in Lab-space) from a given point (i.e. the background color). This should give a more consistent and pleasing amount of contrast.  
+</p><p>
+Bibliography:
+<ol><li>
+<a href="http://bl.ocks.org/mbostock/310c99e53880faec2434">bl.ocks.org/mbostock/310c99e53880faec2434</a><br />
+For introducing the idea of perceptual color
+</li><li>
+<a href="http://tools.medialab.sciences-po.fr/iwanthue/theory.php">medialab: iwanthue</a><br />
+Generating fixed-size palettes of optimal colours using the LAB colour space. 
+Spacing done with repulsive forces or kNN clustering.
+</li><li>
+<a href="http://www.colorcodehex.com/color-model.html">colorcodehex</a> and <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> for the description of the LAB color space.
+</li><li>
+<a href="http://en.wikipedia.org/wiki/Low-discrepancy_sequence">Low-discrepancy sequence</a>
+Methods for nice multidimensional sampling
+</li>
+<li>
+Piotr Migdal's <a href="http://stackoverflow.com/a/28306100/412529">infinite color generator</a> for the idea of sampling all possible colors (instead of just certain slices of lightness).
+</li>
+</ol>
+</p>
+</div>
