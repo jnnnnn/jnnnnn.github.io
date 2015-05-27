@@ -25,6 +25,10 @@ Original Author: Jonathan Newnham
   min-height: 5em;
 }
 
+h4 {
+  margin: 0.2em;
+}
+
 p { max-width: 40em; }
 
 .invalid { color: red; }
@@ -34,8 +38,9 @@ p { max-width: 40em; }
 <h1 style="display:inline">Category Color Generator</h1>
 <div></div>
 <div id="controls" style="float:right; padding:1em">
-  <form id="fc" onsubmit="force.start(); return false;" style="display:inline">   
-    Allowed colors:
+  <form id="fc" onsubmit="force.start(); return false;" style="display:inline">     
+    <pre>(note: d3.lab("white") = {l: 100, a: 0, b: 0})</pre>
+    <h4>Allowed colors:</h4>
     <textarea class="side" id="constrainttext">function constraint(lab) {
   return lab.l > 45 && lab.l < 70;
 }</textarea>
@@ -43,9 +48,11 @@ p { max-width: 40em; }
     <input type="button" value="Pause" onclick="if(sorting) sorting=false; else sortcolors();"/>
     <input type="checkbox" checked id="goslowcheck">Start slowly
   </form>  
+  <h4>Status</h4>
   <div id="status" class="mo side"></div>
   <div id="commentary" class="side">
-  Some example constraints:
+  
+  <h4>Some example constraints</h4>
   <pre>
 // All colours with integer L.a.b. values
 function constraint(lab) { 
@@ -54,9 +61,9 @@ function constraint(lab) {
 
 // Constant distance to a given colour:
 function constraint(lab) {   
-  var centre = d3.lab("#ddffdd");
+  var centre = d3.lab(120, 20, 20); // L, a, b
   var dist = lab_dist(centre, lab);
-  return (65 < dist && dist < 66);
+  return (75 < dist && dist < 76);
 }
 
 // other functions..
@@ -66,7 +73,7 @@ return lab.l < 30; // dark
 return 80 < lab.l; // light
 return lab_dist(lab, d3.lab("blue")) < 50; // blues
 return lab_dist(lab, d3.lab("red")) < 50; // reds
-return lab_dist(lab, d3.lab("green")) > 70; // no greens
+return lab_dist(lab, d3.lab("#00ff00")) > 70; // no greens
   </pre>
   </div>
 </div>
@@ -126,7 +133,7 @@ function coord_to_labcolor(L, x, y) {
 
 function initcolors() {
   sorting = false;  
-  document.getElementById("sortedlist").innerHTML = "";
+  document.getElementById("sortedlist").innerHTML = "\"";
   (1, eval)(document.getElementById("constrainttext").value); // creates the constraint function
   ds = [];
   d_sorteds = [];
@@ -209,10 +216,19 @@ function create_node(d, i) {
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
 
+
 function add_to_sorted_list(lab)
 {
-  var newelem = "<span style=\"background-color: "+lab.rgb()+"\">"+lab.rgb()+"</span>"
-  document.getElementById("sortedlist").innerHTML += "\"" + newelem + "\", ";
+  // don't append to innerHTML because it's too slow (whole string has to be re-parsed)
+  //var newelem = "<span style=\"background-color: "+lab.rgb()+"\">"+lab.rgb()+"</span>"
+  var newelem = document.createElement("span");
+  newelem.textContent = lab.rgb();
+  newelem.style.backgroundColor = lab.rgb();
+  document.getElementById("sortedlist").appendChild(newelem);
+  var sep = document.createElement("span");
+  sep.textContent = "\", \"";
+  document.getElementById("sortedlist").appendChild(sep);
+
   document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length + " / " + ds.length
       +"<br />Distance: "+Math.floor(Math.sqrt(mindist))
 }
@@ -282,12 +298,11 @@ function printColorValue(v) {
 
 <h3>About</h3>
 <p>
-Generate a continuous sequence of distinct random colours for diagrams.
+Click Start to generate a continuous sequence of distinct random colours for diagrams.
 </p><p>
-Sampling is done in the Lab color space so that perceptually different colours are generated for the given lightnesses.
+You can alter the "constraint" function to filter colours before the random selection process starts.
 </p><p>
-Further work: 
-Instead of taking flat slices of lightness, take all samples to be the same distance (in Lab-space) from a given point (i.e. the background color). This should give a more consistent and pleasing amount of contrast.  
+Sampling is done in the d3 <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> so that perceptually different colours are equally spaced. The sampler always chooses the next colour to be as far as possible from all the previously sampled colours.
 </p><p>
 Bibliography:
 <ol><li>
@@ -298,7 +313,7 @@ For introducing the idea of perceptual color
 Generating fixed-size palettes of optimal colours using the LAB colour space. 
 Spacing done with repulsive forces or kNN clustering.
 </li><li>
-<a href="http://www.colorcodehex.com/color-model.html">colorcodehex</a> and <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> for the description of the LAB color space.
+<a href="http://www.colorcodehex.com/color-model.html">colorcodehex</a> and <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> for the description of the LAB color spaces.
 </li><li>
 <a href="http://en.wikipedia.org/wiki/Low-discrepancy_sequence">Low-discrepancy sequence</a>
 Methods for nice multidimensional sampling
