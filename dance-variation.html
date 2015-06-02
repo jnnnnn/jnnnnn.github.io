@@ -17,6 +17,7 @@ Don't forget about these possible variations:
 <li>Translation up/forward/sideways/wrong-way (squat, offset, lean back, slide, sway, flick, close/open hold, walk)</li>
 <li>Rotation around/forward/sideways (close/wrap, circling, spinning, dips, twisted)</li>
 <li>Body part (frame/feet/knees/hips/butt/chest/shoulders/head/hands)</li>
+<li>Hand swaps/flicks</li>
 </ul>
 
 <h3>Variation generator</h3>
@@ -31,7 +32,7 @@ function chooseAtRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-var random_moves = ",,,,single step,with boy turn,with girl turn,walking,both turn".split(",");
+var random_moves = ",,,,single step,with boy turn,with girl turn,walking,both turn,with hand swap".split(",");
 var timings = ",,,,,triple step,reverse,hesitation,quick,slow,slow-quick-quick,quick-quick-slow,robotic".split(",");
 var directions = ",,,,up,down,forward,back,sideways,wrong way".split(",");
 var translations = ",,,,squat,offset,slide,sway,flick,walk".split(",");

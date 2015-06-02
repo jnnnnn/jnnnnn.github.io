@@ -287,8 +287,11 @@ function init() {
 
 function load_text_data() {
   var raw = document.getElementById("textdata").value;
+  if (!raw)
+    return;
   var csv_rows = d3.tsv.parse(raw);
   load_rows(csv_rows);
+  document.getElementById("textdata").value = "";
 }
 
 function load_rows(csv_rows) {
@@ -297,8 +300,8 @@ function load_rows(csv_rows) {
   root.children = [];
   var all_tags = d3.set();
   // construct tree from rows so we can display it
-  for (row of csv_rows) {      
-    if (row.Parent === '-' || row.Parent === "dup")
+  for (row of csv_rows) {    
+    if (row.Parent.trim() === "" || row.Parent.trim() === "-" || row.Parent.trim() === "dup")
       continue;
     var key = row.Start + " → " + row.Move + " → " + row.End;
     var node = { // 
@@ -319,12 +322,11 @@ function load_rows(csv_rows) {
   set_tags_list(all_tags.values().sort());
 
   // second pass is separate in case parent is after child
-  for (node of moves_list) {      
-    var parent = node.tsv.Parent ? moves[node.tsv.Parent] : root;
-    if (!parent)
-      console.log("error:", node);
-    else
-      parent.children.push(node);
+  for (node of moves_list) {    
+    var parent = moves[node.tsv.Parent.split(",")[0]];
+    if (parent == undefined)
+      parent = root;
+    parent.children.push(node);
   }
 
   // minimize everything..
