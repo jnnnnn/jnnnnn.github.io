@@ -74,6 +74,7 @@ return 80 < lab.l; // light
 return lab_dist(lab, d3.lab("blue")) < 50; // blues
 return lab_dist(lab, d3.lab("red")) < 50; // reds
 return lab_dist(lab, d3.lab("#00ff00")) > 70; // no greens
+return lab.rgb().r > 230; // Strong red channel
   </pre>
   </div>
 </div>
