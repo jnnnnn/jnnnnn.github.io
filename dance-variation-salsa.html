@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Pleasing Variation</title>
+<style>
+button { font-size:14pt; }
+</style>
+
+</head>
+<body style="width:100% padding:0pt margin:0pt">
+
+Don't forget about these possible variations:
+<ul>
+<li>Timing (triple step, reverse, hesitation, quick, slow, slow-quick-quick, quick-quick-slow, robotic)</li>
+<li>Translation up/forward/sideways/wrong-way (squat, offset, lean back, slide, sway, flick, close/open hold, walk)</li>
+<li>Rotation around/forward/sideways (close/wrap, circling, spinning, dips, twisted)</li>
+<li>Body part (frame/feet/knees/hips/butt/chest/shoulders/head/hands)</li>
+<li>Hand swaps/flicks</li>
+</ul>
+
+<h3>Variation generator</h3>
+<div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
+<div id="index"></div>
+<button type="button" onclick="random_variation()">Random variation</button>
+<button type="button" onclick="vary()">Alter variation</button>
+
+<div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
+
+<script>
+function chooseAtRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+var random_moves = "spot turn left,spot turn right,cross body lead,travelling left turn,travelling right turn,around the world".split(",");
+var timings = ",,,,,".split(",");
+var directions = ",,,,,,,,,boy in front,boy to side,boy to other side,boy behind,boy to front side,boy to other front side,boy to back side,boy to other back side".split(",");
+var translations = ",,,,with left hand,with right hand,crosshand".split(",");
+var rotations = ",,,,,,,boy facing away,boy turning left,boy turning right,boy half turn left, boy half turn right".split(",");
+var bodyparts = ",,,,hand overhead".split(",");
+
+var variant = {move: "", timing: "", direction:"", translation:"", rotation:"", bodypart:""};
+var totalpossibilities = 0;
+function vary() {  
+  var thing_to_vary = Math.floor(Math.random() * 5);
+  if (thing_to_vary === 0)
+    variant.timing = chooseAtRandom(timings);
+  if (thing_to_vary === 1)
+    variant.direction = chooseAtRandom(directions);
+  if (thing_to_vary === 2)
+    variant.translation = chooseAtRandom(translations);
+  if (thing_to_vary === 3)
+    variant.rotation = chooseAtRandom(rotations);
+  if (thing_to_vary === 4)
+    variant.bodypart = chooseAtRandom(bodyparts);  
+  update_screen();  
+}
+
+function random_variation() {
+  variant.move = chooseAtRandom(random_moves);
+  variant.timing = chooseAtRandom(timings);
+  variant.direction = chooseAtRandom(directions);
+  variant.translation = chooseAtRandom(translations);
+  variant.rotation = chooseAtRandom(rotations);
+  variant.bodypart = chooseAtRandom(bodyparts);
+  update_screen();
+}
+
+function update_screen() {
+  var div = document.getElementById("randvar");
+  div.innerHTML = variant.move + " (" + variant.timing + ") " + variant.direction + " " + variant.translation + " " + variant.rotation + " " + variant.bodypart;
+
+  document.getElementById("index").innerHTML = possibility_index() + " / " + totalpossibilities;
+}
+
+function uniques(arr) {
+  return arr.filter(
+    function(value, index, self) { 
+      return self.indexOf(value) === index; 
+    });
+}
+
+function possibility_index() {
+  var value = 0;
+  var base = 1;
+  value += base * uniques(random_moves).indexOf(variant.move);
+  base *= uniques(random_moves).length;
+  value += base * uniques(timings).indexOf(variant.timing);
+  base *= uniques(timings).length;
+  value += base * uniques(directions).indexOf(variant.direction);
+  base *= uniques(directions).length;
+  value += base * uniques(translations).indexOf(variant.translation);
+  base *= uniques(translations).length;
+  value += base * uniques(rotations).indexOf(variant.rotation);
+  base *= uniques(rotations).length;
+  value += base * uniques(bodyparts).indexOf(variant.bodypart);
+  base *= uniques(bodyparts).length;
+
+  totalpossibilities = base;
+  return value;
+}
+
+function possibility_dedex(value) {
+  var base = totalpossibilities;
+
+  base /= uniques(bodyparts).length;
+  variant.bodypart = uniques(bodyparts)[Math.floor(value/base)];
+  value %= base;
+
+  base /= uniques(rotations).length;
+  variant.rotation = uniques(rotations)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(translations).length;
+  variant.translation = uniques(translations)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(directions).length;
+  variant.direction = uniques(directions)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(timings).length;
+  variant.timing = uniques(timings)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(random_moves).length;
+  variant.move = uniques(random_moves)[Math.floor(value/base)];
+  value %= base;
+
+  return variant;
+}
+
+</script>
+</body>
+</html>
