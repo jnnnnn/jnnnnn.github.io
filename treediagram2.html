@@ -285,6 +285,23 @@ function init() {
   });
 }
 
+function sort_by_depth(node) {
+  var total = 1;
+
+  if (node.children === undefined) {
+    console.log(node);
+    return total;
+  }
+
+  for (child of node.children)
+    total += sort_by_depth(child);
+  node.total_children = total;
+
+  node.children.sort(function(a, b) { return b.total_children - a.total_children; });  
+
+  return total;
+}
+
 function load_text_data() {
   var raw = document.getElementById("textdata").value;
   if (!raw)
@@ -328,6 +345,8 @@ function load_rows(csv_rows) {
       parent = root;
     parent.children.push(node);
   }
+
+  sort_by_depth(root);
 
   // minimize everything..
   //for (child of root.children)
