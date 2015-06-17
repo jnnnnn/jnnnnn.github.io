@@ -22,6 +22,7 @@ Don't forget about these possible variations:
 
 <h3>Variation generator</h3>
 <div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
+<div id="index"></div>
 <button type="button" onclick="random_variation()">Random variation</button>
 <button type="button" onclick="vary()">Alter variation</button>
 
@@ -40,7 +41,7 @@ var rotations = ",,,,,,wrap,circling,spinning,dipped,twisted".split(",");
 var bodyparts = ",,,,frame,feet,knees,hips,butt,chest,shoulders,head,hands".split(",");
 
 var variant = {move: "", timing: "", direction:"", translation:"", rotation:"", bodypart:""};
-
+var totalpossibilities = 0;
 function vary() {  
   var thing_to_vary = Math.floor(Math.random() * 5);
   if (thing_to_vary === 0)
@@ -69,7 +70,65 @@ function random_variation() {
 function update_screen() {
   var div = document.getElementById("randvar");
   div.innerHTML = variant.move + " (" + variant.timing + ") " + variant.direction + " " + variant.translation + " " + variant.rotation + " " + variant.bodypart;
+
+  document.getElementById("index").innerHTML = possibility_index() + " / " + totalpossibilities;
 }
+
+function uniques(arr) {
+  return arr.filter(
+    function(value, index, self) { 
+      return self.indexOf(value) === index; 
+    });
+}
+
+function possibility_index() {
+  var value = 0;
+  var base = 1;
+  value += base * uniques(random_moves).indexOf(variant.move);
+  base *= uniques(random_moves).length;
+  value += base * uniques(timings).indexOf(variant.timing);
+  base *= uniques(timings).length;
+  value += base * uniques(directions).indexOf(variant.direction);
+  base *= uniques(directions).length;
+  value += base * uniques(translations).indexOf(variant.translation);
+  base *= uniques(translations).length;
+  value += base * uniques(rotations).indexOf(variant.rotation);
+  base *= uniques(rotations).length;
+  value += base * uniques(bodyparts).indexOf(variant.bodypart);
+  base *= uniques(bodyparts).length;
+
+  totalpossibilities = base;
+  return value;
+}
+
+function possibility_dedex(value) {
+  var base = totalpossibilities;
+
+  base /= uniques(bodyparts).length;
+  variant.bodypart = uniques(bodyparts)[Math.floor(value/base)];
+  value %= base;
+
+  base /= uniques(rotations).length;
+  variant.rotation = uniques(rotations)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(translations).length;
+  variant.translation = uniques(translations)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(directions).length;
+  variant.direction = uniques(directions)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(timings).length;
+  variant.timing = uniques(timings)[Math.floor(value/base)];
+  value %= base;
+  
+  base /= uniques(random_moves).length;
+  variant.move = uniques(random_moves)[Math.floor(value/base)];
+  value %= base;
+}
+
 </script>
 </body>
 </html>
