@@ -10,7 +10,7 @@ button { font-size:14pt; }
 
 </head>
 <body style="width:100% padding:0pt margin:0pt">
-
+<div id="descriptive">
 Don't forget about these possible variations:
 <ul>
 <li>Timing (triple step, reverse, hesitation, quick, slow, slow-quick-quick, quick-quick-slow, robotic)</li>
@@ -19,13 +19,15 @@ Don't forget about these possible variations:
 <li>Body part (frame/feet/knees/hips/butt/chest/shoulders/head/hands)</li>
 <li>Hand swaps/flicks</li>
 </ul>
+</div>
 
 <h3>Variation generator</h3>
 <div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
 <div id="index"></div>
 <button type="button" onclick="random_variation()">Random variation</button>
 <button type="button" onclick="vary()">Alter variation</button>
-
+<button type="button" onclick="next()">Next variation</button>
+<button type="button" onclick="update_description()">Show generator options</button>
 <div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
 
 <script>
@@ -33,45 +35,46 @@ function chooseAtRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-var random_moves = ",,,,single step,with boy turn,with girl turn,walking,both turn,with hand swap".split(",");
-var timings = ",,,,,triple step,reverse,hesitation,quick,slow,slow-quick-quick,quick-quick-slow,robotic".split(",");
-var directions = ",,,,up,down,forward,back,sideways,wrong way".split(",");
-var translations = ",,,,squat,offset,slide,sway,flick,walk".split(",");
-var rotations = ",,,,,,wrap,circling,spinning,dipped,twisted".split(",");
-var bodyparts = ",,,,frame,feet,knees,hips,butt,chest,shoulders,head,hands".split(",");
+var choices = [
+",,,,single step,with boy turn,with girl turn,walking,both turn,with hand swap".split(","),
+",,,,,triple step,reverse,hesitation,quick,slow,slow-quick-quick,quick-quick-slow,robotic".split(","),
+",,,,up,down,forward,back,sideways,wrong way".split(","),
+",,,,squat,offset,slide,sway,flick,walk".split(","),
+",,,,,,wrap,circling,spinning,dipped,twisted".split(","),
+",,,,frame,feet,knees,hips,butt,chest,shoulders,head,hands".split(",")
+];
 
-var variant = {move: "", timing: "", direction:"", translation:"", rotation:"", bodypart:""};
+var variant = choices.map(function() { return ""; });
 var totalpossibilities = 0;
+
 function vary() {  
-  var thing_to_vary = Math.floor(Math.random() * 5);
-  if (thing_to_vary === 0)
-    variant.timing = chooseAtRandom(timings);
-  if (thing_to_vary === 1)
-    variant.direction = chooseAtRandom(directions);
-  if (thing_to_vary === 2)
-    variant.translation = chooseAtRandom(translations);
-  if (thing_to_vary === 3)
-    variant.rotation = chooseAtRandom(rotations);
-  if (thing_to_vary === 4)
-    variant.bodypart = chooseAtRandom(bodyparts);  
+  var thing_to_vary = Math.floor(Math.random() * choices.length);
+  variant[thing_to_vary] = chooseAtRandom(choices[thing_to_vary]);
   update_screen();  
 }
 
 function random_variation() {
-  variant.move = chooseAtRandom(random_moves);
-  variant.timing = chooseAtRandom(timings);
-  variant.direction = chooseAtRandom(directions);
-  variant.translation = chooseAtRandom(translations);
-  variant.rotation = chooseAtRandom(rotations);
-  variant.bodypart = chooseAtRandom(bodyparts);
+  for (var i = 0; i < choices.length; i++) {
+    variant[i] = chooseAtRandom(choices[i]);
+  }
   update_screen();
 }
 
 function update_screen() {
   var div = document.getElementById("randvar");
-  div.innerHTML = variant.move + " (" + variant.timing + ") " + variant.direction + " " + variant.translation + " " + variant.rotation + " " + variant.bodypart;
-
+  div.innerHTML = variant[0] + " (" + variant[1] + ") " + variant[2] + " " + variant[3] + " (" + variant[4] + ") " + variant[5];
   document.getElementById("index").innerHTML = possibility_index() + " / " + totalpossibilities;
+}
+
+function update_description() {
+  var desc = document.createElement("ul");
+  desc.innerHTML = "The generator selects from the following options (with equal probability):";
+  for (var i = 0; i < choices.length; i++) {
+    var item = document.createElement("li");
+    item.innerHTML = choices[i];
+    desc.appendChild(item);
+  }
+  document.getElementById("descriptive").appendChild(desc);
 }
 
 function uniques(arr) {
@@ -81,21 +84,18 @@ function uniques(arr) {
     });
 }
 
+function next() {
+  possibility_dedex(possibility_index() + 1);
+  update_screen();
+}
+
 function possibility_index() {
   var value = 0;
   var base = 1;
-  value += base * uniques(random_moves).indexOf(variant.move);
-  base *= uniques(random_moves).length;
-  value += base * uniques(timings).indexOf(variant.timing);
-  base *= uniques(timings).length;
-  value += base * uniques(directions).indexOf(variant.direction);
-  base *= uniques(directions).length;
-  value += base * uniques(translations).indexOf(variant.translation);
-  base *= uniques(translations).length;
-  value += base * uniques(rotations).indexOf(variant.rotation);
-  base *= uniques(rotations).length;
-  value += base * uniques(bodyparts).indexOf(variant.bodypart);
-  base *= uniques(bodyparts).length;
+  for (var i = 0; i < choices.length; i++) {
+    value += base * uniques(choices[i]).indexOf(variant[i]);
+    base *= uniques(choices[i]).length;
+  }
 
   totalpossibilities = base;
   return value;
@@ -104,29 +104,12 @@ function possibility_index() {
 function possibility_dedex(value) {
   var base = totalpossibilities;
 
-  base /= uniques(bodyparts).length;
-  variant.bodypart = uniques(bodyparts)[Math.floor(value/base)];
-  value %= base;
-
-  base /= uniques(rotations).length;
-  variant.rotation = uniques(rotations)[Math.floor(value/base)];
-  value %= base;
-  
-  base /= uniques(translations).length;
-  variant.translation = uniques(translations)[Math.floor(value/base)];
-  value %= base;
-  
-  base /= uniques(directions).length;
-  variant.direction = uniques(directions)[Math.floor(value/base)];
-  value %= base;
-  
-  base /= uniques(timings).length;
-  variant.timing = uniques(timings)[Math.floor(value/base)];
-  value %= base;
-  
-  base /= uniques(random_moves).length;
-  variant.move = uniques(random_moves)[Math.floor(value/base)];
-  value %= base;
+  for (var i = choices.length - 1; i >= 0; i--) {
+    base /= uniques(choices[i]).length;
+    variant[i] = uniques(choices[i])[Math.floor(value/base)];
+    value %= base;
+  }
+  return variant;
 }
 
 </script>
