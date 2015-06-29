@@ -16,7 +16,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 15	3	Open hold	Girl hesitation half-turn	Wrap	hard	Week 3			Girl turns half way round during four beats. Step, tap, step, tap. Block a full turn with non-turning hand on hip asap! Leader must clearly stop on beat 2, gentle block with over hand.
 16	root	Wrap	Basic	Wrap	easy, basic	Week 3			
 17	16	Wrap	Step forward + back	Wrap	basic	Week 3			Two steps forward, two steps back.
-18	16	Wrap	Relax hands	Mates hold	easy, basic	Week 3			
+18	44	Wrap	Relax hands	Mates hold	easy, basic	Week 3			
 19	74	Mates hold	Unwind	Open hold	turn	Week 3			
 20	4	Open hold	Boy hesitation outside half-turn	Boy wrap	easy, test	Week 3			Turn outside, swap hands.
 21	16	Boy wrap	Relax hands	Boy wrap	basic	Week 3			
@@ -63,7 +63,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 62	15	Crosshand	Girl hesitation turn	Mates hold	hard	Week 7	2014-02-13		Put right hand on girl's waist, left hands extended
 63	62	Mates hold	Girl half turn	Hammerlock crosshand	fun	Week 7	2014-02-13		
 64	-	Hammerlock crosshand	Girl turn + boy haircomb	Close hold	easy, turn	Week 7	2014-02-13		
-65	16	Wrap	Haircomb	Mates hold	fun, body, basic	extra			Release both hands from seatbelted, then collect hand and extend out to side.
+65	44	Wrap	Haircomb	Mates hold	fun, body, basic	extra			Release both hands from seatbelted, then collect hand and extend out to side.
 66	dup	Open hold	Boy turn	Crosshand	easy, boy	old Week 9			
 67	25	Crosshand	Girl + boy double-handed turn	Crosshand	fast, turn	old Week 9			
 68	dup	Crosshand	Girl haircomb	Open hold	easy, basic	old Week 9			
@@ -171,7 +171,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 173	135	Open hold	Boy turn, girl turn	Shoulder wrap	fast, turn	Adv	2014-04-30		
 174	74	Shoulder wrap	Unwind	Cliffhanger	easy, turn	Adv	2014-04-30		
 175	43	Cliffhanger	Walk through	Cliffhanger	hard	Adv	2014-04-30		
-176	175	Cliffhanger	Girl bow; push forward + pull back	Mates hold	hard, fun, body	Adv	2014-04-30		With girl facing to boy's right, boy's feet planted an equal distance from girl, and good space between, squat and bounce girl through an airborne 180° turn to face boy's left.
+176	175	Cliffhanger	Girl bow; push forward + pull back	Mates hold	hard, fun, body	Adv	2014-04-30		Pull girl's arm up and forward on 1, hand across waist on 2,she bows on 3 (dissipating momentum), boy mostly behind on 4. Push hip on 5, pull on 6, bodyroll 7&8. Might be easier to lead with a walk through first.
 177	684	Mates hold	Lazy sway	Mates hold	easy, basic, body	Adv	2014-04-30		
 178	85	Mates hold	Push-pull	Close hold	easy, fun	Adv	2014-04-30		Push girl forward and step back on 5, pull on 6 and walk around, boy half turn on 7.
 179	40	Close hold	Spin	Cliffhanger	hard, turn	Adv	2014-04-30		
@@ -576,24 +576,24 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 580	dup	Open hold	Girl turn + boy turn	Open hold	fast, turn	Altona	2014-11-10		
 581	-	Open hold	Double arm sweep	Arms up	easy, basic	TSF Level 2	2014-11-13		
 582	-	Arms up	Basic	Embrace	easy, basic	TSF Level 2	2014-11-13		
-583	-	Embrace	Grind step + squat	Embrace	body, fun	TSF Level 2	2014-11-13		Step forward on 1, rotating frames, then return to neutral. At the same time, sweep her right arm down and then behind her to throw it across your shoulder on 4. Also on 4, twist to boy's left, keeping legs interleaved. On 5,6, squat down, then on 7,8, stand up again.
+583	372	Embrace	Grind step + twist squat	Embrace	body, fun	TSF Level 2	2014-11-13		Step forward on 1, rotating frames, then return to neutral. At the same time, sweep her right arm down and then behind her to throw it across your shoulder on 4. Also on 4, twist to boy's left, keeping legs interleaved. On 5,6, squat down, then on 7,8, stand up again.
 584	-	Embrace	Basic	Control hold	easy, basic	TSF Level 2	2014-11-13		
 585	dup	Control hold	Grind step	Mates hold		TSF Level 2	2014-11-13		Step forward on 1, rotating frames, then pull her into wrap, releasing hands to switch hands for mates hold. Right hands on her hip.
 586	dup	Mates hold	Lazy sway	Mates hold	easy, basic, body	TSF Level 2	2014-11-13		
-587	-	Mates hold	Bow	Close hold	hard, swap	TSF Level 2	2014-11-13		Reverse bodyroll by stepping forward with left foot. End roll by pushing girl's frame forward gently with chest, while boy is off to side so she can balance by sticking her butt out. Keep firm hold with left hands, provide support for her to flick upright again. Throw left hand over shoulder then turn into close hold.
+587	156	Mates hold	Bow	Close hold	hard, swap	TSF Level 2	2014-11-13		Reverse bodyroll by stepping forward with left foot. End roll by pushing girl's frame forward gently with chest, while boy is off to side so she can balance by sticking her butt out. Keep firm hold with left hands, provide support for her to flick upright again. Throw left hand over shoulder then turn into close hold.
 588	dup	Close hold	Spin	Close hold opened	easy, swap	TSF Level 2	2014-11-13		
 589	dup	Close hold opened	Bodyroll	Close hold	body	TSF Level 2	2014-11-13		
 590	dup	Open hold	Double turn	Wrap	fast, turn	Altona	2014-11-17		
 591	dup	Wrap	Walk forward	Wrap	easy, basic	Altona	2014-11-17		
-592	-	Wrap	Unwind	Cliffhanger	easy, turn	Altona	2014-11-17		
+592	dup	Wrap	Roll out girl	Cliffhanger	easy, turn	Altona	2014-11-17		
 593	-	Cliffhanger	Free spin	Embrace	easy, turn	Altona	2014-11-17		
 594	dup	Embrace	Straight dip	Embrace	hard, body	Altona	2014-11-17		
 595	dup	Close hold	Basic	Close hold	easy, basic	TSF Level 2	2014-11-19		
 596	dup	Close hold	Stop and roll	Close hold	body	TSF Level 2	2014-11-19		
 597	dup	Close hold	Spin	Close hold opened	easy, swap	TSF Level 2	2014-11-19		Grind step then big contra on 4 to lead into spin.
-598	-	Close hold opened	Hesitation step	Close hold opened	hard	TSF Level 2	2014-11-19		With right arm around girl's waist, prevent her from walking forward with right hand on hip.
-599	-	Close hold opened	Boy turn	Crosshand		TSF Level 2	2014-11-19		
-600	-	Crosshand	Girl turn + arm flick + boy turn	Boy hammerlock	turn, fast, hard	TSF Level 2	2014-11-19		With left hand on top, girl turns under both hands on 5, 6 and boy turns outside on 7,8 with arm flick in between.
+598	332	Close hold opened	Hesitation step	Close hold opened	hard	TSF Level 2	2014-11-19		With right arm around girl's waist, prevent her from walking forward with right hand on hip.
+599	332	Close hold opened	Boy turn	Crosshand		TSF Level 2	2014-11-19		
+600	193	Crosshand	Girl turn + arm flick + boy turn	Boy hammerlock	turn, fast, hard	TSF Level 2	2014-11-19		With left hand on top, girl turns under both hands on 5, 6 and boy turns outside on 7,8 with arm flick in between.
 601	-	Boy hammerlock	Arm sweep + throw-block	Side-by-side	hard	TSF Level 2	2014-11-19		Sweep girl's locking arm around in a full 360 with wrist contact then flick it around her and grab other arm to stop her spinning (flick is too late for her to spin anyway really)
 602	-	Side-by-side	Girl free turn + bodyroll	Mates hold	fast, body	TSF Level 2	2014-11-19		Girl turns on 5, 6 into mates hold then lead a bodyroll.
 603	dup	Mates hold	Wave arm around	Mates hold	basic	TSF Level 2	2014-11-19		Put arm next to hip, then sweep around to above head, then down boy's face (if comfortable) and out in front
@@ -606,7 +606,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 610	dup	Close hold	Basic	Close hold	easy, basic	Altona	2014-11-24		
 611	dup	Close hold	Single step	Close hold	easy, basic	Altona	2014-11-24		
 612	dup	Close hold	Spin	Close hold	easy, swap	Altona	2014-11-24		
-613	729	Open hold	Backflip	Open hold	hard	_-1COOsnYtI	2014-11-24	http://gfycat.com/AmpleColdAfricancivet	Take careful note of vertical momentum management -- Girl stops fall mostly using arms (hanging upside down). Girl should be careful not to kick guy in face or headbutt balls.  http://youtu.be/_-1COOsnYtI?t=1m53s http://youtu.be/u3EPcyy2YAk?t=1m30s
+613	729	Open hold	Backflip	Open hold	hard, elite	_-1COOsnYtI	2014-11-24	http://gfycat.com/AmpleColdAfricancivet	Take careful note of vertical momentum management -- Girl stops fall mostly using arms (hanging upside down). Girl should be careful not to kick guy in face or headbutt balls.  http://youtu.be/_-1COOsnYtI?t=1m53s http://youtu.be/u3EPcyy2YAk?t=1m30s
 614	729	Close hold opened	Lift dip	Close hold	hard	eR-avS5xmvY	2014-11-26	https://youtu.be/eR-avS5xmvY?t=3m23s	From close hold, rotate girl 90d clockwise. Ask for her left leg with your left hand, then throw it up in the air and grab her right leg with your left hand, so she ends up sitting on your hips like scissors. Then let her lean back, supporting her with BLH to GRH.
 615	dup	Open hold	Boy turn	Boy hammerlock	easy, boy	TSF Level 1	2014-11-20		
 616	-	Boy hammerlock	Girl haircomb	Crosshand	easy, basic	TSF Level 1	2014-11-20		Release hammerlock and take freed hand.
@@ -722,7 +722,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 726	-	Mates hold	Slide out, lean her, push-pull	Close hold	hard, nice	JT Ania	2015-04-07		On 3 of basic, slide to the left, pulling her left arm across with you but blocking her hips with right. Push her away with right arm on 5 but pull her back in to close hold on 7.
 727	767	Close hold opened	Jump to leg	Close hold opened	hard, fun	TSF Level 3	2015-04-28		Starting from cliffhanger (boy's right hand), wind up girl and grab her firmly around the waist, your right hip to her left hip and her at right angles. Squat slightly then jump her across you, squatting again slightly to land her on your left thigh (both her legs travel in front of you, her left leg slightly before her right so she can cross her legs as she lands). Jump her back to finish. She will need lots of support from your right arm/shoulder and also your left hand, which is held out in front of her.
 728	729	Open hold	Neck dip	Neck hold	hard, nice, fun	TSF Level 3	2015-04-28		Girl turn on 5, boy goes around quickly for half a 360. Facing the direction of travel with girl slightly behind him facing backward (with good contact), support girl's neck with right shoulder in front of her chest and dip her around yourself.
-729	root	Close hold	Lift	Close hold	hard	filler	2015-04-29		Pick her up and spin her around. Don't try this without permission.
+729	797	Close hold	Lift	Close hold	hard	filler	2015-04-29		Pick her up and spin her around. Don't try this without permission.
 730	729	Close hold opened	Scissor dip	Close hold opened	hard	filler	2015-04-29		With the side of your right hip positioned against the girl's tummy, squat slightly and pick her up with your right arm. She should wrap her legs around you. Raise her right hand until her left arm is straight, and use it to take her weight as she leans back. Support her with your right arm as well.
 731	372	Open hold	Girl squat	Mates hold	body, hard, elite	Korke	2014-05-04	http://gfycat.com/BetterGreedyBengaltiger	On five, throw her left hand away and as it goes overhead pull her left shoulder in front of you to wrap. Lead her down with your right hand on her right shoulder on 1, maybe with other hand on waist as well. As she goes down, lift your left hand so both her arms go above her head. This hand should also provide support because squatting might be hard work for the girl.
 732	-	Hammerlock	Swap sides	Boy wrap	swap	TSF Level 3	2015-04-28		Swap sides on 1&2 then boy keeps turning into wrap.
@@ -771,15 +771,15 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 775	-	Boy hammerlock	Haircomb + arm slide	Cliffhanger		TSF Level 3	2015-05-26		
 776	-	Cliffhanger	Girl TTL	Sweetheart	turn	TSF Level 3	2015-05-26		Girl walks forward and turns into boy.
 777	-	Sweetheart	Girl half turn	Hammerlock crosshand		TSF Level 3	2015-05-26		Get locking hand (GLH) low early and keep it low throughout -- GLA should be straight down at start of turn.
-778	-	Hammerlock crosshand	Girl wrong-way turn + flick + boy turn	Crosshand	hard, turn	TSF Level 3	2015-05-26		On 1, Girl locked with GLH. Step BL on 1 then GTL to BR, flick BLH (GRH) as BRT. Total 4 counts.
-779	-	Crosshand	Girl turn + boy turn	Boy hammerlock	hard, turn	TSF Level 3	2015-05-26		On 5, girl continues to turn in same direction. BLH stays low after girl's turn as BRT.
+778	362,600	Hammerlock crosshand	Girl wrong-way turn + flick + boy turn	Crosshand	hard, turn	TSF Level 3	2015-05-26		On 1, Girl locked with GLH. Step BL on 1 then GTL to BR, flick BLH (GRH) as BRT. Total 4 counts.
+779	362	Crosshand	Girl turn + boy turn	Boy hammerlock	hard, turn	TSF Level 3	2015-05-26		On 5, girl continues to turn in same direction. BLH stays low after girl's turn as BRT.
 780	-	Boy hammerlock	Girl turn	Crosshand	hard, turn	TSF Level 3	2015-05-26		On 1, push GRbicep behind her with BRH for GTR.
 781	41	Embrace	Hip grind	Embrace	body, fun	TSF Level 2	2015-05-27	https://youtu.be/nC-VsjkH4pc?t=28s	Sway sideways on 1, 2, then step forward with BLF on 3, moving girl's hips further away with one or both hands, and twisting about 30°. Should create quite a lot of space between partners. Sway her hips toward and away (lead with one hip or the other; not front-on) from boy on 5, 6 in a figure-of-8 pattern, then step back to return to neutral position. If you're holding her lower rib cage, don't squeeze too hard -- better to hold her actual hips, or lead it one-handed with BLH on her lower back and BRA supporting her frame. Boy's hips should also do a figure-of-8 in the same direction (not towards her, this is not lombada)
 782	12	Cliffhanger	Girl walk forward	Hammerlock crosshand	turn, swap	TSF Level 2	2015-05-27		Girl walks forward past boy and half turns.
 783	251	Close hold	Hexagon walk	Close hold		Jose May	2015-05-30		Origin: tango. Start basic on 1 but don't move right foot on 2, step diagonally forward-right (around the outside of the girl) on 3. Lead girl by rotating boy's frame. Tap on 4 then step diagonally-forward left, left, and diagonally back. Complete hexagon. Can also reverse direction or just rock back and forward on a diagonal.
 784	251	Close hold	Hexagon parade	Close hold		Jose May	2015-05-30		When rocking back and forward on a diagonal, rotate the girl 180° on every second beat so she is always moving forward. Girl should sweep her foot around close to the floor (leg extended, no raised knees), and pivot with both feet together.
 785	784	Close hold	Tango bow	Close hold		Jose May	2015-05-30		Side-by-side with girl, step forward with right on 5, drift on 6, forward left on 7, then turn left away from girl: back right on 8, more back left on 1. Pulling girl with you so she gets closer as you turn away from her. Lean to boy's right on 1, tango-style (stick hip out the other way, boy's left arm raised, frame strong). Can then hold the pose and squeeze her slightly with right forearm so that she drags her left foot up your leg.
-786	736	Wrap	Bow	Wrap	hard, fun	Mar2015	2015-06-02		Bring girl's arms up to her shoulders (boy's arms crossed). She then leans forward from the waist, keeping her back straight and arms out behind her with boy holding her hands.
+786	736,587	Wrap	Bow	Wrap	hard, fun	Mar2015	2015-06-02		Bring girl's arms up to her shoulders (boy's arms crossed behind her). She then leans forward from the waist, keeping her back straight and arms out behind her with boy holding her hands.
 787	451	Awkward wrap	Awkward dip	Awkward wrap		filler	2015-06-02		While she's awkwardly wrapped, lean her backwards, supporting her with your arm. Lead by tugging her shoulder back. Do not force it, the lead is a suggestion only.
 788	322	Awkward wrap	Awkward turn	Awkward wrap	turn	filler	2015-06-02		Let go of the hand at her waist and wind her up another turn.
 789	38	Close hold	Double grind step	Close hold		Sundays	2015-06-14		BLF forward, BRF forward, BLF back, BRF back, repeat with opposite feet. Lead with frame. Don't move girl around boy, boy should move around girl. Leo calls this Drunken Sailor
@@ -788,3 +788,21 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 792	-	Solo	Ribcage to side	Solo	exercise	TSF Level 3	2015-06-16		Don't move your hips. Activate core.
 793	-	Solo	Hips forward	Solo	exercise	TSF Level 3	2015-06-16		Bend knees slightly. Rotate pelvis like Elvis -- top of pelvis moves back and down. Try not to move anything else. 
 794	-	Solo	Hips back	Solo	exercise	TSF Level 3	2015-06-16		Rotate pelvis back the other way.
+795	-	Solo	Hip rotate side	Solo	exercise	TSF Level 2	2015-06-17		Bend your knees then straighten one leg to raise that hip.
+796	800	Open hold	Hair pull faith dip	Open hold	elite	Alba Ronald	2015-06-23	http://gfycat.com/LivelyExhaustedFoxhound	Watch the video. Be careful. Do not lead socially, too scary.
+800	root	Mates hold	Float jump	Mates hold	hard	Aerials 1	2015-06-21		Boy holds girl gently by hip bones. Both squat then she jumps really high by putting her weight on boy's wrists (with her hands). One of the safer aerials.
+801	800,157	Mates hold	Girl stands on boy's thighs	Mates hold	elite	Aerials 1	2015-06-21		Boy places hands on front of girl's hip bones. She holds his wrists and puts her weight on them to jump onto his lower thighs. Boy squats for her to stand on and leans her forward. Try this with a spotter standing to catch the girl to start with. 
+802	800	Open hold	Back-to-back fish lift	Open hold	elite	Aerials 1	2015-06-21	https://youtu.be/FF_EktxQl-g?t=2m52s	Do not lead socially, nearby people might get kicked. Standing back to back, girl puts her right armpit over boy's left shoulder, lock arms. Boy arches back so girl can sit on his lower back, then lift her into the air and spin her around. Girl's trailing leg fully extended, leading leg crouched. Nice to land and use remaining momentum to face each other. Also known as "teapot".
+803	800	Cliffhanger	Cartwheel	Cliffhanger	hard	Aerials 1	2015-06-21		Don't do this socially, you might kick someone. Boy squats, girl cartwheels with her shoulders on his thighs while boy guides her with hands on her waist. Girl faces front (away from boy). One of the safer aerials.
+804	800	Crosshand	Rock-and-roll backflip	Side-by-side	elite	Aerials 1	2015-06-21		Do not lead socially, nearby people might get kicked. Attempt with a spotter first, who is responsible for stopping girl from falling on her head if boy does not flip her fast enough. A second spotter can catch her if he flips too hard and she falls backwards after. Starting with left hand on top, turn girl to her left. BRA goes across her front (near hips) and BLH behind and just above GLknee. Girl should be centred between the boy's feet. Both squat then boy lifts quite hard with his left arm, girl keeps her knees together, she does a backflip around boy's right arm. Girl should just rest her hands on boy's arm, don't hold his left shoulder or grip tightly.
+805	800	Close hold opened	Supergirl	Side-by-side	hard	Aerials 1	2015-06-21	https://youtu.be/FF_EktxQl-g?t=2m28s	Do not lead socially, nearby people might get kicked. Standing side-by-side, boy puts BRA across girl's hips to hold GRthigh, then girl backflips onto boy's shoulder. Boy supports GLshoulder with BLH. Easiest exit is girl's shoulders under BLarm (girl can hold boy's hips while upside-down). Boy should test girl's weight to make sure he is strong enough before attempting this.
+806	805	Cliffhanger	Lifted crucifix	Open hold	elite	Aerials 1	2015-06-21		Do not lead socially, nearby people might get kicked. Attempt with a spotter first. Build up to this with a handstand on boy's thigh.  Girl plants right shoulder (/neck) on boy's right thigh, then kicks her legs up and over his shoulder, rotates around her butt on his shoulder, to end up sitting on his back. Boy needs to lift her waist to help her up (lean forward, but don't hurt your back by lifting too hard -- girl needs to help) then grab girl's upper arms to hold her up (boy has his arms straight above his head). Girl needs to hold her weight on her arms (her arms are straight out to the side) and straightens her body. To dismount, girl either slides down boy's back or goes back the way she came up, without the thigh (boy just holds her) (falling backwards is a bit scary).
+807	800	Crosshand	Waterfall	Open hold	elite	youtube	2015-06-29	https://youtu.be/FF_EktxQl-g?t=3m28s	
+808	800	Open hold	Lindy flip	Open hold	elite	youtube	2015-06-29	https://youtu.be/okOyPH7cu5w?t=14s	WICKED
+809	800	Crosshand	Inversion	Crosshand	hard	youtube	2015-06-29	https://www.youtube.com/watch?v=ONc5e0rzHGQ	
+810	804	Open hold	Over-the-shoulder backflip	Open hold	elite	youtube	2015-06-29	https://youtu.be/myJj0mNNe1Y?t=4m3s	aka frida flip
+811	810	Open hold	Over-the-shoulder double backflip	Open hold	elite	youtube	2015-06-29	https://youtu.be/myJj0mNNe1Y?t=3m24s	hahaha holy shit
+812	803	Open hold	Double cartwheel	Open hold	elite	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=1m11s	
+813	808	Open hold	Around-the-shoulder twist	Open hold	elite	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=58s	
+814	800	Open hold	Fireman's Pole Slide	Open hold	elite	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=2m3s	
+815	800	Open hold	Spinny fling	Open hold	elite	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=2m32s	
