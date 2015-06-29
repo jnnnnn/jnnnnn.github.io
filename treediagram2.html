@@ -68,8 +68,8 @@
 <div id="tags">taggies:</div>
 <div id="detail"></div>
 <div id="controls">  
-  <button type="button" onclick="expand(root); update(root);">Expand</button>
-  <button type="button" onclick="collapse(root); update(root);">Collapse</button>
+  <button type="button" onclick="expand(current_move); update(current_move);">Expand</button>
+  <button type="button" onclick="collapse(current_move); update(current_move);">Collapse</button>
 </div>
 
 <a href="dance-variation.html">More variations</a>
@@ -367,7 +367,6 @@ function dblclick(d) {
 
 function click(d) {
   display_detail(d);
-  expand(d);
   update(d);
 }
 
