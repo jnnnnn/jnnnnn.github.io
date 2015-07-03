@@ -38,12 +38,12 @@
     stroke: #eee;
     stroke-width: 2px;
   }
-
   tspan.state {
     fill-opacity: .5;
-
   }
-  tspan.move {
+  tspan.move { }
+  tspan.index { 
+    fill: white;    
   }
 
   html, body {
@@ -144,10 +144,6 @@ function update(source) {
     .on("mouseover", mouseover)
     .on("dblclick", dblclick);
 
-  nodeEnter.append("circle")
-    .attr("r", 1e-6)
-    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; });
-
   var text = nodeEnter.append("text")
     .attr("x", 13)//function(d) { return d.children || d._children ? -13 : 13; })    
     //.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
@@ -161,6 +157,15 @@ function update(source) {
     .attr("x", 13)
     .attr("y", 13)
     .text(function(d) { return d.tsv.Move; });
+  text.append("tspan")
+    .classed("move index", true)
+    .attr("x", -13)
+    .attr("y", 13)
+    .text(function(d) { return d.tsv.Index; });
+
+  nodeEnter.append("circle")
+    .attr("r", 1e-6)
+    .style("fill-opacity", function(d) { return d._children ? "1" : "0"; });
 
   var svgUpdate = d3.select("svg").transition()
     .duration(duration)
