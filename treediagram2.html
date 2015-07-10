@@ -43,7 +43,7 @@
   }
   tspan.move { }
   tspan.index { 
-    fill: white;    
+    opacity: 0;    
   }
 
   html, body {
@@ -322,8 +322,9 @@ function load_rows(csv_rows) {
   root.children = [];
   var all_tags = d3.set();
   // construct tree from rows so we can display it
-  for (row of csv_rows) {    
-    if (row.Parent.trim() === "" || row.Parent.trim() === "-" || row.Parent.trim() === "dup")
+  for (row of csv_rows) {
+    var first_parent = row.Parent.split(",")[0].trim();
+    if (first_parent === "" || first_parent === "-" || first_parent === "dup")
       continue;
     var key = row.Start + " → " + row.Move + " → " + row.End;
     var node = { // 
