@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Budget</title>
+    <style>
+
+  html, body {
+    padding: 0;
+    margin: 0;
+    height: 99%; 
+  }
+  
+    </style>
+
+  </head>
+  <body>
+<h3 style="display:inline">Budget</h3>
+<div id="data" style="display:inline">
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+</div>
+<div id="svgcontainer" style="width: 100%; height: 80%; overflow-y: scroll; overflow-x: scroll">
+<svg></svg>
+</div>
+
+<!-- load the d3.js library (for layout/animation) --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>  
+<script>
+
+var margin = {top: 20, right: 300, bottom: 20, left: 20},
+  width = 1200 - margin.right - margin.left,
+  height = 700 - margin.top - margin.bottom;
+  
+var svg = d3.select("svg")
+  .attr("width", width + margin.right + margin.left)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+  
+d3.select(self.frameElement).style("height", "500px");
+
+function update() {
+
+}
+
+function init() {  
+  d3.tsv("", function(error, csv_rows) {
+    if (error) {
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      return;
+    }
+    
+    load_rows(csv_rows)
+  });
+}
+
+
+function load_text_data() {
+  var raw = document.getElementById("textdata").value;
+  if (!raw)
+    return;
+  var csv_rows = d3.tsv.parse(raw);
+  load_rows(csv_rows);
+  document.getElementById("textdata").value = "";
+}
+
+function load_rows(csv_rows) {
+  // construct diagram from rows so we can display it
+  for (row of csv_rows) {
+    
+  }
+  update();
+}
+
+init();
+
+function onkeypress()
+{
+  // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
+  // finding keyCodes: http://jsfiddle.net/qAHC2/292/
+  switch(d3.event.keyCode) {    
+    default:
+      console.log(d3.event.keyCode);
+      break;
+  };
+  d3.event.stopPropagation();
+}
+
+d3.select("body")
+    .on("keydown", onkeypress);
+
+</script>
+  
+  </body>
+</html>
