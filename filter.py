@@ -43,9 +43,9 @@ def select_unique():
             outrows.writerow(inrows.__next__()) # copy header
             seen_keys = set()
             for row in inrows:  
-                key = row[0] + " -> " + row[1] + " -> " + row[2]                
-                if key in seen_keys:
-                    row[8] = "dup"
+                key = row[2] + " -> " + row[3] + " -> " + row[4]                
+                if key in seen_keys and row[1] in ["", "-"]:
+                    row[1] = "dup"
                 else:
                     seen_keys.add(key)
                 outrows.writerow(row)               

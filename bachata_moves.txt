@@ -157,7 +157,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 159	20	Boy wrap	Boy half inside turn	Boy hammerlock		Adv	2014-04-16		Inside hand goes high.
 160	1	Boy hammerlock	Four count basic	Boy hammerlock	easy, basic	Adv	2014-04-16		
 161	497	Boy hammerlock	Elbow bump	Control hold	easy, basic	Adv	2014-04-16		Boy gently nudges girl's hammerlock forearm with elbow, and slides to the right for four counts.
-162	135	Control hold	Twists and turn	Wrap	hard, fun	Adv	2014-04-16		Boy very strong, pushes girl using his frame. Girl twists on rightfoot for 2, then leftfoot for 2, then right one (contra) and turn into strong cuddle.
+162	135	Control hold	Twists and turn	Wrap	hard, fun, tango	Adv	2014-04-16		Boy very strong, pushes girl using his frame. Girl twists on rightfoot for 2, then leftfoot for 2, then right one (contra) and turn into strong cuddle.
 163	dup	Wrap	Roll out girl	Cliffhanger	easy, turn	Adv	2014-04-16		
 164	74	Cliffhanger	Wind up	Close hold	turn	Adv	2014-04-16		Boy pulls girl back in and uses button on her back to get under her arm. Keeps free hand on hip so girl's free hand goes to chest or neck.
 165	dup	Close hold	Basic	Close hold	easy, basic	Week 8	2014-04-24		
@@ -806,21 +806,38 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 813	808	Open hold	Around-the-shoulder twist	Open hold	elite, aerial	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=58s	
 814	800	Open hold	Fireman's Pole Slide	Open hold	elite, aerial	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=2m3s	Girl slides down boy's leg
 815	800	Open hold	Flag spin	Open hold	elite, aerial	youtube	2015-06-29	https://youtu.be/xS3HUJdseAc?t=2m32s	Girl rotates while fully horizontally extended
-816	731	Open hold	Girl squat	Open hold		TSF Level 3	2015-06-30		Constant (light) pressure on girl's shoulder to lead this one. Try and take the weight off her legs by supporting her with arms, but keep them widely spread?
+816	731	Open hold	Girl squat	Open hold	hard	TSF Level 3	2015-06-30		Constant (light) pressure on girl's shoulder to lead this one. Try and take the weight off her legs by supporting her with arms, but keep them widely spread?
 817	-	Open hold	Boy turn	Hand to boy neck		TSF Level 2	2015-07-01		
 818	-	Hand to boy neck	Boy bow	Crosshand		TSF Level 2	2015-07-01		
-819	-	Crosshand	Girl turn	Sweetheart		TSF Level 2	2015-07-01		
+819	dup	Crosshand	Girl turn	Sweetheart		TSF Level 2	2015-07-01		
 820	-	Sweetheart	Half turn	Sweetheart		TSF Level 2	2015-07-01		
 821	-	Sweetheart	Half turn	Hammerlock crosshand		TSF Level 2	2015-07-01		
 822	-	Hammerlock crosshand	Half turn	Sweetheart		TSF Level 2	2015-07-01		
 823	-	Sweetheart	Push-pull	Sweetheart		TSF Level 2	2015-07-01		
 824	-	Sweetheart	Girl turn	Cliffhanger		TSF Level 2	2015-07-01		
 825	-	Cliffhanger	Girl free turn	Open hold		TSF Level 2	2015-07-01		
-826	-	Open hold	Girl turn	Crosshand		TSF Level 2	2015-07-01		
-827	-	Crosshand	Girl double-handed turn	Crosshand		TSF Level 2	2015-07-01		
+826	dup	Open hold	Girl turn	Crosshand		TSF Level 2	2015-07-01		
+827	dup	Crosshand	Girl double-handed turn	Crosshand		TSF Level 2	2015-07-01		
 828	-	Crosshand	Hand flick + boy turn	Boy hammerlock		TSF Level 2	2015-07-01		
 829	-	Boy hammerlock	Haircomb + bodyroll	Boy hammerlock		TSF Level 2	2015-07-01		
 830	134	Boy hammerlock	Boy turn while bowed	Open hold		TSF Level 2	2015-07-01		
 831	-	Open hold	Walk forward	Control hold		TSF Level 2	2015-07-01		With a triple step
 832	-	Control hold	Point + triple step	Control hold		TSF Level 2	2015-07-01		
 833	-	Control hold	Dip	Open hold		TSF Level 2	2015-07-01		BLH on GRshoulderblade, BRH at girl's small of back. Boy must not lean forward. Girl can roll head around (right shoulder, back, left shoulder) and bodyroll up.
+834	166	Embrace	Chest isolations	Embrace	body, hard	filler	2015-07-27		Use side of flat hand to move ribcage side to side. Follower's shoulders and hips should stay still. Do not force it, lead is an indication only. Can block opposite shoulder to stop it moving.
+835	-	Solo	Ribcage isolations	Solo	exercise	2+	2015-08-11		Try to keep hips and shoulders still while moving ribcage.
+836	-	Solo	Pelvis isolations	Solo	exercise	2+	2015-08-11		Rotate pelvis in four directions: forward, backward, both sides. Rotation only, no translation.
+837	dup	Close hold	Grind step	Close hold		TSF Level 2	2015-08-11		
+838	dup	Close hold	Spin	Close hold opened		TSF Level 2	2015-08-11		
+839	-	Close hold opened	Forward body roll	Close hold opened		TSF Level 2	2015-08-11		
+840	-	Close hold opened	Walk across	Cliffhanger		TSF Level 2	2015-08-11		
+841	-	Cliffhanger	Girl turn	Close hold		TSF Level 2	2015-08-11		
+842	dup	Close hold	Knee roll	Close hold		TSF Level 2	2015-08-11		
+843	-	Close hold	Basic	Control hold		TSF Level 2	2015-08-11		
+844	-	Control hold	Rondezes	Open hold	Tango	TSF Level 2	2015-08-11		
+845	dup	Open hold	Girl double-handed turn	Catapult		TSF Level 2	2015-08-11		
+846	dup,640	Catapult	Boy blocked outside turn	Hammerlock		TSF Level 2	2015-08-11		
+847	dup	Hammerlock	Wrong-way turn	Open hold		TSF Level 2	2015-08-11		
+848	7	Open hold	Slide steps	Open hold	break	2+	2015-08-11		Slide left then slide right
+849	760	Embrace	Spin and roll	Embrace	break	2+	2015-08-11		Lift on 4 then drop to squat on boy's left on 5. Rotate to boy's right on 6, opening space, then roll on 7,8
+850	dup,703	Open hold	Wrap and roll	Wrap	turn, fast, break	2+	2015-08-11		
