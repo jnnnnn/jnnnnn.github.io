@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Dance move explorer</title>
+
+    <style>
+      div.boxed {
+        border: 2px solid blue;
+        border-radius: 5px;
+        padding: 3px;
+        width: 200px;
+      }
+      div.move {
+
+      }
+      div.moveList {
+
+      }
+      div.position {
+
+      }
+
+      .link {
+        fill: none;
+        stroke: #eee;
+        stroke-width: 2px;
+      }
+      tspan.index { 
+        /* doesn't work in firefox.  opacity: 0.2; */
+        fill-opacity: 0.2;    
+      }
+
+      html, body {
+        padding: 0;
+        margin: 0;
+        height: 99%; 
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+<h3 style="display:inline">Dance move explorer</h3>
+<div id="data" style="display:inline">
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+</div>
+<div id="move"></div>
+
+<!-- load the d3.js library (for layout/animation) --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+  
+<script>
+var color = d3.scale.category20();
+
+var i = 0;
+var positions;
+var moves = {};
+var moves_list = [];
+var root_move = { //
+    "key": "root",
+    "parent": "null",
+    "children": [],
+    "parent_ids": [],
+    "tsv": { 
+      "Start": "",
+      "Move": "",
+      "End": "",
+      "Description": "",
+      "Index": "",
+      "Parent": "",
+      "Tags": "",
+      "Video": ""
+    }
+  };
+
+
+function getColor(tags) {
+  return 'red'; 
+  if (tags.search(/elite/i) != -1)
+    return '#F88'; // light red  
+  if (tags.search(/hard/i) != -1)
+    return '#FA6'; // orange
+  if (tags.search(/fun/i) != -1)
+    return '#4C4'; // light green
+  if (tags.search(/body/i) != -1)
+    return '#88F'; // light blue
+  return 'red'; 
+}
+
+function init() {  
+  d3.tsv("bachata_moves.txt", function(error, csv_rows) {
+    if (error) {
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      return;
+    }
+    
+    load_rows(csv_rows)
+  });
+}
+
+function load_rows(csv_rows) {
+  moves = {};
+  moves_list = [];
+  root_move.children = [];
+  var all_tags = d3.set();
+  // construct tree from rows so we can display it
+  for (row of csv_rows) {
+    var first_parent = row.Parent.split(",")[0].trim();
+    if (first_parent === "" || first_parent === "-" || first_parent === "dup")
+      continue;
+    var key = row.Start + " → " + row.Move + " → " + row.End;
+    var node = { // 
+      "key": key,
+      "children": [],
+      "id": row.Index,
+      "x": 0,
+      "y": 0,
+      "tsv": row,      
+    };
+    moves[row.Index] = node;
+    moves_list.push(node);
+    if (row.Tags)
+      for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(','))
+        all_tags.add(tag);
+  }
+
+  // second pass is separate in case parent is after child
+  for (node of moves_list) {    
+    node.parent_ids = node.tsv.Parent.split(",").filter(id => id in moves);
+    var parent = moves[node.tsv.Parent.split(",")[0]];
+    if (parent == undefined)
+      parent = root_move;
+    parent.children.push(node);    
+  }
+
+  sort_by_depth(root_move);
+
+  // minimize everything..
+  //for (child of root.children)
+  //  collapse(child);
+  var start_positions = csv_rows.map(row => row.Start);
+  var end_positions = csv_rows.map(row => row.End);
+  positions = d3.set(start_positions.concat(end_positions)).values();
+ 
+  // colours from http://jnnnnn.github.io/category-colors-constrained.html
+  color = d3.scale.ordinal()
+      .domain(positions)
+      .range(["#1596ff", "#14e302", "#ff5d13", "#ff1bfe", "#bcc99c", "#e970a1", "#ebbf07", "#08d6f7", "#07dc8c", "#6fa207", "#d082fe", "#cf7f57", "#cabee5", "#17a68d", "#ff5960", "#ff43c5", "#a69334", "#dc830e", "#ac8c86", "#6a9ba8", "#68a45b", "#9c87d7", "#0cb734", "#6fbdfd", "#fca7f5", "#ffa6a8", "#88d905", "#b7cd65", "#bfcd19", "#f8b766", "#bb82a7", "#8ad1c5", "#eaba96", "#d85bff", "#ff7e4e", "#82d86e", "#75d7a1", "#dc68c6", "#bdc2c1", "#8786fe", "#a39262", "#749d7f", "#ff5485", "#e56e78", "#0fdad1", "#8292c3", "#d6c478", "#dac44c"]);
+
+  update_as_move(moves_list[0]);
+}
+
+function sort_by_depth(node) {
+  var total = 1;
+
+  if (node.children === undefined) {
+    console.log(node);
+    return total;
+  }
+
+  for (child of node.children)
+    total += sort_by_depth(child);
+  node.total_children = total;
+
+  node.children.sort(function(a, b) { return b.total_children - a.total_children; });  
+
+  return total;
+}
+
+function update_as_move(move_data) {
+  // redraw the screen.
+  var move_div = document.getElementById("move");
+  move_div.className = "boxed move";
+  move_div.innerHTML = "Move: " + move_data.tsv.Move;
+
+  var div_start = move_div.appendChild(document.createElement("div"));
+  div_start.className = "boxed position";
+  div_start.innerHTML = "Starts from: " + move_data.tsv.Start;
+
+  var div_end = move_div.appendChild(document.createElement("div"));
+  div_end.className = "boxed position";
+  div_end.innerHTML = "Ends in: " + move_data.tsv.End;
+
+  var parents = move_data.parent_ids.map(id => moves[id]);  
+  var div_simpler = move_div.appendChild(document.createElement("div"));
+  div_simpler.className = "boxed moveList";
+  div_simpler.innerHTML = "Simpler variations: " + "";
+
+  var div_complex = move_div.appendChild(document.createElement("div"));
+  div_complex.className = "boxed moveList";
+  div_complex.innerHTML = "Complex variations: " + "";
+
+  var div_similar = move_div.appendChild(document.createElement("div"));  
+  div_similar.className = "boxed moveList";
+  div_similar.innerHTML = "Similar moves: " + "";
+}
+
+function update_as_position() {
+
+}
+
+function load_text_data() {
+  var raw = document.getElementById("textdata").value;
+  if (!raw)
+    return;
+  var csv_rows = d3.tsv.parse(raw);
+  load_rows(csv_rows);
+  document.getElementById("textdata").value = "";
+}
+
+function onkeypress()
+{
+  // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
+  // finding keyCodes: http://jsfiddle.net/qAHC2/292/
+  switch(d3.event.keyCode) {
+    default:
+      console.log(d3.event.keyCode);
+      break;
+  };
+  d3.event.stopPropagation();
+}
+
+d3.select("body")
+    .on("keydown", onkeypress);
+
+init();
+
+</script>
+  
+  </body>
+</html>
