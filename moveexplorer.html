@@ -10,26 +10,40 @@
         border: 2px solid blue;
         border-radius: 5px;
         padding: 3px;
-        width: 200px;
+        max-width: 400px;
       }
       div.move {
-
+        border-color: #55F;
       }
       div.moveList {
-
+        border-color: #AAF;
       }
       div.position {
-
+        border-color: #8C8;
+        background-color: white;
+        
       }
-
+      div.move { text-align: center; background-color: white; }      
+      div.start { text-align: left; }
+      div.end { text-align: right;  }
       .link {
         fill: none;
         stroke: #eee;
         stroke-width: 2px;
       }
+      div.movebox + div.movebox { margin-top: 10px; }
       tspan.index { 
         /* doesn't work in firefox.  opacity: 0.2; */
         fill-opacity: 0.2;    
+      }
+
+      div.similar { background-color: #AAF; }
+      div.simpler { background-color: #AFA; }
+      div.complex { background-color: #FAA; }
+
+      p { 
+        margin: 0;
+        padding: 0;
       }
 
       html, body {
@@ -47,8 +61,11 @@
 <h3 style="display:inline">Dance move explorer</h3>
 <div id="data" style="display:inline">
   <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+  <input id="index_entry" placeholder="Jump to index" onchange="jump_to_index();" onkeyup="jump_to_index();"/>
 </div>
 <div id="move"></div>
+<div id="position"></div>
+<div id="history"></div>
 
 <!-- load the d3.js library (for layout/animation) --> 
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -98,9 +115,23 @@ function init() {
       return;
     }
     
-    load_rows(csv_rows)
+    load_rows(csv_rows);
+
+    var id = getUrlVars()["id"];
+    if (id in moves)
+      update_as_move(moves[id]);
+    else
+      update_as_move(moves_list[0]);
   });
 }
+
+// http://stackoverflow.com/a/20097994/412529
+function getUrlVars() {
+    var vars = {};
+    window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
+      (m,key,value) => vars[decodeURIComponent(key)] = decodeURIComponent(value));
+    return vars;
+  }
 
 function load_rows(csv_rows) {
   moves = {};
@@ -132,7 +163,7 @@ function load_rows(csv_rows) {
   for (node of moves_list) {    
     node.parent_ids = node.tsv.Parent.split(",").filter(id => id in moves);
     var parent = moves[node.tsv.Parent.split(",")[0]];
-    if (parent == undefined)
+    if (parent == undefined) 
       parent = root_move;
     parent.children.push(node);    
   }
@@ -150,8 +181,6 @@ function load_rows(csv_rows) {
   color = d3.scale.ordinal()
       .domain(positions)
       .range(["#1596ff", "#14e302", "#ff5d13", "#ff1bfe", "#bcc99c", "#e970a1", "#ebbf07", "#08d6f7", "#07dc8c", "#6fa207", "#d082fe", "#cf7f57", "#cabee5", "#17a68d", "#ff5960", "#ff43c5", "#a69334", "#dc830e", "#ac8c86", "#6a9ba8", "#68a45b", "#9c87d7", "#0cb734", "#6fbdfd", "#fca7f5", "#ffa6a8", "#88d905", "#b7cd65", "#bfcd19", "#f8b766", "#bb82a7", "#8ad1c5", "#eaba96", "#d85bff", "#ff7e4e", "#82d86e", "#75d7a1", "#dc68c6", "#bdc2c1", "#8786fe", "#a39262", "#749d7f", "#ff5485", "#e56e78", "#0fdad1", "#8292c3", "#d6c478", "#dac44c"]);
-
-  update_as_move(moves_list[0]);
 }
 
 function sort_by_depth(node) {
@@ -164,42 +193,93 @@ function sort_by_depth(node) {
 
   for (child of node.children)
     total += sort_by_depth(child);
-  node.total_children = total;
+  node.total_children = total - 1;
 
   node.children.sort(function(a, b) { return b.total_children - a.total_children; });  
 
   return total;
 }
 
+function create_move_divs(move_data, move_wrapper_div) {
+  var div_box = move_wrapper_div.appendChild(document.createElement("div"));
+  div_box.className = "movebox";
+/*
+  var div_start = div_box.appendChild(document.createElement("div"));
+  div_start.className = "boxed position start";
+  div_start.innerHTML = move_data.tsv.Start +"  →";
+
+  var div_move = div_box.appendChild(document.createElement("div"));
+  div_move.className = "boxed move";
+  div_move.innerHTML = move_data.tsv.Move;
+  div_move._move_data = move_data;
+
+  var div_end = div_box.appendChild(document.createElement("div"));
+  div_end.className = "boxed position end";
+  div_end.innerHTML = " → " + move_data.tsv.End;
+*/
+  var div_move = div_box.appendChild(document.createElement("div"));
+  div_move.className = "boxed move";
+  div_move.innerHTML = move_data.key;
+/*
+  div_move.appendChild(document.createElement("p")).innerHTML = "(" + move_data.total_children + " children)";
+*/
+  div_move._move_data = move_data;
+  return div_move;
+}
+
 function update_as_move(move_data) {
   // redraw the screen.
-  var move_div = document.getElementById("move");
-  move_div.className = "boxed move";
-  move_div.innerHTML = "Move: " + move_data.tsv.Move;
+  var move_wrapper_div = document.getElementById("move");
+  move_wrapper_div.className = "movewrapper";
+  move_wrapper_div.innerHTML = "#" + move_data.tsv.Index;
+ 
+  var parents = move_data.parent_ids.map(id => moves[id]);
+  if (!parents.length)
+    parents = [root_move];
+  var similars = [];
+  for (parent of parents) {
+    Array.prototype.push.apply(similars, parent.children);
+  }
 
-  var div_start = move_div.appendChild(document.createElement("div"));
-  div_start.className = "boxed position";
-  div_start.innerHTML = "Starts from: " + move_data.tsv.Start;
+  function move_click(event) { update_as_move(event.path.filter(item => item._move_data)[0]._move_data); }
 
-  var div_end = move_div.appendChild(document.createElement("div"));
-  div_end.className = "boxed position";
-  div_end.innerHTML = "Ends in: " + move_data.tsv.End;
+  var div_simpler = move_wrapper_div.appendChild(document.createElement("div"));
+  div_simpler.className = "boxed moveList simpler";
+  div_simpler.innerHTML = "Simpler variations: "
+  for (parent of parents) {
+    if (parent === root_move) continue;
+    var div_link_move = create_move_divs(parent, div_simpler);
+    div_link_move.addEventListener("click", move_click);
+  }  
 
-  var parents = move_data.parent_ids.map(id => moves[id]);  
-  var div_simpler = move_div.appendChild(document.createElement("div"));
-  div_simpler.className = "boxed moveList";
-  div_simpler.innerHTML = "Simpler variations: " + "";
+  var div_move = create_move_divs(move_data, move_wrapper_div, function() {});  
+  var div_desc = div_move.appendChild(document.createElement("p"));
+  div_desc.innerHTML = move_data.tsv.Description;
+  var video_link = div_move.appendChild(document.createElement("a"));
+  video_link.setAttribute("href", move_data.tsv.Video);
 
-  var div_complex = move_div.appendChild(document.createElement("div"));
-  div_complex.className = "boxed moveList";
-  div_complex.innerHTML = "Complex variations: " + "";
+  var div_similar = move_wrapper_div.appendChild(document.createElement("div"));  
+  div_similar.className = "boxed moveList similar";
+  div_similar.innerHTML = "Similar moves: "
+  for (similar of similars) {
+    if (similar === move_data) continue;
+    var div_link_move = create_move_divs(similar, div_similar);
+    div_link_move.addEventListener("click", move_click);
+  }  
 
-  var div_similar = move_div.appendChild(document.createElement("div"));  
-  div_similar.className = "boxed moveList";
-  div_similar.innerHTML = "Similar moves: " + "";
+  var div_complex = move_wrapper_div.appendChild(document.createElement("div"));
+  div_complex.className = "boxed moveList complex";
+  div_complex.innerHTML = "Complex variations: ";
+  for (complex of move_data.children) {
+    var div_link_move = create_move_divs(complex, div_complex);
+    div_link_move.addEventListener("click", move_click);
+  }  
+
+  window.history.pushState({"id": move_data.tsv.Index}, move_data.key, "?id="+move_data.tsv.Index);
 }
 
 function update_as_position() {
+  // redraw the screen
 
 }
 
@@ -209,7 +289,14 @@ function load_text_data() {
     return;
   var csv_rows = d3.tsv.parse(raw);
   load_rows(csv_rows);
+  update_as_move(moves_list[0]);
   document.getElementById("textdata").value = "";
+}
+
+function jump_to_index() {
+  var id = document.getElementById("index_entry").value;
+  if (id in moves)
+    update_as_move(moves[id]);
 }
 
 function onkeypress()
