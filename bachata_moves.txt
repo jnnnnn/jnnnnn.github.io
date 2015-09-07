@@ -356,7 +356,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 359	dup	Open hold	Girl turn 5/4	Side-by-side	turn	Adv	2014-08-13		
 360	dup	Side-by-side	About turn	Side-by-side		Adv	2014-08-13		
 361	526	Side-by-side	Lead across	Control hold	fast, turn	Adv	2014-08-13		Girl gets pulled diagonally forward for double turn; boy outside turn on 7,8.
-362	3	Control hold	Wrong-way turn	Open hold	hard, turn	Adv	2014-08-13		One step of basic then girl inside turn the other way. Basic continues in the SAME direction after.
+362	3	Control hold	Wrong-way turn	Open hold	hard, turn	Adv	2014-08-13		One step of basic (with lots of spring in it to prepare -- crouch down slightly as though preparing to leap) then girl inside turn the other way. Basic continues in the SAME direction after, to keep time -- this will feel weird. Requires lots of leading with boy's body positioning / springiness so that she spots it, as it is quite unusual to change direction on the second step of a bar.
 363	dup	Open hold	Basic	Open hold	easy, basic	Adv	2014-08-13		
 364	dup	Open hold	Girl + boy double-handed turn	Boy haircombed	fast, turn	Adv	2014-08-13		
 365	697	Boy haircombed	Boy outside turn	Hammerlock	hard, fun	Adv	2014-08-13		Boy throws girl's hand behind her back then does his outside turn
@@ -423,7 +423,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 426	dup	Open hold	Girl turn + swap hand	Crosshand	easy, turn	Project 2/3 technique	2014-09-16		
 427	dup	Crosshand	Girl double-handed turn + flick	Crosshand	turn	Project 2/3 technique	2014-09-16		
 428	dup	Crosshand	Boy turn	Boy hammerlock	easy	Project 2/3 technique	2014-09-16		
-429	99	Boy hammerlock	Both turn	Hammerlock crosshand	hard, fun	Project 2/3 technique	2014-09-16		Amazing move. Both inside inside turn, keeping hammerlocked arm low.
+429	99,193	Boy hammerlock	Both turn	Hammerlock crosshand	hard, fun	Project 2/3 technique	2014-09-16		Amazing move. Both inside inside turn, keeping hammerlocked arm low.
 430	-	Hammerlock crosshand	Girl half turn	Sweetheart	easy, turn	Project 2/3 technique	2014-09-16		
 431	-	Sweetheart	Girl double-handed turn	Crosshand	turn	Project 2/3 technique	2014-09-16		
 432	dup	Crosshand	Girl double-handed turn	Hands up	easy, turn	Project 2/3 technique	2014-09-16		
@@ -789,7 +789,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 793	-	Solo	Hips forward	Solo	exercise	TSF Level 3	2015-06-16		Bend knees slightly. Rotate pelvis like Elvis -- top of pelvis moves back and down. Try not to move anything else. 
 794	-	Solo	Hips back	Solo	exercise	TSF Level 3	2015-06-16		Rotate pelvis back the other way.
 795	-	Solo	Hip rotate side	Solo	exercise	TSF Level 2	2015-06-17		Bend your knees then straighten one leg to raise that hip. Do not move hips from side to side.
-796	800	Open hold	Hair pull faith dip	Open hold	elite, aerial	Alba Ronald	2015-06-23	http://gfycat.com/LivelyExhaustedFoxhound	Watch the video. Be careful. Do not lead socially, too scary.
+796	858	Open hold	Hair pull faith dip	Open hold	elite, aerial	Alba Ronald	2015-06-23	http://gfycat.com/LivelyExhaustedFoxhound	Watch the video. Be careful. Do not lead socially, too scary.
 800	729	Mates hold	Float jump	Mates hold	aerial	Aerials 1	2015-06-21		Boy holds girl gently by hip bones. Both squat then she jumps really high by putting her weight on boy's wrists (with her hands). One of the safer aerials.
 801	800,157	Mates hold	Girl stands on boy's thighs	Mates hold	hard, aerial	Aerials 1	2015-06-21		Boy places hands on front of girl's hip bones. She holds his wrists and puts her weight on them to jump onto his lower thighs. Boy squats for her to stand on and leans her forward. Try this with a spotter standing to catch the girl to start with. 
 802	800	Open hold	Back-to-back fish lift	Open hold	hard, aerial	Aerials 1	2015-06-21	https://youtu.be/FF_EktxQl-g?t=2m52s	Do not lead socially, nearby people might get kicked. Standing back to back, girl puts her right armpit over boy's left shoulder, lock arms. Boy arches back so girl can sit on his lower back, then lift her into the air and spin her around. Girl's trailing leg fully extended, leading leg crouched. Nice to land and use remaining momentum to face each other. Also known as "teapot".
@@ -841,3 +841,11 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 848	7	Open hold	Slide steps	Open hold	break	2+	2015-08-11		Slide left then slide right
 849	760	Embrace	Spin and roll	Embrace	break	2+	2015-08-11		Lift on 4 then drop to squat on boy's left on 5. Rotate to boy's right on 6, opening space, then roll on 7,8
 850	dup,703	Open hold	Wrap and roll	Wrap	turn, fast, break	2+	2015-08-11		
+851	193,429	Open hold	Both turn (with hand swap)	Hammerlock crosshand	turn	Project 4/5	2015-09-01		GTR on 1, BTL and swaps hands behind his back on 2/3.
+852	851,429	Hammerlock crosshand	Both turn	Boy hammerlock crosshand	turn	Project 4/5	2015-09-01		
+853	567	Mates hold	Walking body rolls	Mates hold	body	Teri	2015-09-02		Need a lot of contact to lead this neatly. Particularly chest/back. Don't be directly behind girl though. Remember to step with toes first, then ball of foot, then heel. Wait for girl to finish roll before starting the next one, and remember to stay connected.
+854	695	Boy wrap	Body rolls	Boy wrap	body	Teri	2015-09-02		Need a lot of contact to lead this neatly. Remember to step with toes first, then ball of foot, then heel. Wait for girl to finish roll before starting the next one, and remember to stay connected.
+855	613	Sweetheart	Forward flip	Sweetheart	elite, aerial	youtube	2015-09-04	https://www.youtube.com/watch?v=i4KgfzuK0O8	
+856	800	Open hold	Trust fall (forward)	Open hold	hard, aerial	youtube	2015-09-04	https://youtu.be/jBXQcqpYHDA?t=8m14s	Boy steps back and girl falls forward, landing with her hands around his neck.
+857	614	Open hold	Shoulder lift dip	Open hold	elite, aerial	youtube	2015-09-04	https://youtu.be/jBXQcqpYHDA?t=8m34s	Girl sits on BR shoulder (belly button at his chin) then leans back past horizontal. GLF should press against BLhip (her leg is against his chest) to help support her, GRknee over BR shoulder.
+858	856	Open hold	Trust fall (backward)	Open hold	elite, aerial	youtube	2014-09-22	https://youtu.be/jBXQcqpYHDA?t=8m46s	Girl falls backward past boy, keeping her body ramrod straight. He catches her at the neck on the way down and lowers her until she is just off the floor.

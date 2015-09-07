@@ -60,8 +60,7 @@
 
 <h3 style="display:inline">Dance move explorer</h3>
 <div id="data" style="display:inline">
-  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
-  <input id="index_entry" placeholder="Jump to index" onchange="jump_to_index();" onkeyup="jump_to_index();"/>
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>  
 </div>
 <div id="move"></div>
 <div id="position"></div>
@@ -291,12 +290,6 @@ function load_text_data() {
   load_rows(csv_rows);
   update_as_move(moves_list[0]);
   document.getElementById("textdata").value = "";
-}
-
-function jump_to_index() {
-  var id = document.getElementById("index_entry").value;
-  if (id in moves)
-    update_as_move(moves[id]);
 }
 
 function onkeypress()
