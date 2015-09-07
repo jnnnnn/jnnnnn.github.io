@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Dance move explorer</title>
 
@@ -10,7 +11,7 @@
         border: 2px solid blue;
         border-radius: 5px;
         padding: 3px;
-        max-width: 25em;
+        /*max-width: 100ch;*/
       }
       div.move {
         border-color: #55F;
@@ -20,12 +21,18 @@
       }
       div.position {
         border-color: #8C8;
-        background-color: white;
-        
+        background-color: white;        
       }
-      div.move { text-align: center; background-color: white; font-size:12pt; }      
-      div.start { text-align: left; }
-      div.end { text-align: right;  }
+      div.move { text-align: center; background-color: white;}      
+      div.move:after { 
+        content: " ";
+        display: block; 
+        height: 0; 
+        clear: both;
+      }
+      div.start { float: left;}
+      div.end { float:right;}
+      div.focus { margin-top: 10px; margin-bottom: 10px; }
       .link {
         fill: none;
         stroke: #eee;
@@ -36,14 +43,17 @@
         /* doesn't work in firefox.  opacity: 0.2; */
         fill-opacity: 0.2;    
       }
-
+      p.movetext {
+        clear:both;
+      }
       div.similar { background-color: #AAF; }
       div.simpler { background-color: #AFA; }
       div.complex { background-color: #FAA; }
 
       p { 
-        margin: 0;
-        padding: 0;
+        margin: 0px;
+        padding: 0px;
+        border: 0px;
       }
 
       html, body {
@@ -202,23 +212,22 @@ function sort_by_depth(node) {
 function create_move_divs(move_data, move_wrapper_div) {
   var div_box = move_wrapper_div.appendChild(document.createElement("div"));
   div_box.className = "movebox";
-/*
-  var div_start = div_box.appendChild(document.createElement("div"));
+
+  var div_move = div_box.appendChild(document.createElement("div"));
+  div_move.className = "boxed move";
+  var move_p = div_move.appendChild(document.createElement("p"));
+  move_p.innerHTML = move_data.tsv.Move;
+  move_p.className = "movetext";
+
+  var div_start = div_move.appendChild(document.createElement("div"));
   div_start.className = "boxed position start";
   div_start.innerHTML = move_data.tsv.Start +"  →";
 
-  var div_move = div_box.appendChild(document.createElement("div"));
-  div_move.className = "boxed move";
-  div_move.innerHTML = move_data.tsv.Move;
-  div_move._move_data = move_data;
 
-  var div_end = div_box.appendChild(document.createElement("div"));
+  var div_end = div_move.appendChild(document.createElement("div"));
   div_end.className = "boxed position end";
   div_end.innerHTML = " → " + move_data.tsv.End;
-*/
-  var div_move = div_box.appendChild(document.createElement("div"));
-  div_move.className = "boxed move";
-  div_move.innerHTML = move_data.tsv.Move;
+
 /*
   div_move.appendChild(document.createElement("p")).innerHTML = "(" + move_data.total_children + " children)";
 */
@@ -251,12 +260,16 @@ function update_as_move(move_data) {
     div_link_move.addEventListener("click", move_click);
   }  
 
-  var div_move = create_move_divs(move_data, move_wrapper_div, function() {});  
+  var div_move_wrapper_inner = move_wrapper_div.appendChild(document.createElement("div"));
+  div_move_wrapper_inner.className = "boxed focus";
+  var div_move = create_move_divs(move_data, div_move_wrapper_inner);  
   var div_desc = div_move.appendChild(document.createElement("p"));
   div_desc.innerHTML = move_data.tsv.Description;
-  var video_link = div_move.appendChild(document.createElement("a"));
-  video_link.setAttribute("href", move_data.tsv.Video);
-
+  if (move_data.tsv.Video) {
+    var video_link = div_move.appendChild(document.createElement("a"));
+    video_link.innerHTML = "image / video";
+    video_link.setAttribute("href", move_data.tsv.Video);
+  }
   var div_similar = move_wrapper_div.appendChild(document.createElement("div"));  
   div_similar.className = "boxed moveList similar";
   div_similar.innerHTML = "Similar moves: "
