@@ -11,20 +11,20 @@
         border: 2px solid blue;
         border-radius: 5px;
         padding: 3px;
-        /*max-width: 100ch;*/
-      }
-      div.move {
-        border-color: #55F;
       }
       div.moveList {
         border-color: #AAF;
       }
       div.position {
         border-color: #8C8;
-        background-color: white;        
+        background-color: white;
       }
-      div.move { text-align: center; background-color: white;}      
-      div.move:after { 
+      div.move {
+        border-color: #55F;
+        text-align: center; 
+        background-color: white;
+      }
+      div.move:after { /* ensures that contained floats are contained */
         content: " ";
         display: block; 
         height: 0; 
@@ -39,21 +39,26 @@
         stroke-width: 2px;
       }
       div.movebox + div.movebox { margin-top: 10px; }
-      tspan.index { 
-        /* doesn't work in firefox.  opacity: 0.2; */
-        fill-opacity: 0.2;    
-      }
       p.movetext {
         clear:both;
+      }
+      div.focus p.movetext {
+        font-weight: bold;
       }
       div.similar { background-color: #AAF; }
       div.simpler { background-color: #AFA; }
       div.complex { background-color: #FAA; }
-
+      div.topbox { 
+        display: inline; 
+      }
       p { 
         margin: 0px;
         padding: 0px;
         border: 0px;
+      }
+      p.tag {
+        display: inline;
+        margin-right: 1em;
       }
 
       html, body {
@@ -72,9 +77,9 @@
 <div id="data" style="display:inline">
   <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>  
 </div>
-<div id="move"></div>
-<div id="position"></div>
-<div id="history"></div>
+<div id="move" class="topbox"></div>
+<div id="position" class="topbox"></div>
+<div id="history" class="topbox"></div>
 
 <!-- load the d3.js library (for layout/animation) --> 
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -127,8 +132,11 @@ function init() {
     load_rows(csv_rows);
 
     var id = getUrlVars()["id"];
+    var pos = getUrlVars()["pos"];
     if (id in moves)
       update_as_move(moves[id]);
+    else if (pos)
+      update_as_position(pos);
     else
       update_as_move(moves_list[0]);
   });
@@ -163,9 +171,12 @@ function load_rows(csv_rows) {
     };
     moves[row.Index] = node;
     moves_list.push(node);
+    node.tags = [];
     if (row.Tags)
-      for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(','))
+      for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(',')) {  
         all_tags.add(tag);
+        node.tags.push(tag);
+      }
   }
 
   // second pass is separate in case parent is after child
@@ -179,16 +190,13 @@ function load_rows(csv_rows) {
 
   sort_by_depth(root_move);
 
-  // minimize everything..
-  //for (child of root.children)
-  //  collapse(child);
   var start_positions = csv_rows.map(row => row.Start);
   var end_positions = csv_rows.map(row => row.End);
   positions = d3.set(start_positions.concat(end_positions)).values();
  
   // colours from http://jnnnnn.github.io/category-colors-constrained.html
   color = d3.scale.ordinal()
-      .domain(positions)
+      .domain(all_tags)
       .range(["#1596ff", "#14e302", "#ff5d13", "#ff1bfe", "#bcc99c", "#e970a1", "#ebbf07", "#08d6f7", "#07dc8c", "#6fa207", "#d082fe", "#cf7f57", "#cabee5", "#17a68d", "#ff5960", "#ff43c5", "#a69334", "#dc830e", "#ac8c86", "#6a9ba8", "#68a45b", "#9c87d7", "#0cb734", "#6fbdfd", "#fca7f5", "#ffa6a8", "#88d905", "#b7cd65", "#bfcd19", "#f8b766", "#bb82a7", "#8ad1c5", "#eaba96", "#d85bff", "#ff7e4e", "#82d86e", "#75d7a1", "#dc68c6", "#bdc2c1", "#8786fe", "#a39262", "#749d7f", "#ff5485", "#e56e78", "#0fdad1", "#8292c3", "#d6c478", "#dac44c"]);
 }
 
@@ -219,27 +227,54 @@ function create_move_divs(move_data, move_wrapper_div) {
   move_p.innerHTML = move_data.tsv.Move;
   move_p.className = "movetext";
 
+  function move_click(event) { 
+    update_as_move(event.path.filter(item => item._move_data)[0]._move_data); 
+    event.stopPropagation();
+  }
+  div_move._move_data = move_data;
+  div_move.addEventListener("click", move_click);
+
+  function position_click(event) { 
+    update_as_position(event.path.filter(item => item._position)[0]._position); 
+    event.stopPropagation();
+  }
+
   var div_start = div_move.appendChild(document.createElement("div"));
   div_start.className = "boxed position start";
   div_start.innerHTML = move_data.tsv.Start +"  →";
-
+  div_start._position = move_data.tsv.Start;
+  div_start.addEventListener("click", position_click);
 
   var div_end = div_move.appendChild(document.createElement("div"));
   div_end.className = "boxed position end";
   div_end.innerHTML = " → " + move_data.tsv.End;
+  div_end._position = move_data.tsv.End;
+  div_end.addEventListener("click", position_click);
+  
+  function tag_click(event) {
+    update_as_tag(event.path.filter(item => item._tag)[0]._tag);
+    event.stopPropagation();
+  }
 
-/*
-  div_move.appendChild(document.createElement("p")).innerHTML = "(" + move_data.total_children + " children)";
-*/
-  div_move._move_data = move_data;
+  var div_tags = div_move.appendChild(document.createElement("div"));
+  for (tag of move_data.tags) {
+    var p_tag = div_tags.appendChild(document.createElement("p"));
+    p_tag.className = "tag";
+    p_tag.setAttribute("style", "color:"+color(tag));
+    p_tag.innerHTML = tag;
+    p_tag._tag = tag;
+    p_tag.addEventListener("click", tag_click);
+  }
+
   return div_move;
 }
 
 function update_as_move(move_data) {
   // redraw the screen.
-  var move_wrapper_div = document.getElementById("move");
-  move_wrapper_div.className = "movewrapper";
-  move_wrapper_div.innerHTML = "#" + move_data.tsv.Index;
+  document.getElementById("move").innerHTML = "";
+  document.getElementById("position").innerHTML = "";
+  var move_topbox = document.getElementById("move");
+  move_topbox.className = "movewrapper topbox";  
  
   var parents = move_data.parent_ids.map(id => moves[id]);
   if (!parents.length)
@@ -249,18 +284,15 @@ function update_as_move(move_data) {
     Array.prototype.push.apply(similars, parent.children);
   }
 
-  function move_click(event) { update_as_move(event.path.filter(item => item._move_data)[0]._move_data); }
-
-  var div_simpler = move_wrapper_div.appendChild(document.createElement("div"));
+  var div_simpler = move_topbox.appendChild(document.createElement("div"));
   div_simpler.className = "boxed moveList simpler";
   div_simpler.innerHTML = "Simpler variations: "
   for (parent of parents) {
     if (parent === root_move) continue;
     var div_link_move = create_move_divs(parent, div_simpler);
-    div_link_move.addEventListener("click", move_click);
   }  
 
-  var div_move_wrapper_inner = move_wrapper_div.appendChild(document.createElement("div"));
+  var div_move_wrapper_inner = move_topbox.appendChild(document.createElement("div"));
   div_move_wrapper_inner.className = "boxed focus";
   var div_move = create_move_divs(move_data, div_move_wrapper_inner);  
   var div_desc = div_move.appendChild(document.createElement("p"));
@@ -270,29 +302,78 @@ function update_as_move(move_data) {
     video_link.innerHTML = "image / video";
     video_link.setAttribute("href", move_data.tsv.Video);
   }
-  var div_similar = move_wrapper_div.appendChild(document.createElement("div"));  
+  var div_similar = move_topbox.appendChild(document.createElement("div"));  
   div_similar.className = "boxed moveList similar";
-  div_similar.innerHTML = "Similar moves: "
+  div_similar.innerHTML = "Similar moves: ";
   for (similar of similars) {
     if (similar === move_data) continue;
     var div_link_move = create_move_divs(similar, div_similar);
-    div_link_move.addEventListener("click", move_click);
   }  
 
-  var div_complex = move_wrapper_div.appendChild(document.createElement("div"));
+  var div_complex = move_topbox.appendChild(document.createElement("div"));
   div_complex.className = "boxed moveList complex";
   div_complex.innerHTML = "Complex variations: ";
-  for (complex of move_data.children) {
-    var div_link_move = create_move_divs(complex, div_complex);
-    div_link_move.addEventListener("click", move_click);
-  }  
+  for (complex of move_data.children) 
+    create_move_divs(complex, div_complex);
 
-  window.history.pushState({"id": move_data.tsv.Index}, move_data.key, "?id="+move_data.tsv.Index);
+  window.history.pushState({"move": move_data.tsv.Index}, move_data.key, "?move="+move_data.tsv.Index);
 }
 
-function update_as_position() {
+function update_as_position(position_str) {
   // redraw the screen
+  document.getElementById("move").innerHTML = "";
+  document.getElementById("position").innerHTML = "";
+  var position_topbox = document.getElementById("position");
+  position_topbox.className = "positionwrapper topbox";   
 
+  var starts = [];
+  var ends = [];
+  var loops = [];
+  for (move of moves_list) {
+    if (move.tsv.Start === position_str) {
+      if (move.tsv.End === position_str) 
+        loops.push(move);
+      else
+        starts.push(move);
+    } else if (move.tsv.End === position_str)
+      ends.push(move);
+  }
+  starts.sort((a,b) => a.tsv.End.localeCompare(b.tsv.End));
+  ends.sort((a,b) => a.key.localeCompare(b.key));
+  loops.sort((a,b) => a.key.localeCompare(b.key));
+
+  var div_position_moves = position_topbox.appendChild(document.createElement("div"));  
+  div_position_moves.className = "boxed moveList similar";
+  div_position_moves.innerHTML = "Moves for '" + position_str + "':";
+
+  for (move of starts)
+    create_move_divs(move, div_position_moves);
+  for (move of loops)
+    create_move_divs(move, div_position_moves);
+  for (move of ends)
+    create_move_divs(move, div_position_moves);
+
+  window.history.pushState({"position": position_str}, position_str, "?pos="+position_str);
+}
+
+function update_as_tag(tag_str) {  
+  // redraw the screen
+  document.getElementById("move").innerHTML = "";
+  document.getElementById("position").innerHTML = "";
+  var position_topbox = document.getElementById("position");
+  position_topbox.className = "tagwrapper topbox";
+
+  var div_tags = position_topbox.appendChild(document.createElement("div"));  
+  div_tags.className = "boxed moveList similar";
+  div_tags.innerHTML = "Moves tagged '" + tag_str + "':";  
+  for (move of moves_list) {
+    for (tag of move.tags) {
+      if (tag_str === tag)
+        create_move_divs(move, div_tags);
+    }
+  }
+
+  window.history.pushState({"tag": tag_str}, tag_str, "?tag="+tag_str);
 }
 
 function load_text_data() {

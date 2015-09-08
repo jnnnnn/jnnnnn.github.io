@@ -1,13 +1,13 @@
 Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
-1	root	Open hold	Basic	Open hold	easy, basic	Week 1			Step to the side, bring other foot together. Repeat in same direction for total of four counts. Don't bounce! Push knees forward as they take weight to get the swaying motion. Shoulders can also sway horizontally side-to-side (no vertical movement).
-2	682	Open hold	Basic forward	Open hold	easy, basic	Week 1			Push on the follower's palms with the back of your hands.
+1	root	Open hold	Basic	Open hold	easy, basic	Week 1			Holding hands, step sideways to BL (boy's left) on 1, bring BRfoot together on 2. Repeat in same direction for total of four counts. Girl mirrors. Complete 8-beat phrase (two bars) by stepping to BR (just tap your foot on 4 and 8, no weight transfer because you're about to step on it on the next beat). Tips: Don't bounce! Push knees forward as they take weight to get the swaying motion -- hips go alternately up and down, not side-to-side. Upper body (not just shoulders) can also sway horizontally side-to-side (no vertical movement).
+2	682	Open hold	Basic forward	Open hold	easy, basic	Week 1			Push on the follower's palms with the back of your hands so that she walks backwards. Lead (pull as smoothly as possible) her forward again on 5.
 3	root	Open hold	Girl turn	Open hold	easy, turn	Week 1			Prepare by lifting pivot hand and pointing the direction of the turn with it.
 4	root	Open hold	Boy turn	Open hold	easy, boy	Week 1			Put one hand on chest, out of the way. Use other hand to place follower's hand on waist for trailing.
 5	4	Open hold	Boy turn	Crosshand	easy, boy	Week 1			Put one hand on chest, out of the way. Use this hand to grab the follower's trailing hand.
 6	-	Open hold	Basic	Control hold	easy, basic	Week 1			Palms face partner, hands 70cm apart. Hold her wrists firmly.
 7	1	Control hold	Single steps	Control hold	easy, basic	Week 1			Step left, feet together, step right, feet together. Repeat
 8	-	Control hold	Basic	Open hold	easy, basic	Week 1			
-9	3	Open hold	Girl turn	Hammerlock	easy, turn	Week 2			Turn, keeping one hand low. Keep contact with both hands.
+9	3	Open hold	Girl turn	Hammerlock	easy, turn	Week 2			Turn on 1, keeping BRH very low. Keep contact with both hands. Boy should keep girl's hand very close to her butt with her arm almost straight and flip his palm downward while she is facing away to avoid twisting her arm (practise as a follow to see how to do this comfortably). Girl will end up in hammerlock (one arm behind her back). Girl should complete the full 360 degree turn. To allow this, boy should offset himself to the girl's right so he is not pulling on the hammerlocked arm.
 10	9	Hammerlock	Unwind	Open hold	easy, turn	Week 2			
 11	10	Hammerlock	Windmill	Hammerlock	fun, hard, turn	Week 2			Boy half outside turn (outside hand over head), bring outside hand down, continue/repeat.
 12	10	Hammerlock	Crossover	Open hold	easy, swap	Week 2			Walk past each other, half turn.
@@ -27,7 +27,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 26	1	Crosshand	Girl haircomb	Open hold	easy, basic	Week 3			Boy's wrist goes just over girl's head and places her hand on her neck. Side of hand runs down arm as a guide.
 27	681	Crosshand	Boy haircomb	Close hold	basic	Week 3			Leader pulls follower's hands over leader's head.
 28	451	Close hold	Dip	Close hold	fun, body	Week No Mark			Boy squats down without bending forward; girl leans back on her toes, knees up and hips forward, head drops last
-29	root	Close hold	Basic	Close hold	easy, basic	Week 4	2014-01-23		Hands on each others' shoulderblades, boy's left and girl's right hands extended -- girl's elbow cupped in boy's elbow. Feet interleaved, right knees making contact. Firm pressure between BLA and GRA. BRH not too far around -- for advanced dancers, hand on back of shoulder joint. Keep BRelbow up so girl can feel frame at all times. Yes, this can be hard work, but you won't be able to some of the fun stuff without this as a foundation.
+29	root	Close hold	Basic	Close hold	easy, basic	Week 4	2014-01-23		BRH on GLshoulderblade or teres major. GLH on boy's shoulder. Keep BRelbow up so girl can feel frame at all times -- no gaps anywhere between these arms, from GLshoulder to BRshoulder. BLH and GRH extended -- girl's elbow cupped in boy's elbow. GLA should press outward slightly so boy can move her around if he wants to. Feet interleaved, inside of right knees making contact. BRelbow must stay up so girl can feel frame -- which will probably be hard work, but you won't be able to do some of the fun stuff without this as a foundation. If boy is too tall to keep his elbow up, squat enough that you can keep your right arm horizontal anyway without straining the girl.
 30	29	Close hold	Single step	Close hold	basic	Week 4	2014-01-23		Leader blocks basic with outside knee. Can also prepare by pre-swaying shoulders.
 31	695	Close hold	Bodyroll + side dip	Close hold	body	Week 4	2014-01-23		Led using palm roll on girl's back. Head forward, then shoulders forward, then hips forward, then sit back and down. Side roll is sit rotated then knee flick other leg to roll back up, head last.
 32	695	Close hold	Shoulder roll + body roll	Close hold	body	Week 4	2014-01-23		
@@ -130,7 +130,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 132	dup	Hammerlock	Windmill	Hammerlock	fun, hard, turn	Week 3	2014-03-20		
 133	98	Open hold	Boy turn	Boy hammerlock	easy, boy	Week 3	2014-03-20		
 134	160	Boy hammerlock	Boy bow	Open hold	boy	Week 3	2014-03-20		Holding hammerlock hand but dropping the other, leader bows / slides under follower's arm.
-135	3	Open hold	Girl turn	Wrap	easy, turn	Week 4	2014-03-27		
+135	3	Open hold	Girl turn	Wrap	easy, turn	Week 4	2014-03-27		On 5, turn girl, keeping BRH low and staying connected with both hands. Block the last quarter of her turn with BRbreast on GLshoulderblade, and maybe BRhip/thigh on GLbutt.
 136	123	Wrap	Girl half turn	Shoulder wrap	easy	Week 4	2014-03-27		
 137	-	Shoulder wrap	Girl turn + boy hand to elbow + boy turn + haircomb	Arm up	turn	Week 4	2014-03-27		
 138	74	Shoulder wrap	Girl turn	Open hold	easy, turn	Week 4	2014-03-27		
