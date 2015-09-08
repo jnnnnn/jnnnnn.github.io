@@ -344,14 +344,22 @@ function update_as_position(position_str) {
 
   var div_position_moves = position_topbox.appendChild(document.createElement("div"));  
   div_position_moves.className = "boxed moveList similar";
-  div_position_moves.innerHTML = "Moves for '" + position_str + "':";
+  div_position_moves.innerHTML = "Moves starting from " + position_str + ":";
+
+  var div_position_moves2 = position_topbox.appendChild(document.createElement("div"));  
+  div_position_moves2.className = "boxed moveList similar";
+  div_position_moves2.innerHTML = "Moves staying in " + position_str + ":";
+
+  var div_position_moves3 = position_topbox.appendChild(document.createElement("div"));  
+  div_position_moves3.className = "boxed moveList similar";
+  div_position_moves3.innerHTML = "Moves ending in " + position_str + ":";
 
   for (move of starts)
     create_move_divs(move, div_position_moves);
   for (move of loops)
-    create_move_divs(move, div_position_moves);
+    create_move_divs(move, div_position_moves2);
   for (move of ends)
-    create_move_divs(move, div_position_moves);
+    create_move_divs(move, div_position_moves3);
 
   window.history.pushState({"position": position_str}, position_str, "?pos="+position_str);
 }
