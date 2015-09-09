@@ -131,10 +131,10 @@ function init() {
     
     load_rows(csv_rows);
 
-    var id = getUrlVars()["id"];
+    var moveid = getUrlVars()["move"];
     var pos = getUrlVars()["pos"];
-    if (id in moves)
-      update_as_move(moves[id]);
+    if (moveid in moves)
+      update_as_move(moves[moveid]);
     else if (pos)
       update_as_position(pos);
     else
@@ -272,7 +272,6 @@ function create_move_divs(move_data, move_wrapper_div) {
 
 function update_as_move(move_data) {
   // redraw the screen.
-  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var move_topbox = document.getElementById("move");
@@ -318,12 +317,13 @@ function update_as_move(move_data) {
   for (complex of move_data.children) 
     create_move_divs(complex, div_complex);
 
-  window.history.pushState({"move": move_data.tsv.Index}, move_data.key, "?move="+move_data.tsv.Index);
+  var state = {"move": move_data.tsv.Index, "x": window.scrollX, "y": window.scrollY};
+  window.history.pushState(state, move_data.key, "?move="+move_data.tsv.Index);
+  window,scrollTo(0,0);
 }
 
 function update_as_position(position_str) {
   // redraw the screen
-  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var position_topbox = document.getElementById("position");
@@ -364,12 +364,13 @@ function update_as_position(position_str) {
   for (move of ends)
     create_move_divs(move, div_position_moves3);
 
-  window.history.pushState({"position": position_str}, position_str, "?pos="+position_str);
+  var state = {"position": position_str, "x": window.scrollX, "y": window.scrollY};
+  window.history.pushState(state, position_str, "?pos="+position_str);
+  window,scrollTo(0,0);
 }
 
 function update_as_tag(tag_str) {  
   // redraw the screen
-  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var position_topbox = document.getElementById("position");
@@ -385,7 +386,22 @@ function update_as_tag(tag_str) {
     }
   }
 
-  window.history.pushState({"tag": tag_str}, tag_str, "?tag="+tag_str);
+  var state = {"tag": tag_str, "x": window.scrollX, "y": window.scrollY};
+  window.history.pushState(state, tag_str, "?tag="+tag_str);
+  window,scrollTo(0,0);
+}
+
+window.onpopstate = function(event) {
+  if ("move" in event.state) {
+    update_as_move(moves[event.state.move]);
+  } 
+  if ("position" in event.state) {
+    update_as_position(event.state.position);
+  }
+  if ("tag" in event.state) {
+    update_as_tag(event.state.tag);
+  }
+  window.scrollTo(event.state.x, event.state.y);
 }
 
 function load_text_data() {
