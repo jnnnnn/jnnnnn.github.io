@@ -263,7 +263,8 @@ function create_move_divs(move_data, move_wrapper_div) {
     p_tag.setAttribute("style", "color:"+color(tag));
     p_tag.innerHTML = tag;
     p_tag._tag = tag;
-    p_tag.addEventListener("click", tag_click);
+    if (move_wrapper_div.className.includes("focus"))
+      p_tag.addEventListener("click", tag_click);
   }
 
   return div_move;
@@ -271,6 +272,7 @@ function create_move_divs(move_data, move_wrapper_div) {
 
 function update_as_move(move_data) {
   // redraw the screen.
+  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var move_topbox = document.getElementById("move");
@@ -321,6 +323,7 @@ function update_as_move(move_data) {
 
 function update_as_position(position_str) {
   // redraw the screen
+  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var position_topbox = document.getElementById("position");
@@ -366,6 +369,7 @@ function update_as_position(position_str) {
 
 function update_as_tag(tag_str) {  
   // redraw the screen
+  window,scrollTo(0,0);
   document.getElementById("move").innerHTML = "";
   document.getElementById("position").innerHTML = "";
   var position_topbox = document.getElementById("position");
