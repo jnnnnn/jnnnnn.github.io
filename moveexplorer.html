@@ -329,6 +329,25 @@ function update_as_position(position_str) {
   var position_topbox = document.getElementById("position");
   position_topbox.className = "positionwrapper topbox";   
 
+  var position_basic = moves_list.filter(move => 
+       move.tsv.Start === position_str 
+    && move.tsv.End === position_str 
+    && move.tsv.Move === "Basic"
+  )[0];
+
+  if (position_basic) {
+    var div_move_wrapper_inner = position_topbox.appendChild(document.createElement("div"));
+    div_move_wrapper_inner.className = "boxed focus";
+    var div_move = create_move_divs(position_basic, div_move_wrapper_inner);  
+    var div_desc = div_move.appendChild(document.createElement("p"));
+    div_desc.innerHTML = position_basic.tsv.Description;
+    if (position_basic.tsv.Video) {
+      var video_link = div_move.appendChild(document.createElement("a"));
+      video_link.innerHTML = "image / video";
+      video_link.setAttribute("href", position_basic.tsv.Video);
+    }
+  }
+
   var starts = [];
   var ends = [];
   var loops = [];
