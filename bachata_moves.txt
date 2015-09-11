@@ -243,7 +243,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 246	38	Close hold	Grind step	Close hold	easy, basic	Week 13	2014-05-28		Step forward on 1 and back on 2
 247	30	Close hold	Stop and roll	Close hold	body	Week 13	2014-05-28		Basic on 1 but stop on 2 (no movement). Bodyroll on 3,4.
 248	-	Close hold	Step back + throw hand	Side-by-side	body	Week 13	2014-05-28		
-249	47	Side-by-side	Pivots	Side-by-side	body	Week 13	2014-05-28		Twitch hand so follower stiffens, hold her wrist. Use hand to pivot follower.
+249	47	Side-by-side	Pivots	Side-by-side	body, tango	Week 13	2014-05-28		Twitch hand so follower stiffens, hold her wrist. Use hand to pivot follower.
 250	dup	Side-by-side	Girl spin + boy spin	Control hold	fast, turn	Week 13	2014-05-28		
 251	170	Control hold	Tango parade	Side-by-side	hard	Week 13	2014-05-28		Girl faces to side and walks forwards, boy walks backwards
 252	dup	Side-by-side	About turn	Side-by-side		Week 13	2014-05-28		Both forward on 1, 2, half turn inwards on 3 (swap hands) (led on 1), tap on 4.
@@ -289,7 +289,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 292	193	Hammerlock	Girl turn + boy half turn	Boy wrap	fast, turn	Adv	2014-07-09		
 293	302	Boy wrap	Hands to shoulders + let go	Boy wrap	easy, basic	Adv	2014-07-09		
 294	302	Boy wrap	Throw hands + hip pinball	Open hold	hard, body, turn	Adv	2014-07-09		Throw hands down for four counts (stomp on 1). Then reach behind to push girl's hips to the left on 1, right on 2, then left on 3, with boy going in the other direction to emphasise. Boy 3/4 outside turn at end.
-295	-	Embrace	Basic	Embrace	easy, basic	Adv	2014-07-16		
+295	29	Embrace	Basic	Embrace	easy, basic	Adv	2014-07-16		Position: similar to close hold but with both of boy's hands on both of girl's shoulderblades/teres majors. Make sure the girl is well supported but don't squeeze her. Shoulders back and down for both partners (latissimus dorsi activated). Strong core (abs/lower back muscles) also important. Hold up her arms all the way along -- an instructor should not be able to insert a finger anywhere between your arms (under girl's arm and over boy's). Move apart slightly if necessary. Holding up her arms can be quite tiring until you get used to it, suck it up. Elbows right up so that arms are horizontal. If she is too short, squat slightly as well. Arms should form a circle -- partners not too close and not too far away. This is so the girl has room to move. Also make contact with inside of right knees/thighs if you are both comfortable with it. Movement: BLF left, BRF together. x2. Repeat the other way for total 8 counts.
 296	30	Embrace	Slow steps	Embrace	easy, basic, fun	Adv	2014-07-16		Lead with little whole-body shrug and then seesaw motion. Let girl feel rhythm.
 297	39	Embrace	Half turn + open up	Close hold opened	easy	Adv	2014-07-16		Slight contra for half turn and then allow girl to continue by pulling her back slightly and pushing hand.
 298	323	Close hold opened	Walk across + walk around	Close hold	easy	Adv	2014-07-16		Girl walks across in front of boy then turns on 3,4. Then walk around each other clockwise for 4.
@@ -468,7 +468,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 471	dup	Open hold	Girl turn 5/4	Side-by-side	turn	Project 4/5	2014-10-07		
 472	-	Side-by-side	Girl turn	Cliffhanger	easy, turn	Project 4/5	2014-10-07		Lead by bouncing hand up then going in an arm-extended circle starting downward.
 473	33	Cliffhanger	Drag	Close hold	fun	Project 4/5	2014-10-07		Walk backwards and pull girl with you.
-474	170	Close hold	Quarter turn + forward walk	Close hold	travel	TSF Level 2	2014-10-08		Lunge forward on 1, step back on 2, then turn frames on 4. Walk forward and half turn x2, then finish last half of basic.
+474	170	Close hold	Quarter turn + forward walk	Close hold	travel, tango	TSF Level 2	2014-10-08		Lunge forward on 1, step back on 2, then turn frames on 4. Walk forward and half turn x2, then finish last half of basic.
 475	155	Open hold	Girl hesitation half-turn	Mates hold	hard	TSF Level 2	2014-10-08		Turn girl, putting right hand on her right hip and making contact manboob to shoulderblade and boy's right thigh to girl's left butt.
 476	156	Mates hold	Lunge and half turn	Mates hold	hard, swap	TSF Level 2	2014-10-08		Half turn is awkward, lead with contra. Centre of rotation is - as always - between inside feet. 
 478	19	Mates hold	Sideways basic and girl turn	Close hold	easy, turn	TSF Level 2	2014-10-08		
@@ -558,7 +558,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 562	193	Open hold	Girl turn + boy turn	Boy haircombed	turn, fast	TSF Level 2	2014-10-30		
 563	497	Boy haircombed	Arm sweep	Arm up	easy, basic	TSF Level 2	2014-10-30		Sweep arm from chest in nearly two full circles over four beats, starting down.
 564	dup	Arm up	Girl turn	Control hold	easy, turn	TSF Level 2	2014-10-30		
-565	509	Control hold	Grind step	Mates hold		TSF Level 2	2014-10-30		
+565	509	Control hold	Grind step	Mates hold		TSF Level 2	2014-10-30		On 1, push her to step back. Sweep GRA backward as well. On 2, sweep GRA over between you so that she turns 180° to her left, ending up in mates hold. Don't break contact with BRH as you slide down to GLhip, guide her into cuddle with BRA.
 566	dup	Mates hold	Lazy sway	Mates hold	easy, basic, body	TSF Level 2	2014-10-30		Lean away from the direction of sway (spring into it)
 567	760	Mates hold	Body rolls	Mates hold	body	TSF Level 2	2014-10-30		Either two two-beat rolls then a slow one or vice versa.
 568	dup	Close hold	Grind step	Close hold	easy, basic	TSF Level 2	2014-11-05		Lunge (step forward) on 1, back on 2, stop on 3, drop on 4, open on 5 by throwing arm down, bodyroll on 7.
@@ -636,7 +636,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 640	20	Crosshand	Boy half turn + arm flick	Hammerlock crosshand	fun	TSF Level 2	2014-12-04		Boy half turns under BLH (starting on -1), keeping BRH on his shoulder. BLH flicks GLH around behind her on second beat, then boy turns back to take new hammerlocking GLH.
 641	10	Hammerlock crosshand	Girl outside turn	Hammerlock crosshand	easy, turn, fun	TSF Level 2	2014-12-04		Let go of locking hand and trail around waist to take it again.
 642	dup	Hammerlock crosshand	Girl turn	Close hold	easy, turn	TSF Level 2	2014-12-04		
-643	246	Close hold	Grind step	Mates hold		TSF Level 2	2014-12-04		Both step back on 1 then forward on 2 to be in mates hold at right angles to previous direction (girl quarter turn left). Maintain contact with right arm and let girl feel where the cuddling arm is going to be. 
+643	246,565	Close hold	Grind step	Mates hold		TSF Level 2	2014-12-04		Both step back on 1 then forward on 2 to be in mates hold at right angles to previous direction (girl quarter turn left). Maintain contact with right arm and let girl feel where the cuddling arm is going to be. 
 644	dup	Mates hold	Lazy sway	Mates hold	easy, basic, body	TSF Level 2	2014-12-04		Sway left for two beats then right for two beats. Pretend you are superman about to launch into the sky in both directions.
 645	dup	Mates hold	Basic	Mates hold	easy, basic	TSF Level 2	2014-12-04		
 646	dup	Mates hold	Girl turn	Open hold	easy, turn	TSF Level 2	2014-12-04		Lead with small contra (pull slightly with left hand) on 4.
@@ -849,7 +849,7 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 856	800	Open hold	Trust fall (forward)	Open hold	hard, aerial	youtube	2015-09-04	https://youtu.be/jBXQcqpYHDA?t=8m14s	Boy steps back and girl falls forward, landing with her hands around his neck.
 857	614	Open hold	Shoulder lift dip	Open hold	elite, aerial	youtube	2015-09-04	https://youtu.be/jBXQcqpYHDA?t=8m34s	Girl sits on BR shoulder (belly button at his chin) then leans back past horizontal. GLF should press against BLhip (her leg is against his chest) to help support her, GRknee over BR shoulder.
 858	856	Open hold	Trust fall (backward)	Open hold	elite, aerial	youtube	2015-09-10	https://youtu.be/jBXQcqpYHDA?t=8m46s	Girl falls backward past boy, keeping her body ramrod straight. He catches her at the neck on the way down and lowers her until she is just off the floor.
-859		Control hold	Cross on two	Control hold	tango	Teri/David	2015-09-10		Boy: step left on 1 as normal, then pivot whole body (keeping feet aligned with body) on left toes and cross right foot behind to step on 2. Lift arms to shoulder height on 1 to indicate something weird happening, then lower them again on 2. Straighten up back to facing each other on 3, tap on 4 as usual. If girl's frame is strong she will rotate and step across herself as well.
-860		Embrace	Hesitation pivot	Embrace	tango, fast	Teri/David	2015-09-10		Boy: step left on 1 as normal, then pivot whole body 90° to the right on two on the ball of BRF. Heel of BRF lands on 2.5 ("two-and"). Girl should rotate as well. On three, girl steps backwards and boy steps forward, rotating back to close hold on 4.
-861		Crosshand	Girl turn + neck roll	Neck hold	body	Teri/David	2015-09-10		BLH on top, BLH to shoulder at start of turn on 5. For neck roll, wait until girl has finished turn. Lift arm so it doesn't hit her head. Do not slide palm around. Fingers press at base of neck (trapezius muscle) and hand feels like it is rotating around wrist. 
-862		Neck hold	Body roll	Neck hold	body	Teri/David	2015-09-10		Lead (don't pull) her neck toward you to start the roll.
+859	682,474	Control hold	Cross on two	Control hold	tango	Teri/David	2015-09-10		Boy: step left on 1 as normal, then pivot whole body (keeping feet aligned with body) on left toes and cross right foot behind to step on 2. Lift arms to shoulder height on 1 to indicate something weird happening, then lower them again on 2. Straighten up back to facing each other on 3, tap on 4 as usual. If girl's frame is strong she will rotate and step across herself as well.
+860	474	Embrace	Hesitation pivot	Embrace	tango, fast	Teri/David	2015-09-10		Boy: step left on 1 as normal, then pivot whole body 90° to the right on two on the ball of BRF. Heel of BRF lands on 2.5 ("two-and"). Girl should rotate as well. On three, girl steps backwards and boy steps forward, rotating back to close hold on 4.
+861	467,684	Crosshand	Girl turn + neck roll	Neck hold	body	Teri/David	2015-09-10		BLH on top, BLH to shoulder at start of turn on 5. For neck roll, wait until girl has finished turn. Lift arm so it doesn't hit her head. Do not slide palm around. Fingers press at base of neck (trapezius muscle) and hand feels like it is rotating around wrist. 
+862	417	Neck hold	Body roll	Neck hold	body	Teri/David	2015-09-10		Lead (don't pull) her neck toward you to start the roll.
