@@ -228,14 +228,14 @@ function create_move_divs(move_data, move_wrapper_div) {
   move_p.className = "movetext";
 
   function move_click(event) { 
-    update_as_move(event.path.filter(item => item._move_data)[0]._move_data); 
+    update_as_move(event.currentTarget._move_data); 
     event.stopPropagation();
   }
   div_move._move_data = move_data;
   div_move.addEventListener("click", move_click);
 
   function position_click(event) { 
-    update_as_position(event.path.filter(item => item._position)[0]._position); 
+    update_as_position(event.currentTarget._position); 
     event.stopPropagation();
   }
 
@@ -252,7 +252,7 @@ function create_move_divs(move_data, move_wrapper_div) {
   div_end.addEventListener("click", position_click);
   
   function tag_click(event) {
-    update_as_tag(event.path.filter(item => item._tag)[0]._tag);
+    update_as_tag(event.currentTarget._tag);
     event.stopPropagation();
   }
 
@@ -303,6 +303,13 @@ function update_as_move(move_data) {
     video_link.innerHTML = "image / video";
     video_link.setAttribute("href", move_data.tsv.Video);
   }
+
+  var div_complex = move_topbox.appendChild(document.createElement("div"));
+  div_complex.className = "boxed moveList complex";
+  div_complex.innerHTML = "Complex variations: ";
+  for (complex of move_data.children) 
+    create_move_divs(complex, div_complex);
+
   var div_similar = move_topbox.appendChild(document.createElement("div"));  
   div_similar.className = "boxed moveList similar";
   div_similar.innerHTML = "Similar moves: ";
@@ -310,12 +317,6 @@ function update_as_move(move_data) {
     if (similar === move_data) continue;
     var div_link_move = create_move_divs(similar, div_similar);
   }  
-
-  var div_complex = move_topbox.appendChild(document.createElement("div"));
-  div_complex.className = "boxed moveList complex";
-  div_complex.innerHTML = "Complex variations: ";
-  for (complex of move_data.children) 
-    create_move_divs(complex, div_complex);
 
   var state = {"move": move_data.tsv.Index, "x": window.scrollX, "y": window.scrollY};
   window.history.pushState(state, move_data.key, "?move="+move_data.tsv.Index);
