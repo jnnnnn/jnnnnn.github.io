@@ -548,6 +548,9 @@ function build_transitions_from_rows(state_data, csv_rows) {
       if (state_map[row.Start] === undefined || state_map[row.End] === undefined)
           throw "Undefined state lol";
 
+      state_map[row.Start].size += 1;
+      state_map[row.End].size += 1;
+
       // finished construction, save it for returning (or counting)
       build_transitions[key] = td;
     } else {
@@ -580,11 +583,14 @@ function init_states() {
     var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
     var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
     var states = d3.set(start_states.concat(end_states)).values();
-    state_data = states.map(function(state, index){ return { // sd
+    state_data = states.map(function(state, index){ 
+      return { // sd
         name: state, 
         x:width / 2, 
-        y:22 + 22*index
-      }; }); 
+        y:22 + 22*index, 
+        size: 0
+      }; 
+    }); 
     
     // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
     color = d3.scale.ordinal()
@@ -612,7 +618,7 @@ function init_states() {
     state_node.append("circle")
         .attr("cx", 0)
         .attr("cy", 0)
-        .attr("r", 12)
+        .attr("r", function(sd, i) { return 7 + Math.sqrt(sd.size); })
         .style("fill", function(sd, i) { return color(sd.name); })
         .style("opacity", 0.5)
         ;
