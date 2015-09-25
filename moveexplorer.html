@@ -108,20 +108,6 @@ var root_move = { //
     }
   };
 
-
-function getColor(tags) {
-  return 'red'; 
-  if (tags.search(/elite/i) != -1)
-    return '#F88'; // light red  
-  if (tags.search(/hard/i) != -1)
-    return '#FA6'; // orange
-  if (tags.search(/fun/i) != -1)
-    return '#4C4'; // light green
-  if (tags.search(/body/i) != -1)
-    return '#88F'; // light blue
-  return 'red'; 
-}
-
 function init() {  
   d3.tsv("bachata_moves.txt", function(error, csv_rows) {
     if (error) {
@@ -135,8 +121,9 @@ function init() {
     var pos = getUrlVars()["pos"];
     if (moveid in moves)
       update_as_move(moves[moveid]);
-    else if (pos)
+    else if (pos) {
       update_as_position(pos);
+    }
     else
       update_as_move(moves_list[0]);
   });
@@ -228,14 +215,22 @@ function create_move_divs(move_data, move_wrapper_div) {
   move_p.className = "movetext";
 
   function move_click(event) { 
-    update_as_move(event.currentTarget._move_data); 
+    var move_data = event.currentTarget._move_data;
+    update_as_move(move_data);
+    var state = {"move": move_data.tsv.Index, "x": window.scrollX, "y": window.scrollY};
+    window.history.pushState(state, move_data.key, "?move="+move_data.tsv.Index);
+    window,scrollTo(0,0);
     event.stopPropagation();
   }
   div_move._move_data = move_data;
   div_move.addEventListener("click", move_click);
 
   function position_click(event) { 
-    update_as_position(event.currentTarget._position); 
+    var position_str = event.currentTarget._position;
+    update_as_position(position_str);     
+    var state = {"position": position_str, "x": window.scrollX, "y": window.scrollY};
+    window.history.pushState(state, position_str, "?pos="+position_str);
+    window.scrollTo(0,0);
     event.stopPropagation();
   }
 
@@ -252,7 +247,11 @@ function create_move_divs(move_data, move_wrapper_div) {
   div_end.addEventListener("click", position_click);
   
   function tag_click(event) {
-    update_as_tag(event.currentTarget._tag);
+    var tag_str = event.currentTarget._tag;
+    update_as_tag(tag_str);
+    var state = {"tag": tag_str, "x": window.scrollX, "y": window.scrollY};
+    window.history.pushState(state, tag_str, "?tag="+tag_str);
+    window,scrollTo(0,0);
     event.stopPropagation();
   }
 
@@ -316,11 +315,7 @@ function update_as_move(move_data) {
   for (similar of similars) {
     if (similar === move_data) continue;
     var div_link_move = create_move_divs(similar, div_similar);
-  }  
-
-  var state = {"move": move_data.tsv.Index, "x": window.scrollX, "y": window.scrollY};
-  window.history.pushState(state, move_data.key, "?move="+move_data.tsv.Index);
-  window,scrollTo(0,0);
+  }    
 }
 
 function update_as_position(position_str) {
@@ -383,10 +378,6 @@ function update_as_position(position_str) {
     create_move_divs(move, div_position_moves2);
   for (move of ends)
     create_move_divs(move, div_position_moves3);
-
-  var state = {"position": position_str, "x": window.scrollX, "y": window.scrollY};
-  window.history.pushState(state, position_str, "?pos="+position_str);
-  window,scrollTo(0,0);
 }
 
 function update_as_tag(tag_str) {  
@@ -405,10 +396,6 @@ function update_as_tag(tag_str) {
         create_move_divs(move, div_tags);
     }
   }
-
-  var state = {"tag": tag_str, "x": window.scrollX, "y": window.scrollY};
-  window.history.pushState(state, tag_str, "?tag="+tag_str);
-  window,scrollTo(0,0);
 }
 
 window.onpopstate = function(event) {
