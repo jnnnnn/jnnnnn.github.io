@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" ><!-- HATE -->
+<title>FIX Translate</title>
+<link rel="icon" type="image/png" href="/favicon.png" />
+<script type="text/javascript">
+
+customDestTags = {
+	'FIX 4.2' : "FIX42.xml",
+	'FIX 4.3' : "FIX43.xml",
+	'FIX 4.4' : "FIX44.xml", 
+	'FIX 5.0' : "FIX50.xml",
+	'FIXT 1.1' : "FIXT11.xml", 
+	};
+
+var tags = {}; // maps number to translated "number(tagname)"
+var valueEnums = {}; // maps number to  ( map of enum (possible value) to description )
+var fixSpec = document.createElement('div'); // might be xml FIX specification
+var fields = document.createElement('div');
+
+// prepare the global tags map by reading from an xml file...
+function buildTags(dest) {
+	document.getElementById("errors").innerHTML = "";
+	
+	var url = "DataDictionary/" + customDestTags[dest];
+	if (true)
+		url = url + "?nocache="+Math.random();	 
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET",url,false);
+	xmlhttp.send();
+	
+	if (xmlhttp.status != 200) {
+		document.getElementById("errors").innerHTML = "Error trying to get " + customDestTags[dest] + ", response was HTTP " + xmlhttp.status;
+		return;
+	}
+	
+	fixSpec = xmlhttp.responseXML;	
+	fields = fixSpec.getElementsByTagName("fields")[0];	
+	tags = {};
+
+	for (var fnum = 0; fnum < fields.childNodes.length; fnum++ ) {
+	    var field = fields.childNodes[fnum];
+	    if (field.tagName == "field") {
+	        var tagNum = parseInt(field.getAttribute("number"));
+	        var tagName = field.getAttribute("name");
+	        tags[tagNum] = tagName;
+
+	        values = {};
+	        for (var fnum2 = 0; fnum2 < field.childNodes.length; fnum2++) {
+	            var subfield = field.childNodes[fnum2];
+	            if (subfield.tagName == "value") {
+	                var fieldVal = subfield.getAttribute("enum");
+	                var desc = titleCase(subfield.getAttribute("description"));
+	                values[fieldVal] = desc;
+	            }
+	        }
+	        if (values)
+	            valueEnums[tagNum] = values;
+	    }
+	}
+}
+
+function titleCase(s) {
+	var result = s.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+	return result.replace(/_/g, ' ');
+}
+ 
+// Convert fix numbers to a descriptive table
+function translateFix() {
+	clearTranslatedFields();	
+	var ignoreFields = document.getElementById('ignoreFields').value.split(',').map(function trimmer(s) { return s.trim() });	
+	var delims = "|`\t_ \n";
+	var intext = document.getElementById('un').value;	
+	var newtext = intext.replace(/<0x1E>/g, '\n'); intext = newtext; // for TSX logs				
+	var newtext = intext.replace(/\\x01/g, '|'); intext = newtext; // for FIXTESTER logs
+	var field_re = new RegExp("["+delims+"]?([0-9]+) *=", "g");
+	
+	// walk through fields, putting everything that isn't a field ID into the value
+		
+	var match = field_re.exec(intext);	
+	var startValIndex = field_re.lastIndex;
+	var endValIndex = 0;
+	while (startValIndex != 0)
+	{		
+		var nextmatch = field_re.exec(intext);
+		if (field_re.lastIndex == 0)
+			endValIndex = intext.length;
+		else
+			endValIndex = field_re.lastIndex - nextmatch[0].length;
+		
+		var fieldId = match[1];
+		var fieldValue = intext.substring(startValIndex, endValIndex);
+		if (document.getElementById("checkHideSpaces").checked)
+			fieldValue = fieldValue.trim();
+		if (ignoreFields.indexOf(""+fieldId) == -1)
+			addTranslatedField(fieldId, fieldValue);
+		
+		startValIndex = field_re.lastIndex;
+		match = nextmatch;
+	}	
+}
+
+// because IE still sucks
+if (typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    }
+}
+
+function clearTranslatedFields() {
+	var table = document.getElementById('translated');
+	for (var i = table.rows.length - 1; i > 0; i--) {
+		table.deleteRow(i);
+	}
+}
+
+function addTranslatedField(fieldId, fieldValue) {
+	var table = document.getElementById('translated');
+	var row = table.insertRow(table.rows.length);
+	if (fieldId == 35)
+		row.className = "newMessage";
+	
+	var cellId = 0;		
+	var cell = row.insertCell(cellId++);
+	cell.className = "fieldId";	
+	cell.innerHTML = "<a href=\"http://fixwiki.org/fixwiki/" + fieldId + "\">"+fieldId+"</a>";
+	
+	cell = row.insertCell(cellId++);
+	cell.className = "fieldName";
+	if (fieldId in tags)
+		cell.innerHTML = tags[fieldId];
+		
+	cell = row.insertCell(cellId++);
+	cell.className = "fieldValue";
+	cell.innerHTML = fieldValue.replace(/\s/g, "<span class=\"valuespace\">&nbsp</span>");
+	
+	cell = row.insertCell(cellId++);
+	cell.className = "fieldDesc";
+	if (fieldId in valueEnums && fieldValue in valueEnums[fieldId])	
+		cell.innerHTML = valueEnums[fieldId][fieldValue];
+}
+
+// configure the tags map
+function setCustomDest(dest) {
+	saveCookie(dest);
+	buildTags(dest);
+	translateFix();
+}
+
+// set up the form that allows choosing a custom set of tags
+function initCustomDests() {
+	var div = document.getElementById('customDests');
+	for (customDest in customDestTags)
+		div.innerHTML += '<input type="radio" name="radioDest" id="CDEST" onchange="setCustomDest(\'CDEST\')">CDEST</input> <br />'.replace(/CDEST/g, customDest);
+	div.innerHTML += "<a href=\"http://iresswiki.devel.iress.com.au/wiki/Fix_Translate#How_to_add_a_destination\">Add another</a>"
+	// select previous value saved in cookie
+	loadCookie();
+}
+
+// save the currently selected destination type to cookie
+function saveCookie(dest) {	
+	document.cookie="fix_translate_dest="+escape(dest);
+}
+
+// load the selected destination type from cookie
+function loadCookie() {
+	var name = "fix_translate_dest";
+	var prefix = name + "=";
+	var c_start = document.cookie.indexOf(prefix) + prefix.length;
+	var c_end = document.cookie.indexOf(";", c_start);
+	if (c_end === -1)
+		c_end = document.cookie.length;
+	var dest = unescape(document.cookie.substring(c_start, c_end));
+	
+	var inputs = document.getElementById("customDests").getElementsByTagName("input");
+	for (var i = 0; i < inputs.length; ++i) {
+		if (inputs[i].id == dest) {
+			inputs[i].checked = true;
+			setCustomDest(dest)
+			break;
+		}
+	}
+}
+
+function parseurl() {
+	var matches = /fix=([^&#]*)/.exec(window.location.search);
+	if (!matches || matches[1] === "")
+		;
+	else
+	{
+		document.getElementById("un").value = decodeURIComponent(matches[1]);
+		translateFix();
+	}
+}
+
+</script>
+<style>
+div.options { 	
+	display: inline;
+	margin:5px;
+	padding-left:20px;
+	text-indent:0px;
+}
+div#customDests {	
+	-moz-column-width: 8em;
+	-webkit-column-width: 8em;
+	column-width: 8em;	
+}
+p {
+	margin: 5px;
+}
+td { 
+	padding-left: 5px;
+	padding-right: 5px;
+	vertical-align:top; 
+}
+
+table.messageTable, table.messageTable th {
+	border-width: 1px;
+	border-color: #cccccc;
+	border-collapse: collapse;	
+	border-style: solid;
+}
+table.messageTable td {
+	border-style: none;
+	border-width: 0px;
+}
+table.messageTable td.fieldId, table.messageTable td.fieldValue {	
+	font-family: consolas, sans, arial, sans-serif;	
+}
+table.messageTable td.fieldId {
+	text-align:right;
+}
+table.messageTable td.fieldName {
+	max-width:15em;
+}
+table.messageTable td.fieldValue {
+	max-width:15em;
+	word-wrap:break-word;
+}
+
+table.messageTable tr:nth-child(3n+1) {
+	background-color: #dddddd;
+}
+table.messageTable tr.newMessage {
+	background-color: #bbffbb;
+}
+table.messageTable td.fieldId a {
+	color: #000088;
+	text-decoration: none;
+}
+
+span.valuespace {
+	color: #600;
+	background-color: #FBB;
+}
+
+</style>
+</head>
+<body onload="initCustomDests(); document.getElementById('un').focus(); parseurl();">
+<form>
+	<div>
+		<div class="errors" id="errors"></div>		
+		<a href="file:///Z:/Developers/TI/External%20Specifications/" style="float:right;">Destination specific documentation</a>
+	</div>
+	<table style="width: 100%"><tr>
+		<td style="width: 40%">
+			<textarea style="width: 100%" rows="10" id="un" onkeyup="translateFix();" onchange="translateFix();" placeholder="FIX message(s) go here"></textarea>		
+			<p style="margin:0px">Destination type:</p>
+			<div id='customDests'>
+				<!--e.g. <input type="radio" name="radioDest" onchange="setCustomDest('FIX Standard')">FIX Standard</input>-->
+			</div>
+			<div id="options">
+			<p>
+				Ignore: <input id="ignoreFields" style="width:20em" placeholder="Fields to be ignored." value="8,9,34,10" onkeyup="translateFix();" onchange="translateFix();"/>
+			</p>
+			<p>
+				<input id="checkHideSpaces" type="checkbox" onchange="translateFix();">Hide spaces</input>
+			</p>
+
+			</div>			
+			<p>
+				This is the FIX translaterator. Paste one or more fix messages into the box above and it will be translated to a more readable form.
+			</p>
+			<p>
+				You might also like <a href="http://fixwiki.fixprotocol.org/fixwiki">The Fix Wiki</a> or a <a href="http://www.quickfixengine.org/xml.html">well-formed FIX specification</a>.
+			</p>
+			<p> 
+				For a tabular summary of many FIX messages, use <a href="FixTranslate3.html">FixTranslate3</a>.  
+			</p>
+			<p>
+				<a href="readme.txt">Readme</a> - <a href="mailto:jnewnham@iress.com.au">Contact maintainer</a><a href="http://www.youtube.com/watch?v=Tx1XIm6q4r4"> 1</a>
+			</p>
+		</td><td style="width: 60%">
+			<table id="translated" class="messageTable">
+			<tr>
+				<th>ID</th>
+				<th>Field</th>
+				<th>Value</th>
+				<th>(Desc)</th>
+			</tr>			
+			</table>
+	</tr></table>
+</form>
+
+</body>
+</html>
