@@ -154,7 +154,6 @@ function initCustomDests() {
 	var div = document.getElementById('customDests');
 	for (customDest in customDestTags)
 		div.innerHTML += '<input type="radio" name="radioDest" id="CDEST" onchange="setCustomDest(\'CDEST\')">CDEST</input> <br />'.replace(/CDEST/g, customDest);
-	div.innerHTML += "<a href=\"http://iresswiki.devel.iress.com.au/wiki/Fix_Translate#How_to_add_a_destination\">Add another</a>"
 	// select previous value saved in cookie
 	loadCookie();
 }
@@ -291,7 +290,7 @@ span.valuespace {
 				For a tabular summary of many FIX messages, use <a href="FixTranslate3.html">FixTranslate3</a>.  
 			</p>
 			<p>
-				<a href="readme.txt">Readme</a> - <a href="mailto:jnewnham@iress.com.au">Contact maintainer</a><a href="http://www.youtube.com/watch?v=Tx1XIm6q4r4"> 1</a>
+				<a href="readme.txt">Readme</a>
 			</p>
 		</td><td style="width: 60%">
 			<table id="translated" class="messageTable">
