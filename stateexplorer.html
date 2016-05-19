@@ -83,6 +83,9 @@ div#explanation p {
 <body>
 <h1 style="display:inline">State transition explorer</h1>
 <p style="display:inline; pad-left:0.5em"><a href="stateexplorer-instructions.html">Instructions: Click things!</a></p>
+<div id="data" style="display:inline">
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+</div>
 <div id="controls" style="float:right">
   <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
     <p class="setting" title="Show transitions out of the currently selected state">
@@ -508,6 +511,15 @@ function start_physics() {
   });
 }
 
+function load_text_data() {
+  var raw = document.getElementById("textdata").value;
+  if (!raw)
+    return;
+  var csv_rows = d3.tsv.parse(raw);
+  load_rows(csv_rows);
+  document.getElementById("textdata").value = "";
+}
+
 // combine multiple duplicate rows, keeping count.
 function build_transitions_from_rows(state_data, csv_rows) {  
   // while we're building the array of transitions, there might be some duplicates. 
@@ -578,60 +590,67 @@ function init_states() {
   var datafile = matches[1];
 
   d3.tsv(datafile, function(error, csv_rows) {
+
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-    var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
-    var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
-    var states = d3.set(start_states.concat(end_states)).values();
-    state_data = states.map(function(state, index){ 
-      return { // sd
-        name: state, 
-        x:width / 2, 
-        y:22 + 22*index, 
-        size: 0
-      }; 
-    }); 
-    
-    // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
-    color = d3.scale.ordinal()
-        .domain(states)
-        .range(["#30c514", "#9321ff", "#d31911", "#0d7396", "#fb83c5", "#c2a962", "#3162db", "#3cc091", "#8e5e60", "#fc9010", "#46770e", "#ae2fba", "#fc8c71", "#cc1e58", "#98a7f4", "#9eafab", "#8c5697", "#aab31e", "#607049", "#9a5c17", "#33bcc2", "#69bf51", "#2f56ff", "#ca9fb8", "#cb0783", "#dc8df4", "#296bb9", "#d4a424", "#3cb6f3", "#756c12", "#157a48", "#b94335", "#af466c", "#da9d88", "#656b75", "#137775", "#f28ea1", "#93b486", "#8c41dc", "#83653e", "#96adcf", "#b34a07", "#e39c56", "#93b760", "#8254b9", "#ae408d", "#fd77f5", "#74be19", "#9e583f", "#696597", "#b9aa87", "#d01b37", "#ae0edc", "#d696d0", "#19c46b", "#f8914a", "#42c341", "#bcac46", "#a35356", "#50716a", "#4864c4", "#1fbbda", "#6eb9aa", "#5b7230", "#8c5a81", "#be3b4c", "#7c50d0", "#7fb3c3", "#027c2f", "#736a54", "#63afff", "#be9de8", "#9f44ae", "#69bd79", "#a9b06e", "#fd7ddd", "#bca79f", "#8fb932", "#725eae"]);
-
-    transition_data = build_transitions_from_rows(state_data, csv_rows); 
-
-    layer0.selectAll(".axis").data([
-          [[0, height/2],[width, height/2]],
-          [[width/2, 0],[width/2, height]],
-      ])
-      .enter().append("path")
-        .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
-        .classed("axis", true);
-
-    var state_node = layer2.selectAll(".posnode")
-        .data(state_data)
-      .enter().append("g")
-        .classed("posnode", true)
-        .attr("transform", function(d, i) { return "translate(" + d.x + "," + d.y + ")"; })
-        .on("click", posnodeclick)      
-        .call(force.drag);
-
-    state_node.append("circle")
-        .attr("cx", 0)
-        .attr("cy", 0)
-        .attr("r", function(sd, i) { return 7 + Math.sqrt(sd.size); })
-        .style("fill", function(sd, i) { return color(sd.name); })
-        .style("opacity", 0.5)
-        ;
-
-    state_node.append("text")
-        .attr("dy", "4pt")
-        .attr("class", "posnode")        
-        .text(function(sd) { return sd.name; })
-        .style("fill", "black")
-        ;
-
-    select_state(); // select a state at random to start things off
+    else
+      load_rows(csv_rows);
   });
+}
+
+function load_rows(csv_rows) {
+  document.getElementById("errors").innerHTML = "";
+  var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
+  var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
+  var states = d3.set(start_states.concat(end_states)).values();
+  state_data = states.map(function(state, index){ 
+    return { // sd
+      name: state, 
+      x:width / 2, 
+      y:22 + 22*index, 
+      size: 0
+    }; 
+  }); 
+  
+  // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
+  color = d3.scale.ordinal()
+      .domain(states)
+      .range(["#30c514", "#9321ff", "#d31911", "#0d7396", "#fb83c5", "#c2a962", "#3162db", "#3cc091", "#8e5e60", "#fc9010", "#46770e", "#ae2fba", "#fc8c71", "#cc1e58", "#98a7f4", "#9eafab", "#8c5697", "#aab31e", "#607049", "#9a5c17", "#33bcc2", "#69bf51", "#2f56ff", "#ca9fb8", "#cb0783", "#dc8df4", "#296bb9", "#d4a424", "#3cb6f3", "#756c12", "#157a48", "#b94335", "#af466c", "#da9d88", "#656b75", "#137775", "#f28ea1", "#93b486", "#8c41dc", "#83653e", "#96adcf", "#b34a07", "#e39c56", "#93b760", "#8254b9", "#ae408d", "#fd77f5", "#74be19", "#9e583f", "#696597", "#b9aa87", "#d01b37", "#ae0edc", "#d696d0", "#19c46b", "#f8914a", "#42c341", "#bcac46", "#a35356", "#50716a", "#4864c4", "#1fbbda", "#6eb9aa", "#5b7230", "#8c5a81", "#be3b4c", "#7c50d0", "#7fb3c3", "#027c2f", "#736a54", "#63afff", "#be9de8", "#9f44ae", "#69bd79", "#a9b06e", "#fd7ddd", "#bca79f", "#8fb932", "#725eae"]);
+
+  transition_data = build_transitions_from_rows(state_data, csv_rows); 
+
+  layer0.selectAll(".axis").data([
+        [[0, height/2],[width, height/2]],
+        [[width/2, 0],[width/2, height]],
+    ])
+    .enter().append("path")
+      .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
+      .classed("axis", true);
+
+  var state_node = layer2.selectAll(".posnode")
+      .data(state_data)
+    .enter().append("g")
+      .classed("posnode", true)
+      .attr("transform", function(d, i) { return "translate(" + d.x + "," + d.y + ")"; })
+      .on("click", posnodeclick)      
+      .call(force.drag);
+
+  state_node.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", function(sd, i) { return 7 + Math.sqrt(sd.size); })
+      .style("fill", function(sd, i) { return color(sd.name); })
+      .style("opacity", 0.5)
+      ;
+
+  state_node.append("text")
+      .attr("dy", "4pt")
+      .attr("class", "posnode")        
+      .text(function(sd) { return sd.name; })
+      .style("fill", "black")
+      ;
+
+  select_state(); // select a state at random to start things off  
 }
 
 function posnodeclick (sd)
