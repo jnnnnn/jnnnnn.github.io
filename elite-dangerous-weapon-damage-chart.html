@@ -1,0 +1,195 @@
+   <!DOCTYPE html>
+    <html>
+      <head>
+        <title>The d3 test</title>
+<style>
+.chart {
+
+}
+
+body { margin: 0; padding: 0; }
+
+.main text {
+    font: 10px sans-serif;  
+}
+
+.tick line{
+  opacity: 0.2;
+}
+
+circle {
+    fill: steelblue;
+}
+
+</style>
+        <script type="text/javascript" src="d3.v4.min.js"></script>
+      </head>
+      <body onclick="draw_chart();">
+        <div class='content'>
+        <div id="controls">        
+          <input type="checkbox" id="powerscale" checked="false"/><label>Power scale</label>
+          <input type="radio" name="dps" id="ShieldDps" checked/><label>Shield DPS</label>
+          <input type="radio" name="dps" id="HullDps"/><label>Hull DPS</label>
+        </div>
+        <div id="chart"><svg id="chart"/></div>
+        <div id="errors"></div>
+        </div>
+        <script type="text/javascript">
+
+var csv_rows = [];
+d3.tsv("elite-weapon-data.tsv", function(error, csv_rows_a) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load file: " + error.statusText;
+    else {
+      csv_rows = csv_rows_a;
+      setup_controls();
+      draw_chart();
+    }
+  });
+
+
+var shapes = {
+  "fixed": d3.symbol().type(d3.symbolTriangle),
+  "gimbal": d3.symbol().type(d3.symbolSquare),
+  "turret": d3.symbol().type(d3.symbolCircle),
+  "": d3.symbol().type(d3.symbolWye),
+};
+
+function damage(d) { return document.getElementById('ShieldDps').checked ? d.DPSvS : d.DPSvH; }
+function draw_chart() {
+  
+  var margin = {top: 20, right: 60, bottom: 60, left: 60}
+    , width = window.innerWidth -10 - margin.left - margin.right
+    , height = window.innerHeight - document.getElementById('controls').offsetHeight -10 - margin.top - margin.bottom;
+
+  data = csv_rows.filter(d=>document.getElementById('weapon'+d.Type).checked);
+  data = data.filter(d=>document.getElementById('track'+d.Track).checked);
+  data = data.filter(d=>document.getElementById('class'+d.Class).checked);
+
+  var powerscale = document.getElementById('powerscale').checked;
+  var x = d3.scalePow().exponent(powerscale ? 0.3 : 1)
+            .domain([0, d3.max(data, d => Number.parseInt(d.Draw))])
+            .range([ 0, width ]);
+
+  var y = d3.scalePow().exponent(powerscale ? 0.3 : 1)
+          .domain([0, d3.max(data, d => Number.parseInt(damage(d)))])
+          .range([ height, 0 ]);
+
+  d3.selectAll("svg#chart > *").remove();
+  var chart = d3.select('svg#chart')
+      .attr('width', width + margin.right + margin.left)
+      .attr('height', height + margin.top + margin.bottom)
+      .attr('class', 'chart');
+
+  var main = chart.append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('class', 'main');   
+      
+  main.append('g')
+    .attr('transform', 'translate(0,' + height + ')')
+    .attr('class', 'main axis date')
+    .call(d3.axisBottom(x));
+
+  main.append('g')
+    .attr('transform', 'translate(0,0)')
+    .call(d3.axisLeft(y).tickSizeInner(-width));
+
+  var g = main.append("svg:g"); 
+
+  var dots = g.selectAll("scatter-dots")
+    .data(data)
+    .enter().append("g");
+
+  dots.attr('transform', d=>`translate(${x(d.Draw || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
+
+  dots.append('path')
+    .attr('d', d=>shapes[d.Track]())
+    .style('stroke', d => classColors(d.Type))
+    .attr('fill-opacity', '0');
+
+  dots.append('title')
+    .text(d=>d.WEAPON + " (" + 
+      (document.getElementById('ShieldDps').checked ? "Shield" : "Hull" )
+      + " DPS: " + damage(d) + ")");
+
+  dots.append('text')
+    .text(d=>d.Type === "faction" ? d.WEAPON : "")
+    .attr('text-anchor', 'middle');
+}
+
+var classColors = 0;
+function setup_controls() { 
+  classColors = d3.scaleOrdinal()
+      .domain([...new Set(csv_rows.map(d=>d.Type))])
+      .range(["#03014b", "#05a501", "#ff1902", "#f701ff", "#139dab", "#674102", "#eb5a94", "#208fff", "#092cd5", "#035821", "#7a6189", "#b65fd6", "#909403", "#9f051b", "#d97302", "#8f9070", "#6c0239", "#cb7767", "#fe0aba", "#fe035b", "#3440b0", "#700471", "#08a358", "#9509ff", "#0b7bb6", "#b58637", "#f45b3e", "#8e05bd", "#153e7f", "#3c7c01", "#9781d6", "#646a20", "#419271", "#af579d", "#80332e", "#7c66fe", "#7d8e9b", "#9b4102", "#b70781", "#8f6967", "#ad054a", "#070389", "#ea5b68", "#ae5670", "#fe028c", "#db39d8", "#6d9a52", "#6c4593", "#0e02fb", "#936d45", "#bf0501", "#e257c4", "#fc0335", "#f45d03", "#bf5cff", "#196e88", "#d17741", "#a0089d", "#69239e", "#046bf1", "#733467", "#506d45", "#4263bf", "#497871", "#808bc2", "#b47e99", "#8444fb", "#7e6adf", "#a22d6a", "#c3503c", "#43014c", "#bc1bee", "#751802", "#9c8e4e", "#9d5532", "#db273d", "#431a76", "#7c6301", "#b03e4a", "#e6266c", "#6f9c03", "#0545d4", "#a96404", "#af7cb7", "#475e8f", "#80012a", "#335d02", "#03664d", "#05792b", "#3fa234", "#568fe0", "#c34603", "#5695b9", "#4a02dc", "#6a37cc", "#ab8b04", "#9d3da0", "#708824", "#f646aa", "#ff08e2", "#062d82", "#d36c9d", "#740256", "#b973cc", "#6e64a8", "#79776e", "#c40e6d", "#a05957", "#ce05a7", "#3555ff", "#d96c7b", "#037d4c", "#746e41", "#4102ab", ]);
+
+  var weapontypes = d3.select('#controls')
+    .append('div')
+      .attr('id', 'weapontypes')
+    .selectAll('p')
+      .data([...new Set(csv_rows.map(d=>d.Type))]);
+
+  weapontypes
+    .enter()
+    .insert('label')
+      .text(d=>d)
+      .attr('id', d=>d)
+      .style('color', d=>classColors(d));
+  weapontypes
+    .enter()
+    .insert('input', d=>document.getElementById(d))
+      .attr('type', 'checkbox')
+      .attr('checked', 'true')
+      .attr('id', d=>'weapon'+d);
+
+  var tracktypes = d3.select('#controls')
+    .append('div')
+      .attr('id', 'tracktypes')
+    .selectAll('p')
+      .data([...new Set(csv_rows.map(d=>d.Track))]);
+  tracktypes
+    .enter()
+    .insert('label')
+      .text(d=>d)
+      .attr('id', d=>d);    
+  tracktypes
+    .enter()
+    .insert('input', d=>document.getElementById(d))
+      .attr('type', 'checkbox')
+      .attr('checked', 'true')
+      .attr('id', d=>'track'+d);        
+  tracktypes
+    .enter()
+    .insert('svg', d=>document.getElementById(d))
+      .attr('width', '20')
+      .attr('height', '15')
+    .append('path')
+      .attr('d', d=>shapes[d]())
+      .style('stroke', 'black')
+      .attr('fill-opacity', '0')
+      .attr('transform', 'translate(10,10)');
+
+
+  var classes = d3.select('#controls')
+    .append('div')
+      .attr('id', 'classes')
+    .selectAll('p')
+      .data([...new Set(csv_rows.map(d=>d.Class))]);
+  classes
+    .enter()
+    .insert('label')
+      .text(d=>'Class ' + d)
+      .attr('id', d=>'classl'+d);
+  classes
+    .enter()
+    .insert('input', d=>document.getElementById('classl'+d))
+      .attr('type', 'checkbox')
+      .attr('checked', 'true')
+      .attr('id', d=>'class'+d);
+}
+
+        </script>
+      </body>
+    </html>
