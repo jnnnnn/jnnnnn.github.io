@@ -24,7 +24,7 @@ circle {
 </style>
         <script type="text/javascript" src="d3.v4.min.js"></script>
       </head>
-      <body onclick="draw_chart();">
+      <body onclick="update_chart();">
         <div class='content'>
         <div id="controls">        
           <input type="checkbox" id="powerscale" checked="false"/><label>Power scale</label>
@@ -43,7 +43,8 @@ d3.tsv("elite-weapon-data.tsv", function(error, csv_rows_a) {
     else {
       csv_rows = csv_rows_a;
       setup_controls();
-      draw_chart();
+      init_chart();
+      update_chart();
     }
   });
 
@@ -55,27 +56,16 @@ var shapes = {
   "": d3.symbol().type(d3.symbolWye),
 };
 
+var g = 0;
+var x = 0;
+var y = 0;
+var width = 0, height = 0;
 function damage(d) { return document.getElementById('ShieldDps').checked ? d.DPSvS : d.DPSvH; }
-function draw_chart() {
-  
+function init_chart() {  
   var margin = {top: 20, right: 15, bottom: 60, left: 60}
-    , width = window.innerWidth - margin.left - margin.right
-    , height = window.innerHeight - document.getElementById('controls').offsetHeight -10 - margin.top - margin.bottom;
+  width = window.innerWidth - margin.left - margin.right
+  height = window.innerHeight - document.getElementById('controls').offsetHeight -10 - margin.top - margin.bottom;
 
-  data = csv_rows.filter(d=>document.getElementById('weapon'+d.Type).checked);
-  data = data.filter(d=>document.getElementById('track'+d.Track).checked);
-  data = data.filter(d=>document.getElementById('class'+d.Class).checked);
-
-  var powerscale = document.getElementById('powerscale').checked;
-  var x = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-            .domain([0, d3.max(data, d => Number.parseFloat(d.Draw))])
-            .range([ 0, width ]);
-
-  var y = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-          .domain([0, d3.max(data, d => Number.parseFloat(damage(d)))])
-          .range([ height, 0 ]);
-
-  d3.selectAll("svg#chart > *").remove();
   var chart = d3.select('svg#chart')
       .attr('width', width + margin.right + margin.left)
       .attr('height', height + margin.top + margin.bottom)
@@ -89,34 +79,61 @@ function draw_chart() {
       
   main.append('g')
     .attr('transform', 'translate(0,' + height + ')')
-    .attr('class', 'main axis date')
-    .call(d3.axisBottom(x));
+    .attr('id', 'bottomaxis');
 
   main.append('g')
     .attr('transform', 'translate(0,0)')
-    .call(d3.axisLeft(y).tickSizeInner(-width));
+    .attr('id', 'leftaxis');
 
-  var g = main.append("svg:g"); 
+  g = main.append("svg:g"); 
+}
 
-  var dots = g.selectAll("scatter-dots")
-    .data(data)
-    .enter().append("g");
+function update_chart() {
+  var t = d3.transition()
+      .duration(250);
+  data = csv_rows.filter(d=>document.getElementById('weapon'+d.Type).checked);
+  data = data.filter(d=>document.getElementById('track'+d.Track).checked);
+  data = data.filter(d=>document.getElementById('class'+d.Class).checked);
 
-  dots.attr('transform', d=>`translate(${x(d.Draw || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
+  var powerscale = document.getElementById('powerscale').checked;
+  var x = d3.scalePow().exponent(powerscale ? 0.3 : 1)
+            .domain([0, d3.max(data, d => Number.parseFloat(d.Draw))])
+            .range([ 0, width ]);
 
-  dots.append('path')
+  var y = d3.scalePow().exponent(powerscale ? 0.3 : 1)
+          .domain([0, d3.max(data, d => Number.parseFloat(damage(d)))])
+          .range([ height, 0 ]);
+
+  d3.selectAll("#bottomaxis").transition(t).call(d3.axisBottom(x));
+  d3.selectAll("#leftaxis").transition(t).call(d3.axisLeft(y).tickSizeInner(-width));
+
+  var dots = g.selectAll("g")
+    .data(data, d=>d.WEAPON);
+
+  var newdots = dots.enter().append('g')
+    .style('opacity', 1e-6);
+
+  newdots.append('path')
     .attr('d', d=>shapes[d.Track]())
     .style('stroke', d => classColors(d.Type))
     .attr('fill-opacity', '0');
-
-  dots.append('title')
+  newdots.append('title')
     .text(d=>d.WEAPON + " (" + 
       (document.getElementById('ShieldDps').checked ? "Shield" : "Hull" )
       + " DPS: " + damage(d) + ")");
-
-  dots.append('text')
+  newdots.append('text')
     .text(d=>d.Type === "faction" ? d.WEAPON : "")
     .attr('text-anchor', 'middle');
+
+  dots.exit()
+    .transition(t)
+      .style("opacity", 1e-6)
+      .remove();
+
+  newdots.merge(dots)
+      .transition(t)
+        .style('opacity', 1)
+        .attr('transform', d=>`translate(${x(d.Draw || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
 }
 
 var classColors = 0;
