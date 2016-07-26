@@ -259,6 +259,8 @@ function select_distant_node()
   // update the "nearest" value for all the other (nearby) nodes
   var sq = function(x) { return x * x; }
 
+  // each candidate node knows how far away the nearest selected node is.
+  // if the newly-selected node is closer, we need to update this distance.
   ds.forEach(function(d) {
     dist = (sq(d.lab.a - selected_node.lab.a)
             + sq(d.lab.b - selected_node.lab.b)
