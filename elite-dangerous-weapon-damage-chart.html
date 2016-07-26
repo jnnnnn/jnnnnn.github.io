@@ -58,8 +58,8 @@ var shapes = {
 function damage(d) { return document.getElementById('ShieldDps').checked ? d.DPSvS : d.DPSvH; }
 function draw_chart() {
   
-  var margin = {top: 20, right: 60, bottom: 60, left: 60}
-    , width = window.innerWidth -10 - margin.left - margin.right
+  var margin = {top: 20, right: 15, bottom: 60, left: 60}
+    , width = window.innerWidth - margin.left - margin.right
     , height = window.innerHeight - document.getElementById('controls').offsetHeight -10 - margin.top - margin.bottom;
 
   data = csv_rows.filter(d=>document.getElementById('weapon'+d.Type).checked);
@@ -68,11 +68,11 @@ function draw_chart() {
 
   var powerscale = document.getElementById('powerscale').checked;
   var x = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-            .domain([0, d3.max(data, d => Number.parseInt(d.Draw))])
+            .domain([0, d3.max(data, d => Number.parseFloat(d.Draw))])
             .range([ 0, width ]);
 
   var y = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-          .domain([0, d3.max(data, d => Number.parseInt(damage(d)))])
+          .domain([0, d3.max(data, d => Number.parseFloat(damage(d)))])
           .range([ height, 0 ]);
 
   d3.selectAll("svg#chart > *").remove();
