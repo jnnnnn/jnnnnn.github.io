@@ -88,10 +88,25 @@ function init_chart() {
   main.append('g')
     .attr('transform', 'translate(0,' + height + ')')
     .attr('id', 'bottomaxis');
-
   main.append('g')
     .attr('transform', 'translate(0,0)')
     .attr('id', 'leftaxis');
+
+  // axis labels
+  main.append('text')
+    .attr('x', width/2)
+    .attr('y', height + 50)
+    .style('text-anchor', 'middle')
+    .style('font-size', '20px')
+    .text('WEP capacitor drain per second');
+
+  // axis labels
+  main.append('text')
+    .style('text-anchor', 'middle')
+    .style('font-size', '20px')
+    .attr('transform', `translate(-30, ${height/2}) rotate(-90)`)
+    .text('Damage per second (point blank range, including reloading)');
+
 
   g = main.append("svg:g"); 
 }
