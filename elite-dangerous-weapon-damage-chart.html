@@ -42,10 +42,12 @@ circle {
           <input type="checkbox" id="logscale"/><label>Log scale</label>
           <input type="radio" name="dps" id="ShieldDps" checked/><label>Shield DPS</label>
           <input type="radio" name="dps" id="HullDps"/><label>Hull DPS</label>
+          <input type="radio" name="xunits" id="xunitdrain"/><label>vs. WEP drain</label>
+          <input type="radio" name="xunits" id="xunitdpe" checked/><label>vs. Damage Per WEP drain</label>          
           <br/>
-          <input type="radio" name="range" id="range0" checked/><label>Point Blank</label>
-          <input type="radio" name="range" id="range500"/><label>500m</label>
-          <input type="radio" name="range" id="range2000"/><label>2km</label>          
+          <input type="radio" name="range" id="range0"/><label>Point Blank</label>
+          <input type="radio" name="range" id="range500" /><label>500m</label>
+          <input type="radio" name="range" id="range2000" checked/><label>2km</label>          
         </div>
         <div id="chart"><svg id="chart"/></div>
         <div id="errors"></div>
@@ -84,6 +86,13 @@ function damage(d) {
     damage *= d.Range2km;
   return damage
 }
+function xvalue(d) {
+  if (document.getElementById('xunitdrain').checked)
+    return d.Draw;
+  if (document.getElementById('ShieldDps').checked)
+    return d.EvS;
+  return d.EvH;
+}
 function init_chart() {  
   var margin = {top: 20, right: 15, bottom: 60, left: 60}
   width = window.innerWidth - margin.left - margin.right
@@ -109,19 +118,18 @@ function init_chart() {
 
   // axis labels
   main.append('text')
-    .attr('x', width/2)
-    .attr('y', height + 50)
+    .attr('id', 'xaxislabel')
     .style('text-anchor', 'middle')
     .style('font-size', '20px')
-    .text('WEP capacitor drain per second');
+    .attr('transform', `translate(${width/2}, ${height + 50})`);
 
   // axis labels
   main.append('text')
+    .attr('id', 'yaxislabel')
     .style('text-anchor', 'middle')
     .style('font-size', '20px')
-    .attr('transform', `translate(-30, ${height/2}) rotate(-90)`)
+    .attr('transform', `translate(-30, ${height/2}) rotate(-90)`)    
     .text('Damage per second (including reloading)');
-
 
   g = main.append("svg:g"); 
 }
@@ -137,7 +145,7 @@ function update_chart() {
   var powerscale = false;  
   var x = logscale ? d3.scaleLog().base(2) : d3.scalePow().exponent(powerscale ? 0.4: 1);
   var y = logscale ? d3.scaleLog().base(2) : d3.scalePow().exponent(powerscale ? 0.4 : 1);
-  x.domain([logscale ? 0.1 : 0, d3.max(data, d => Number.parseFloat(d.Draw))]);
+  x.domain([logscale ? 0.1 : 0, d3.max(data, d => Number.parseFloat(xvalue(d)))]);
   y.domain([logscale ? 1 : 0, d3.max(data, d => Number.parseFloat(damage(d)))]);
   x.range([ 0, width ]);
   y.range([ height, 0]);
@@ -169,12 +177,15 @@ function update_chart() {
   newdots.merge(dots)
       .transition(t)
         .style('opacity', 1)
-        .attr('transform', d=>`translate(${x(d.Draw || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
+        .attr('transform', d=>`translate(${x(xvalue(d) || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
 
   g.selectAll("g > title")
     .text(d=>d.WEAPON + " (" + 
       (document.getElementById('ShieldDps').checked ? "Shield" : "Hull" )
-      + " DPS: " + damage(d) + ")")
+      + " DPS: " + damage(d) + ")");
+
+  d3.select("#xaxislabel")
+    .text(document.getElementById('xunitdrain').checked ? 'WEP capacitor drain per second' : 'Damage per WEP capacitor usage');
 }
 
 var classColors = 0;
