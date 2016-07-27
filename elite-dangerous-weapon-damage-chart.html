@@ -27,10 +27,15 @@ circle {
       <body onclick="update_chart();">
         <div class='content'>
         <div style="float:right;">
+          <p>
           <a href="https://forums.frontier.co.uk/showthread.php/246086-Official-FDev-Damage-Stats-for-Every-Weapon">source: Truesilver</a>
+          </p>
+          <p>
+          <a href="http://inara.cz/galaxy-outfitting">Where to buy modules</a>
+          </p>
         </div>
         <div id="controls">        
-          <input type="checkbox" id="powerscale" checked="false"/><label>Power scale</label>
+          <input type="checkbox" id="logscale"/><label>Log scale</label>
           <input type="radio" name="dps" id="ShieldDps" checked/><label>Shield DPS</label>
           <input type="radio" name="dps" id="HullDps"/><label>Hull DPS</label>
         </div>
@@ -98,17 +103,18 @@ function update_chart() {
   data = data.filter(d=>document.getElementById('track'+d.Track).checked);
   data = data.filter(d=>document.getElementById('class'+d.Class).checked);
 
-  var powerscale = document.getElementById('powerscale').checked;
-  var x = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-            .domain([0, d3.max(data, d => Number.parseFloat(d.Draw))])
-            .range([ 0, width ]);
+  var logscale = document.getElementById('logscale').checked;
+  var powerscale = false;  
+  var x = logscale ? d3.scaleLog().base(2) : d3.scalePow().exponent(powerscale ? 0.4: 1);
+  var y = logscale ? d3.scaleLog().base(2) : d3.scalePow().exponent(powerscale ? 0.4 : 1);
+  x.domain([logscale ? 0.1 : 0, d3.max(data, d => Number.parseFloat(d.Draw))]);
+  y.domain([logscale ? 1 : 0, d3.max(data, d => Number.parseFloat(damage(d)))]);
+  x.range([ 0, width ]);
+  y.range([ height, 0]);
+  
 
-  var y = d3.scalePow().exponent(powerscale ? 0.3 : 1)
-          .domain([0, d3.max(data, d => Number.parseFloat(damage(d)))])
-          .range([ height, 0 ]);
-
-  d3.selectAll("#bottomaxis").transition(t).call(d3.axisBottom(x));
-  d3.selectAll("#leftaxis").transition(t).call(d3.axisLeft(y).tickSizeInner(-width));
+  d3.selectAll("#bottomaxis").transition(t).call(d3.axisBottom(x).scale(x));
+  d3.selectAll("#leftaxis").transition(t).call(d3.axisLeft(y).tickSizeInner(-width).scale(y));
 
   var dots = g.selectAll("g")
     .data(data, d=>d.WEAPON);
