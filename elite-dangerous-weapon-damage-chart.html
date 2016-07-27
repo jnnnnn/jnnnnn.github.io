@@ -157,9 +157,6 @@ function update_chart() {
     .style('stroke', d => classColors(d.Type))
     .attr('fill-opacity', '0');
   newdots.append('title')
-    .text(d=>d.WEAPON + " (" + 
-      (document.getElementById('ShieldDps').checked ? "Shield" : "Hull" )
-      + " DPS: " + damage(d) + ")");
   newdots.append('text')
     .text(d=>d.Type === "faction" ? d.WEAPON : "")
     .attr('text-anchor', 'middle');
@@ -173,6 +170,11 @@ function update_chart() {
       .transition(t)
         .style('opacity', 1)
         .attr('transform', d=>`translate(${x(d.Draw || 0)},${y(damage(d) || 0)}) scale(${d.Class || 1})`);
+
+  g.selectAll("g > title")
+    .text(d=>d.WEAPON + " (" + 
+      (document.getElementById('ShieldDps').checked ? "Shield" : "Hull" )
+      + " DPS: " + damage(d) + ")")
 }
 
 var classColors = 0;
