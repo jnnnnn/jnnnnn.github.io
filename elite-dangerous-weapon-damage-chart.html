@@ -38,6 +38,10 @@ circle {
           <input type="checkbox" id="logscale"/><label>Log scale</label>
           <input type="radio" name="dps" id="ShieldDps" checked/><label>Shield DPS</label>
           <input type="radio" name="dps" id="HullDps"/><label>Hull DPS</label>
+          <br/>
+          <input type="radio" name="range" id="range0" checked/><label>Point Blank</label>
+          <input type="radio" name="range" id="range500"/><label>500m</label>
+          <input type="radio" name="range" id="range2000"/><label>2km</label>          
         </div>
         <div id="chart"><svg id="chart"/></div>
         <div id="errors"></div>
@@ -68,7 +72,14 @@ var g = 0;
 var x = 0;
 var y = 0;
 var width = 0, height = 0;
-function damage(d) { return document.getElementById('ShieldDps').checked ? d.DPSvS : d.DPSvH; }
+function damage(d) { 
+  var damage = document.getElementById('ShieldDps').checked ? d.DPSvS : d.DPSvH;
+  if (document.getElementById('range500').checked)
+    damage *= d.Range500m;
+  else if (document.getElementById('range2000').checked)
+    damage *= d.Range2km;
+  return damage
+}
 function init_chart() {  
   var margin = {top: 20, right: 15, bottom: 60, left: 60}
   width = window.innerWidth - margin.left - margin.right
@@ -105,7 +116,7 @@ function init_chart() {
     .style('text-anchor', 'middle')
     .style('font-size', '20px')
     .attr('transform', `translate(-30, ${height/2}) rotate(-90)`)
-    .text('Damage per second (point blank range, including reloading)');
+    .text('Damage per second (including reloading)');
 
 
   g = main.append("svg:g"); 
