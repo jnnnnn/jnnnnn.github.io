@@ -39,14 +39,15 @@ p { max-width: 40em; }
 <div></div>
 <div id="controls" style="float:right; padding:1em">
   <form id="fc" onsubmit="force.start(); return false;" style="display:inline">     
-    <pre>(note: d3.lab("white") = {l: 100, a: 0, b: 0})</pre>
+    <pre>(note: d3.jab("white") = {J: 100, a: 0, b: 0})</pre>
     <h4>Allowed colors:</h4>
-    <textarea class="side" id="constrainttext">function constraint(lab) {
-  return lab.l > 45 && lab.l < 70;
+    <textarea class="side" id="constrainttext">function constraint(jab) {
+  return jab.J > 45 && jab.J < 95;
 }</textarea>
     <input type="button" value="Start" onclick="initcolors();"/>
-    <input type="button" value="Pause" onclick="if(sorting) sorting=false; else sortcolors();"/>
-    <input type="checkbox" checked id="goslowcheck">Start slowly
+    <input type="button" value="Pause" onclick="if(sorting) sorting=false; else {sorting=true; sortcolors();}"/>
+    <input type="checkbox" checked id="goslowcheck">Slow
+    <input type="checkbox" checked id="hexcheck">hex codes
   </form>  
   <h4>Status</h4>
   <div id="status" class="mo side"></div>
@@ -54,35 +55,35 @@ p { max-width: 40em; }
   
   <h4>Some example constraints</h4>
   <pre>
-// All colours with integer L.a.b. values
-function constraint(lab) { 
+// All colours with integer J.a.b. values
+function constraint(jab) { 
   return true;
 }
 
 // Constant distance to a given colour:
-function constraint(lab) {   
-  var centre = d3.lab(120, 20, 20); // L, a, b
-  var dist = lab_dist(centre, lab);
+function constraint(jab) {   
+  var centre = d3.jab(120, 20, 20); // J, a, b
+  var dist = jab_dist(centre, jab);
   return (75 < dist && dist < 76);
 }
 
 // other functions..
-return 30*30 < lab.a*lab.a+lab.b*lab.b ; // No greys
-return lab.a + lab.b < 10; // no red
-return lab.l < 30; // dark
-return 80 < lab.l; // light
-return lab_dist(lab, d3.lab("blue")) < 50; // blues
-return lab_dist(lab, d3.lab("red")) < 50; // reds
-return lab_dist(lab, d3.lab("#00ff00")) > 70; // no greens
-return lab.rgb().r > 230; // Strong red channel
+return 30*30 < jab.a*jab.a+jab.b*jab.b ; // No greys
+return jab.a + jab.b < 10; // no red
+return jab.J < 30; // dark
+return 80 < jab.J; // light
+return jab_dist(jab, d3.jab("blue")) < 50; // blues
+return jab_dist(jab, d3.jab("red")) < 50; // reds
+return jab_dist(jab, d3.jab("#00ff00")) > 70; // no greens
+return jab.rgb().r > 230; // Strong red channel
   </pre>
   </div>
 </div>
 <svg id="graph" style="display:inline"></svg>
 <div id="sortedlist" class="mo"></div>
 
-<script src="d3.v3.min.js"></script>
-
+<script src="d3.v4.min.js"></script>
+<script src="d3-cam02.0.1.4.js"></script>
 <script>
 
 var width = 800;
@@ -100,7 +101,7 @@ var y0 = height / 2;
 
 var sorting = false;
 
-var scalefactor = 3.5; // distance on screen vs. change in color
+var scalefactor = 10; // distance on screen vs. change in color
 var mindist = 0; // distance between adjacent color points
 
 // set up axes
@@ -114,22 +115,19 @@ layer0.selectAll(".axis").data([
           [[width/2, 0],[width/2, height]],
       ])
       .enter().append("path")
-        .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
+        .attr("d", function(d) { return d3.line().curve(d3.curveLinear)(d); })
         .style("stroke-width", "1")
         .classed("axis", true);
 
 var ds = []; // unselected colors
 var d_sorteds = []; // selected colors
 
-function validcolor(lab) {
-  var rugub = lab.rgb();
-  return ((0 < rugub.r) && (rugub.r < 256) 
-      && (0 < rugub.g) && (rugub.g < 256) 
-      && (0 < rugub.b) && (rugub.b < 256));
+function validcolor(jab) {
+  return jab.rgb().displayable();
 }
 
-function coord_to_labcolor(L, x, y) {
-  return d3.lab(L, (x-x0)/scalefactor, (y-y0)/scalefactor);
+function coord_to_jabcolor(J, x, y) {
+  return d3.jab(J, (x-x0)/scalefactor, (y-y0)/scalefactor);
 }
 
 function initcolors() {
@@ -146,20 +144,20 @@ function initcolors() {
 }
 
 // should probably use a web worker here but don't want a separate file. Use SetTimeout instead.
-function innerloop(L) {
-  if (L > 100) {
+function innerloop(J) {
+  if (J > 100) {
     document.getElementById("status").innerHTML = "Initialized. " + ds.length + " colours prepared.";
     setTimeout(startsort, 1000);
     return;
   }
-  document.getElementById("status").innerHTML = "Initializing, please wait. L="+L+", N="+ds.length;
-  for (b = -110; b < 100; b+=1) {
-    for (a = -100; a < 100; a+=1) {
-      var lab = d3.lab(L, a, b);
-      if (validcolor(lab)) {
-        if (constraint(lab)) {
+  document.getElementById("status").innerHTML = "Initializing, please wait. J="+J+", N="+ds.length;
+  for (b = -40; b < 40; b+=1) {
+    for (a = -40; a < 40; a+=1) {
+      var jab = d3.jab(J, a, b);
+      if (validcolor(jab)) {
+        if (constraint(jab)) {
           ds.push({ 
-            lab: lab, // the color
+            jab: jab, // the color
             x: a * scalefactor + x0, // screen coord
             y: b * scalefactor + y0, // screen coord
             nearest: 1000000 // (distance to the nearest chosen color) ** 2
@@ -168,9 +166,8 @@ function innerloop(L) {
       }
     }
   }
-  setTimeout(function() { innerloop(L+1); }, 0);
+  setTimeout(function() { innerloop(J+1); }, 0);
 }
-
 
 function startsort() {
   sorting = true;
@@ -180,11 +177,8 @@ function startsort() {
   sortcolors();
 }
 
-function lab_dist(lab_1, lab_2) {
-  return Math.sqrt(
-    (lab_1.l-lab_2.l)*(lab_1.l-lab_2.l) +
-    (lab_1.a-lab_2.a)*(lab_1.a-lab_2.a) +
-    (lab_1.b-lab_2.b)*(lab_1.b-lab_2.b));
+function jab_dist(jab_1, jab_2) {
+  return jab_1.de(jab_2);
 }
 
 // Order colours by greatest distance from all other selected colors.
@@ -198,10 +192,9 @@ function sortcolors() {
     var i = d_sorteds.length;
     d_sorteds.push(d_new);
     create_node(d_new, i);
-    add_to_sorted_list(d_new.lab);
-    var delay = 500 * d3.ease("quad")(1-i/50);
+    add_to_sorted_list(d_new.jab);    
     var goSlow = document.getElementById("goslowcheck").checked;
-    setTimeout(sortcolors, goSlow?delay:0);
+    setTimeout(sortcolors, goSlow?100:0);
   }
 }
 
@@ -212,26 +205,39 @@ function create_node(d, i) {
       .classed("posnode", true)
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", function(d) { return d.lab.l * 0.11 + 3; }) // rudimentary perspective
-      .style("fill", function(d) { return d.lab; })
+      .attr("r", function(d) { return d.jab.J * 0.11 + 3; }) // rudimentary perspective
+      .style("fill", function(d) { return d.jab; })
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
 
+// format a number as a two-digit hex
+function formatHex(v)
+{
+  return ("00" + Math.round(v).toString(16))
+    .substr(-2);
+}
 
-function add_to_sorted_list(lab)
+function add_to_sorted_list(jab)
 {
   // don't append to innerHTML because it's too slow (whole string has to be re-parsed)
-  //var newelem = "<span style=\"background-color: "+lab.rgb()+"\">"+lab.rgb()+"</span>"
   var newelem = document.createElement("span");
-  newelem.textContent = lab.rgb();
-  newelem.style.backgroundColor = lab.rgb();
+  var rgb = jab.rgb();
+  if (document.getElementById("hexcheck").checked)
+    newelem.textContent = "#" + formatHex(rgb.r) + formatHex(rgb.g) + formatHex(rgb.b);
+  else
+    newelem.textContent = rgb;
+  newelem.style.backgroundColor = rgb;
+  if (jab.de(d3.jab("white")) > jab.de(d3.jab("black")))
+    newelem.style.color = "white";
+  else
+    newelem.style.color = "black";
   document.getElementById("sortedlist").appendChild(newelem);
   var sep = document.createElement("span");
   sep.textContent = "\", \"";
   document.getElementById("sortedlist").appendChild(sep);
 
   document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length + " / " + ds.length
-      +"<br />Distance: "+Math.floor(Math.sqrt(mindist))
+      +"<br />Distance: "+ Math.sqrt(mindist).toFixed(2);
 }
 
 // find the node that is furthest away from all the currently selected (sorted) nodes.
@@ -256,15 +262,11 @@ function select_distant_node()
   var index = ds.indexOf(selected_node);
   ds.splice(index, 1);
   
-  // update the "nearest" value for all the other (nearby) nodes
-  var sq = function(x) { return x * x; }
-
-  // each candidate node knows how far away the nearest selected node is.
-  // if the newly-selected node is closer, we need to update this distance.
+  // update the "nearest" value for all the other (nearby) nodes  
   ds.forEach(function(d) {
-    dist = (sq(d.lab.a - selected_node.lab.a)
-            + sq(d.lab.b - selected_node.lab.b)
-            + sq(d.lab.l - selected_node.lab.l));
+    // each candidate node knows how far away the nearest selected node is.
+    // if the newly-selected node is closer, we need to update this distance.  
+    dist = d.jab.de(selected_node.jab);
     if (dist < d.nearest)
       d.nearest = dist;
   });
@@ -275,12 +277,12 @@ function select_distant_node()
 layer0.on("mousemove", function() {
   var x = d3.mouse(this)[0];
   var y = d3.mouse(this)[1];
-  var lab = coord_to_labcolor(50, x, y);
-  var rgb = lab.rgb();
+  var jab = coord_to_jabcolor(50, x, y);
+  var rgb = jab.rgb();
   var status = "x=" + x + ", y=" + y;
 
   status += "<br />";
-  status += "L=" + lab.l + ", a=" + Math.floor(lab.a) + ", b=" + Math.floor(lab.b);
+  status += "J=" + jab.j + ", a=" + Math.floor(jab.a) + ", b=" + Math.floor(jab.b);
   
   status += "<br />";
   status += "R="+ printColorValue(rgb.r) + " G=" + printColorValue(rgb.g) + " B=" + printColorValue(rgb.b);
@@ -290,9 +292,9 @@ layer0.on("mousemove", function() {
 
 function printColorValue(v) {
   if (v < 0 || v > 255)
-    return "<span class=\"invalid\">" + v + "</span>";
+    return "<span class=\"invalid\">" + Math.round(v) + "</span>";
   else
-    return "" + v
+    return "" + Math.round(v);
 }
 
 </script>
@@ -301,11 +303,11 @@ function printColorValue(v) {
 
 <h3>About</h3>
 <p>
-Click Start to generate a continuous sequence of distinct random colours for diagrams.
+Click Start to generate a continuous sequence of distinct colours for diagrams.
 </p><p>
-You can alter the "constraint" function to filter colours before the random selection process starts.
+You can alter the "constraint" function to filter colours before the selection process starts.
 </p><p>
-Sampling is done in the d3 <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> so that perceptually different colours are equally spaced. The sampler always chooses the next colour to be as far as possible from all the previously sampled colours.
+Sampling is done in the CIECAM02-UCS <a href="http://gramaz.io/d3-cam02/index.html">color space</a> so that perceptually different colours are equally spaced. The sampler always chooses the next colour to be as far as possible from all the previously sampled colours.
 </p><p>
 Bibliography:
 <ol><li>
@@ -325,7 +327,7 @@ Methods for nice multidimensional sampling
 Piotr Migdal's <a href="http://stackoverflow.com/a/28306100/412529">infinite color generator</a> for the idea of sampling all possible colors (instead of just certain slices of lightness).
 </li>
 <li>
-Some nobody's <a href="http://xqt2.com/p/colours_sim.html">colour picking by simulation</a> only works for up to about 12 colours (20 was reaaaaaaaly slow).
+Matthew Sarsby's <a href="http://xqt2.com/p/colours_sim.html">colour picking by simulation</a> only works for up to about 12 colours (20 was reaaaaaaaly slow).
 </li>
 </ol>
 </p>
