@@ -47,7 +47,8 @@ p { max-width: 40em; }
     <input type="button" value="Start" onclick="initcolors();"/>
     <input type="button" value="Pause" onclick="if(sorting) sorting=false; else {sorting=true; sortcolors();}"/>
     <input type="checkbox" checked id="goslowcheck">Slow
-    <input type="checkbox" checked id="hexcheck">hex codes
+    <input type="checkbox" checked id="hexcheck">hex codes    
+    <input type="button" value="Copy to clipboard" onclick="copyToClipboard();" />
   </form>  
   <h4>Status</h4>
   <div id="status" class="mo side"></div>
@@ -205,7 +206,7 @@ function create_node(d, i) {
       .classed("posnode", true)
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", function(d) { return d.jab.J * 0.11 + 3; }) // rudimentary perspective
+      .attr("r", function(d) { return d.jab.J * 0.11 + 3; }) // rudimentary perspective -- lighter colours get bigger circles
       .style("fill", function(d) { return d.jab; })
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
@@ -295,6 +296,27 @@ function printColorValue(v) {
     return "<span class=\"invalid\">" + Math.round(v) + "</span>";
   else
     return "" + Math.round(v);
+}
+
+function copyToClipboard() {  
+  // http://stackoverflow.com/a/987376/412529
+  function SelectText(element) {
+    if (document.body.createTextRange) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+    } else if (window.getSelection) {
+        var selection = window.getSelection();        
+        var range = document.createRange();
+        range.selectNodeContents(element);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+  }
+
+  SelectText(document.getElementById("sortedlist"));
+  document.execCommand('copy');
+  document.getElementById("status").innerHTML = "Copied to clipboard";
 }
 
 </script>
