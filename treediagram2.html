@@ -121,7 +121,7 @@ function update(source) {
   // Compute the new tree layout.
   var levelwidths = [1];
   childCount(0, root, levelwidths);  
-  var newHeight = d3.max(levelwidths) * 50; // 20 pixels per line  
+  var newHeight = d3.max(levelwidths) * 70; // 20 pixels per line  
   tree = tree.size([newHeight, width]);
   newHeight += margin.top + margin.bottom;
   
@@ -161,7 +161,7 @@ function update(source) {
   text.append("tspan")
     .classed("move index", true)
     .attr("x", -13)
-    .attr("y", 13)
+    .attr("y", 16)
     .text(function(d) { return d.tsv.Index; });
 
   nodeEnter.append("circle")
