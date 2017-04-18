@@ -360,6 +360,20 @@ function load_rows(csv_rows) {
   //  collapse(child);
 
   update(root);
+
+  var moveid = getUrlVars()["move"];
+  if (moveid) {
+    var svg = d3.select("svg")[0][0];
+    
+  }
+}
+
+// http://stackoverflow.com/a/20097994/412529
+function getUrlVars() {
+  var vars = {};
+  window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
+    (m,key,value) => vars[decodeURIComponent(key)] = decodeURIComponent(value));
+  return vars;
 }
 
 init();

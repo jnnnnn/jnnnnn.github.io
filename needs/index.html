@@ -41,8 +41,10 @@ function load_rows(csv_rows) {
 }
 
 function layout() {
-  var sel = d3.select("div#needs").data(needs_data);
-  sel.enter()
+  var sel = d3.select("div#needs").selectAll("div").data(needs_data);
+  var need_divs = sel.enter()
+    .append("div");
+  need_divs
     .append("p")
       .text(d => d.name);
 }

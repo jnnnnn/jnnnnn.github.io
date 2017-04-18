@@ -131,11 +131,11 @@ function init() {
 
 // http://stackoverflow.com/a/20097994/412529
 function getUrlVars() {
-    var vars = {};
-    window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
-      (m,key,value) => vars[decodeURIComponent(key)] = decodeURIComponent(value));
-    return vars;
-  }
+  var vars = {};
+  window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
+    (m,key,value) => vars[decodeURIComponent(key)] = decodeURIComponent(value));
+  return vars;
+}
 
 function load_rows(csv_rows) {
   moves = {};

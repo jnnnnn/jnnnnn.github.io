@@ -1,0 +1,33 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="700" height="300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs xmlns="http://www.w3.org/1999/xhtml"><style type="text/css"><![CDATA[
+.node rect { cursor: move; fill-opacity: 0.9; shape-rendering: crispEdges; }
+.node text { pointer-events: none; text-shadow: rgb(255, 255, 255) 0px 1px 0px; }
+.link { fill: none; stroke: rgb(0, 0, 0); stroke-opacity: 0.2; }
+.link:hover { stroke-opacity: 0.5; }]]></style></defs><g transform="translate(10,10)"><g><path class="link" d="M36,15C179,15 179,15 322,15" style="stroke-width: 30;"><title>Order 1 → Trade 1
+200 Widgets</title></path><path class="link" d="M36,133.31564531799432C179,133.31564531799432 179,135 322,135" style="stroke-width: 30;"><title>Order 2 → Trade 3
+200 Widgets</title></path><path class="link" d="M36,182.06564531799432C179,182.06564531799432 179,268.75 322,268.75" style="stroke-width: 22.5;"><title>Order 2 → Trade 5
+150 Widgets</title></path><path class="link" d="M36,159.56564531799432C179,159.56564531799432 179,207.25 322,207.25" style="stroke-width: 22.5;"><title>Order 2 → Trade 4
+150 Widgets</title></path><path class="link" d="M358,129C501,129 501,36 644,36" style="stroke-width: 18;"><title>Trade 3 → Account 1
+120 Widgets</title></path><path class="link" d="M358,9C501,9 501,9 644,9" style="stroke-width: 18;"><title>Trade 1 → Account 1
+120 Widgets</title></path><path class="link" d="M36,37.5C179,37.5 179,75.5 322,75.5" style="stroke-width: 15;"><title>Order 1 → Trade 2
+100 Widgets</title></path><path class="link" d="M358,264.25C501,264.25 501,65.25 644,65.25" style="stroke-width: 13.5;"><title>Trade 5 → Account 1
+90 Widgets</title></path><path class="link" d="M358,202.75C501,202.75 501,51.75 644,51.75" style="stroke-width: 13.5;"><title>Trade 4 → Account 1
+90 Widgets</title></path><path class="link" d="M358,24C501,24 501,163.39999999999998 644,163.39999999999998" style="stroke-width: 12;"><title>Trade 1 → Account 2
+80 Widgets</title></path><path class="link" d="M358,72.5C501,72.5 501,22.5 644,22.5" style="stroke-width: 9;"><title>Trade 2 → Account 1
+60 Widgets</title></path><path class="link" d="M358,141.75C501,141.75 501,179.14999999999998 644,179.14999999999998" style="stroke-width: 7.5;"><title>Trade 3 → Account 2
+50 Widgets</title></path><path class="link" d="M358,80C501,80 501,172.39999999999998 644,172.39999999999998" style="stroke-width: 6;"><title>Trade 2 → Account 2
+40 Widgets</title></path><path class="link" d="M358,212.275C501,212.275 501,185.67499999999998 644,185.67499999999998" style="stroke-width: 5.55;"><title>Trade 4 → Account 2
+37 Widgets</title></path><path class="link" d="M358,273.775C501,273.775 501,191.225 644,191.225" style="stroke-width: 5.55;"><title>Trade 5 → Account 2
+37 Widgets</title></path><path class="link" d="M358,147.75C501,147.75 501,270.85 644,270.85" style="stroke-width: 4.5;"><title>Trade 3 → Account 3
+30 Widgets</title></path><path class="link" d="M358,216.775C501,216.775 501,274.82500000000005 644,274.82500000000005" style="stroke-width: 3.45;"><title>Trade 4 → Account 3
+23 Widgets</title></path><path class="link" d="M358,278.27500000000003C501,278.27500000000003 501,278.27500000000003 644,278.27500000000003" style="stroke-width: 3.45;"><title>Trade 5 → Account 3
+23 Widgets</title></path></g><g><g class="node" transform="translate(0,0)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="45" width="36" style="fill: rgb(31, 119, 180); stroke: rgb(15, 58, 88);"><title>Order 1
+300 Widgets</title></rect><text x="42" y="22.5" dy=".35em" text-anchor="start">Order 1</text></g><g class="node" transform="translate(322,0)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="30" width="36" style="fill: rgb(174, 199, 232); stroke: rgb(85, 98, 114);"><title>Trade 1
+200 Widgets</title></rect><text x="42" y="15" dy=".35em" text-anchor="start">Trade 1</text></g><g class="node" transform="translate(322,257.5)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="22.5" width="36" style="fill: rgb(174, 199, 232); stroke: rgb(85, 98, 114);"><title>Trade 5
+150 Widgets</title></rect><text x="42" y="11.25" dy=".35em" text-anchor="start">Trade 5</text></g><g class="node" transform="translate(644,0)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="72" width="36" style="fill: rgb(255, 127, 14); stroke: rgb(125, 62, 7);"><title>Account 1
+480 Widgets</title></rect><text x="-6" y="36" dy=".35em" text-anchor="end">Account 1</text></g><g class="node" transform="translate(644,268.6)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="11.4" width="36" style="fill: rgb(255, 127, 14); stroke: rgb(125, 62, 7);"><title>Account 3
+76 Widgets</title></rect><text x="-6" y="5.7" dy=".35em" text-anchor="end">Account 3</text></g><g class="node" transform="translate(322,196)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="22.5" width="36" style="fill: rgb(174, 199, 232); stroke: rgb(85, 98, 114);"><title>Trade 4
+150 Widgets</title></rect><text x="42" y="11.25" dy=".35em" text-anchor="start">Trade 4</text></g><g class="node" transform="translate(322,120)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="30" width="36" style="fill: rgb(174, 199, 232); stroke: rgb(85, 98, 114);"><title>Trade 3
+200 Widgets</title></rect><text x="42" y="15" dy=".35em" text-anchor="start">Trade 3</text></g><g class="node" transform="translate(322,68)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="15" width="36" style="fill: rgb(174, 199, 232); stroke: rgb(85, 98, 114);"><title>Trade 2
+100 Widgets</title></rect><text x="42" y="7.5" dy=".35em" text-anchor="start">Trade 2</text></g><g class="node" transform="translate(644,157.39999999999998)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="36.6" width="36" style="fill: rgb(255, 127, 14); stroke: rgb(125, 62, 7);"><title>Account 2
+244 Widgets</title></rect><text x="-6" y="18.3" dy=".35em" text-anchor="end">Account 2</text></g><g class="node" transform="translate(0,118.31564531799432)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><rect height="75" width="36" style="fill: rgb(31, 119, 180); stroke: rgb(15, 58, 88);"><title>Order 2
+500 Widgets</title></rect><text x="42" y="37.5" dy=".35em" text-anchor="start">Order 2</text></g></g></g></svg>

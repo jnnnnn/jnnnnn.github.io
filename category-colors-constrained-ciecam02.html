@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+
+
+License: Public Domain.
+Original Author: Jonathan Newnham
+-->
+<style>
+
+.axis {
+  stroke: #999;
+  stroke-opacity: .5;
+  fill-opacity: 0;
+  stroke-width: 1;
+}
+
+.mo {
+  font-family: Consolas, Inconsolata, "Courier New", Courier, monospace;
+}
+
+.side {
+  display: block; 
+  width: 25em; 
+  min-height: 5em;
+}
+
+h4 {
+  margin: 0.2em;
+}
+
+p { max-width: 40em; }
+
+.invalid { color: red; }
+
+</style>
+<body>
+<h1 style="display:inline">Category Color Generator</h1>
+<div></div>
+<div id="controls" style="float:right; padding:1em">
+  <form id="fc" onsubmit="force.start(); return false;" style="display:inline">     
+    <pre>(note: d3.jab("white") = {J: 100, a: 0, b: 0})</pre>
+    <h4>Allowed colors:</h4>
+    <textarea class="side" id="constrainttext">function constraint(jab) {
+  return jab.J > 45 && jab.J < 95;
+}</textarea>
+    <input type="button" value="Start" onclick="initcolors();"/>
+    <input type="button" value="Pause" onclick="if(sorting) sorting=false; else {sorting=true; sortcolors();}"/>
+    <input type="checkbox" checked id="goslowcheck">Slow
+    <input type="checkbox" checked id="hexcheck">hex codes
+  </form>  
+  <h4>Status</h4>
+  <div id="status" class="mo side"></div>
+  <div id="commentary" class="side">
+  
+  <h4>Some example constraints</h4>
+  <pre>
+// All colours with integer J.a.b. values
+function constraint(jab) { 
+  return true;
+}
+
+// Constant distance to a given colour:
+function constraint(jab) {   
+  var centre = d3.jab(120, 20, 20); // J, a, b
+  var dist = jab_dist(centre, jab);
+  return (75 < dist && dist < 76);
+}
+
+// other functions..
+return 30*30 < jab.a*jab.a+jab.b*jab.b ; // No greys
+return jab.a + jab.b < 10; // no red
+return jab.J < 30; // dark
+return 80 < jab.J; // light
+return jab_dist(jab, d3.jab("blue")) < 50; // blues
+return jab_dist(jab, d3.jab("red")) < 50; // reds
+return jab_dist(jab, d3.jab("#00ff00")) > 70; // no greens
+return jab.rgb().r > 230; // Strong red channel
+  </pre>
+  </div>
+</div>
+<svg id="graph" style="display:inline"></svg>
+<div id="sortedlist" class="mo"></div>
+
+<script src="d3.v4.min.js"></script>
+<script src="d3-cam02.0.1.4.js"></script>
+<script>
+
+var width = 800;
+var height = 800;
+
+var svg = d3.select("svg#graph")
+    .attr("width", width)
+    .attr("height", height);
+
+var layer0 = svg.append("g").attr("id", "layer0"); // for background stuff (link paths, text)
+var layer1 = svg.append("g").attr("id", "layer1"); // for background stuff (link paths, text)
+
+var x0 = width / 2;
+var y0 = height / 2;
+
+var sorting = false;
+
+var scalefactor = 10; // distance on screen vs. change in color
+var mindist = 0; // distance between adjacent color points
+
+// set up axes
+layer0.selectAll(".backrect").data([0]).enter().append("rect")
+      .classed("backgrect", true)
+      .attr("height", height)
+      .attr("width", width)
+      .style("fill", "white");
+layer0.selectAll(".axis").data([
+          [[0, height/2],[width, height/2]],
+          [[width/2, 0],[width/2, height]],
+      ])
+      .enter().append("path")
+        .attr("d", function(d) { return d3.line().curve(d3.curveLinear)(d); })
+        .style("stroke-width", "1")
+        .classed("axis", true);
+
+var ds = []; // unselected colors
+var d_sorteds = []; // selected colors
+
+function validcolor(jab) {
+  return jab.rgb().displayable();
+}
+
+function coord_to_jabcolor(J, x, y) {
+  return d3.jab(J, (x-x0)/scalefactor, (y-y0)/scalefactor);
+}
+
+function initcolors() {
+  sorting = false;  
+  document.getElementById("sortedlist").innerHTML = "\"";
+  (1, eval)(document.getElementById("constrainttext").value); // creates the constraint function
+  ds = [];
+  d_sorteds = [];
+
+  layer1.selectAll(".posnode").remove();
+
+  // the world's slowest loop:
+  innerloop(0);
+}
+
+// should probably use a web worker here but don't want a separate file. Use SetTimeout instead.
+function innerloop(J) {
+  if (J > 100) {
+    document.getElementById("status").innerHTML = "Initialized. " + ds.length + " colours prepared.";
+    setTimeout(startsort, 1000);
+    return;
+  }
+  document.getElementById("status").innerHTML = "Initializing, please wait. J="+J+", N="+ds.length;
+  for (b = -40; b < 40; b+=1) {
+    for (a = -40; a < 40; a+=1) {
+      var jab = d3.jab(J, a, b);
+      if (validcolor(jab)) {
+        if (constraint(jab)) {
+          ds.push({ 
+            jab: jab, // the color
+            x: a * scalefactor + x0, // screen coord
+            y: b * scalefactor + y0, // screen coord
+            nearest: 1000000 // (distance to the nearest chosen color) ** 2
+          });
+        }
+      }
+    }
+  }
+  setTimeout(function() { innerloop(J+1); }, 0);
+}
+
+function startsort() {
+  sorting = true;
+  if (0 === d_sorteds.length) {
+    layer1.selectAll(".posnode").remove()     
+  }
+  sortcolors();
+}
+
+function jab_dist(jab_1, jab_2) {
+  return jab_1.de(jab_2);
+}
+
+// Order colours by greatest distance from all other selected colors.
+function sortcolors() {
+  var d_new = select_distant_node();
+  if (!sorting)
+    return;
+  if(d_new.nearest > 0)
+  {        
+    d_new.sorted = true;
+    var i = d_sorteds.length;
+    d_sorteds.push(d_new);
+    create_node(d_new, i);
+    add_to_sorted_list(d_new.jab);    
+    var goSlow = document.getElementById("goslowcheck").checked;
+    setTimeout(sortcolors, goSlow?100:0);
+  }
+}
+
+function create_node(d, i) {
+  var nodes = layer1.selectAll(".posnode")
+      .data(d_sorteds)
+    .enter().append("circle")
+      .classed("posnode", true)
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", function(d) { return d.jab.J * 0.11 + 3; }) // rudimentary perspective
+      .style("fill", function(d) { return d.jab; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+// format a number as a two-digit hex
+function formatHex(v)
+{
+  return ("00" + Math.round(v).toString(16))
+    .substr(-2);
+}
+
+function add_to_sorted_list(jab)
+{
+  // don't append to innerHTML because it's too slow (whole string has to be re-parsed)
+  var newelem = document.createElement("span");
+  var rgb = jab.rgb();
+  if (document.getElementById("hexcheck").checked)
+    newelem.textContent = "#" + formatHex(rgb.r) + formatHex(rgb.g) + formatHex(rgb.b);
+  else
+    newelem.textContent = rgb;
+  newelem.style.backgroundColor = rgb;
+  if (jab.de(d3.jab("white")) > jab.de(d3.jab("black")))
+    newelem.style.color = "white";
+  else
+    newelem.style.color = "black";
+  document.getElementById("sortedlist").appendChild(newelem);
+  var sep = document.createElement("span");
+  sep.textContent = "\", \"";
+  document.getElementById("sortedlist").appendChild(sep);
+
+  document.getElementById("status").innerHTML = "Sorted: "+d_sorteds.length + " / " + ds.length
+      +"<br />Distance: "+ Math.sqrt(mindist).toFixed(2);
+}
+
+// find the node that is furthest away from all the currently selected (sorted) nodes.
+function select_distant_node()
+{  
+  // could optimize this by only updating colours within mindist of selected node 
+  // (would need an octree or something), and keeping a heap so we don't need to do 
+  // a full scan for the next colour each time. 
+  //
+  // It's fast enough like this though.
+
+  var selected_node = ds[0];
+  // find the node with the highest "nearest" value (full scan)
+  // -- in other words, the most distant one
+  ds.forEach(function(d) {
+    if (d.nearest > selected_node.nearest)
+      selected_node = d;
+  });
+  mindist = selected_node.nearest; // for UI
+
+  // remove it from candidates list
+  var index = ds.indexOf(selected_node);
+  ds.splice(index, 1);
+  
+  // update the "nearest" value for all the other (nearby) nodes  
+  ds.forEach(function(d) {
+    // each candidate node knows how far away the nearest selected node is.
+    // if the newly-selected node is closer, we need to update this distance.  
+    dist = d.jab.de(selected_node.jab);
+    if (dist < d.nearest)
+      d.nearest = dist;
+  });
+  
+  return selected_node;
+}
+
+layer0.on("mousemove", function() {
+  var x = d3.mouse(this)[0];
+  var y = d3.mouse(this)[1];
+  var jab = coord_to_jabcolor(50, x, y);
+  var rgb = jab.rgb();
+  var status = "x=" + x + ", y=" + y;
+
+  status += "<br />";
+  status += "J=" + jab.j + ", a=" + Math.floor(jab.a) + ", b=" + Math.floor(jab.b);
+  
+  status += "<br />";
+  status += "R="+ printColorValue(rgb.r) + " G=" + printColorValue(rgb.g) + " B=" + printColorValue(rgb.b);
+
+  document.getElementById("status").innerHTML = status;
+});
+
+function printColorValue(v) {
+  if (v < 0 || v > 255)
+    return "<span class=\"invalid\">" + Math.round(v) + "</span>";
+  else
+    return "" + Math.round(v);
+}
+
+</script>
+
+<div id="about" style="display:inline">
+
+<h3>About</h3>
+<p>
+Click Start to generate a continuous sequence of distinct colours for diagrams.
+</p><p>
+You can alter the "constraint" function to filter colours before the selection process starts.
+</p><p>
+Sampling is done in the CIECAM02-UCS <a href="http://gramaz.io/d3-cam02/index.html">color space</a> so that perceptually different colours are equally spaced. The sampler always chooses the next colour to be as far as possible from all the previously sampled colours.
+</p><p>
+Bibliography:
+<ol><li>
+<a href="http://bl.ocks.org/mbostock/310c99e53880faec2434">bl.ocks.org/mbostock/310c99e53880faec2434</a><br />
+For introducing the idea of perceptual color
+</li><li>
+<a href="http://tools.medialab.sciences-po.fr/iwanthue/theory.php">medialab: iwanthue</a><br />
+Generating fixed-size palettes of optimal colours using the LAB colour space. 
+Spacing done with repulsive forces or kNN clustering.
+</li><li>
+<a href="http://www.colorcodehex.com/color-model.html">colorcodehex</a> and <a href="http://en.wikipedia.org/wiki/Lab_color_space">Lab color space</a> for the description of the LAB color spaces.
+</li><li>
+<a href="http://en.wikipedia.org/wiki/Low-discrepancy_sequence">Low-discrepancy sequence</a>
+Methods for nice multidimensional sampling
+</li>
+<li>
+Piotr Migdal's <a href="http://stackoverflow.com/a/28306100/412529">infinite color generator</a> for the idea of sampling all possible colors (instead of just certain slices of lightness).
+</li>
+<li>
+Matthew Sarsby's <a href="http://xqt2.com/p/colours_sim.html">colour picking by simulation</a> only works for up to about 12 colours (20 was reaaaaaaaly slow).
+</li>
+</ol>
+</p>
+</div>
