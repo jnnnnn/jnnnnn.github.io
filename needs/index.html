@@ -16,8 +16,8 @@ Original Author: Jonathan Newnham
 <script>
 
 var needs_data = []; // filled out from load_rows csv
-var width = 300;
-var height = 30;
+var width = 800;
+var height = 100;
 var x = d3.scaleLinear()
     .domain([0, 1])
     .range([0, width]);
@@ -50,9 +50,7 @@ function layout() {
   var sel = d3.select("div#needs").selectAll("div").data(needs_data);
   var need_divs = sel.enter()
     .append("div");
-  need_divs
-    .append("p")
-      .text(d => d.name);
+  //need_divs.append("p").text(d => d.name);
   var canvass = need_divs
     .append("canvas")
       .attr("width", width)
@@ -74,6 +72,16 @@ function draw_bar(datum) {
   context.lineTo(x(datum.response), height);
   context.strokeStyle = "black";
   context.stroke();
+
+  context.font = "30px 'Helvetica'";
+  context.fillStyle = "black";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.shadowColor = "white";
+  context.shadowBlur = 5;
+  context.strokeStyle = "white";
+  context.strokeText(datum.name, x(0.5), height/2);
+  //context.fillText(datum.name, x(0.5), height/2);
 }
 
 function onclick(datum) {
