@@ -34,6 +34,7 @@ function load_rows(csv_rows) {
       name: row.name,
       type: row.type,
       importance: row.importance,
+      response: 0.5,
     };
   });
 
@@ -47,6 +48,12 @@ function layout() {
   need_divs
     .append("p")
       .text(d => d.name);
+  var canvass = need_divs
+    .append("canvas")
+      .attr("width", width)
+      .attr("height", height)
+      .on("click", onclick)
+      .on("touch", onclick);
 }
 
 init();
