@@ -1,0 +1,45 @@
+name	type	importance
+air	physical	1
+drink	physical	1
+food	physical	1
+rest	physical	1
+shelter	physical	1
+clean/safe	physical	2
+exercise	physical	2
+touch	physical	2
+sex	physical	3
+adventure	mental	4
+challenge	mental	4
+personal space	mental	4
+acts of service	interpersonal	5
+appreciation (gifts)	interpersonal	5
+appreciation (words)	interpersonal	5
+quality time	interpersonal	5
+choosing dreams/goals/values	autonomy	10
+choosing plans for fulfilling dreams/goals/values	autonomy	10
+celebrating creation and success	celebration	10
+celebrating losses (mourning)	celebration	10
+authenticity	integrity	10
+creativity	integrity	10
+meaning	integrity	10
+self-worth	integrity	10
+acceptance	interdependence	10
+appreciation	interdependence	10
+closeness	interdependence	10
+community	interdependence	10
+consideration	interdependence	10
+emotional safety	interdependence	10
+empathy	interdependence	10
+honesty (the constructive kind)	interdependence	10
+love	interdependence	10
+reassurance	interdependence	10
+respect	interdependence	10
+support	interdependence	10
+trust	interdependence	10
+understanding	interdependence	10
+fun	play	10
+laughter	play	10
+beauty	spirituality	10
+inspiration	spirituality	10
+order	spirituality	10
+peace	spirituality	10

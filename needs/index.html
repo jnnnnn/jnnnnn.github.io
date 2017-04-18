@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+Needs.html: a tool for helping people express their needs.
+
+License: CC0
+Original Author: Jonathan Newnham
+-->
+<style>
+</style>
+<title>Needs Tool</title>
+<body>
+<div id="errors"></div>
+<div id="needs"></div>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var needs_data = []; // filled out from load_rows csv
+
+function init() {
+  d3.tsv("needs.tsv", function(error, csv_rows) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+    else
+      load_rows(csv_rows);
+  });
+}
+
+function load_rows(csv_rows) {
+  document.getElementById("errors").innerHTML = "";
+  needs_data = csv_rows.map(function(row) {
+    return {
+      name: row.name,
+      type: row.type,
+      importance: row.importance,
+    };
+  });
+
+  layout();
+}
+
+function layout() {
+  var sel = d3.select("div#needs").data(needs_data);
+  sel.enter()
+    .append("p")
+      .text(d => d.name);
+}
+
+init();
+
+</script>
+</body>
