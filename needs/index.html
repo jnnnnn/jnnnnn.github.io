@@ -21,7 +21,7 @@ var height = 30;
 var x = d3.scaleLinear()
     .domain([0, 1])
     .range([0, width]);
-var color = d3.interpolateInferno;
+var color = d3.interpolateWarm;
 
 function init() {
   d3.tsv("needs.tsv", function(error, csv_rows) {
