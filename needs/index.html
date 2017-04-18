@@ -21,7 +21,10 @@ var height = 100;
 var x = d3.scaleLinear()
     .domain([0, 1])
     .range([0, width]);
-var color = d3.interpolateWarm;
+var color = d3.scaleLinear()
+    .domain([0, 0.25, 0.5, 0.75, 1])
+    .range(["blue", "cyan", "green", "yellow", "red"])
+    .interpolate(d3.interpolateLab);
 
 function init() {
   d3.tsv("needs.tsv", function(error, csv_rows) {
