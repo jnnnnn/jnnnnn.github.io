@@ -36,13 +36,14 @@ function init() {
 }
 
 function load_rows(csv_rows) {
+  var urlparams = getUrlParams(window.location);
   document.getElementById("errors").innerHTML = "";
   needs_data = csv_rows.map(function(row) {
     return {
       name: row.name,
       type: row.type,
       importance: row.importance,
-      response: NaN,
+      response: parseFloat(urlparams[row.name] || NaN),
     };
   });
 
@@ -91,7 +92,32 @@ function draw_bar(datum) {
 function onclick(datum) {
   var coords = d3.mouse(this);
   datum.response = x.invert(coords[0]);
-  d3.select(this).each(draw_bar);
+  regenerate_url();
+  d3.select(this).each(draw_bar);  
+}
+
+function regenerate_url() {
+  params = "";
+  for (var d of needs_data) {
+    if (d.response >= 0 && d.response <= 1) {
+      params += "&" + encodeURI(d.name) + "=" + d.response.toFixed(2);
+    }
+  }  
+  window.history.replaceState({}, "Needs Tool", "index.html?"+params);
+}
+
+// http://stackoverflow.com/a/520845/412529
+function getUrlParams(url) {
+  var re = /(?:\?|&(?:amp;)?)([^=&#]+)(?:=?([^&#]*))/g,
+      match, params = {},
+      decode = function (s) {return decodeURIComponent(s.replace(/\+/g, " "));};
+
+  if (typeof url == "undefined") url = document.location.href;
+
+  while (match = re.exec(url)) {
+    params[decode(match[1])] = decode(match[2]);
+  }
+  return params;
 }
 
 init();
