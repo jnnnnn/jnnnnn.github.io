@@ -12,11 +12,16 @@ Original Author: Jonathan Newnham
 <body>
 <div id="errors"></div>
 <div id="needs"></div>
-
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
 var needs_data = []; // filled out from load_rows csv
+var width = 300;
+var height = 30;
+var x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([0, width]);
+var color = d3.interpolateInferno;
 
 function init() {
   d3.tsv("needs.tsv", function(error, csv_rows) {
@@ -54,6 +59,27 @@ function layout() {
       .attr("height", height)
       .on("click", onclick)
       .on("touch", onclick);
+
+  canvass.each(draw_bar);
+}
+
+function draw_bar(datum) {
+  var context = this.getContext("2d");
+
+  context.fillStyle = color(datum.response);
+  context.fillRect(0, 0, x(1), height);
+  
+  context.beginPath();
+  context.moveTo(x(datum.response), 0);
+  context.lineTo(x(datum.response), height);
+  context.strokeStyle = "black";
+  context.stroke();
+}
+
+function onclick(datum) {
+  var coords = d3.mouse(this);
+  datum.response = x.invert(coords[0]);
+  d3.select(this).each(draw_bar);
 }
 
 init();
