@@ -63,8 +63,8 @@ function layout() {
     .append("canvas")
       .attr("width", width)
       .attr("height", height)
-      .on("click", onclick)
-      .on("touch", onclick);
+      .on("mousedown", onclick)
+      .on("touchstart", onclick);
   canvass.each(draw_bar);
 }
 
