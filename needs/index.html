@@ -20,7 +20,7 @@ div#needs div {
 <script>
 
 var needs_data = []; // filled out from load_rows csv
-var width = 900;
+var width = 800;
 var height = 120;
 var x = d3.scaleLinear()
     .domain([0, 1])
@@ -71,7 +71,7 @@ function layout() {
 function draw_bar(datum) {
   var context = this.getContext("2d");
 
-  context.font = "40px 'Helvetica'";
+  context.font = "36px 'Helvetica'";
   context.fillStyle = "black";
   context.textAlign = "center";
   context.textBaseline = "middle";
