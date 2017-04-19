@@ -27,7 +27,7 @@ var x = d3.scaleLinear()
     .range([0, width]);
 var color = d3.scaleLinear()
     .domain([0, 0.25, 0.5, 0.75, 1])
-    .range(["blue", "cyan", "green", "yellow", "red"])
+    .range(["blue", d3.color("cyan").darker(), "green", d3.color("yellow").darker(), "red"])
     .interpolate(d3.interpolateLab);
 
 function init() {
@@ -85,11 +85,22 @@ function draw_bar(datum) {
   context.moveTo(x(datum.response), 0);
   context.lineTo(x(datum.response), height);
   context.strokeStyle = "black";
+  context.lineWidth = 5;  
   context.stroke();
 
+  context.lineWidth = 1;
   context.strokeStyle = "white";
   context.strokeText(datum.name, x(0.5), height/2);
   //context.fillText(datum.name, x(0.5), height/2);
+
+  var r = datum.response;
+  var subtext = r < 0.1 ? "fulfilled" : 
+    r < 0.3 ? "satisfied" : 
+    r < 0.9 ? "want more" : 
+    r < 1.0 ? "desperate" : "";
+
+  context.font = "20px 'Helvetica'";
+  context.fillText(subtext, x(0.5), height/2 + 30);
 }
 
 function onclick(datum) {
