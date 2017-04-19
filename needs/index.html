@@ -21,7 +21,7 @@ div#needs div {
 
 var needs_data = []; // filled out from load_rows csv
 var width = 800;
-var height = 100;
+var height = 120;
 var x = d3.scaleLinear()
     .domain([0, 1])
     .range([0, width]);
@@ -71,7 +71,7 @@ function layout() {
 function draw_bar(datum) {
   var context = this.getContext("2d");
 
-  context.font = "30px 'Helvetica'";
+  context.font = "40px 'Helvetica'";
   context.fillStyle = "black";
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -99,8 +99,8 @@ function draw_bar(datum) {
     r < 0.9 ? "want more" : 
     r < 1.0 ? "desperate" : "";
 
-  context.font = "20px 'Helvetica'";
-  context.fillText(subtext, x(0.5), height/2 + 30);
+  context.font = "30px 'Helvetica'";
+  context.fillText(subtext, x(0.5), height/2 + 35);
 }
 
 function onclick(datum) {
