@@ -26,36 +26,47 @@ var x = d3.scaleLinear();
 var y = d3.scaleLinear();
 
 var stops = [];
-var timings = [];
+var stops_map = d3.map();
+var stoptimes = [];
 
 function init() {
 	loadstops();
+  loadroutes();
 }
 
 function loadstops() {
   d3.csv("gtfs/2/stops.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-    else
-      load_rows(csv_rows);
+    else {
+      stops = csv_rows.map(row => ({
+          stop_id: row.stop_id,
+          stop_name: row.stop_name,
+          stop_lat: parseFloat(row.stop_lat),
+          stop_lon: parseFloat(row.stop_lon),        
+      }));
+      for (let stop of stops) {
+        stops_map[stop.stop_id] = stop;
+      }
+      layout();
+    }
   });
 }
 
-function load_rows(csv_rows) {
-  document.getElementById("errors").innerHTML = "";
-  stops = csv_rows.map(function(row) {
-    return {
-      stop_id: row.stop_id,
-      stop_name: row.stop_name,
-      stop_lat: parseFloat(row.stop_lat),
-      stop_lon: parseFloat(row.stop_lon),
-    };
+function loadroutes() {
+  d3.csv("gtfs/2/stop_times.txt", function(error, csv_rows) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+    else {
+      stoptimes = d3.nest().key(csvrow => csvrow.trip_id).entries(csv_rows);
+      layout();
+    }
   });
-
-  layout();
 }
 
 function layout() {
+  if (!(stops && stoptimes))
+    return;
   var miny = d3.min(stops.map(d=>d.stop_lat));
   var maxy = d3.max(stops.map(d=>d.stop_lat));
   var minx = d3.min(stops.map(d=>d.stop_lon));
@@ -82,6 +93,29 @@ function update() {
       .attr("r", 5)
     .append("svg:title")
       .text(d=>d.stop_name);
+
+  var path = d3.select("svg").selectAll("path").data(stoptimes);
+  path
+    .enter()
+    .append("path")
+      .attr("stroke", "red")
+      .attr("stroke-width", 1)
+      .attr("d", d=>makepath(d.values))
+    .append("title")
+      .text(d=>d.key);
+}
+
+// given a bunch of stop_times rows, such as
+// trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled
+// "4037.T2.2-CRB-G-mjp-1.1.H","06:21:00","06:21:00","45793","2","","0","0","8480.94045265525"
+// generate an SVG path.
+function makepath(csv_rows) {
+  result = "m";
+  for (let row of csv_rows) {
+    stop = stops_map[row.stop_id];
+    result += " " + Math.round(x(stop.stop_lon)) + "," + Math.round(y(stop.stop_lat));
+  }
+  return result;
 }
 
 init();
