@@ -65,7 +65,7 @@ function layout() {
     .range([0, width]);
   y = d3.scaleLinear()
     .domain([miny, maxy])
-    .range([0, height]);
+    .range([height, 0]);
 
   update();
 }
