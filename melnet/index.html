@@ -100,6 +100,7 @@ function update() {
     .append("path")
       .attr("stroke", "red")
       .attr("stroke-width", 1)
+      .attr("fill", "transparent")
       .attr("d", d=>makepath(d.values))
     .append("title")
       .text(d=>d.key);
@@ -110,7 +111,7 @@ function update() {
 // "4037.T2.2-CRB-G-mjp-1.1.H","06:21:00","06:21:00","45793","2","","0","0","8480.94045265525"
 // generate an SVG path.
 function makepath(csv_rows) {
-  result = "m";
+  result = "M";
   for (let row of csv_rows) {
     stop = stops_map[row.stop_id];
     result += " " + Math.round(x(stop.stop_lon)) + "," + Math.round(y(stop.stop_lat));
