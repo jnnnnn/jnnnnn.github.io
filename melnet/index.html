@@ -10,23 +10,30 @@ Original Author: Jonathan Newnham
 </style>
 <title>Melnet</title>
 <body>
-<div id="main"></div>
+<div id="errors"></div>
+<div id="main">
+  <svg id="chart" width="800" height="800">
+    
+  </svg>
+</div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
 var width = 800;
 var height = 800;
 
+var x = d3.scaleLinear();
+var y = d3.scaleLinear();
+
 var stops = [];
 var timings = [];
 
 function init() {
 	loadstops();
-	loadtimings();	
 }
 
 function loadstops() {
-  d3.tsv("needs.tsv", function(error, csv_rows) {
+  d3.csv("gtfs/2/stops.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else
@@ -35,14 +42,13 @@ function loadstops() {
 }
 
 function load_rows(csv_rows) {
-  var urlparams = getUrlParams(window.location);
   document.getElementById("errors").innerHTML = "";
-  needs_data = csv_rows.map(function(row) {
+  stops = csv_rows.map(function(row) {
     return {
-      name: row.name,
-      type: row.type,
-      importance: row.importance,
-      response: parseFloat(urlparams[row.name] || NaN),
+      stop_id: row.stop_id,
+      stop_name: row.stop_name,
+      stop_lat: parseFloat(row.stop_lat),
+      stop_lon: parseFloat(row.stop_lon),
     };
   });
 
@@ -50,86 +56,32 @@ function load_rows(csv_rows) {
 }
 
 function layout() {
-  var sel = d3.select("div#needs").selectAll("div").data(needs_data);
-  var need_divs = sel.enter()
-    .append("div");
-  //need_divs.append("p").text(d => d.name);
-  var canvass = need_divs
-    .append("canvas")
-      .attr("width", width)
-      .attr("height", height)
-      .on("mousedown", onclick)
-      .on("touch", onclick);
-  canvass.each(draw_bar);
+  var miny = d3.min(stops.map(d=>d.stop_lat));
+  var maxy = d3.max(stops.map(d=>d.stop_lat));
+  var minx = d3.min(stops.map(d=>d.stop_lon));
+  var maxx = d3.max(stops.map(d=>d.stop_lon));
+  x = d3.scaleLinear()
+    .domain([minx, maxx])
+    .range([0, width]);
+  y = d3.scaleLinear()
+    .domain([miny, maxy])
+    .range([0, height]);
+
+  update();
 }
 
-function draw_bar(datum) {
-  var context = this.getContext("2d");
-
-  context.font = "36px 'Helvetica'";
-  context.fillStyle = "black";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.shadowColor = "white";
-  context.shadowBlur = 5;
-
-  var r = datum.response; // 0...1
-  context.fillStyle = "black";
-  context.fillRect(0, 0, x(1), height);
-  context.fillStyle = color(r);
-  context.fillRect(r > 0.5 ? 0 : x(r), 0, r > 0.5 ? x(r) : x(1), height);
-  
-  context.beginPath();
-  context.moveTo(x(datum.response), 0);
-  context.lineTo(x(datum.response), height);
-  context.strokeStyle = "black";
-  context.lineWidth = 5;  
-  context.stroke();
-
-  context.lineWidth = 1.5;
-  context.strokeStyle = "white";
-  context.strokeText(datum.name, x(0.5), height/2);
-  //context.fillText(datum.name, x(0.5), height/2);
-
-  var r = datum.response;
-  var subtext = r < 0.1 ? "desperate" : 
-    r < 0.7 ? "want more" : 
-    r < 0.9 ? "satisfied" : 
-    r < 1.0 ? "fulfilled" : "";
-
-  context.font = "30px 'Helvetica'";
-  context.fillText(subtext, x(0.5), height/2 + 35);
-}
-
-function onclick(datum) {
-  var coords = d3.mouse(this);
-  datum.response = x.invert(coords[0]);
-  regenerate_url();
-  d3.select(this).each(draw_bar);  
-}
-
-function regenerate_url() {
-  params = "";
-  for (var d of needs_data) {
-    if (d.response >= 0 && d.response <= 1) {
-      params += "&" + encodeURI(d.name) + "=" + d.response.toFixed(2);
-    }
-  }  
-  window.history.replaceState({}, "Needs Tool", "index.html?"+params);
-}
-
-// http://stackoverflow.com/a/520845/412529
-function getUrlParams(url) {
-  var re = /(?:\?|&(?:amp;)?)([^=&#]+)(?:=?([^&#]*))/g,
-      match, params = {},
-      decode = function (s) {return decodeURIComponent(s.replace(/\+/g, " "));};
-
-  if (typeof url == "undefined") url = document.location.href;
-
-  while (match = re.exec(url)) {
-    params[decode(match[1])] = decode(match[2]);
-  }
-  return params;
+function update() {
+  var sel = d3.select("svg").selectAll("circle").data(stops);
+  sel
+    .enter()
+    .append("circle")
+      .style("stroke", "black")
+      .style("fill", "grey")
+      .attr("cx", d=>x(d.stop_lon))
+      .attr("cy", d=>y(d.stop_lat))
+      .attr("r", 5)
+    .append("svg:title")
+      .text(d=>d.stop_name);
 }
 
 init();

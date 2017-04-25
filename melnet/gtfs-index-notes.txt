@@ -1,0 +1,66 @@
+gtfs\1 71 vline routes?
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"1-Ech-mjp-1","","","Echuca/Moama - Melbourne Via Bendigo or Heathcote","2"
+"1-Ech-A-mjp-1","","","Echuca/Moama - Melbourne Via Bendigo or Heathcote","2"
+"1-Ech-B-mjp-1","","","Echuca/Moama - Melbourne Via Bendigo or Heathcote","2"
+
+
+gtfs\10 6 overland train to adelaide
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"10-GSR-mjp-1","","Overland","Adelaide - Melbourne","2"
+"10-GSR-A-mjp-1","","Overland","Adelaide","2"
+"10-GSR-C-mjp-1","","Overland","Melbourne","2"
+
+
+gtfs\11 2 skybus
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"11-SKY-mjp-1","","SkyBus","City - Melbourne Airport","3"
+
+
+gtfs\2 84 metro train
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"2-ALM-C-mjp-1","","Alamein","City (Flinders Street) - Alamein","2"
+"2-ALM-D-mjp-1","","Alamein","City (Flinders Street) - Alamein","2"
+"2-ALM-E-mjp-1","","Alamein","City (Flinders Street) - Alamein","2"
+
+
+gtfs\3 98 tram
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"3-1-mjp-1","","1","South Melbourne Beach - East Coburg","0"
+"3-1-A-mjp-1","","1","South Melbourne Beach - East Coburg","0"
+"3-1-B-mjp-1","","1","South Melbourne Beach - East Coburg","0"
+
+
+gtfs\4 343 metro bus
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"4-PMA-mjp-1","","109 Express","Arts Centre","3"
+"4-150-mjp-1","","150","Williams Landing Station - Tarneit Station","3"
+"4-151-mjp-1","","151","Williams Landing Station - Tarneit Station","3"
+
+
+gtfs\5 231
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"5-V45-mjp-1","","","Swan Hill - Melbourne Via Bendigo","3"
+"5-V45-B-mjp-1","","","Swan Hill - Melbourne Via Bendigo","3"
+"5-V45-C-mjp-1","","","Swan Hill - Melbourne Via Bendigo","3"
+
+
+gtfs\6 316
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"6-54n-mjp-1","","","Wonthaggi - Traralgon Via Inverloch, Leongatha & Mirboo Nth","3"
+"6-855-mjp-1","","","Traralgon - Yarram Via Gormandale","3"
+"6-86N-mjp-1","","","Horsham - Kaniva Via Dimboola & Nhill","3"
+
+
+gtfs\7 8
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"7-B01-mjp-1","","TeleBus 1","Lilydale Station - Chirnside Park SC","3"
+"7-B02-mjp-1","","TeleBus 2","Mooroolbark Station - Chirnside Park SC","3"
+"7-B03-mjp-1","","TeleBus 3","Mooroolbark Station - Chirnside Park SC","3"
+
+
+gtfs\8 22 
+﻿route_id,agency_id,route_short_name,route_long_name,route_type
+"8-941-mjp-1","","941","City - Watergardens","3"
+"8-942-mjp-1","","942","City - St Albans","3"
+"8-943-mjp-1","","943","Watergardens Station - Melton","3"
