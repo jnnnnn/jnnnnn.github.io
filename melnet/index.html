@@ -11,6 +11,11 @@ Original Author: Jonathan Newnham
 <title>Melnet</title>
 <body>
 <div id="errors"></div>
+<div id="controls">
+  <input type="text" id="time" placeholder="current time" onchange="updateTime();"/> 
+  <button id="play" onclick="start();">Start</button>
+  <button id="pause" onclick="pause();">Pause</button>
+</div>
 <div id="main">
   <svg id="chart" width="800" height="800">
     
@@ -22,7 +27,9 @@ Original Author: Jonathan Newnham
 var width = 800;
 var height = 800;
 
-var slowupdateinterval = 100; // ms
+var slowupdateinterval = 1000; // ms
+
+var gtfsdata = "gtfs/4/";
 
 var x = d3.scaleLinear();
 var y = d3.scaleLinear();
@@ -34,7 +41,7 @@ var vehicles = [];
 var calendars = []; // key: service_id -> monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
 var trips_map = d3.map(); // key: trip_id -> route_id,service_id,trip_id,shape_id,trip_headsign,direction_id
 
-var now = new Date(2017,4,1,5);
+var now = new Date(2017,4,1,10);
 var parseTime = d3.timeParse("%H:%M:%S");
 function parseTimeFull(s) {
   var time = parseTime(s);  
@@ -49,9 +56,10 @@ function init() {
 }
 
 function loadstops() {
-  d3.csv("gtfs/2/stops.txt", function(error, csv_rows) {
+  d3.select("div#errors").text("Loading stops");
+  d3.csv(gtfsdata+"stops.txt", function(error, csv_rows) {
     if (error)
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
       stops = csv_rows.map(row => ({
           stop_id: row.stop_id,
@@ -70,7 +78,8 @@ function loadstops() {
 }
 
 function loadcalendar() {
-  d3.csv("gtfs/2/calendar.txt", function(error, csv_rows) {
+  d3.select("div#errors").text("Loading calendar");
+  d3.csv(gtfsdata+"calendar.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
@@ -81,7 +90,8 @@ function loadcalendar() {
 }
 
 function loadtrips() {
-  d3.csv("gtfs/2/trips.txt", function(error, csv_rows) {
+  d3.select("div#errors").text("Loading trips");
+  d3.csv(gtfsdata+"trips.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
@@ -95,26 +105,26 @@ function loadtrips() {
 
 
 function loadroutes() {
-  console.log("CSV loading started");
-  d3.csv("gtfs/2/stop_times.txt", function(error, csv_rows) {
+  d3.select("div#errors").text("Loading stop times");
+  d3.csv(gtfsdata+"stop_times.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-    else {
-      console.log("Nesting started");
+    else {      
+      d3.select("div#errors").text("Grouping stop times");     
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
-      console.log("Nesting finished");
+      console.log(allstoptimes.length + " trips in the stop times list.");
+      d3.select("div#errors").text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) 
           row.departure_time = parseTimeFull(row.departure_time);
         stoptimes.min = d3.min(stoptimes.values.map(row=>row.departure_time));
         stoptimes.max = d3.max(stoptimes.values.map(row=>row.departure_time));
       }
-      console.log("Times parsed");
+      d3.select("div#errors").text("");
       //stoptimess = allstoptimes.filter(stoptimes => stoptimes.min < now && now < stoptimes.max);
       stoptimess = allstoptimes;
-      //console.log("Times filtered");
     }
 
     setInterval(update, slowupdateinterval);
@@ -245,10 +255,9 @@ function render() {
 
 function update() {
   now = new Date(now.getTime() + 6*10*slowupdateinterval);
-  d3.select("div#errors").text(now);
+  d3.select("input#time").attr("value", now);
   computeVehiclePositions();
   renderVehicles();
-  console.log(now);
 }
 
 // given a bunch of stop_times rows, such as
@@ -262,6 +271,16 @@ function makepath(csv_rows) {
     result += " " + Math.round(x(stop.stop_lon)) + "," + Math.round(y(stop.stop_lat));
   }
   return result;
+}
+
+function updateTime() {
+}
+
+function start() {
+
+}
+function pause() {
+
 }
 
 init();
