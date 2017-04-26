@@ -11,21 +11,28 @@ Original Author: Jonathan Newnham
 <title>Melnet</title>
 <body>
 <div id="errors"></div>
+<div id="controls">
+  <input type="text" id="time" size="30" />
+  <button onclick="start();">Start</button>
+  <button onclick="pause();">Pause</button>
+</div>
 <div id="main">
-  <svg id="chart" width="800" height="800">
-    
+  <svg id="chart" width="1000" height="1000">
+    <image xlink:href="http://i.imgur.com/xC1rTuO.jpg" x="0" y="0" height="1000px" width="1000px" />
   </svg>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var width = 800;
-var height = 800;
+var width = 1000;
+var height = 1000;
 
 var slowupdateinterval = 100; // ms
 
 var x = d3.scaleLinear();
 var y = d3.scaleLinear();
+
+var timer;
 
 var stops = [];
 var stops_map = d3.map(); // key: stop_id
@@ -42,6 +49,15 @@ function parseTimeFull(s) {
   time.setMonth(now.getMonth());
   time.setDate(now.getDate());
   return time;
+}
+
+function start() {
+  clearInterval(timer);
+  timer = setInterval(update, slowupdateinterval);
+}
+
+function pause() {
+  clearInterval(timer);
 }
 
 function init() {
@@ -117,7 +133,7 @@ function loadroutes() {
       //console.log("Times filtered");
     }
 
-    setInterval(update, slowupdateinterval);
+    timer = setInterval(update, slowupdateinterval);
   });
 }
 
@@ -248,7 +264,6 @@ function update() {
   d3.select("div#errors").text(now);
   computeVehiclePositions();
   renderVehicles();
-  console.log(now);
 }
 
 // given a bunch of stop_times rows, such as
