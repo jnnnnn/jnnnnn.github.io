@@ -12,13 +12,13 @@ Original Author: Jonathan Newnham
 <body>
 <div id="errors"></div>
 <div id="controls">
-  <input type="text" id="time" placeholder="current time" onchange="updateTime();"/> 
-  <button id="play" onclick="start();">Start</button>
-  <button id="pause" onclick="pause();">Pause</button>
+  <input type="text" id="time" size="30" />
+  <button onclick="start();">Start</button>
+  <button onclick="pause();">Pause</button>
 </div>
 <div id="main">
-  <svg id="chart" width="800" height="800">
-    
+  <svg id="chart" width="1000" height="1000">
+    <image xlink:href="http://i.imgur.com/xC1rTuO.jpg" x="0" y="0" height="1000px" width="1000px" />
   </svg>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -33,6 +33,8 @@ var gtfsdata = "gtfs/4/";
 
 var x = d3.scaleLinear();
 var y = d3.scaleLinear();
+
+var timer;
 
 var stops = [];
 var stops_map = d3.map(); // key: stop_id
@@ -49,6 +51,15 @@ function parseTimeFull(s) {
   time.setMonth(now.getMonth());
   time.setDate(now.getDate());
   return time;
+}
+
+function start() {
+  clearInterval(timer);
+  timer = setInterval(update, slowupdateinterval);
+}
+
+function pause() {
+  clearInterval(timer);
 }
 
 function init() {
@@ -127,7 +138,7 @@ function loadroutes() {
       stoptimess = allstoptimes;
     }
 
-    setInterval(update, slowupdateinterval);
+    timer = setInterval(update, slowupdateinterval);
   });
 }
 
@@ -271,16 +282,6 @@ function makepath(csv_rows) {
     result += " " + Math.round(x(stop.stop_lon)) + "," + Math.round(y(stop.stop_lat));
   }
   return result;
-}
-
-function updateTime() {
-}
-
-function start() {
-
-}
-function pause() {
-
 }
 
 init();
