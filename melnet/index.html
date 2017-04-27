@@ -31,8 +31,8 @@ var height = 1000;
 // 1000 is much less demanding
 var slowupdateinterval = 100; // ms
 
-var gtfsdata = "gtfs/4/"; // which dataset to use
-var stoptimesfile = gtfsdata+"stop_times-filtered.txt"; // generate a smaller stop_times.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
+var gtfsdata = "gtfs/2/"; // which dataset to use
+var stoptimesfile = gtfsdata+"stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM) -- should match splitter.py setting
 
 // pretty terrible map alignment (cast and rectangular fit) because I can't be bothered doing a proper projection mapping.
