@@ -24,15 +24,24 @@ Original Author: Jonathan Newnham
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var width = 800;
-var height = 800;
+var width = 1000;
+var height = 1000;
 
 var slowupdateinterval = 1000; // ms
 
 var gtfsdata = "gtfs/4/";
+var stoptimesfile = gtfsdata+"stop_times-filtered.txt";
 
-var x = d3.scaleLinear();
-var y = d3.scaleLinear();
+
+var lonwidth = 0.68;
+var x = d3.scaleLinear()
+    .domain([145.0737485429375 - lonwidth, 145.0737485429375 + lonwidth])
+    .range([0, width]);
+
+var latwidth = 0.54;
+var y = d3.scaleLinear()
+    .domain([-37.9766627535362 - latwidth, -37.9766627535362 + latwidth])
+    .range([height, 0]);
 
 var timer;
 
@@ -82,8 +91,8 @@ function loadstops() {
         stops_map[stop.stop_id] = stop;
       }
     }
-    layout();
-    renderstations();
+    //layout();
+    //renderstations();
     loadcalendar();
   });
 }
@@ -117,11 +126,12 @@ function loadtrips() {
 
 function loadroutes() {
   d3.select("div#errors").text("Loading stop times");
-  d3.csv(gtfsdata+"stop_times.txt", function(error, csv_rows) {
+  d3.csv(stoptimesfile, function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {      
-      d3.select("div#errors").text("Grouping stop times");     
+      d3.select("div#errors").text("Grouping stop times"); 
+      console.log(csv_rows[0]);    
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
