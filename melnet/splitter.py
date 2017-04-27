@@ -1,7 +1,7 @@
 import os, csv, datetime
 
-window_start = datetime.datetime(2017, 5, 1, 10, 0)
-window_end = datetime.datetime(2017, 5, 1, 11, 0)
+window_start = datetime.datetime(2017, 5, 1, 10, 0) # 1 May, 10am
+window_end = datetime.datetime(2017, 5, 1, 11, 0) # 1 May, 11am
 
 for args, dirname, files in os.walk('gtfs'):    
 	if 'stop_times.txt' in files:
