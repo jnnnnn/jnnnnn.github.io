@@ -15,6 +15,7 @@ Original Author: Jonathan Newnham
   <input type="text" id="time" size="30" />
   <button onclick="start();">Start</button>
   <button onclick="pause();">Pause</button>
+  <button onclick="window.now=new Date(document.getElementById('time').value);">Set Time</button>
 </div>
 <div id="main">
   <svg id="chart" width="1000" height="1000">
@@ -31,8 +32,7 @@ var height = 1000;
 // 1000 is much less demanding
 var slowupdateinterval = 100; // ms
 
-var gtfsdata = "gtfs/2/"; // which dataset to use
-var stoptimesfile = gtfsdata+"stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
+var stoptimesfile = "stop_times-filtered.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM) -- should match splitter.py setting
 
 // pretty terrible map alignment (cast and rectangular fit) because I can't be bothered doing a proper projection mapping.
@@ -48,15 +48,12 @@ var y = d3.scaleLinear()
     .domain([-37.9766627535362 - latwidth, -37.9766627535362 + latwidth])
     .range([height, 0]);
 
+var colors = d3.scaleOrdinal()
+  .range(["#66aeff", "#fe7a0b", "#0bc811", "#fe5aea", "#a5a898", "#bca602", "#16bfb8", "#b59bcd", "#e98391", "#6abb81", "#93aabe", "#d1976c", "#be9ba7", "#d77efc", "#a09dfc", "#d888c3", "#89b742", "#17bae3", "#a6ac69"]);
+
 var timer;
 
-var stops = [];
-var stops_map = d3.map(); // key: stop_id
-var stoptimess = [];
-var vehicles = [];
-var calendars = []; // key: service_id -> monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
-var trips_map = d3.map(); // key: trip_id -> route_id,service_id,trip_id,shape_id,trip_headsign,direction_id
-
+var datasets = [];
 var parseTime = d3.timeParse("%H:%M:%S");
 function parseTimeFull(s) {
   var time = parseTime(s);  
@@ -69,6 +66,11 @@ function parseTimeFull(s) {
 function start() {
   clearInterval(timer);
   timer = setInterval(update, slowupdateinterval);
+
+  // create a group for each dataset, to put vehicles etc. in.  
+  var g = d3.select("svg").selectAll("g").data(datasets, d=>d.key);
+  g.enter().append("g").attr("class", d=>"data"+d.key);
+  g.exit().remove();
 }
 
 function pause() {
@@ -76,70 +78,86 @@ function pause() {
 }
 
 function init() {
-	loadstops();
+  dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
+  colors.domain(dataset_keys);
+  for (let key of dataset_keys) {
+    dataset = { 
+        "key": key, 
+        "gtfsdatapath": "gtfs/"+key+"/",
+        "color": d3.color(colors(key)),
+        "stops": [],
+        "stops_map": d3.map(), // key: stop_id
+        "stoptimess": [],
+        "vehicles": [],
+        "calendars": [], // key: service_id -> monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+        "trips_map": d3.map(), // key: trip_id -> route_id,service_id,trip_id,shape_id,trip_headsign,direction_id
+      }
+    datasets.push(dataset);
+	  loadstops(dataset);
+  }
 }
 
-function loadstops() {
+function loadstops(dataset) {
   d3.select("div#errors").text("Loading stops");
-  d3.csv(gtfsdata+"stops.txt", function(error, csv_rows) {
+  d3.csv(dataset.gtfsdatapath+"stops.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
-      stops = csv_rows.map(row => ({
+      dataset.stops = csv_rows.map(row => ({
           stop_id: row.stop_id,
           stop_name: row.stop_name,
           stop_lat: parseFloat(row.stop_lat),
           stop_lon: parseFloat(row.stop_lon),        
       }));
-      for (let stop of stops) {
-        stops_map[stop.stop_id] = stop;
+      for (let stop of dataset.stops) {
+        dataset.stops_map[stop.stop_id] = stop;
       }
     }
     //layout();
-    //renderstations();
-    loadcalendar();
+    renderstations();
+    loadcalendar(dataset);
   });
 }
 
-function loadcalendar() {
+function loadcalendar(dataset) {
   d3.select("div#errors").text("Loading calendar");
-  d3.csv(gtfsdata+"calendar.txt", function(error, csv_rows) {
+  d3.csv(dataset.gtfsdatapath+"calendar.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
-      calendars = csv_rows;
+      dataset.calendars = csv_rows;
     }
-    loadtrips();
+    loadtrips(dataset);
   });
 }
 
-function loadtrips() {
+function loadtrips(dataset) {
   d3.select("div#errors").text("Loading trips");
-  d3.csv(gtfsdata+"trips.txt", function(error, csv_rows) {
+  d3.csv(dataset.gtfsdatapath+"trips.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
       for (let trip of csv_rows) {
-        trips_map[trip.trip_id] = trip;
+        dataset.trips_map[trip.trip_id] = trip;
       }
     }
-    loadroutes();
+    loadroutes(dataset);
   });
 }
 
 
-function loadroutes() {
+function loadroutes(dataset) {
   d3.select("div#errors").text("Loading stop times");
-  d3.csv(stoptimesfile, function(error, csv_rows) {
+  d3.csv(dataset.gtfsdatapath+stoptimesfile, function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-    else {      
+    else {
       d3.select("div#errors").text("Grouping stop times"); 
-      console.log(csv_rows[0]);    
+      //console.log(csv_rows[0]);    
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
-      console.log(allstoptimes.length + " trips in the stop times list.");
+      //console.log(allstoptimes.length + " trips in the stop times list.");
       d3.select("div#errors").text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) 
@@ -149,10 +167,8 @@ function loadroutes() {
       }
       d3.select("div#errors").text("");
       //stoptimess = allstoptimes.filter(stoptimes => stoptimes.min < now && now < stoptimes.max);
-      stoptimess = allstoptimes;
+      dataset.stoptimess = allstoptimes;
     }
-
-    timer = setInterval(update, slowupdateinterval);
   });
 }
 
@@ -160,50 +176,63 @@ var easer = function(x1, x2, t1, t2, t) {
   return  x1 + (x2 - x1) * d3.easeQuadInOut((t - t1) / (t2 - t1));
 }
 
+// I'm lazy, this is a bad algorithm -- it currently checks every trip (to see 
+// if it should be displayed) every frame, and for active trips, it checks every stop. 
+// A better foundation would be a queue of upcoming trips indexed by start time, and 
+// each trip as a queue as well. 
+// Doing that would require explicit support for discontinuous jumps though.
 function computeVehiclePositions() {
-  vehicles = [];
-
-  let current_services = d3.set();
   let day = d3.timeFormat("%A")(now).toLowerCase();
-  for (let service of calendars)
-  {    
-    if (!(service[day] === "1"))
-      continue;
-    if (d3.timeParse("%Y%m%d")(service.start_date) > now)
-      continue;
-    if (d3.timeParse("%Y%m%d")(service.end_date) < now)
-      continue;
-    current_services.add(service.service_id);     
-  }
+  for (let dataset of datasets) {
+    let current_services = d3.set();    
+    dataset.vehicles = [];
+    let vehicles = dataset.vehicles;
+      
+    for (let service of dataset.calendars)
+    {    
+      if (!(service[day] === "1"))
+        continue;
+      if (d3.timeParse("%Y%m%d")(service.start_date) > now)
+        continue;
+      if (d3.timeParse("%Y%m%d")(service.end_date) < now)
+        continue;
+      current_services.add(service.service_id);     
+    }
+    
+    var stops_map = dataset.stops_map;
+    for (let stoptimes of dataset.stoptimess) {
+      let trip_id = stoptimes.key;
+      if (!current_services.has(dataset.trips_map[trip_id].service_id))
+        continue;
+      if (stoptimes.min > now || stoptimes.max < now)
+        continue;
 
-  for (let stoptimes of stoptimess) {
-    let trip_id = stoptimes.key;
-    if (!current_services.has(trips_map[trip_id].service_id))
-      continue;
-
-    for (var i = 0; i < stoptimes.values.length-1; i++) {
-      let legstart = stoptimes.values[i];
-      let legend = stoptimes.values[i+1];      
-      if (legstart.departure_time <= now && now < legend.departure_time) {
-        var frac = (now - legstart.departure_time) / (legend.departure_time - legstart.departure_time);
-        vehicles.push({ 
-          key: stoptimes.key,
-          lat: easer(stops_map[legstart.stop_id].stop_lat, stops_map[legend.stop_id].stop_lat, legstart.departure_time, legend.departure_time, now),
-          lon: easer(stops_map[legstart.stop_id].stop_lon, stops_map[legend.stop_id].stop_lon, legstart.departure_time, legend.departure_time, now),
-        });
-        break;
+      for (var i = 0; i < stoptimes.values.length-1; i++) {
+        let legstart = stoptimes.values[i];
+        let legend = stoptimes.values[i+1];      
+        if (legstart.departure_time <= now && now < legend.departure_time) {
+          var frac = (now - legstart.departure_time) / (legend.departure_time - legstart.departure_time);
+          vehicles.push({ 
+            key: stoptimes.key,
+            lat: easer(stops_map[legstart.stop_id].stop_lat, stops_map[legend.stop_id].stop_lat, legstart.departure_time, legend.departure_time, now),
+            lon: easer(stops_map[legstart.stop_id].stop_lon, stops_map[legend.stop_id].stop_lon, legstart.departure_time, legend.departure_time, now),
+          });
+          break;
+        }
       }
     }
   }
 }
 
-function layout() {
-  if (!(stops && stoptimess))
+// Computes bounds of first dataset so that it fits nicely on the screen.
+function layout() {  
+  let dataset = datasets[0];
+  if (!(dataset.stops && dataset.stoptimess))
     return;
-  var miny = d3.min(stops.map(d=>d.stop_lat));
-  var maxy = d3.max(stops.map(d=>d.stop_lat));
-  var minx = d3.min(stops.map(d=>d.stop_lon));
-  var maxx = d3.max(stops.map(d=>d.stop_lon));
+  var miny = d3.min(dataset.stops.map(d=>d.stop_lat));
+  var maxy = d3.max(dataset.stops.map(d=>d.stop_lat));
+  var minx = d3.min(dataset.stops.map(d=>d.stop_lon));
+  var maxx = d3.max(dataset.stops.map(d=>d.stop_lon));
   x = d3.scaleLinear()
     .domain([minx, maxx])
     .range([0, width]);
@@ -213,69 +242,85 @@ function layout() {
 }
 
 function renderstations() {
-  var sel = d3.select("svg").selectAll("g.station").data(stops);
-  sel
-    .enter()
-    .append("g")
-      .classed("station", true)
-    .append("circle")
-      .style("stroke", "black")
-      .style("fill", "transparent")
-      .attr("cx", d=>x(d.stop_lon))
-      .attr("cy", d=>y(d.stop_lat))
-      .attr("r", 3)
-    .append("svg:title")
-      .text(d=>d.stop_name);
+  for (let dataset of datasets) {
+    var sel = d3.select("svg")
+      .select("g.data"+dataset.key)
+      .selectAll("g.station").data(dataset.stops);
+    sel
+      .enter()
+      .append("g")
+        .classed("station", true)
+      .append("circle")
+        .style("stroke", "black")
+        .style("fill", "transparent")
+        .attr("cx", d=>x(d.stop_lon))
+        .attr("cy", d=>y(d.stop_lat))
+        .attr("r", 3)
+      .append("svg:title")
+        .text(d=>d.stop_name);
+  }
 }
 
 function rendertracks() {
-  var path = d3.select("svg").selectAll("g.route").data(stoptimess);
-  path
-    .enter()
-    .append("g")
-      .classed("route", true)
-    .append("path")
-      .attr("stroke", "red")
-      .attr("stroke-width", 1)
-      .attr("fill", "transparent")
-      .attr("d", d=>makepath(d.values))
-    .append("title")
-      .text(d=>d.key);
-  path
-    .exit()
-    .remove();
+  for (let dataset of datasets) {
+    var path = d3.select("svg")
+      .select("g.data"+dataset.key)
+      .selectAll("g.route").data(dataset.stoptimess);
+
+    path
+      .enter()
+      .append("g")
+        .classed("route", true)
+      .append("path")
+        .attr("stroke", dataset.color.darker())
+        .attr("stroke-width", 1)
+        .attr("fill", "transparent")
+        .attr("d", d=>makepath(dataset, d.values))
+      .append("title")
+        .text(d=>d.key);
+    path
+      .exit()
+      .remove();
+  }
 }
 
 function renderVehicles() {
-  var vehicledots = d3.select("svg").selectAll("g.vehicle").data(vehicles, d=>d.key);
-  vehicledots
-    .enter()
-    .append("g")
-      .classed("vehicle", true)
-      .attr("transform", d => "translate(" + x(d.lon) + "," + y(d.lat) + ")")
-    .append("circle")
-      .style("stroke", "blue")
-      .style("fill", "transparent")
-      .attr("r", 1)
-      //.attr("opacity", 0)
-    .append("svg:title")
-      .text(d=>d.key);
-
   var t = d3.transition()
       .duration(slowupdateinterval)
       .ease(d3.easeLinear);
-  
-  vehicledots.exit().remove();
+
+  for (let dataset of datasets) {
+    var vehicledots = d3.select("svg")
+      .select("g.data"+dataset.key)
+      .selectAll("g.vehicle")
+      .data(dataset.vehicles, d=>d.key);
+
+    vehicledots
+      .enter()
+      .append("g")
+        .classed("vehicle", true)
+        .attr("transform", d => "translate(" + x(d.lon) + "," + y(d.lat) + ")")
+      .append("circle")
+        .style("stroke", dataset.color)
+        .style("fill", "transparent")
+        .attr("r", 1)
+        //.attr("opacity", 0)
+      .append("svg:title")
+        .text(d=>d.key);
+    
+    vehicledots.exit().remove();
+  }
 
   d3.select("svg").selectAll("g.vehicle")
-      .transition(t)
+      //.transition(t)
       .attr("opacity", 1)
       .attr("transform", d=>"translate(" + x(d.lon) + "," + y(d.lat) + ")");
+
 }
 
 function update() {
   now = new Date(now.getTime() + 6*10*slowupdateinterval);
-  d3.select("input#time").attr("value", now);
+  d3.select("input#time").node().value = now;
   computeVehiclePositions();
   //rendertracks();
   renderVehicles();
@@ -285,10 +330,10 @@ function update() {
 // trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled
 // "4037.T2.2-CRB-G-mjp-1.1.H","06:21:00","06:21:00","45793","2","","0","0","8480.94045265525"
 // generate an SVG path.
-function makepath(csv_rows) {
+function makepath(dataset, csv_rows) {
   result = "M";
   for (let row of csv_rows) {
-    stop = stops_map[row.stop_id];
+    stop = dataset.stops_map[row.stop_id];
     result += " " + Math.round(x(stop.stop_lon)) + "," + Math.round(y(stop.stop_lat));
   }
   return result;
