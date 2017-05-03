@@ -127,7 +127,22 @@ function loadcalendar(dataset) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
-      dataset.calendars = csv_rows;
+      dataset.calendars = [];
+      for (let service_row of csv_rows)
+      {
+        dataset.calendars.push({
+          start_date: d3.timeParse("%Y%m%d")(service_row.start_date),
+          end_date: d3.timeParse("%Y%m%d")(service_row.end_date),
+          monday: service_row.monday,
+          tuesday: service_row.tuesday,
+          wednesday: service_row.wednesday,
+          thursday: service_row.thursday,
+          friday: service_row.friday,
+          saturday: service_row.saturday,
+          sunday: service_row.sunday,
+          service_id: service_row.service_id,
+        });
+      }
     }
     loadtrips(dataset);
   });
@@ -194,9 +209,9 @@ function computeVehiclePositions() {
     {    
       if (!(service[day] === "1"))
         continue;
-      if (d3.timeParse("%Y%m%d")(service.start_date) > now)
+      if (service.start_date > now)
         continue;
-      if (d3.timeParse("%Y%m%d")(service.end_date) < now)
+      if (service.end_date < now)
         continue;
       current_services.add(service.service_id);     
     }
