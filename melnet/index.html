@@ -95,7 +95,10 @@ function init() {
 }
 
 function loadstops(dataset) {
-  d3.select("div#errors").text("Loading stops");
+  d3.select("div#errors")
+    .append("div")
+      .classed("data"+dataset.key, true)
+      .text("Loading stops");
   d3.csv(dataset.gtfsdatapath+"stops.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
@@ -117,7 +120,7 @@ function loadstops(dataset) {
 }
 
 function loadcalendar(dataset) {
-  d3.select("div#errors").text("Loading calendar");
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading calendar");
   d3.csv(dataset.gtfsdatapath+"calendar.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
@@ -144,7 +147,7 @@ function loadcalendar(dataset) {
 }
 
 function loadtrips(dataset) {
-  d3.select("div#errors").text("Loading trips");
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading trips");
   d3.csv(dataset.gtfsdatapath+"trips.txt", function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
@@ -159,25 +162,25 @@ function loadtrips(dataset) {
 
 
 function loadroutes(dataset) {
-  d3.select("div#errors").text("Loading stop times");
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading stop times");
   d3.csv(dataset.gtfsdatapath+stoptimesfile, function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
     else {
-      d3.select("div#errors").text("Grouping stop times"); 
+      d3.select("div#errors").select("div.data"+dataset.key).text("Grouping stop times"); 
       //console.log(csv_rows[0]);    
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
       //console.log(allstoptimes.length + " trips in the stop times list.");
-      d3.select("div#errors").text("Parsing stop times");
+      d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) 
           row.departure_time = parseTimeFull(row.departure_time);
         stoptimes.min = d3.min(stoptimes.values.map(row=>row.departure_time));
         stoptimes.max = d3.max(stoptimes.values.map(row=>row.departure_time));
       }
-      d3.select("div#errors").text("");
+      d3.select("div#errors").select("div.data"+dataset.key).remove();
       //stoptimess = allstoptimes.filter(stoptimes => stoptimes.min < now && now < stoptimes.max);
       allstoptimes.sort((a,b)=>d3.ascending(a.min, b.min));
       dataset.stoptimess = allstoptimes;
