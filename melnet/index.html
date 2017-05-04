@@ -344,8 +344,8 @@ function renderVehicles() {
         .attr("transform", d => "translate(" + x(d.lon) + "," + y(d.lat) + ")")
         .attr("opacity", 0)
       .append("circle")
-        .style("stroke", dataset.color)
-        .style("fill", "transparent")
+        .style("stroke", "transparent")
+        .style("fill", dataset.color)
         .attr("r", 1)
         
       .append("svg:title")
