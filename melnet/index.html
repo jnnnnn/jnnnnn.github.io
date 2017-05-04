@@ -40,6 +40,8 @@ var height = 1000;
 var slowupdateinterval = 100; // ms
 
 var stoptimesfile = "stop_times-filtered.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
+var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
+dataset_keys = ["2", "3", "4"];
 var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM) -- should match splitter.py setting
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
@@ -78,8 +80,6 @@ function pause() {
 }
 
 function init() {
-  dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
-  //dataset_keys = ["2"];
   colors.domain(dataset_keys);
   for (let key of dataset_keys) {
     dataset = { 
