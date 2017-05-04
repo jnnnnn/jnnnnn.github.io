@@ -303,7 +303,7 @@ function rendertracks() {
   for (let dataset of datasets) {
     var path = d3.select("svg")
       .select("g.data"+dataset.key)
-      .selectAll("g.route").data(dataset.stoptimess);
+      .selectAll("g.route").data(dataset.vehicles);
 
     path
       .enter()
@@ -312,9 +312,9 @@ function rendertracks() {
       .append("path")
         .attr("stroke", dataset.color)
         .attr("stroke-width", 1)
-        .attr("stroke-opacity", 0.03)
+        .attr("stroke-opacity", 0.1)
         .attr("fill", "transparent")
-        .attr("d", d=>makepath(dataset, d.values))
+        .attr("d", d=>makepath(dataset, d.legs))
       .append("title")
         .text(d=>d.key);
     path
