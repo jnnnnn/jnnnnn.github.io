@@ -257,7 +257,9 @@ function computeVehiclePositions() {
         if (vehicle.legs[vehicle.legindex].departure_time > now) 
           break;
       }
-      // compute position based on easing through the current leg
+      // compute position based on easing through the current leg      
+      if (vehicle.legindex >= vehicle.legs.length)        
+        continue;
       let legstart = vehicle.legs[vehicle.legindex - 1];
       let legend = vehicle.legs[vehicle.legindex];
       vehicle.lat = easer(stops_map[legstart.stop_id].stop_lat, stops_map[legend.stop_id].stop_lat, legstart.departure_time, legend.departure_time, now);
