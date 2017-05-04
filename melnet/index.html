@@ -31,7 +31,7 @@ This code is licensed as CC-0 so do whatever you want with it.
   <button onclick="start();">Start</button>
   <button onclick="pause();">Pause</button>
   <button onclick="settime(0);">Set Time</button>
-  <input type="range" id="timeslider" style="width:500px" onchange="settime(1);" />
+  <input type="range" id="timeslider" style="width:500px" oninput="settime(1);" />
 </div>
 <div id="main">
   <svg id="chart" width="1000" height="1000">
@@ -70,6 +70,7 @@ var colors = d3.scaleOrdinal()
   .range(["#66aeff", "#fe7a0b", "#0bc811", "#fe5aea", "#a5a898", "#bca602", "#16bfb8", "#b59bcd", "#e98391", "#6abb81", "#93aabe", "#d1976c", "#be9ba7", "#d77efc", "#a09dfc", "#d888c3", "#89b742", "#17bae3", "#a6ac69"]);
 
 var timer;
+var ticking = false; // whether timer=setInterval is active
 
 var datasets = [];
 var parseTime = d3.timeParse("%H:%M:%S");
@@ -84,6 +85,7 @@ function parseTimeFull(s) {
 function start() {
   clearInterval(timer);
   timer = setInterval(update, slowupdateinterval);
+  ticking = true;
 
   // create a group for each dataset, to put vehicles etc. in.  
   var g = d3.select("svg").selectAll("g").data(datasets, d=>d.key);
@@ -96,6 +98,7 @@ function start() {
 
 function pause() {
   clearInterval(timer);
+  ticking = false;
 }
 
 function init() {
@@ -400,9 +403,11 @@ function renderVehicles() {
 }
 
 function update() {
-  now = new Date(now.getTime() + 6*10*slowupdateinterval);
-  document.getElementById("timeslider").value = now.valueOf();
-  d3.select("input#time").node().value = now;
+  if (ticking){
+    now = new Date(now.getTime() + 6*10*slowupdateinterval);
+    document.getElementById("timeslider").value = now.valueOf();
+  }
+  d3.select("input#time").node().value = now;  
   computeVehiclePositions();
   //rendertracks();
   renderVehicles();
@@ -424,6 +429,8 @@ function settime(type) {
       vehicle.legindex = 1;
     */
   }
+  if (!ticking)
+    update();
 }
 
 // given a bunch of stop_times rows, such as
