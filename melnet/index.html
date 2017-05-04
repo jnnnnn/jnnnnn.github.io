@@ -177,8 +177,8 @@ function loadroutes(dataset) {
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) 
           row.departure_time = parseTimeFull(row.departure_time);
-        stoptimes.min = d3.min(stoptimes.values.map(row=>row.departure_time));
-        stoptimes.max = d3.max(stoptimes.values.map(row=>row.departure_time));
+        stoptimes.min = stoptimes.values[0].departure_time;
+        stoptimes.max = stoptimes.values[stoptimes.values.length-1].departure_time;
       }
       d3.select("div#errors").select("div.data"+dataset.key).remove();
       //stoptimess = allstoptimes.filter(stoptimes => stoptimes.min < now && now < stoptimes.max);
