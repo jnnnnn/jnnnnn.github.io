@@ -24,6 +24,8 @@ for args, dirname, files in os.walk('gtfs'):
 			quoting=csv.QUOTE_ALL,
 			lineterminator='\n')
 		fout.writeheader()
+		prevstoptime = None
+		prevtrip = None
 		for row in f: 
 			try:
 				trip = trips[row['trip_id']]
@@ -32,9 +34,20 @@ for args, dirname, files in os.walk('gtfs'):
 					continue
 				if service[window_start.strftime('%A').lower()] != "1":
 					continue
-				stoptime = datetime.datetime.strptime(row['departure_time'], '%H:%M:%S').time()
+				stoptime = datetime.datetime.strptime(row['departure_time'], '%H:%M:%S').time()								
 				if stoptime < window_start.time() or stoptime > window_end.time():
-					continue
+					continue				
+
+				# detect teleporting vehicles and fudge the stop times so they don't jump
+				if stoptime == prevstoptime and row['trip_id'] == prevtrip:
+					#print("teleportation!", args, row)
+					stoptime = stoptime.replace(second=30)
+					row['departure_time'] = stoptime.strftime('%H:%M:%S')
+					#print(row)
+				prevstoptime = stoptime				
+				prevtrip = row['trip_id']
+
 				fout.writerow(row)
 			except Exception as e:
-				print(e)
+				#print(e)
+				pass
