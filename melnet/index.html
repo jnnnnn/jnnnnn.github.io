@@ -260,23 +260,28 @@ function computeVehiclePositions() {
 
 // Computes bounds of first dataset so that it fits nicely on the screen.
 function layout() {  
-  let dataset = datasets[0];
-  if (!(dataset.stops && dataset.stoptimess))
-    return;
-  var miny = d3.min(dataset.stops.map(d=>d.stop_lat));
-  var maxy = d3.max(dataset.stops.map(d=>d.stop_lat));
-  var minx = d3.min(dataset.stops.map(d=>d.stop_lon));
-  var maxx = d3.max(dataset.stops.map(d=>d.stop_lon));
-  
+  var miny = 90;
+  var minx = 180;
+  var maxy = -90;
+  var maxx = -180;
+  for (let dataset of datasets) {
+    if (!(dataset.stops && dataset.stoptimess))
+      return; // not fully loaded yet
+    var miny = Math.min(miny, d3.min(dataset.stops.map(d=>d.stop_lat)));
+    var maxy = Math.max(maxy, d3.max(dataset.stops.map(d=>d.stop_lat)));
+    var minx = Math.min(minx, d3.min(dataset.stops.map(d=>d.stop_lon)));
+    var maxx = Math.max(maxx, d3.max(dataset.stops.map(d=>d.stop_lon)));
+  }
   // zoom to fit width because the calculation is easier
   var longitude_width = maxx - minx;  
-  var zoom_level = Math.log2(width / longitude_width * 180 / 128);
+  var zoom_level = Math.floor(Math.log2(width / longitude_width * 180 / 128)); // floor might zoom in too much but cutting edges off is better than being too far out
   projection = d3.geoMercator()
     .center([(minx + maxx)/2, (miny + maxy)/2]) 
     .scale( (1 << 8 + zoom_level) / 2 / Math.PI ) 
     .translate([width / 2, height / 2]); 
 
   console.log("projection:", width, 'px ×', height, 'px, center = ', (minx + maxx)/2, (miny + maxy)/2, ', zoom=', zoom_level);
+  console.log(projection([minx, miny]), projection([maxx, maxy]));
 }
 
 function renderstations() {
