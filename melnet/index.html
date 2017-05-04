@@ -372,6 +372,7 @@ function update() {
 
 function settime() {
   now = new Date(document.getElementById('time').value);
+  lastnow = new Date(2000, 1, 1); // reset this so that we add all vehicles necessary on next tick
   // reset performance-optimization indices that assume time is monotonic
   for (let dataset of datasets) {
     dataset.stoptimessindex = 0;
