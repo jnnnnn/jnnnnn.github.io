@@ -5,6 +5,21 @@ Melnet.html: a tool for visualising GTFS data
 
 License: CC0
 Original Author: Jonathan Newnham
+
+0. Clone this repository to your local machine. Install python 3 if you haven't already.
+1. Download a GTFS dataset. If you don't use Melbourne, you will need to generate a new background map (or just remove it) and uncomment the call to layout() to automatically fit to the geographical coordinates.
+2. If it's a zip file, extract everything into gtfs/*. If there are zip files inside the folders, extract those too.
+3. If stop_times.txt is >50MB, run splitter.py to cut out a small section.
+4. Set parameters at the top of index.html:
+  var gtfsdata = "gtfs/4/"; // which dataset to use. For Melbourne, 2 is trains, 3 is trams, 4 is buses.
+  var stoptimesfile = gtfsdata+"stop_times-filtered.txt"; // generate a smaller stop_times.txt using splitter.py - 100MB ones don't work because the browser runs out of memory loading them
+  var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM) - should match splitter.py setting
+5. run start_server.bat, and click "melnet" when it opens the index page. You might have to point it to the right python folder (I use anaconda but plain python will be C:\Python35\python.exe)
+6. you can turn on routes display by uncommenting rendertracks();
+7. you can turn on stops (stations) display by uncommenting renderstations().
+
+This code is licensed as CC-0 so do whatever you want with it.
+
 -->
 <style>
 </style>
@@ -47,8 +62,8 @@ var now = new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) 
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 var projection = d3.geoMercator()
-  .center([144.9670397,-37.817744]) // center of melbourne train network limits
-  .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 10
+  .center([144.9670397,-37.817744]) // melbourne city centre
+  .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 12
   .translate([500, 500]); // width/2, height/2
 
 var colors = d3.scaleOrdinal()
