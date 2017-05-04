@@ -15,7 +15,8 @@ Original Author: Jonathan Newnham
   <input type="text" id="time" size="30" />
   <button onclick="start();">Start</button>
   <button onclick="pause();">Pause</button>
-  <button onclick="settime();">Set Time</button>
+  <button onclick="settime(0);">Set Time</button>
+  <input type="range" id="timeslider" style="width:500px" onchange="settime(1);" />
 </div>
 <div id="main">
   <svg id="chart" width="1000" height="1000">
@@ -42,7 +43,7 @@ var slowupdateinterval = 100; // ms
 var stoptimesfile = "stop_times-filtered.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
 dataset_keys = ["2", "3", "4"];
-var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM) -- should match splitter.py setting
+var now = new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 var projection = d3.geoMercator()
@@ -73,6 +74,9 @@ function start() {
   var g = d3.select("svg").selectAll("g").data(datasets, d=>d.key);
   g.enter().append("g").attr("class", d=>"data"+d.key);
   g.exit().remove();
+
+  document.getElementById("timeslider").min = new Date(2017,4,1,5).valueOf();
+  document.getElementById("timeslider").max = new Date(2017,4,1,12).valueOf();  
 }
 
 function pause() {
@@ -382,14 +386,19 @@ function renderVehicles() {
 
 function update() {
   now = new Date(now.getTime() + 6*10*slowupdateinterval);
+  document.getElementById("timeslider").value = now.valueOf();
   d3.select("input#time").node().value = now;
   computeVehiclePositions();
   //rendertracks();
   renderVehicles();
 }
 
-function settime() {
-  now = new Date(document.getElementById('time').value);
+function settime(type) {
+  if (type == 1)
+    now = new Date(+d3.select('#timeslider').node().value);
+  else
+    now = new Date(document.getElementById('time').value);
+  d3.select("input#time").node().value = now;
   lastnow = new Date(2000, 1, 1); // reset this so that we add all vehicles necessary on next tick
   // reset performance-optimization indices that assume time is monotonic
   for (let dataset of datasets) {
