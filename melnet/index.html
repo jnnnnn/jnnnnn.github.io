@@ -20,7 +20,13 @@ Original Author: Jonathan Newnham
 <div id="main">
   <svg id="chart" width="1000" height="1000">
     <!-- generated with http://open.mapquestapi.com/staticmap/v4/getmap?key=SECRET_KEY&size=1000,1000&zoom=10&center=-37.9766627535362,145.0737485429375 -->
-    <image xlink:href="http://i.imgur.com/xC1rTuO.jpg" x="0" y="0" height="1000px" width="1000px" />
+    <!--<image xlink:href="http://i.imgur.com/xC1rTuO.jpg" x="0" y="0" height="1000px" width="1000px" />-->
+    <!-- zoom=12&center=-37.817744,144.9670397.jpg -->
+    <image xlink:href="http://i.imgur.com/eIvhRMf.jpg" x="0" y="0" height="1000px" width="1000px" />
+    <!-- zoom=11&center=-37.817744,144.9670397.jpg -->
+    <!--<image xlink:href="http://i.imgur.com/EwapVG0.jpg" x="0" y="0" height="1000px" width="1000px" />-->
+
+    
   </svg>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -38,8 +44,8 @@ var now = new Date(2017,4,1,10); // date to start from (this is 1 May 2017, 10AM
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 var projection = d3.geoMercator()
-  .center([145.0737485429375, -37.9766627535362]) // center of melbourne train network limits
-  .scale( (1 << 8 + 10) / 2 / Math.PI ) // zoom level 10
+  .center([144.9670397,-37.817744]) // center of melbourne train network limits
+  .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 10
   .translate([500, 500]); // width/2, height/2
 
 var colors = d3.scaleOrdinal()
