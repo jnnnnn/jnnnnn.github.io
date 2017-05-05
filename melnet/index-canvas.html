@@ -49,7 +49,9 @@ var height = 1000;
 // 1000 is much less demanding
 var slowupdateinterval = 20; // ms
 
-var stoptimesfile = "stop_times-filtered.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
+var mapquestkey = "MAPQUEST_API_KEY_GOES_HERE";
+
+var stoptimesfile = "stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
 dataset_keys = ["2", "3", "4"];
 var now = new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
@@ -201,11 +203,10 @@ function loadroutes(dataset) {
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) {
           row.departure_time = parseTimeFull(row.departure_time);   
-          if (!layout) {       
-            let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
-            row.x = c[0];
-            row.y = c[1];
-          }
+          // todo: make sure this only happens once layout has completed -- do it separately?
+          let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
+          row.x = c[0];
+          row.y = c[1];
         }
         stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
         if (stoptimes.values.length > 1) {
@@ -320,6 +321,14 @@ function compute_projection() {
 
   console.log("projection:", width, 'px ×', height, 'px, center = ', (minx + maxx)/2, (miny + maxy)/2, ', zoom=', zoom_level);
   console.log(projection([minx, miny]), projection([maxx, maxy]));
+
+  if (layout) {
+    document.getElementById("map").src = 
+      "http://open.mapquestapi.com/staticmap/v4/getmap?key=" + mapquestkey +
+      "&size=" + width + "," + height + 
+      "&zoom="+ zoom_level +
+      "&center="+(miny + maxy)/2+","+(minx + maxx)/2;
+  }
 }
 
 function renderstations() {
