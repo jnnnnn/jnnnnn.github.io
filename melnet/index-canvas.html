@@ -203,13 +203,20 @@ function loadroutes(dataset) {
       //console.log(allstoptimes.length + " trips in the stop times list.");
       d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
-        for (let row of stoptimes.values) 
-          row.departure_time = parseTimeFull(row.departure_time);
-        stoptimes.min = stoptimes.values[0].departure_time;
-        stoptimes.max = stoptimes.values[stoptimes.values.length-1].departure_time;
+        for (let row of stoptimes.values) {
+          row.departure_time = parseTimeFull(row.departure_time);          
+          let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
+          row.x = c[0];
+          row.y = c[1];
+        }
+        stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
+        if (stoptimes.values.length > 1) {
+          stoptimes.min = stoptimes.values[0].departure_time;
+          stoptimes.max = stoptimes.values[stoptimes.values.length-1].departure_time;
+        }
       }
       d3.select("div#errors").select("div.data"+dataset.key).remove();
-      //stoptimess = allstoptimes.filter(stoptimes => stoptimes.min < now && now < stoptimes.max);
+      allstoptimes = allstoptimes.filter(stoptimes => stoptimes.values.length > 1);
       allstoptimes.sort((a,b)=>d3.ascending(a.min, b.min));
       dataset.stoptimess = allstoptimes;
     }
@@ -246,7 +253,7 @@ function computeVehiclePositions() {
 
     // add new ones    
     let vehicles = dataset.vehicles;
-    vehicles.sort((a,b)=>d3.ascending(a.key, b.key));
+    //vehicles.sort((a,b)=>d3.ascending(a.key, b.key));
     for (let i = dataset.stoptimessindex; i < dataset.stoptimess.length; i++) {
       let stoptimes = dataset.stoptimess[i];
 
@@ -284,8 +291,8 @@ function computeVehiclePositions() {
         continue;
       let legstart = vehicle.legs[vehicle.legindex - 1];
       let legend = vehicle.legs[vehicle.legindex];
-      vehicle.lat = easer(stops_map[legstart.stop_id].stop_lat, stops_map[legend.stop_id].stop_lat, legstart.departure_time, legend.departure_time, now);
-      vehicle.lon = easer(stops_map[legstart.stop_id].stop_lon, stops_map[legend.stop_id].stop_lon, legstart.departure_time, legend.departure_time, now);
+      vehicle.x = easer(legstart.x, legend.x, legstart.departure_time, legend.departure_time, now);
+      vehicle.y = easer(legstart.y, legend.y, legstart.departure_time, legend.departure_time, now);
     }
   }
   lastnow = now;
@@ -381,7 +388,7 @@ function renderVehicles() {
       .enter()
       .append("g")
         .classed("vehicle", true)
-        .attr("transform", projected_transform)
+        .attr("transform", d => "translate(" + d.x + "," + d.y + ")")
         .attr("opacity", 0)
       .append("circle")
         .style("stroke", "transparent")
@@ -397,7 +404,7 @@ function renderVehicles() {
   }
 
   d3.select("svg").selectAll("g.vehicle")
-      .attr("transform", projected_transform)
+      .attr("transform", d => "translate(" + d.x + "," + d.y + ")")
       .transition(t)
       .attr("opacity", 1);
 }
