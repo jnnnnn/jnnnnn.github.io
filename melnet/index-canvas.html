@@ -55,6 +55,7 @@ dataset_keys = ["2", "3", "4"];
 var now = new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
+var layout = false;
 var projection = d3.geoMercator()
   .center([144.9670397,-37.817744]) // melbourne city centre
   .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 12
@@ -135,7 +136,8 @@ function loadstops(dataset) {
         dataset.stops_map[stop.stop_id] = stop;
       }
     }
-    //layout();
+    if (layout)
+      compute_projection();
     renderstations();
     loadcalendar(dataset);
   });
@@ -198,10 +200,12 @@ function loadroutes(dataset) {
       d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) {
-          row.departure_time = parseTimeFull(row.departure_time);          
-          let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
-          row.x = c[0];
-          row.y = c[1];
+          row.departure_time = parseTimeFull(row.departure_time);   
+          if (!layout) {       
+            let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
+            row.x = c[0];
+            row.y = c[1];
+          }
         }
         stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
         if (stoptimes.values.length > 1) {
@@ -293,7 +297,7 @@ function computeVehiclePositions() {
 }
 
 // Computes bounds of first dataset so that it fits nicely on the screen.
-function layout() {  
+function compute_projection() {  
   var miny = 90;
   var minx = 180;
   var maxy = -90;
@@ -338,39 +342,22 @@ function renderstations() {
   }
 }
 
-function rendertracks() {
+function rendertracks(ctx) {
   for (let dataset of datasets) {
-    var path = d3.select("svg")
-      .select("g.data"+dataset.key)
-      .selectAll("g.route").data(dataset.vehicles);
-
-    path
-      .enter()
-      .append("g")
-        .classed("route", true)
-      .append("path")
-        .attr("stroke", dataset.color)
-        .attr("stroke-width", 1)
-        .attr("stroke-opacity", 0.1)
-        .attr("fill", "transparent")
-        .attr("d", d=>makepath(dataset, d.legs))
-      .append("title")
-        .text(d=>d.key);
-    path
-      .exit()
-      .remove();
+    ctx.strokeStyle = dataset.color;
+    ctx.lineWidth = 0.5;
+    for (vehicle of dataset.vehicles) {
+      ctx.beginPath();
+      ctx.moveTo(vehicle.legs[0].x, vehicle.legs[0].y);
+      for (leg of vehicle.legs) {
+        ctx.lineTo(leg.x, leg.y);
+      }
+      ctx.stroke();
+    }
   }
 }
 
-function projected_transform(d) {
-    let c = projection([d.lon, d.lat]); 
-    return "translate(" + c[0] + "," + c[1] + ")";
-}
-
-function renderVehicles() {
-  var canvas  = document.getElementById("chart");
-  var ctx = canvas.getContext("2d");
-  ctx.drawImage(document.getElementById("map"), 0, 0);
+function renderVehicles(ctx) {  
   for (let dataset of datasets) {
     ctx.fillStyle = dataset.color;
     for (let vehicle of dataset.vehicles) {
@@ -385,9 +372,16 @@ function update() {
     document.getElementById("timeslider").value = now.valueOf();
   }
   d3.select("input#time").node().value = now;  
+
+  var canvas  = document.getElementById("chart");
+  var ctx = canvas.getContext("2d");
+  ctx.save()
+  ctx.globalAlpha = 0.05;
+  ctx.drawImage(document.getElementById("map"), 0, 0);
+  ctx.restore()
   computeVehiclePositions();
-  //rendertracks();
-  renderVehicles();
+  //rendertracks(ctx);
+  renderVehicles(ctx);
 }
 
 function settime(type) {
