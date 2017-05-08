@@ -51,17 +51,18 @@ var slowupdateinterval = 20; // ms
 
 var mapquestkey = "MAPQUEST_API_KEY_GOES_HERE";
 
+var rootfolder = "gtfs-wellington/";
 var stoptimesfile = "stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
-dataset_keys = ["2", "3", "4"];
-var now = new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
+//dataset_keys = ["2", "3", "4"];
+var now = new Date() // new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 // layout=true: compute bounds of dataset automatically and generate map from MapQuest using mapquestkey, above
 // layout=false: use the defined projection and whatever map is specified in the image tag, above
-var layout = false;
+var layout = true;
 var projection = d3.geoMercator()
-  .center([144.9670397,-37.817744]) // melbourne city centre
+  .center([144.968853,-37.817986]) // melbourne city centre
   .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 12
   .translate([500, 500]); // width/2, height/2
 
@@ -91,8 +92,18 @@ function start() {
   g.enter().append("g").attr("class", d=>"data"+d.key);
   g.exit().remove();
 
-  document.getElementById("timeslider").min = new Date(2017,4,1,5).valueOf();
-  document.getElementById("timeslider").max = new Date(2017,4,1,12).valueOf();  
+  var datemin = new Date();
+  datemin.setHours(5);
+  datemin.setMinutes(0);
+  datemin.setSeconds(0);
+
+  var datemax = new Date();
+  datemax.setHours(23);
+  datemax.setMinutes(0);
+  datemax.setSeconds(0);
+
+  document.getElementById("timeslider").min = datemin.valueOf();
+  document.getElementById("timeslider").max = datemax.valueOf();  
 }
 
 function pause() {
@@ -206,11 +217,12 @@ function loadroutes(dataset) {
         for (let row of stoptimes.values) {
           row.departure_time = parseTimeFull(row.departure_time);   
           // todo: make sure this only happens once layout has completed -- do it separately?
+          // do projection here instead of on demand because on demand makes the chrome and firefox garbage collectors thrash and causes stuttering
           let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
           row.x = c[0];
           row.y = c[1];
         }
-        stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
+        //stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
         if (stoptimes.values.length > 1) {
           stoptimes.min = stoptimes.values[0].departure_time;
           stoptimes.max = stoptimes.values[stoptimes.values.length-1].departure_time;
@@ -379,7 +391,7 @@ function renderVehicles(ctx) {
 
 function update() {
   if (ticking){
-    now = new Date(now.getTime() + 6*10*slowupdateinterval);
+    now = new Date(now.getTime() + slowupdateinterval);
     document.getElementById("timeslider").value = now.valueOf();
   }
   d3.select("input#time").node().value = now;  
@@ -399,7 +411,7 @@ function settime(type) {
   if (type == 1)
     now = new Date(+d3.select('#timeslider').node().value);
   else
-    now = new Date(document.getElementById('time').value);
+    now = new Date();
   d3.select("input#time").node().value = now;
   lastnow = new Date(2000, 1, 1); // reset this so that we add all vehicles necessary on next tick
   // reset performance-optimization indices that assume time is monotonic
