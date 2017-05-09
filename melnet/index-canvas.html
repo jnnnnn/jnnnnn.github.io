@@ -22,6 +22,8 @@ This code is licensed as CC-0 so do whatever you want with it.
 
 -->
 <style>
+div, canvas { display:inline; }
+div#errors { display: block; }
 </style>
 <title>Melnet</title>
 <body>
@@ -33,11 +35,14 @@ This code is licensed as CC-0 so do whatever you want with it.
   <button onclick="settime(0);">Set Time</button>
   <input type="range" id="timeslider" style="width:500px" oninput="settime(1);" />
 </div>
+
 <div id="main">  
-  <canvas id="chart" width="1000" height="1000"></canvas>
-  <div style="visibility:hidden; display:inline">
-    <img src="http://i.imgur.com/eIvhRMf.jpg" id="map" height="1000" width="1000"/>
-  </div>
+  <canvas id="chart" width="1000" height="1000"></canvas>  
+  <div id="legend" style="float:right"/>
+</div>
+
+<div style="visibility:hidden;">
+  <img src="http://open.mapquestapi.com/staticmap/v4/getmap?key=SECRET_MAP_KEY&size=1000,1000&zoom=12&center=-41.243574,174.883046" id="map" height="1000" width="1000"/>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
@@ -61,10 +66,11 @@ var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know
 // layout=true: compute bounds of dataset automatically and generate map from MapQuest using mapquestkey, above
 // layout=false: use the defined projection and whatever map is specified in the image tag, above
 var layout = true;
+var automap = true;
 var projection = d3.geoMercator()
-  .center([144.968853,-37.817986]) // melbourne city centre
+  .center([174.883046, -41.243574]) // melbourne city centre
   .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 12
-  .translate([500, 500]); // width/2, height/2
+  .translate([width/2, height/2]);
 
 var colors = d3.scaleOrdinal()
   .range(["#66aeff", "#fe7a0b", "#0bc811", "#fe5aea", "#a5a898", "#bca602", "#16bfb8", "#b59bcd", "#e98391", "#6abb81", "#93aabe", "#d1976c", "#be9ba7", "#d77efc", "#a09dfc", "#d888c3", "#89b742", "#17bae3", "#a6ac69"]);
@@ -73,7 +79,9 @@ var timer;
 var ticking = false; // whether timer=setInterval is active
 
 var datasets = [];
+var agencies = d3.map();
 var parseTime = d3.timeParse("%H:%M:%S");
+var parseDate = d3.timeParse("Y%%m%d");
 function parseTimeFull(s) {
   var time = parseTime(s);  
   time.setFullYear(now.getFullYear());
@@ -112,12 +120,10 @@ function pause() {
 }
 
 function init() {
-  colors.domain(dataset_keys);
   for (let key of dataset_keys) {
     dataset = { 
         "key": key, 
-        "gtfsdatapath": "gtfs/"+key+"/",
-        "color": d3.color(colors(key)),
+        "gtfsdatapath": rootfolder+key+"/",
         "stops": [], // { "stops.txt" }
         "stops_map": d3.map(), // { stop_id : stops.txt }
         "stoptimess": [], // list of {key: trip_id, values: [stop_times.txt rows]}   sorted (by min(stop time)) 
@@ -125,11 +131,25 @@ function init() {
         "vehicles": [], // { key: trip_id, lat: , lon: }
         "calendars": [], // key: service_id -> monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
         "trips_map": d3.map(), // key: trip_id -> route_id,service_id,trip_id,shape_id,trip_headsign,direction_id
-
-      }
+        "loaded": false,
+    }
     datasets.push(dataset);
     loadstops(dataset);
   }
+}
+
+function completeLoading() {
+  for (let dataset of datasets) {
+    if (!dataset.loaded)
+      return;
+  }
+
+  compute_agency_colors();
+  if (layout)
+    compute_projection();
+  compute_screen_coordinates(); 
+  renderLegend();
+  start(); 
 }
 
 function loadstops(dataset) {
@@ -151,9 +171,26 @@ function loadstops(dataset) {
         dataset.stops_map[stop.stop_id] = stop;
       }
     }
-    if (layout)
-      compute_projection();
     renderstations();
+    loadagencies(dataset);
+  });
+}
+
+function loadagencies(dataset) {  
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading agencies");
+  d3.csv(dataset.gtfsdatapath+"agency.txt", function(error, csv_rows) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
+    else {
+      agencies.set(dataset.key, {name: dataset.key});
+      for (let row of csv_rows) {
+        agencies.set(dataset.key + "/" + row.agency_id, {
+          name: row.agency_name,
+          color: d3.color("black"), // set later
+        });
+      }
+    }
+    
     loadcalendar(dataset);
   });
 }
@@ -162,7 +199,7 @@ function loadcalendar(dataset) {
   d3.select("div#errors").select("div.data"+dataset.key).text("Loading calendar");
   d3.csv(dataset.gtfsdatapath+"calendar.txt", function(error, csv_rows) {
     if (error)
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
       dataset.calendars = [];
       for (let service_row of csv_rows)
@@ -181,6 +218,18 @@ function loadcalendar(dataset) {
         });
       }
     }
+    loadcalendarexceptions(dataset);
+  });
+}
+
+function loadcalendarexceptions(dataset) {
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading calendar exceptions");
+  d3.csv(dataset.gtfsdatapath+"calendar_dates.txt", function(error, csv_rows) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
+    else {
+      dataset.calendarExceptions = csv_rows; // service_id, date, exception_type=1(on) | 2(off)
+    }
     loadtrips(dataset);
   });
 }
@@ -189,7 +238,7 @@ function loadtrips(dataset) {
   d3.select("div#errors").select("div.data"+dataset.key).text("Loading trips");
   d3.csv(dataset.gtfsdatapath+"trips.txt", function(error, csv_rows) {
     if (error)
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
       for (let trip of csv_rows) {
         dataset.trips_map[trip.trip_id] = trip;
@@ -199,30 +248,36 @@ function loadtrips(dataset) {
   });
 }
 
-
 function loadroutes(dataset) {
+  d3.select("div#errors").select("div.data"+dataset.key).text("Loading trips");
+  d3.csv(dataset.gtfsdatapath+"routes.txt", function(error, csv_rows) {
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
+    else {
+      dataset.routes_map = d3.map();
+      for (let row of csv_rows) {
+        dataset.routes_map.set(row.route_id, row);
+      }
+    }
+    loadstoptimes(dataset);
+  });
+}
+
+function loadstoptimes(dataset) {
   d3.select("div#errors").select("div.data"+dataset.key).text("Loading stop times");
   d3.csv(dataset.gtfsdatapath+stoptimesfile, function(error, csv_rows) {
     if (error)
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
       d3.select("div#errors").select("div.data"+dataset.key).text("Grouping stop times"); 
-      //console.log(csv_rows[0]);    
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
-      //console.log(allstoptimes.length + " trips in the stop times list.");
       d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
         for (let row of stoptimes.values) {
           row.departure_time = parseTimeFull(row.departure_time);   
-          // todo: make sure this only happens once layout has completed -- do it separately?
-          // do projection here instead of on demand because on demand makes the chrome and firefox garbage collectors thrash and causes stuttering
-          let c = projection([dataset.stops_map[row.stop_id].stop_lon, dataset.stops_map[row.stop_id].stop_lat]);
-          row.x = c[0];
-          row.y = c[1];
         }
-        //stoptimes.values = stoptimes.values.filter(row => row.x > 0 && row.x < width && row.y > 0 && row.y < height);
         if (stoptimes.values.length > 1) {
           stoptimes.min = stoptimes.values[0].departure_time;
           stoptimes.max = stoptimes.values[stoptimes.values.length-1].departure_time;
@@ -233,6 +288,8 @@ function loadroutes(dataset) {
       allstoptimes.sort((a,b)=>d3.ascending(a.min, b.min));
       dataset.stoptimess = allstoptimes;
     }
+    dataset.loaded = true;
+    completeLoading();
   });
 }
 
@@ -249,16 +306,32 @@ function computeVehiclePositions() {
   
   let day = d3.timeFormat("%A")(now).toLowerCase();
   for (let dataset of datasets) {
-    let current_services = d3.set();
-    for (let service of dataset.calendars)
-    {    
-      if (!(service[day] === "1"))
-        continue;
-      if (service.start_date > now)
-        continue;
-      if (service.end_date < now)
-        continue;
-      current_services.add(service.service_id);     
+
+    // work out which services (trips) are active (so we can filter trips efficiently)
+    if ("undefined" === typeof dataset.current_services) {
+      dataset.current_services = d3.set();
+      for (let service of dataset.calendars)
+      {    
+        if (!(service[day] === "1"))
+          continue;
+        if (service.start_date > now)
+          continue;
+        if (service.end_date < now)
+          continue;
+        dataset.current_services.add(service.service_id);     
+      }
+
+      // parse exceptions (which some places (LOOKING AT YOU WELLINGTON) use to specify the whole calendar)
+      today = d3.timeFormat("%Y%m%d")(new Date());
+      for (let calendar_exception of dataset.calendarExceptions)
+      {
+        if (calendar_exception.date === today) {
+          if (calendar_exception.exception_type === "1")
+            dataset.current_services.add(calendar_exception.service_id);
+          else
+            dataset.current_services.remove(calendar_exception.service_id);
+        }
+      }
     }
 
     // remove old vehicles
@@ -271,16 +344,22 @@ function computeVehiclePositions() {
       let stoptimes = dataset.stoptimess[i];
 
       let trip_id = stoptimes.key;
-      if (!current_services.has(dataset.trips_map[trip_id].service_id))
+      let trip = dataset.trips_map[trip_id];
+      if (!dataset.current_services.has(trip.service_id))
         continue;
+      let agency_id = dataset.routes_map.get(trip.route_id).agency_id;
 
       if (stoptimes.min < now) {
         if (stoptimes.min >= lastnow && stoptimes.max > now) {
           // we just ticked past the min time for this trip.. so this vehicle just appeared. Add it to the active list.
+          let agency = agencies.get(dataset.key + "/" + agency_id);
+          if (!agency)
+            agency = agencies.get(dataset.key);
           vehicles.push({ 
             key: stoptimes.key,
             start: stoptimes.min,
             end: stoptimes.max,
+            color: agency.color,
             legs: stoptimes.values,          
             legindex: 1, // legs[legindex] is the upcoming stop
           });
@@ -311,6 +390,13 @@ function computeVehiclePositions() {
   lastnow = now;
 }
 
+// give each agency a unique color
+function compute_agency_colors() { 
+  colors.domain(agencies.keys());
+  for (agency_key of agencies.keys())
+    agencies.get(agency_key).color = d3.color(colors(agency_key));
+}
+
 // Computes bounds of first dataset so that it fits nicely on the screen.
 function compute_projection() {  
   var miny = 90;
@@ -327,7 +413,7 @@ function compute_projection() {
   }
   // zoom to fit width because the calculation is easier
   var longitude_width = maxx - minx;  
-  var zoom_level = Math.floor(Math.log2(width / longitude_width * 180 / 128)); // floor might zoom in too much but cutting edges off is better than being too far out
+  var zoom_level = Math.floor(Math.log2(width / longitude_width * 180 / 128)); 
   projection = d3.geoMercator()
     .center([(minx + maxx)/2, (miny + maxy)/2]) 
     .scale( (1 << 8 + zoom_level) / 2 / Math.PI ) 
@@ -336,12 +422,25 @@ function compute_projection() {
   console.log("projection:", width, 'px ×', height, 'px, center = ', (minx + maxx)/2, (miny + maxy)/2, ', zoom=', zoom_level);
   console.log(projection([minx, miny]), projection([maxx, maxy]));
 
-  if (layout) {
+  if (automap) {
     document.getElementById("map").src = 
       "http://open.mapquestapi.com/staticmap/v4/getmap?key=" + mapquestkey +
       "&size=" + width + "," + height + 
       "&zoom="+ zoom_level +
       "&center="+(miny + maxy)/2+","+(minx + maxx)/2;
+  }
+}
+
+function compute_screen_coordinates() {
+  for (let dataset of datasets) {
+    for (let stoptimes of dataset.stoptimess) {
+      for (let stoptime of stoptimes.values) {
+        // do projection here instead of on demand because on demand makes the chrome and firefox garbage collectors thrash and causes stuttering
+        let c = projection([dataset.stops_map[stoptime.stop_id].stop_lon, dataset.stops_map[stoptime.stop_id].stop_lat]);
+        stoptime.x = c[0];
+        stoptime.y = c[1];
+      }
+    }    
   }
 }
 
@@ -381,17 +480,27 @@ function rendertracks(ctx) {
 }
 
 function renderVehicles(ctx) {  
-  for (let dataset of datasets) {
-    ctx.fillStyle = dataset.color;
+  for (let dataset of datasets) {    
     for (let vehicle of dataset.vehicles) {
+      ctx.fillStyle = vehicle.color;
       ctx.fillRect(vehicle.x-1, vehicle.y-1, 3, 3);
     }
   }    
 }
 
+function renderLegend() {  
+  var sel = d3.select("div#legend").selectAll("div").data(agencies.keys());
+  sel.enter()
+    .append("div")
+    .append("p")
+      .style("color", d=>agencies.get(d).color)
+      .text(d=>agencies.get(d).name);
+  sel.exit().remove();
+}
+
 function update() {
   if (ticking){
-    now = new Date(now.getTime() + slowupdateinterval);
+    now = new Date(now.getTime() + 60*slowupdateinterval);
     document.getElementById("timeslider").value = now.valueOf();
   }
   d3.select("input#time").node().value = now;  
