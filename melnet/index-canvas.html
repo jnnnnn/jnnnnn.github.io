@@ -32,13 +32,12 @@ div#errors { display: block; }
   <input type="text" id="time" size="30" />
   <button onclick="start();">Start</button>
   <button onclick="pause();">Pause</button>
-  <button onclick="settime(0);">Set Time</button>
   <input type="range" id="timeslider" style="width:500px" oninput="settime(1);" />
 </div>
 
 <div id="main">  
   <canvas id="chart" width="1000" height="1000"></canvas>  
-  <div id="legend" style="float:right"/>
+  <div id="legend" style="float:left"/>
 </div>
 
 <div style="visibility:hidden;">
@@ -59,8 +58,8 @@ var mapquestkey = "MAPQUEST_API_KEY_GOES_HERE";
 var rootfolder = "gtfs-wellington/";
 var stoptimesfile = "stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
-//dataset_keys = ["2", "3", "4"];
-var now = new Date() // new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
+dataset_keys = ["1"];
+var now = new Date(2017, 4, 1, 5) // new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 // layout=true: compute bounds of dataset automatically and generate map from MapQuest using mapquestkey, above
@@ -69,7 +68,7 @@ var layout = true;
 var automap = true;
 var projection = d3.geoMercator()
   .center([174.883046, -41.243574]) // melbourne city centre
-  .scale( (1 << 8 + 12) / 2 / Math.PI ) // zoom level 12
+  .scale( (1 << 8 + 11) / 2 / Math.PI ) // zoom level 12
   .translate([width/2, height/2]);
 
 var colors = d3.scaleOrdinal()
@@ -100,12 +99,12 @@ function start() {
   g.enter().append("g").attr("class", d=>"data"+d.key);
   g.exit().remove();
 
-  var datemin = new Date();
+  var datemin = new Date(now);
   datemin.setHours(5);
   datemin.setMinutes(0);
   datemin.setSeconds(0);
 
-  var datemax = new Date();
+  var datemax = new Date(now);
   datemax.setHours(23);
   datemax.setMinutes(0);
   datemax.setSeconds(0);
@@ -146,7 +145,7 @@ function completeLoading() {
 
   compute_agency_colors();
   if (layout)
-    compute_projection();
+    zoom_to_all();
   compute_screen_coordinates(); 
   renderLegend();
   start(); 
@@ -182,12 +181,17 @@ function loadagencies(dataset) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
     else {
-      agencies.set(dataset.key, {name: dataset.key});
       for (let row of csv_rows) {
-        agencies.set(dataset.key + "/" + row.agency_id, {
+        let agency = {
           name: row.agency_name,
           color: d3.color("black"), // set later
-        });
+          latmin: 90, 
+          latmax: -90, 
+          lonmin: 180, 
+          lonmax: -180,
+        };
+        agencies.set(dataset.key + "/" + row.agency_id, agency);
+        agencies.set(dataset.key + "/", agency); // Melbourne datasets have blank agency_id in routes.txt      
       }
     }
     
@@ -275,8 +279,16 @@ function loadstoptimes(dataset) {
         .entries(csv_rows);
       d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
+        let agency = getAgencyFromTripId(dataset, stoptimes.key);
         for (let row of stoptimes.values) {
-          row.departure_time = parseTimeFull(row.departure_time);   
+          row.departure_time = parseTimeFull(row.departure_time);
+
+          // update agency bounds
+          let stop = dataset.stops_map[row.stop_id];
+          if (stop.stop_lat < agency.latmin) agency.latmin = stop.stop_lat;
+          if (stop.stop_lat > agency.latmax) agency.latmax = stop.stop_lat;
+          if (stop.stop_lon < agency.lonmin) agency.lonmin = stop.stop_lon;
+          if (stop.stop_lon > agency.lonmax) agency.lonmax = stop.stop_lon;
         }
         if (stoptimes.values.length > 1) {
           stoptimes.min = stoptimes.values[0].departure_time;
@@ -287,6 +299,7 @@ function loadstoptimes(dataset) {
       allstoptimes = allstoptimes.filter(stoptimes => stoptimes.values.length > 1);
       allstoptimes.sort((a,b)=>d3.ascending(a.min, b.min));
       dataset.stoptimess = allstoptimes;
+
     }
     dataset.loaded = true;
     completeLoading();
@@ -295,6 +308,12 @@ function loadstoptimes(dataset) {
 
 var easer = function(x1, x2, t1, t2, t) {
   return  x1 + (x2 - x1) * d3.easeQuadInOut((t - t1) / (t2 - t1));
+}
+
+function getAgencyFromTripId(dataset, trip_id) {
+  let trip = dataset.trips_map[trip_id];
+  let agency_id = dataset.routes_map.get(trip.route_id).agency_id;    
+  return agencies.get(dataset.key + "/" + agency_id);
 }
 
 // I'm lazy, this is a bad algorithm -- it currently checks every trip (to see 
@@ -347,14 +366,11 @@ function computeVehiclePositions() {
       let trip = dataset.trips_map[trip_id];
       if (!dataset.current_services.has(trip.service_id))
         continue;
-      let agency_id = dataset.routes_map.get(trip.route_id).agency_id;
-
+      
       if (stoptimes.min < now) {
         if (stoptimes.min >= lastnow && stoptimes.max > now) {
           // we just ticked past the min time for this trip.. so this vehicle just appeared. Add it to the active list.
-          let agency = agencies.get(dataset.key + "/" + agency_id);
-          if (!agency)
-            agency = agencies.get(dataset.key);
+          let agency = getAgencyFromTripId(dataset, trip_id);
           vehicles.push({ 
             key: stoptimes.key,
             start: stoptimes.min,
@@ -398,36 +414,41 @@ function compute_agency_colors() {
 }
 
 // Computes bounds of first dataset so that it fits nicely on the screen.
-function compute_projection() {  
-  var miny = 90;
-  var minx = 180;
-  var maxy = -90;
-  var maxx = -180;
+function zoom_to_all() {  
+  var latmin = 90;
+  var lonmin = 180;
+  var latmax = -90;
+  var lonmax = -180;
   for (let dataset of datasets) {
     if (!(dataset.stops && dataset.stoptimess))
       return; // not fully loaded yet
-    var miny = Math.min(miny, d3.min(dataset.stops.map(d=>d.stop_lat)));
-    var maxy = Math.max(maxy, d3.max(dataset.stops.map(d=>d.stop_lat)));
-    var minx = Math.min(minx, d3.min(dataset.stops.map(d=>d.stop_lon)));
-    var maxx = Math.max(maxx, d3.max(dataset.stops.map(d=>d.stop_lon)));
+    var latmin = Math.min(latmin, d3.min(dataset.stops.map(d=>d.stop_lat)));
+    var latmax = Math.max(latmax, d3.max(dataset.stops.map(d=>d.stop_lat)));
+    var lonmin = Math.min(lonmin, d3.min(dataset.stops.map(d=>d.stop_lon)));
+    var lonmax = Math.max(lonmax, d3.max(dataset.stops.map(d=>d.stop_lon)));
   }
+  compute_projection(lonmin, lonmax, latmin, latmax);
+}
+
+function compute_projection(lonmin, lonmax, latmin, latmax) {
   // zoom to fit width because the calculation is easier
-  var longitude_width = maxx - minx;  
+  var longitude_width = lonmax - lonmin;  
   var zoom_level = Math.floor(Math.log2(width / longitude_width * 180 / 128)); 
+
   projection = d3.geoMercator()
-    .center([(minx + maxx)/2, (miny + maxy)/2]) 
+    .center([(lonmin + lonmax)/2, (latmin + latmax)/2]) 
     .scale( (1 << 8 + zoom_level) / 2 / Math.PI ) 
     .translate([width / 2, height / 2]); 
 
-  console.log("projection:", width, 'px ×', height, 'px, center = ', (minx + maxx)/2, (miny + maxy)/2, ', zoom=', zoom_level);
-  console.log(projection([minx, miny]), projection([maxx, maxy]));
+  console.log("projection:", width, 'px ×', height, 'px, center = ', (lonmin + lonmax)/2, (latmin + latmax)/2, ', zoom=', zoom_level);
+  console.log(projection([lonmin, latmin]), projection([lonmax, latmax]));
 
   if (automap) {
     document.getElementById("map").src = 
       "http://open.mapquestapi.com/staticmap/v4/getmap?key=" + mapquestkey +
       "&size=" + width + "," + height + 
       "&zoom="+ zoom_level +
-      "&center="+(miny + maxy)/2+","+(minx + maxx)/2;
+      "&center="+(latmin + latmax)/2+","+(lonmin + lonmax)/2;
   }
 }
 
@@ -494,8 +515,23 @@ function renderLegend() {
     .append("div")
     .append("p")
       .style("color", d=>agencies.get(d).color)
-      .text(d=>agencies.get(d).name);
+      .text(d=>agencies.get(d).name)
+      .on("click", zoom_to_agency);
+
   sel.exit().remove();
+}
+
+function zoom_to_agency(e) {  
+  let agency = agencies.get(this.__data__);
+  compute_projection(agency.lonmin, agency.lonmax, agency.latmin, agency.latmax);
+  compute_screen_coordinates();
+
+  // blank canvas because low alpha doesn't fade away properly
+  var canvas  = document.getElementById("chart");
+  var ctx = canvas.getContext("2d");
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, width, height);
 }
 
 function update() {
@@ -507,10 +543,12 @@ function update() {
 
   var canvas  = document.getElementById("chart");
   var ctx = canvas.getContext("2d");
+  
   ctx.save()
   ctx.globalAlpha = 0.05;
   ctx.drawImage(document.getElementById("map"), 0, 0);
   ctx.restore()
+
   computeVehiclePositions();
   //rendertracks(ctx);
   renderVehicles(ctx);
