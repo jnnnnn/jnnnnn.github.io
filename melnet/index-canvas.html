@@ -32,7 +32,7 @@ div#errors { display: block; }
   <input type="text" id="time" size="30" />
   <button onclick="start();">Start</button>
   <button onclick="pause();">Pause</button>
-  <input type="range" id="timeslider" style="width:500px" oninput="settime(1);" />
+  <input type="range" id="timeslider" style="width:500px" oninput="settime();" />
 </div>
 
 <div id="main">  
@@ -534,7 +534,7 @@ function zoom_to_agency(e) {
   ctx.fillRect(0, 0, width, height);
 }
 
-function update() {
+function update(alpha = 0.05) {
   if (ticking){
     now = new Date(now.getTime() + 60*slowupdateinterval);
     document.getElementById("timeslider").value = now.valueOf();
@@ -545,7 +545,7 @@ function update() {
   var ctx = canvas.getContext("2d");
   
   ctx.save()
-  ctx.globalAlpha = 0.05;
+  ctx.globalAlpha = alpha;
   ctx.drawImage(document.getElementById("map"), 0, 0);
   ctx.restore()
 
@@ -555,10 +555,7 @@ function update() {
 }
 
 function settime(type) {
-  if (type == 1)
-    now = new Date(+d3.select('#timeslider').node().value);
-  else
-    now = new Date();
+  now = new Date(+d3.select('#timeslider').node().value);
   d3.select("input#time").node().value = now;
   lastnow = new Date(2000, 1, 1); // reset this so that we add all vehicles necessary on next tick
   // reset performance-optimization indices that assume time is monotonic
@@ -571,7 +568,7 @@ function settime(type) {
     */
   }
   if (!ticking)
-    update();
+    update(1);
 }
 
 // given a bunch of stop_times rows, such as
