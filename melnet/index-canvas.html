@@ -191,7 +191,7 @@ function loadagencies(dataset) {
           lonmax: -180,
         };
         agencies.set(dataset.key + "/" + row.agency_id, agency);
-        agencies.set(dataset.key + "/", agency); // Melbourne datasets have blank agency_id in routes.txt      
+        dataset.default_agency = agency; // use one at random if a route doesn't specify     
       }
     }
     
@@ -312,8 +312,10 @@ var easer = function(x1, x2, t1, t2, t) {
 
 function getAgencyFromTripId(dataset, trip_id) {
   let trip = dataset.trips_map[trip_id];
+  if (!trip)
+    return dataset.default_agency;
   let agency_id = dataset.routes_map.get(trip.route_id).agency_id;    
-  return agencies.get(dataset.key + "/" + agency_id);
+  return agencies.get(dataset.key + "/" + agency_id) || dataset.default_agency;
 }
 
 // I'm lazy, this is a bad algorithm -- it currently checks every trip (to see 
