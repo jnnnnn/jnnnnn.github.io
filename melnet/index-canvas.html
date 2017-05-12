@@ -532,13 +532,6 @@ function zoom_to_agency(e) {
   let agency = agencies.get(this.__data__);
   compute_projection(agency.lonmin, agency.lonmax, agency.latmin, agency.latmax);
   compute_screen_coordinates();
-
-  // blank canvas because low alpha doesn't fade away properly
-  var canvas  = document.getElementById("chart");
-  var ctx = canvas.getContext("2d");
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, width, height);
 }
 
 function update(alpha = 0.05) {
@@ -551,14 +544,30 @@ function update(alpha = 0.05) {
   var canvas  = document.getElementById("chart");
   var ctx = canvas.getContext("2d");
   
-  ctx.save()
-  ctx.globalAlpha = alpha;
-  ctx.drawImage(document.getElementById("map"), 0, 0);
-  ctx.restore()
-
+  renderBackground(ctx, alpha);
   computeVehiclePositions();
   //rendertracks(ctx);
   renderVehicles(ctx);
+}
+
+function renderBackground(ctx, alpha) {
+  let image = document.getElementById("map");
+  if (image.complete && image.naturalHeight != 0) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(image, 0, 0);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = "White";
+    ctx.fillRect(0, 0, width, height);
+    
+    ctx.fillStyle = "Black";
+    ctx.font = "30px Arial";
+    ctx.textAlign="center";
+    ctx.globalAlpha = 0.3;
+    ctx.fillText("Map Loading...",width/2,height/2);
+    ctx.globalAlpha = 1.0;
+  }
 }
 
 function settime(type) {
@@ -574,8 +583,8 @@ function settime(type) {
       vehicle.legindex = 1;
     */
   }
-  if (!ticking)
-    update(1);
+
+  update(1);
 }
 
 // given a bunch of stop_times rows, such as
