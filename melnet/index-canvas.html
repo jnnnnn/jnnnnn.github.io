@@ -22,8 +22,6 @@ This code is licensed as CC-0 so do whatever you want with it.
 
 -->
 <style>
-div, canvas { display:inline; }
-div#errors { display: block; }
 </style>
 <title>Melnet</title>
 <body>
@@ -72,7 +70,7 @@ var projection = d3.geoMercator()
   .translate([width/2, height/2]);
 
 var colors = d3.scaleOrdinal()
-  .range(["#5a6a7c", "#fd5105", "#21ce03", "#fe17fe", "#86751c", "#a7556e", "#9769ff", "#01996f", "#0b9aef", "#fe3191", "#a955b7", "#4b940b", "#766356", "#b96d43", "#1991a0", "#5b71bf", "#876f8a", "#527351", "#db4951", "#d561b1", "#c768fb", "#bd7f0b", "#919500", "#7d63ab", "#297b70", "#6f7875", "#117fb3", "#7488f9", "#6c8a46", "#e4750d", "#995b4c", "#94734b", "#d26082", "#03aa4d", "#ab6999", "#ff5c79"]);
+  .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd", "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f"]);
 
 var timer;
 var ticking = false; // whether timer=setInterval is active
@@ -281,6 +279,8 @@ function loadstoptimes(dataset) {
       for (let stoptimes of allstoptimes) {
         let agency = getAgencyFromTripId(dataset, stoptimes.key);
         for (let row of stoptimes.values) {
+          if (!row || !row.departure_time)
+            continue; // skip blank lines
           row.departure_time = parseTimeFull(row.departure_time);
 
           // update agency bounds
@@ -508,7 +508,8 @@ function renderVehicles(ctx) {
   for (let dataset of datasets) {    
     for (let vehicle of dataset.vehicles) {
       ctx.fillStyle = vehicle.color;
-      var speed = 1+Math.floor(10*Math.sqrt(((vehicle.x - vehicle.xold)**2 + (vehicle.y - vehicle.yold)**2)));
+      var speed = 1+Math.floor(10*Math.sqrt(((vehicle.x - vehicle.xold)**2 + (vehicle.y - vehicle.yold)**2)));      
+      if (speed > 100) speed = 1;
       if (speed > 10) speed = 10;
       speed = 2;
       ctx.fillRect(Math.round(vehicle.x-speed/2), Math.round(vehicle.y-speed/2), speed, speed);
