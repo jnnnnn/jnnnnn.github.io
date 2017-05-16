@@ -509,9 +509,8 @@ function renderVehicles(ctx) {
     for (let vehicle of dataset.vehicles) {
       ctx.fillStyle = vehicle.color;
       var speed = 1+Math.floor(10*Math.sqrt(((vehicle.x - vehicle.xold)**2 + (vehicle.y - vehicle.yold)**2)));      
-      if (speed > 100) speed = 1;
+      if (!speed || speed < 2 || speed > 100) speed = 2;
       if (speed > 10) speed = 10;
-      speed = 2;
       ctx.fillRect(Math.round(vehicle.x-speed/2), Math.round(vehicle.y-speed/2), speed, speed);
     }
   }    
