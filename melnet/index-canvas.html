@@ -39,9 +39,10 @@ This code is licensed as CC-0 so do whatever you want with it.
 </div>
 
 <div style="visibility:hidden;">
-  <img src="http://open.mapquestapi.com/staticmap/v4/getmap?key=SECRET_MAP_KEY&size=1000,1000&zoom=12&center=-41.243574,174.883046" id="map" height="1000" width="1000"/>
+  <img src="http://open.mapquestapi.com/staticmap/v4/getmap?key=ArU5lJQnKKckKItiTSWHLhUfdV3CDu4K&size=1000,1000&zoom=11&center=-41.243574,174.883046" id="map" height="1000" width="1000"/>
 </div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="pako_inflate.min.js"></script>
 <script>
 
 var width = 1000;
@@ -49,15 +50,17 @@ var height = 1000;
 
 // 100 means fast, smooth, but requires good cpu for > 20k trips
 // 1000 is much less demanding
-var slowupdateinterval = 20; // ms
+var slowupdateinterval = 10; // ms
 
 var mapquestkey = "MAPQUEST_API_KEY_GOES_HERE";
 
-var rootfolder = "gtfs-wellington/";
-var stoptimesfile = "stop_times.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
+var rootfolder = "gtfs-melbourne/";
+var stoptimesfile = "stop_times-filtered.txt"; // generate a smaller stop_times-filtered.txt using splitter.py -- big ones don't work because the browser runs out of memory loading them
 var dataset_keys = ["1","2","3","4","5","6","7","8","10","11"];
-dataset_keys = ["1"];
-var now = new Date(2017, 4, 1, 5) // new Date(2017,4,1,5); // date to start from (this is 1 May 2017, 5AM) -- should match splitter.py setting
+//dataset_keys = ["rail", "metrolink", "bus"];
+//dataset_keys = ["1"];
+var now = new Date(2017,4,29,5); // new Date(2017,4,1,5); // date to start from (this is 29 May 2017, 5AM) -- should match splitter.py setting
+//now = new Date(2017, 4, 8, 5); // LA
 var lastnow = new Date(2000, 1, 1); // previous tick of simulation, used to know which vehicles have just appeared
 
 // layout=true: compute bounds of dataset automatically and generate map from MapQuest using mapquestkey, above
@@ -69,8 +72,13 @@ var projection = d3.geoMercator()
   .scale( (1 << 8 + 11) / 2 / Math.PI ) // zoom level 12
   .translate([width/2, height/2]);
 
+var inflate = true;
+var perhour = false; // whether to load data one hour at a time
+var hour = 5; // the current hour that we have loaded data for (if perhour)
+
 var colors = d3.scaleOrdinal()
-  .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd", "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f"]);
+  .range(["#1b70fc", "#afb30f", "#d50527", "#158940", "#f898fd", "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f"]);
+//colors.range(d3.schemeCategory20);
 
 var timer;
 var ticking = false; // whether timer=setInterval is active
@@ -107,6 +115,8 @@ function start() {
   datemax.setMinutes(0);
   datemax.setSeconds(0);
 
+  hour = now.getHours();
+
   document.getElementById("timeslider").min = datemin.valueOf();
   document.getElementById("timeslider").max = datemax.valueOf();  
 }
@@ -117,6 +127,8 @@ function pause() {
 }
 
 function init() {
+  datasets = [];
+  agencies = d3.map();
   for (let key of dataset_keys) {
     dataset = { 
         "key": key, 
@@ -267,23 +279,29 @@ function loadroutes(dataset) {
 
 function loadstoptimes(dataset) {
   d3.select("div#errors").select("div.data"+dataset.key).text("Loading stop times");
-  d3.csv(dataset.gtfsdatapath+stoptimesfile, function(error, csv_rows) {
+  
+  var fname = dataset.gtfsdatapath + (perhour ? `stop_times_${hour}.txt`: stoptimesfile) + (inflate ? ".deflate" : "")
+  var inflater = inflate ? ungzipcsv : d3.csv;
+  inflater(fname, function(error, csv_rows) {
     if (error)
       document.getElementById("errors").innerHTML = "Couldn't load " + error.statusText;
-    else {
+    else {      
       d3.select("div#errors").select("div.data"+dataset.key).text("Grouping stop times"); 
       var allstoptimes = d3.nest()
         .key(csvrow => csvrow.trip_id)        
         .entries(csv_rows);
       d3.select("div#errors").select("div.data"+dataset.key).text("Parsing stop times");
       for (let stoptimes of allstoptimes) {
-        let agency = getAgencyFromTripId(dataset, stoptimes.key);
+        let agency = getAgencyFromTripId(dataset, stoptimes.key);        
         for (let row of stoptimes.values) {
           if (!row || !row.departure_time)
             continue; // skip blank lines
           row.departure_time = parseTimeFull(row.departure_time);
 
-          // update agency bounds
+          // these strings are big and unneeded after nesting -- remove to free memory
+          //delete row.trip_id; 
+
+          // update agency bounds (for zooming)
           let stop = dataset.stops_map[row.stop_id];
           if (stop.stop_lat < agency.latmin) agency.latmin = stop.stop_lat;
           if (stop.stop_lat > agency.latmax) agency.latmax = stop.stop_lat;
@@ -304,6 +322,18 @@ function loadstoptimes(dataset) {
     dataset.loaded = true;
     completeLoading();
   });
+}
+
+function ungzipcsv(fname, callback) {
+  let rawFile = new XMLHttpRequest();
+  rawFile.open('GET', fname, true);  
+  rawFile.responseType = 'arraybuffer';
+  rawFile.onerror = () => callback('Error retrieving file: ' + rawFile, undefined);
+  rawFile.onload = response => {
+    try { callback('', d3.csvParse(pako.ungzip(rawFile.response, {to:'string'}))); }
+    catch (err) { callback(`Error with file ${fname}:` + err.message) }    
+  }
+  rawFile.send();
 }
 
 var easer = function(x1, x2, t1, t2, t) {
@@ -543,6 +573,13 @@ function update(alpha = 0.05) {
 
   var canvas  = document.getElementById("chart");
   var ctx = canvas.getContext("2d");
+
+  if (perhour && hour != now.getHours())
+  {
+    pause();
+    hour = now.getHours();
+    init(); // load the current hour's worth of data
+  }
   
   renderBackground(ctx, alpha);
   computeVehiclePositions();
