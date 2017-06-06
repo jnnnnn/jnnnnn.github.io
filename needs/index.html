@@ -117,7 +117,7 @@ div#needs div {
     var subtext = r < 0.2 ? "is desperate" :
       r < 0.7 ? "is that I want more" :
       r < 0.9 ? "is satisfied" :
-      r < 1.0 ? "is fulfilled" : "";
+      r <= 1.0 ? "is fulfilled" : "";
     context.font = "30px 'Helvetica'";
     context.fillStyle = "white";
     context.fillText("My need for", x(0.5), height / 2 - 35)
@@ -128,6 +128,11 @@ div#needs div {
   function onclick(datum) {
     var coords = d3.mouse(this);
     datum.response = x.invert(coords[0]);
+    // for perfectionists:
+    if (datum.response > 0.95) 
+      datum.response = 1;
+    if (datum.response < 0.05)
+      datum.response = 0;
     regenerate_url();
     d3.select(this).each(draw_bar);
   }
