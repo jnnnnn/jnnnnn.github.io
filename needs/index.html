@@ -7,137 +7,138 @@ License: CC0
 Original Author: Jonathan Newnham
 -->
 <style>
-div#needs div { 
+div#needs div {
   display: flex;
   justify-content: center;
 }
 </style>
 <title>Needs Tool</title>
-<body>
-<div id="errors"></div>
-<div id="needs"></div>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script>
 
-var needs_data = []; // filled out from load_rows csv
-var width = 800;
-var height = 120;
-var x = d3.scaleLinear()
+<body>
+  <div id="errors"></div>
+  <div id="needs"></div>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+  var needs_data = []; // filled out from load_rows csv
+  var width = 800;
+  var height = 120;
+  var x = d3.scaleLinear()
     .domain([0, 1])
     .range([0, width]);
-var color = d3.scaleLinear()
+  var color = d3.scaleLinear()
     .domain([0, 0.1, 0.4, 1])
     .range(["red", "red", d3.color("yellow").darker(), "green"])
     .interpolate(d3.interpolateLab);
 
-function init() {
-  d3.tsv("needs.tsv", function(error, csv_rows) {
-    if (error)
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-    else
-      load_rows(csv_rows);
-  });
-}
+  function init() {
+    d3.tsv("needs.tsv", function(error, csv_rows) {
+      if (error)
+        document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+      else
+        load_rows(csv_rows);
+    });
+  }
 
-function load_rows(csv_rows) {
-  var urlparams = getUrlParams(window.location);
-  document.getElementById("errors").innerHTML = "";
-  needs_data = csv_rows.map(function(row) {
-    return {
-      name: row.name,
-      type: row.type,
-      importance: row.importance,
-      response: parseFloat(urlparams[row.name] || NaN),
-    };
-  });
+  function load_rows(csv_rows) {
+    var urlparams = getUrlParams(window.location);
+    document.getElementById("errors").innerHTML = "";
+    needs_data = csv_rows.map(function(row) {
+      return {
+        name: row.name,
+        type: row.type,
+        importance: row.importance,
+        response: parseFloat(urlparams[row.name] || NaN),
+      };
+    });
 
-  layout();
-}
+    layout();
+  }
 
-function layout() {
-  var sel = d3.select("div#needs").selectAll("div").data(needs_data);
-  var need_divs = sel.enter()
-    .append("div");
-  //need_divs.append("p").text(d => d.name);
-  var canvass = need_divs
-    .append("canvas")
+  function layout() {
+    var sel = d3.select("div#needs").selectAll("div").data(needs_data);
+    var need_divs = sel.enter()
+      .append("div");
+    //need_divs.append("p").text(d => d.name);
+    var canvass = need_divs
+      .append("canvas")
       .attr("width", width)
       .attr("height", height)
       .on("mousedown", onclick)
       .on("touch", onclick);
-  canvass.each(draw_bar);
-}
-
-function draw_bar(datum) {
-  var context = this.getContext("2d");
-
-  context.font = "36px 'Helvetica'";
-  context.fillStyle = "black";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.shadowColor = "white";
-  context.shadowBlur = 5;
-
-  var r = datum.response; // 0...1
-  context.fillStyle = "black";
-  context.fillRect(0, 0, x(1), height);
-  context.fillStyle = color(r);
-  context.fillRect(r > 0.5 ? 0 : x(r), 0, r > 0.5 ? x(r) : x(1), height);
-  
-  context.beginPath();
-  context.moveTo(x(datum.response), 0);
-  context.lineTo(x(datum.response), height);
-  context.strokeStyle = "black";
-  context.lineWidth = 5;  
-  context.stroke();
-
-  context.lineWidth = 1.5;
-  context.strokeStyle = "white";
-  context.strokeText(datum.name, x(0.5), height/2);
-  //context.fillText(datum.name, x(0.5), height/2);
-
-  var r = datum.response;
-  var subtext = r < 0.1 ? "desperate" : 
-    r < 0.7 ? "want more" : 
-    r < 0.9 ? "satisfied" : 
-    r < 1.0 ? "fulfilled" : "";
-
-  context.font = "30px 'Helvetica'";
-  context.fillText(subtext, x(0.5), height/2 + 35);
-}
-
-function onclick(datum) {
-  var coords = d3.mouse(this);
-  datum.response = x.invert(coords[0]);
-  regenerate_url();
-  d3.select(this).each(draw_bar);  
-}
-
-function regenerate_url() {
-  params = "";
-  for (var d of needs_data) {
-    if (d.response >= 0 && d.response <= 1) {
-      params += "&" + encodeURI(d.name) + "=" + d.response.toFixed(2);
-    }
-  }  
-  window.history.replaceState({}, "Needs Tool", "index.html?"+params);
-}
-
-// http://stackoverflow.com/a/520845/412529
-function getUrlParams(url) {
-  var re = /(?:\?|&(?:amp;)?)([^=&#]+)(?:=?([^&#]*))/g,
-      match, params = {},
-      decode = function (s) {return decodeURIComponent(s.replace(/\+/g, " "));};
-
-  if (typeof url == "undefined") url = document.location.href;
-
-  while (match = re.exec(url)) {
-    params[decode(match[1])] = decode(match[2]);
+    canvass.each(draw_bar);
   }
-  return params;
-}
 
-init();
+  function draw_bar(datum) {
+    var context = this.getContext("2d");
 
-</script>
+    context.font = "36px 'Helvetica'";
+    context.fillStyle = "black";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.shadowColor = "white";
+    context.shadowBlur = 5;
+
+    var r = datum.response; // 0...1
+    context.fillStyle = "black";
+    context.fillRect(0, 0, x(1), height);
+    context.fillStyle = color(r);
+    context.fillRect(r > 0.5 ? 0 : x(r), 0, r > 0.5 ? x(r) : x(1), height);
+
+    context.beginPath();
+    context.moveTo(x(datum.response), 0);
+    context.lineTo(x(datum.response), height);
+    context.strokeStyle = "black";
+    context.lineWidth = 5;
+    context.stroke();
+
+    context.lineWidth = 1.5;
+    context.strokeStyle = "white";
+    context.strokeText(datum.name, x(0.5), height / 2);
+    //context.fillText(datum.name, x(0.5), height/2);
+
+    var r = datum.response;
+    var subtext = r < 0.1 ? "desperate" :
+      r < 0.7 ? "want more" :
+      r < 0.9 ? "satisfied" :
+      r < 1.0 ? "fulfilled" : "";
+
+    context.font = "30px 'Helvetica'";
+    context.fillText(subtext, x(0.5), height / 2 + 35);
+  }
+
+  function onclick(datum) {
+    var coords = d3.mouse(this);
+    datum.response = x.invert(coords[0]);
+    regenerate_url();
+    d3.select(this).each(draw_bar);
+  }
+
+  function regenerate_url() {
+    params = "";
+    for (var d of needs_data) {
+      if (d.response >= 0 && d.response <= 1) {
+        params += "&" + encodeURI(d.name) + "=" + d.response.toFixed(2);
+      }
+    }
+    window.history.replaceState({}, "Needs Tool", "index.html?" + params);
+  }
+
+  // http://stackoverflow.com/a/520845/412529
+  function getUrlParams(url) {
+    var re = /(?:\?|&(?:amp;)?)([^=&#]+)(?:=?([^&#]*))/g,
+      match, params = {},
+      decode = function(s) {
+        return decodeURIComponent(s.replace(/\+/g, " "));
+      };
+
+    if (typeof url == "undefined") url = document.location.href;
+
+    while (match = re.exec(url)) {
+      params[decode(match[1])] = decode(match[2]);
+    }
+    return params;
+  }
+
+  init();
+  </script>
 </body>
