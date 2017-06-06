@@ -42,8 +42,9 @@ div#needs div {
   function load_rows(csv_rows) {
     var urlparams = getUrlParams(window.location);
     document.getElementById("errors").innerHTML = "";
-    needs_data = csv_rows.map(function(row) {
+    needs_data = csv_rows.map(function(row, i) {
       return {
+        id: i,
         name: row.name,
         type: row.type,
         importance: row.importance,
@@ -57,19 +58,33 @@ div#needs div {
   function layout() {
     var sel = d3.select("div#needs").selectAll("div").data(needs_data);
     var need_divs = sel.enter()
-      .append("div");
+      .append("div")
+      .attr("id", d => "need" + d.id);
     //need_divs.append("p").text(d => d.name);
     var canvass = need_divs
       .append("canvas")
       .attr("width", width)
       .attr("height", height)
+      .attr("id", d => "need" + d.id)
       .on("mousedown", onclick)
       .on("touch", onclick);
     canvass.each(draw_bar);
   }
 
   function draw_bar(datum) {
-    var context = this.getContext("2d");
+    d3.select("div#need" + datum.id).transition("t" + datum.id)
+      .duration(2000)
+      .ease(Math.sqrt)
+      .tween("hint", function() {
+        var canvas = d3.select("div#need" + datum.id + " canvas").node();
+        return function(t) {
+          draw_bar_i(canvas, datum, 1 - t);
+        };
+      });
+  }
+
+  function draw_bar_i(canvas, datum, opacity) {
+    var context = canvas.getContext("2d");
 
     context.font = "36px 'Helvetica'";
     context.fillStyle = "black";
@@ -96,14 +111,18 @@ div#needs div {
     context.strokeText(datum.name, x(0.5), height / 2);
     //context.fillText(datum.name, x(0.5), height/2);
 
+    context.save();
+    context.globalAlpha = opacity;
     var r = datum.response;
-    var subtext = r < 0.1 ? "desperate" :
-      r < 0.7 ? "want more" :
-      r < 0.9 ? "satisfied" :
-      r < 1.0 ? "fulfilled" : "";
-
+    var subtext = r < 0.2 ? "is desperate" :
+      r < 0.7 ? "is that I want more" :
+      r < 0.9 ? "is satisfied" :
+      r < 1.0 ? "is fulfilled" : "";
     context.font = "30px 'Helvetica'";
+    context.fillStyle = "white";
+    context.fillText("My need for", x(0.5), height / 2 - 35)
     context.fillText(subtext, x(0.5), height / 2 + 35);
+    context.restore();
   }
 
   function onclick(datum) {
