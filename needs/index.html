@@ -115,8 +115,9 @@ div#needs div {
     context.globalAlpha = opacity;
     var r = datum.response;
     var subtext = r < 0.2 ? "is desperate" :
-      r < 0.7 ? "is that I want more" :
-      r < 0.9 ? "is satisfied" :
+      r < 0.4 ? "is severe" :
+      r < 0.6 ? "is that I want more" :
+      r < 0.8 ? "is satisfied" :
       r <= 1.0 ? "is fulfilled" : "";
     context.font = "30px 'Helvetica'";
     context.fillStyle = "white";
