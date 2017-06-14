@@ -69,7 +69,17 @@ d3.tsv("8ball-answers.tsv", function(error, tsv_rows) {
 });
 
 function onend1() {
-  var selected = ds[Math.floor(Math.random() * ds.length)];
+  // http://stackoverflow.com/a/20097994/412529
+  var urlvars = {};
+  window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
+    (m,key,value) => urlvars[decodeURIComponent(key)] = decodeURIComponent(value));
+  
+  if ("type" in urlvars)
+    vals = ds.filter(d=>urlvars["type"].split(",").includes(d.Type));
+  else
+    vals = ds;
+  var selected = vals[Math.floor(Math.random() * vals.length)];
+  
   var nodes = svg.selectAll("g")
       .data([selected], function(d) { return d.Text; });
 
