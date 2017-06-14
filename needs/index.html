@@ -31,9 +31,10 @@ div#needs div {
     .interpolate(d3.interpolateLab);
 
   function init() {
-    d3.tsv("needs.tsv", function(error, csv_rows) {
+    let fname = new URL(window.location).searchParams.get("f") || "needs.tsv";
+    d3.tsv(fname, function(error, csv_rows) {
       if (error)
-        document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+        document.getElementById("errors").innerHTML = "Couldn't load " + fname + ": " + error.statusText;
       else
         load_rows(csv_rows);
     });
