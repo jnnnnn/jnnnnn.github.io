@@ -74,8 +74,7 @@ div#needs div {
 
   function draw_bar(datum) {
     d3.select("div#need" + datum.id).transition("t" + datum.id)
-      .duration(2000)
-      .ease(Math.sqrt)
+      .duration(5000)
       .tween("hint", function() {
         var canvas = d3.select("div#need" + datum.id + " canvas").node();
         return function(t) {
