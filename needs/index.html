@@ -41,7 +41,7 @@ div#needs div {
   }
 
   function load_rows(csv_rows) {
-    var urlparams = getUrlParams(window.location);
+    var url = new URL(window.location);
     document.getElementById("errors").innerHTML = "";
     needs_data = csv_rows.map(function(row, i) {
       return {
@@ -49,7 +49,7 @@ div#needs div {
         name: row.name,
         type: row.type,
         importance: row.importance,
-        response: parseFloat(urlparams[row.name] || NaN),
+        response: parseFloat(url.searchParams.get(row.name) || NaN),
       };
     });
 
@@ -147,22 +147,6 @@ div#needs div {
       }
     }
     window.history.replaceState({}, "Needs Tool", "index.html?" + params);
-  }
-
-  // http://stackoverflow.com/a/520845/412529
-  function getUrlParams(url) {
-    var re = /(?:\?|&(?:amp;)?)([^=&#]+)(?:=?([^&#]*))/g,
-      match, params = {},
-      decode = function(s) {
-        return decodeURIComponent(s.replace(/\+/g, " "));
-      };
-
-    if (typeof url == "undefined") url = document.location.href;
-
-    while (match = re.exec(url)) {
-      params[decode(match[1])] = decode(match[2]);
-    }
-    return params;
   }
 
   init();
