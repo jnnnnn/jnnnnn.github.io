@@ -17,6 +17,7 @@ div#needs div {
 <body>
   <div id="errors"></div>
   <div id="needs"></div>
+  <p>Discuss.</p>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
   var needs_data = []; // filled out from load_rows csv
@@ -70,6 +71,25 @@ div#needs div {
       .on("mousedown", onclick)
       .on("touch", onclick);
     canvass.each(draw_bar);
+
+    if (!needs_data.some(d => d.response >= 0)) {
+      setTimeout(() => demo(0, 8000), 0);
+      for (let i of[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
+        needs_data[i].timeout = setTimeout(() => demo(i, 3000 + 500 * i), 8000);
+      }
+    }
+  }
+
+  function demo(id, duration) {
+    var canvas = d3.select("div#need" + id + " canvas").node();
+    d3.select("div#need" + id)
+      .transition("t" + id)
+      .duration(duration)
+      .tween("hint", () => (t => draw_bar_i(canvas, {
+        name: canvas.__data__.name,
+        response: t
+      }, 1 - t)))
+      .on("end", () => draw_bar_i(canvas, canvas.__data__, 0))
   }
 
   function draw_bar(datum) {
