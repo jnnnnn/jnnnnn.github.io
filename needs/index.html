@@ -146,6 +146,9 @@ div#needs div {
   function onclick(datum) {
     var coords = d3.mouse(this);
     datum.response = x.invert(coords[0]);
+    // cancel demo on touch
+    for (let d of needs_data)
+      clearTimeout(d.timeout); 
     // for perfectionists:
     if (datum.response > 0.95) 
       datum.response = 1;
