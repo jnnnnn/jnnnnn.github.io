@@ -69,7 +69,9 @@ div#needs div {
       .attr("height", height)
       .attr("id", d => "need" + d.id)
       .on("mousedown", onclick)
-      .on("touch", onclick);
+      .on("touch", onclick)
+      .on("touchstart", touchstart)
+      .on("touchmove", touchmove)
     canvass.each(draw_bar);
 
     if (!needs_data.some(d => d.response >= 0)) {
@@ -156,6 +158,18 @@ div#needs div {
       datum.response = 0;
     regenerate_url();
     d3.select(this).each(draw_bar);
+  }
+
+  function touchstart(datum) {
+    datum.x = d3.event.touches[0].screenX;
+    datum.y = d3.event.touches[0].screenY;
+  }
+
+  function touchmove(datum) {
+    let xmove = Math.abs(datum.x - d3.event.touches[0].screenX);
+    let ymove = Math.abs(datum.y - d3.event.touches[0].screenY);
+    if (xmove > ymove)
+      onclick.call(this, datum);
   }
 
   function regenerate_url() {
