@@ -74,9 +74,10 @@ div#needs div {
       .on("touchmove", touchmove)
     canvass.each(draw_bar);
 
+    // start off some initial animation so new users get the idea
     if (!needs_data.some(d => d.response >= 0)) {
       setTimeout(() => demo(0, 8000), 0);
-      for (let i of[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
+      for (let i = 0; i < needs_data.length && i < 15; ++i) {
         needs_data[i].timeout = setTimeout(() => demo(i, 3000 + 500 * i), 8000);
       }
     }
