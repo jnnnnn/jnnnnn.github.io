@@ -62,15 +62,15 @@ path {
 
     heirarchy = stratify(rows);
     heirarchy.count();
-    heirarchy.each(d => {
+    root = partition(heirarchy);
+    root.each(d => {
       d.x = (d.x0 + d.x1)/2; 
       d.y = (d.y0 + d.y1)/2;
     });
     // root node centred and not rotated 
-    heirarchy.x = 0;
-    hierarchy.y = Math.PI/2;
+    root.x = 0;
+    root.y = Math.PI/2;
     
-    root = partition(heirarchy);
     svg.selectAll("path")
       .data(root.descendants())
       .enter().append("path")
