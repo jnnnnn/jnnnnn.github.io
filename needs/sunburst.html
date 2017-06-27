@@ -68,8 +68,8 @@ path {
       d.y = (d.y0 + d.y1)/2;
     });
     // root node centred and not rotated 
-    root.x = 0;
-    root.y = Math.PI/2;
+    root.x = 0.25;
+    root.y = 0;
     
     svg.selectAll("path")
       .data(root.descendants())
