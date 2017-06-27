@@ -46,6 +46,7 @@ path {
   };
   var color = d => {
     let p = pointRadial(x(d.x), radius - y(d.y)/1.2);
+    if (d.y === 0) p = [0,0]; // root grey
     let xtoa = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
     let ytob = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
     return d3.lab(60, xtoa(p[0]), ytob(p[1]));
@@ -67,7 +68,7 @@ path {
       d.x = (d.x0 + d.x1)/2; 
       d.y = (d.y0 + d.y1)/2;
     });
-    // root node centred and not rotated 
+    // root node centred and not rotated
     root.x = 0.25;
     root.y = 0;
     
