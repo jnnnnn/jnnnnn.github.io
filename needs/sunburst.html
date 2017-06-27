@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+path {
+  stroke: #fff;
+}
+</style>
+
+<body>
+  <svg />
+  <p>Source: <a href="http://imgur.com/a/CkxQC">Geoffrey Roberts</a></p>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+  var width = 800,
+    height = 800,
+    radius = (Math.min(width, height) / 2) - 10;
+
+  var formatNumber = d3.format(",d");
+
+  var x = d3.scaleLinear()
+    .range([0, 2 * Math.PI]);
+
+  var y = d3.scaleLinear()
+    .range([0, radius]);
+
+  var range100 = d3.scaleLinear().range([0, 100]);
+
+  var stratify = d3.stratify()
+    .id(d => d.Index)
+    .parentId(d => d.Parent);
+
+  var partition = d3.partition();
+
+  var arc = d3.arc()
+    .startAngle(d => x(d.x0))
+    .endAngle(d => x(d.x1))
+    .innerRadius(d => Math.max(0, y(d.y0)))
+    .outerRadius(d => Math.max(0, y(d.y1)));
+
+  var pointRadial = (θ, r) => [(r = +r) * Math.cos(θ -= Math.PI / 2), r * Math.sin(θ)];
+
+  var translate = d => pointRadial(x((d.x0 + d.x1) / 2), y((d.y0 + d.y1) / 2));
+  var rotate = d => {
+    let θ = x((d.x0 + d.x1) / 2);
+    return θ * 180 / Math.PI + (θ > Math.PI ? 90 : -90);
+  };
+  var color = d => {
+    let p = pointRadial(x((d.x0 + d.x1) / 2), radius - y((d.y0 + d.y1) / 2)/1.2);
+    let xtoa = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
+    let ytob = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
+    return d3.lab(60, xtoa(p[0]), ytob(p[1]));
+  }
+
+  var svg = d3.select("body").selectAll("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
+
+  d3.tsv("feelings-tree.tsv", function(error, rows) {
+    if (error) throw error;
+
+    heirarchy = stratify(rows);
+    heirarchy.count();
+    root = partition(heirarchy);
+    svg.selectAll("path")
+      .data(root.descendants())
+      .enter().append("path")
+      .attr("d", arc)
+      .style("fill", d => color(d))
+      .append("title")
+      .text(d => d.data.Move);
+    svg.selectAll("g")
+      .data(root.descendants())
+      .enter().append("g")
+      .attr("transform", d => "translate(" + translate(d) + ") rotate(" + rotate(d) + ")")
+      .append("text")
+      .text(d => d.data.Move)
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "central");
+  });
+
+  d3.select(self.frameElement).style("height", height + "px");
+  </script>
