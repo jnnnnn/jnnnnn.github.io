@@ -20,7 +20,8 @@ path {
   var x = d3.scaleLinear()
     .range([0, 2 * Math.PI]);
 
-  var y = d3.scaleLinear()
+  var y = d3.scalePow()
+    .exponent(2)
     .range([0, radius]);
 
   var range100 = d3.scaleLinear().range([0, 100]);
