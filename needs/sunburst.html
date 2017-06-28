@@ -8,24 +8,59 @@ path {
 
 <body>
   <svg />
+  <button type="button" onclick="swapProjection()">click me</button>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
   var width = 800,
     height = 800,
-    radius = (Math.min(width, height) / 2) - 10;
+    padding = 10
+  radius = (Math.min(width, height) / 2) - padding;
 
   var formatNumber = d3.format(",d");
 
   var angle = 0.0;
   var τ = 2 * Math.PI;
   //var x = d3.scaleLinear().range([0, 2 * Math.PI]);
-  var x = a => (a * τ) + angle;
-  var y = d3.scalePow()
-    .exponent(1.5)
-    .range([0, radius]);
+  var projections = {
+    radial: {
+      name: "radial",
+      x: a => (a * τ) + angle, // 0..1 -> 0..τ,
+      y: d3.scalePow() // 0..1 -> 0..r
+        .exponent(1.5)
+        .range([0, radius]),
+      shape: d3.arc()
+        .startAngle(d => projections.radial.x(d.x0))
+        .endAngle(d => projections.radial.x(d.x1))
+        .innerRadius(d => Math.max(0, projections.radial.y(d.y0)))
+        .outerRadius(d => Math.max(0, projections.radial.y(d.y1))),
+      translate: d => pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
+      rotate: d => {
+        let θ = projections.radial.x(d.x);
+        return θ * 360 / τ + ((θ % τ) > Math.PI ? 90 : -90);
+      }
+    },
+    cartesian: {
+      name: "cartesian",
+      x: d3.scaleLinear().range([-width / 2 + padding, width / 2 - padding]),
+      y: d3.scaleLinear().range([-height / 2 + padding, height / 2 - padding]),
+      shape: d => d3.line()
+        .curve(d3.curveLinearClosed)
+        ([
+          [projections.cartesian.x(d.y0), projections.cartesian.y(d.x0)],
+          [projections.cartesian.x(d.y0), projections.cartesian.y(d.x1)],
+          [projections.cartesian.x(d.y1), projections.cartesian.y(d.x1)],
+          [projections.cartesian.x(d.y1), projections.cartesian.y(d.x0)]
+        ]),
+      translate: d => [projections.cartesian.x(d.y), projections.cartesian.y(d.x)],
+      rotate: d => 0
+    }
+  };
+  var p = projections.radial;
+  var currentProjection = p.name;
+  var ycolor = d3.scaleLinear().domain([0, 1]).range([1.5 * radius, 0.1 * radius]);
 
   var range100 = d3.scaleLinear().range([0, 100]);
-
+  var interval;
   var duration = 2000;
 
   var stratify = d3.stratify()
@@ -34,25 +69,17 @@ path {
 
   var partition = d3.partition();
 
-  var arc = d3.arc()
-    .startAngle(d => x(d.x0))
-    .endAngle(d => x(d.x1))
-    .innerRadius(d => Math.max(0, y(d.y0)))
-    .outerRadius(d => Math.max(0, y(d.y1)));
-
   var pointRadial = (θ, r) => [(r = +r) * Math.cos(θ -= Math.PI / 2), r * Math.sin(θ)];
 
-  var translate = d => pointRadial(x(d.x), y(d.y));
-  var rotate = d => {
-    let θ = x(d.x);
-    return θ * 360 / τ + ((θ%τ) > Math.PI ? 90 : -90);
-  };
+  var easeBothWays = f => t => t % 1 < 0.5 ? f(Math.abs(t % 1) * 2) : f(2 * (1 - Math.abs(t % 1)));
+  var cartesianToColorSpace = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
   var color = d => {
-    var p = pointRadial(x(d.x), radius - y(d.y)/1.2);
-    if (d.y == 0.0) p = [0,0]; // root grey
-    let xtoa = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
-    let ytob = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
-    return d3.lab(60, xtoa(p[0]), ytob(p[1]));
+    var p = pointRadial(
+      (d.x * τ + 10 * angle) % τ,
+      ycolor(d.y)
+    );
+    if (d.y == 0.0) p = [0, 0]; // root grey
+    return d3.lab(70, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
   }
 
   var svg = d3.select("body").selectAll("svg")
@@ -79,34 +106,109 @@ path {
     svg.selectAll("path")
       .data(root.descendants())
       .enter().append("path")
-      .attr("d", arc)
+      .attr("d", p.shape)
       .style("fill", d => color(d))
       .append("title")
-      .text(d => d.data.Move);      
+      .text(d => d.data.Move);
 
     svg.selectAll("g")
       .data(root.descendants())
       .enter().append("g")
-      .attr("transform", d => "translate(" + translate(d) + ") rotate(" + rotate(d) + ")")
+      .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")")
       .append("text")
       .text(d => d.data.Move)
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central");
+
+    svg.selectAll("path").node().onclick = startInterval;
   });
 
-  function transition() {
-    svg.selectAll("g") // text
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(duration)
-      .attr("transform", d => "translate(" + translate(d) + ") rotate(" + rotate(d) + ")");
-
-    return svg.selectAll("path") // arcs
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(duration)
-      .attr("d", arc)
-      .style("fill", d => color(d));
+  function startInterval() {
+    console.log("hey");
+    if (interval) {
+      interval.stop();
+      interval2.stop();
+      interval = null;
+    } else {
+      duration = 1000;
+      interval = d3.interval(function() {
+        angle += 0.01;
+        angle %= τ;
+        transition();
+      }, 1000);
+    }
+    interval2 = d3.interval(function() {
+      let y = projections.radial.y
+      y.exponent() == 1.8 ? y.exponent(1.2) : y.exponent(1.8);
+    }, 10000);
   }
+
+  function transition(name) {    
+    svg.selectAll("g") // text
+      .transition(name)
+      .ease(d3.easeLinear)
+      .duration(duration)
+      .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")");
+
+    var result = svg.selectAll("path") // arcs
+      .transition(name)
+      .ease(d3.easeLinear)
+      .duration(duration)
+      .style("fill", d => color(d));
+
+    if (p.name === currentProjection)
+      result.attr("d", p.shape);
+    else
+      result.attrTween("d", pathTween(10));
+
+    currentProjection = p.name;
+
+    return result;
+  }
+
+  // https://bl.ocks.org/mbostock/3916621
+  function pathTween(precision) {    
+    return function(d) { // factory function
+      var path0 = this,
+        path1 = path0.cloneNode(),
+        n0 = path0.getTotalLength(),
+        n1 = (path1.setAttribute("d", p.shape(d)), path1).getTotalLength();
+
+      // Uniform sampling of distance based on specified precision.
+      var distances = [0],
+        i = 0,
+        dt = precision / Math.max(n0, n1);
+      while ((i += dt) < 1) distances.push(i);
+      distances.push(1);
+
+      // Compute point-interpolators at each distance.
+      var points = distances.map(function(t) {
+        var p0 = path0.getPointAtLength(t * n0),
+          p1 = path1.getPointAtLength(t * n1);
+        return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
+      });
+
+      return function(t) {
+        return t < 1 ? "M" + points.map(function(p) {
+          return p(t);
+        }).join("L") : p.shape(d);
+      };
+    };
+  }
+
+  function swapProjection() {
+    if (interval)
+      interval.stop();
+    p = p.name === "radial" ? projections.cartesian : projections.radial;
+    var t = transition();
+    if (interval)
+    {
+      interval = null;
+      t.on("end", startInterval);
+    }
+
+  }
+
+
   d3.select(self.frameElement).style("height", height + "px");
   </script>
