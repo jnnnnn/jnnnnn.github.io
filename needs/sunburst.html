@@ -60,7 +60,7 @@ path {
   var ycolor = d3.scaleLinear().domain([0, 1]).range([1.5 * radius, 0.1 * radius]);
 
   var range100 = d3.scaleLinear().range([0, 100]);
-  var interval;
+  var interval, interval2;
   var duration = 2000;
 
   var stratify = d3.stratify()
@@ -121,7 +121,7 @@ path {
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central");
 
-    svg.selectAll("path").node().onclick = startInterval;
+    svg.selectAll("path").node().onclick = () => interval ? stopInterval() : startInterval();
   });
 
   function pathclick(d) {
@@ -141,17 +141,14 @@ path {
     return result;
   }
 
-  function startInterval() {    
-    if (interval) {
-      stopInterval()
-    } else {
-      duration = 1000;
-      interval = d3.interval(function() {
-        angle += 0.01;
-        angle %= τ;
-        transition();
-      }, 1000);
-    }
+  function startInterval() {
+    if (interval) return;
+    duration = 1000;
+    interval = d3.interval(function() {
+      angle += 0.01;
+      angle %= τ;
+      transition();
+    }, 1000);
     interval2 = d3.interval(function() {
       let y = projections.radial.y
       y.exponent() == 1.8 ? y.exponent(1.2) : y.exponent(1.8);
