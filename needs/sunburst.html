@@ -107,6 +107,7 @@ path {
       .data(root.descendants())
       .enter().append("path")
       .attr("d", p.shape)
+      .on("click", pathclick)
       .style("fill", d => color(d))
       .append("title")
       .text(d => d.data.Move);
@@ -123,12 +124,26 @@ path {
     svg.selectAll("path").node().onclick = startInterval;
   });
 
-  function startInterval() {
-    console.log("hey");
+  function pathclick(d) {
+    let result = stopInterval();
+    angle = τ * (1.25 - d.x);
+    transition();
+  }
+
+  // returns true if interval was running
+  function stopInterval() {
+    let result = !!interval;
     if (interval) {
       interval.stop();
       interval2.stop();
       interval = null;
+    }
+    return result;
+  }
+
+  function startInterval() {    
+    if (interval) {
+      stopInterval()
     } else {
       duration = 1000;
       interval = d3.interval(function() {
@@ -143,7 +158,7 @@ path {
     }, 10000);
   }
 
-  function transition(name) {    
+  function transition(name) {
     svg.selectAll("g") // text
       .transition(name)
       .ease(d3.easeLinear)
@@ -167,7 +182,7 @@ path {
   }
 
   // https://bl.ocks.org/mbostock/3916621
-  function pathTween(precision) {    
+  function pathTween(precision) {
     return function(d) { // factory function
       var path0 = this,
         path1 = path0.cloneNode(),
@@ -197,16 +212,11 @@ path {
   }
 
   function swapProjection() {
-    if (interval)
-      interval.stop();
+    let restart = stopInterval();
     p = p.name === "radial" ? projections.cartesian : projections.radial;
     var t = transition();
-    if (interval)
-    {
-      interval = null;
+    if (restart)
       t.on("end", startInterval);
-    }
-
   }
 
 
