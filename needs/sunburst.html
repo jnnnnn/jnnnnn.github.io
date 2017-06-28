@@ -8,7 +8,6 @@ path {
 
 <body>
   <svg />
-  <p>Source: <a href="http://imgur.com/a/CkxQC">Geoffrey Roberts</a></p>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
   var width = 800,
@@ -17,14 +16,17 @@ path {
 
   var formatNumber = d3.format(",d");
 
-  var x = d3.scaleLinear()
-    .range([0, 2 * Math.PI]);
-
+  var angle = 0.0;
+  var τ = 2 * Math.PI;
+  //var x = d3.scaleLinear().range([0, 2 * Math.PI]);
+  var x = a => (a * τ) + angle;
   var y = d3.scalePow()
     .exponent(1.5)
     .range([0, radius]);
 
   var range100 = d3.scaleLinear().range([0, 100]);
+
+  var duration = 2000;
 
   var stratify = d3.stratify()
     .id(d => d.Index)
@@ -43,7 +45,7 @@ path {
   var translate = d => pointRadial(x(d.x), y(d.y));
   var rotate = d => {
     let θ = x(d.x);
-    return θ * 180 / Math.PI + (θ > Math.PI ? 90 : -90);
+    return θ * 360 / τ + ((θ%τ) > Math.PI ? 90 : -90);
   };
   var color = d => {
     var p = pointRadial(x(d.x), radius - y(d.y)/1.2);
@@ -59,27 +61,29 @@ path {
     .append("g")
     .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
-  d3.tsv("feelings-tree.tsv", function(error, rows) {
+  var fname = new URL(location).searchParams.get("data") || "feelings-tree.tsv";
+  d3.tsv(fname, function(error, rows) {
     if (error) throw error;
 
     heirarchy = stratify(rows);
     heirarchy.count();
     root = partition(heirarchy);
     root.each(d => {
-      d.x = (d.x0 + d.x1)/2; 
-      d.y = (d.y0 + d.y1)/2;
+      d.x = (d.x0 + d.x1) / 2;
+      d.y = (d.y0 + d.y1) / 2;
     });
     // root node centred and not rotated
     root.x = 0.25;
     root.y = 0.0;
-    
+
     svg.selectAll("path")
       .data(root.descendants())
       .enter().append("path")
       .attr("d", arc)
       .style("fill", d => color(d))
       .append("title")
-      .text(d => d.data.Move);
+      .text(d => d.data.Move);      
+
     svg.selectAll("g")
       .data(root.descendants())
       .enter().append("g")
@@ -90,5 +94,19 @@ path {
       .attr("dominant-baseline", "central");
   });
 
+  function transition() {
+    svg.selectAll("g") // text
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(duration)
+      .attr("transform", d => "translate(" + translate(d) + ") rotate(" + rotate(d) + ")");
+
+    return svg.selectAll("path") // arcs
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(duration)
+      .attr("d", arc)
+      .style("fill", d => color(d));
+  }
   d3.select(self.frameElement).style("height", height + "px");
   </script>
