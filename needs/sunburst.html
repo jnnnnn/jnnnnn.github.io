@@ -69,7 +69,7 @@ path {
   var interval, interval2;
   var duration = 5000;
   var root;
-  
+
   var stratify = d3.stratify()
     .id(d => d.Index)
     .parentId(d => d.Parent);
@@ -125,7 +125,7 @@ path {
       .on("click", pathclick)
       .style("fill", d => "white");
     newPaths.append("title")
-      .text(d => d.data.Move);
+      .text(d => d.data.Description);
 
     paths.exit().remove();
     paths.merge(newPaths)
@@ -142,7 +142,7 @@ path {
 
     newTexts
       .append("text")
-      .text(d => d.data.Move)
+      .text(d => d.data.Description)
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "central");
 
@@ -154,7 +154,7 @@ path {
       .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")")
     
     texts.selectAll("text")
-      .text(d => d.data.Move);
+      .text(d => d.data.Description);
 
     svg.selectAll("path").node().onclick = () => interval ? stopInterval() : startInterval();
   }
