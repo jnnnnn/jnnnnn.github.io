@@ -1,132 +1,132 @@
 Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
-0			Feelings			https://au.pinterest.com/pin/571394271450399668/			
-1	0		Fearful						
-2	0		Angry						
-3	0		Disgusted						
-4	0		Sad						
-5	0		Happy						
-6	0		Surprised						
-7	0		Bad						
-9	1		Scared						
-10	1		Anxious						
-11	1		Insecure						
-12	1		Weak						
-13	1		Rejected						
-14	1		Threatened						
-15	1		Let-down						
-16	2		Humiliated						
-17	2		Bitter						
-18	2		Mad						
-19	2		Aggressive						
-20	2		Frustrated						
-21	2		Distant						
-22	2		Critical						
-23	3		Disapproving						
-24	3		Disappointed						
-25	3		Awful						
-26	3		Repelled						
-27	4		Hurt						
-28	4		Depressed						
-29	4		Guilty						
-30	4		Despair						
-31	4		Vulnerable						
-32	4		Lonely						
-33	5		Optimistic						
-34	5		Trusting						
-35	5		Peaceful						
-36	5		Powerful						
-37	5		Accepted						
-38	5		Proud						
-39	5		Interested						
-40	5		Content						
-41	5		Playful						
-42	6		Excited						
-43	6		Amazed						
-44	6		Confused						
-45	6		Startled						
-46	7		Tired						
-47	7		Stressed						
-48	7		Busy						
-49	7		Bored						
-51	9		Helpless						
-52	9		Frightened						
-53	10		Overwhelmed						
-54	10		Worried						
-55	11		Inadequate						
-56	11		Inferior						
-57	12		Worthless						
-58	12		Insignificant						
-59	13		Excluded						
-60	13		Persecuted						
-61	14		Nervous						
-62	14		Exposed						
-63	15		Betrayed						
-64	15		Resentful						
-65	16		Disrespected						
-66	16		Ridiculed						
-67	17		Indignant						
-68	17		Violated						
-69	18		Furious						
-70	18		Jealous						
-71	19		Provoked						
-72	19		Hostile						
-73	20		Infuriated						
-74	20		Annoyed						
-75	21		Withdrawn						
-76	21		Numb						
-77	22		Sceptical						
-78	22		Dismissive						
-79	23		Judgmental						
-80	23		Embarrassed						
-81	24		Appalled						
-82	24		Revolted						
-83	25		Nauseated						
-84	25		Detestable						
-85	26		Horrified						
-86	26		Hesitant						
-87	27		Embarrassed						
-88	27		Disapointed						
-89	28		Inferior						
-90	28		Empty						
-91	29		Remorseful						
-92	29		Ashamed						
-93	30		Powerless						
-94	30		Grief						
-95	31		Fragile						
-96	31		Victimised						
-97	32		Abandoned						
-98	32		Isolated						
-99	33		Inspired						
-100	33		Hopeful						
-101	34		Intimate						
-102	34		Sensitive						
-103	35		Thankful						
-104	35		Loving						
-105	36		Creative						
-106	36		Courageous						
-107	37		Valued						
-108	37		Respected						
-109	38		Confidant						
-110	38		Successful						
-111	39		Inquisitive						
-112	39		Curious						
-113	40		Joyful						
-114	40		Free						
-115	41		Cheeky						
-116	41		Aroused						
-117	42		Energetic						
-118	42		Eager						
-119	43		Awe						
-120	43		Astonished						
-121	44		Perplexed						
-122	44		Disillusioned						
-123	45		Dismayed						
-124	45		Shocked						
-125	46		Unfocussed						
-126	46		Sleepy						
-127	47		Uncontrolled						
-128	47		Overwhelmed						
-129	48		Rushed						
-130	48		Pressured						
-131	49		Apathetic						
-132	49		Indifferent						
+0			Feelings			https://au.pinterest.com/pin/571394271450399668/			Feelings
+1	0		Fearful						Fearful
+2	0		Angry						Angry
+3	0		Disgusted						Disgusted
+4	0		Sad						Sad
+5	0		Happy						Happy
+6	0		Surprised						Surprised
+7	0		Bad						Bad
+9	1		Scared						Scared
+10	1		Anxious						Anxious
+11	1		Insecure						Insecure
+12	1		Weak						Weak
+13	1		Rejected						Rejected
+14	1		Threatened						Threatened
+15	1		Let-down						Let-down
+16	2		Humiliated						Humiliated
+17	2		Bitter						Bitter
+18	2		Mad						Mad
+19	2		Aggressive						Aggressive
+20	2		Frustrated						Frustrated
+21	2		Distant						Distant
+22	2		Critical						Critical
+23	3		Disapproving						Disapproving
+24	3		Disappointed						Disappointed
+25	3		Awful						Awful
+26	3		Repelled						Repelled
+27	4		Hurt						Hurt
+28	4		Depressed						Depressed
+29	4		Guilty						Guilty
+30	4		Despair						Despair
+31	4		Vulnerable						Vulnerable
+32	4		Lonely						Lonely
+33	5		Optimistic						Optimistic
+34	5		Trusting						Trusting
+35	5		Peaceful						Peaceful
+36	5		Powerful						Powerful
+37	5		Accepted						Accepted
+38	5		Proud						Proud
+39	5		Interested						Interested
+40	5		Content						Content
+41	5		Playful						Playful
+42	6		Excited						Excited
+43	6		Amazed						Amazed
+44	6		Confused						Confused
+45	6		Startled						Startled
+46	7		Tired						Tired
+47	7		Stressed						Stressed
+48	7		Busy						Busy
+49	7		Bored						Bored
+51	9		Helpless						Helpless
+52	9		Frightened						Frightened
+53	10		Overwhelmed						Overwhelmed
+54	10		Worried						Worried
+55	11		Inadequate						Inadequate
+56	11		Inferior						Inferior
+57	12		Worthless						Worthless
+58	12		Insignificant						Insignificant
+59	13		Excluded						Excluded
+60	13		Persecuted						Persecuted
+61	14		Nervous						Nervous
+62	14		Exposed						Exposed
+63	15		Betrayed						Betrayed
+64	15		Resentful						Resentful
+65	16		Disrespected						Disrespected
+66	16		Ridiculed						Ridiculed
+67	17		Indignant						Indignant
+68	17		Violated						Violated
+69	18		Furious						Furious
+70	18		Jealous						Jealous
+71	19		Provoked						Provoked
+72	19		Hostile						Hostile
+73	20		Infuriated						Infuriated
+74	20		Annoyed						Annoyed
+75	21		Withdrawn						Withdrawn
+76	21		Numb						Numb
+77	22		Sceptical						Sceptical
+78	22		Dismissive						Dismissive
+79	23		Judgmental						Judgmental
+80	23		Embarrassed						Embarrassed
+81	24		Appalled						Appalled
+82	24		Revolted						Revolted
+83	25		Nauseated						Nauseated
+84	25		Detestable						Detestable
+85	26		Horrified						Horrified
+86	26		Hesitant						Hesitant
+87	27		Embarrassed						Embarrassed
+88	27		Disapointed						Disapointed
+89	28		Inferior						Inferior
+90	28		Empty						Empty
+91	29		Remorseful						Remorseful
+92	29		Ashamed						Ashamed
+93	30		Powerless						Powerless
+94	30		Grief						Grief
+95	31		Fragile						Fragile
+96	31		Victimised						Victimised
+97	32		Abandoned						Abandoned
+98	32		Isolated						Isolated
+99	33		Inspired						Inspired
+100	33		Hopeful						Hopeful
+101	34		Intimate						Intimate
+102	34		Sensitive						Sensitive
+103	35		Thankful						Thankful
+104	35		Loving						Loving
+105	36		Creative						Creative
+106	36		Courageous						Courageous
+107	37		Valued						Valued
+108	37		Respected						Respected
+109	38		Confidant						Confidant
+110	38		Successful						Successful
+111	39		Inquisitive						Inquisitive
+112	39		Curious						Curious
+113	40		Joyful						Joyful
+114	40		Free						Free
+115	41		Cheeky						Cheeky
+116	41		Aroused						Aroused
+117	42		Energetic						Energetic
+118	42		Eager						Eager
+119	43		Awe						Awe
+120	43		Astonished						Astonished
+121	44		Perplexed						Perplexed
+122	44		Disillusioned						Disillusioned
+123	45		Dismayed						Dismayed
+124	45		Shocked						Shocked
+125	46		Unfocussed						Unfocussed
+126	46		Sleepy						Sleepy
+127	47		Uncontrolled						Uncontrolled
+128	47		Overwhelmed						Overwhelmed
+129	48		Rushed						Rushed
+130	48		Pressured						Pressured
+131	49		Apathetic						Apathetic
+132	49		Indifferent						Indifferent

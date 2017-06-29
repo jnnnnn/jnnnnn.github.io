@@ -1,273 +1,271 @@
 Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 0						http://www.psychpage.com/learning/library/assess/feelings.html			
-1	0		Good						
-2	0		Bad						
-3	1		Open						
-4	1		Happy						
-5	1		Alive						
-6	1		Good						
-7	1		Love						
-8	1		Interested						
-9	1		Positive						
-10	1		Strong						
-11	3		understanding						
-12	3		confident						
-13	3		reliable						
-14	3		easy						
-15	3		amazed						
-16	3		free						
-17	3		sympathetic						
-18	3		interested						
-19	3		satisfied						
-20	3		receptive						
-21	3		accepting						
-22	3		kind						
-23	4		great						
-24	4		gay						
-25	4		joyous						
-26	4		lucky						
-27	4		fortunate						
-28	4		delighted						
-29	4		overjoyed						
-30	4		gleeful						
-31	4		thankful						
-32	4		important						
-33	4		festive						
-34	4		ecstatic						
-35	4		satisfied						
-36	4		glad						
-37	4		cheerful						
-38	4		sunny						
-39	4		merry						
-40	4		elated						
-41	4		jubilant						
-42	5		playful						
-43	5		courageous						
-44	5		energetic						
-45	5		liberated						
-46	5		optimistic						
-47	5		provocative						
-48	5		impulsive						
-49	5		free						
-50	5		frisky						
-51	5		animated						
-52	5		spirited						
-53	5		thrilled						
-54	5		wonderful						
-55	6		calm						
-56	6		peaceful						
-57	6		at ease						
-58	6		comfortable						
-59	6		pleased						
-60	6		encouraged						
-61	6		clever						
-62	6		surprised						
-63	6		content						
-64	6		quiet						
-65	6		certain						
-66	6		relaxed						
-67	6		serene						
-68	6		free and easy						
-69	6		bright						
-70	6		blessed						
-71	6		reassured						
-72	7		loving						
-73	7		considerate						
-74	7		affectionate						
-75	7		sensitive						
-76	7		tender						
-77	7		devoted						
-78	7		attracted						
-79	7		passionate						
-80	7		admiration						
-81	7		warm						
-82	7		touched						
-83	7		sympathy						
-84	7		close						
-85	7		loved						
-86	7		comforted						
-87	7		drawn toward						
-88	8		concerned						
-89	8		affected						
-90	8		fascinated						
-91	8		intrigued						
-92	8		absorbed						
-93	8		inquisitive						
-94	8		nosy						
-95	8		snoopy						
-96	8		engrossed						
-97	8		curious						
-98	9		eager						
-99	9		keen						
-100	9		earnest						
-101	9		intent						
-102	9		anxious						
-103	9		inspired						
-104	9		determined						
-105	9		excited						
-106	9		enthusiastic						
-107	9		bold						
-108	9		brave						
-109	9		daring						
-110	9		challenged						
-111	9		optimistic						
-112	9		re-enforced						
-113	9		confident						
-114	9		hopeful						
-115	10		impulsive						
-116	10		free						
-117	10		sure						
-118	10		certain						
-119	10		rebellious						
-120	10		unique						
-121	10		dynamic						
-122	10		tenacious						
-123	10		hardy						
-124	10		secure						
-125	2		Angry						
-126	2		Depressed						
-127	2		Confused						
-128	2		Helpless						
-129	2		Indifferent						
-130	2		Afraid						
-131	2		Hurt						
-132	2		Sad						
-133	125		irritated						
-134	125		enraged						
-135	125		hostile						
-136	125		insulting						
-137	125		sore						
-138	125		annoyed						
-139	125		upset						
-140	125		hateful						
-141	125		unpleasant						
-142	125		offensive						
-143	125		bitter						
-144	125		aggressive						
-145	125		resentful						
-146	125		inflamed						
-147	125		provoked						
-148	125		incensed						
-149	125		infuriated						
-150	125		cross						
-151	125		worked up						
-152	125		boiling						
-153	125		fuming						
-154	125		indignant						
-155	126		lousy						
-156	126		disappointed						
-157	126		discouraged						
-158	126		ashamed						
-159	126		powerless						
-160	126		diminished						
-161	126		guilty						
-162	126		dissatisfied						
-163	126		miserable						
-164	126		detestable						
-165	126		repugnant						
-166	126		despicable						
-167	126		disgusting						
-168	126		abominable						
-169	126		terrible						
-170	126		in despair						
-171	126		sulky						
-172	126		bad						
-173	126		a sense of loss						
-174	127		upset						
-175	127		doubtful						
-176	127		uncertain						
-177	127		indecisive						
-178	127		perplexed						
-179	127		embarrassed						
-180	127		hesitant						
-181	127		shy						
-182	127		stupefied						
-183	127		disillusioned						
-184	127		unbelieving						
-185	127		skeptical						
-186	127		distrustful						
-187	127		misgiving						
-188	127		lost						
-189	127		unsure						
-190	127		uneasy						
-191	127		pessimistic						
-192	127		tense						
-193	128		incapable						
-194	128		alone						
-195	128		paralyzed						
-196	128		fatigued						
-197	128		useless						
-198	128		inferior						
-199	128		vulnerable						
-200	128		empty						
-201	128		forced						
-202	128		hesitant						
-203	128		despair						
-204	128		frustrated						
-205	128		distressed						
-206	128		woeful						
-207	128		pathetic						
-208	128		tragic						
-209	128		in a stew						
-210	128		dominated						
-211	129		insensitive						
-212	129		dull						
-213	129		nonchalant						
-214	129		neutral						
-215	129		reserved						
-216	129		weary						
-217	129		bored						
-218	129		preoccupied						
-219	129		cold						
-220	129		disinterested						
-221	129		lifeless						
-222	130		fearful						
-223	130		terrified						
-224	130		suspicious						
-225	130		anxious						
-226	130		alarmed						
-227	130		panic						
-228	130		nervous						
-229	130		scared						
-230	130		worried						
-231	130		frightened						
-232	130		timid						
-233	130		shaky						
-234	130		restless						
-235	130		doubtful						
-236	130		threatened						
-237	130		cowardly						
-238	130		quaking						
-239	130		menaced						
-240	130		wary						
-241	131		crushed						
-242	131		tormented						
-243	131		deprived						
-244	131		pained						
-245	131		tortured						
-246	131		dejected						
-247	131		rejected						
-248	131		injured						
-249	131		offended						
-250	131		afflicted						
-251	131		aching						
-252	131		victimized						
-253	131		heartbroken						
-254	131		agonized						
-255	131		appalled						
-256	131		humiliated						
-257	131		wronged						
-258	131		alienated						
-259	132		tearful						
-260	132		sorrowful						
-261	132		pained						
-262	132		grief						
-263	132		anguish						
-264	132		desolate						
-265	132		desperate						
-266	132		pessimistic						
-267	132		unhappy						
-268	132		lonely						
-269	132		grieved						
-270	132		mournful						
-271	132		dismayed						
+3	0		Open						Open
+4	0		Happy						Happy
+5	0		Alive						Alive
+6	0		Good						Good
+7	0		Love						Love
+8	0		Interested						Interested
+9	0		Positive						Positive
+10	0		Strong						Strong
+11	3		Understanding						Understanding
+12	3		Confident						Confident
+13	3		Reliable						Reliable
+14	3		Easy						Easy
+15	3		Amazed						Amazed
+16	3		Free						Free
+17	3		Sympathetic						Sympathetic
+18	3		Interested						Interested
+19	3		Satisfied						Satisfied
+20	3		Receptive						Receptive
+21	3		Accepting						Accepting
+22	3		Kind						Kind
+23	4		Great						Great
+24	4		Gay						Gay
+25	4		Joyous						Joyous
+26	4		Lucky						Lucky
+27	4		Fortunate						Fortunate
+28	4		Delighted						Delighted
+29	4		Overjoyed						Overjoyed
+30	4		Gleeful						Gleeful
+31	4		Thankful						Thankful
+32	4		Important						Important
+33	4		Festive						Festive
+34	4		Ecstatic						Ecstatic
+35	4		Satisfied						Satisfied
+36	4		Glad						Glad
+37	4		Cheerful						Cheerful
+38	4		Sunny						Sunny
+39	4		Merry						Merry
+40	4		Elated						Elated
+41	4		Jubilant						Jubilant
+42	5		Playful						Playful
+43	5		Courageous						Courageous
+44	5		Energetic						Energetic
+45	5		Liberated						Liberated
+46	5		Optimistic						Optimistic
+47	5		Provocative						Provocative
+48	5		Impulsive						Impulsive
+49	5		Free						Free
+50	5		Frisky						Frisky
+51	5		Animated						Animated
+52	5		Spirited						Spirited
+53	5		Thrilled						Thrilled
+54	5		Wonderful						Wonderful
+55	6		Calm						Calm
+56	6		Peaceful						Peaceful
+57	6		At ease						At ease
+58	6		Comfortable						Comfortable
+59	6		Pleased						Pleased
+60	6		Encouraged						Encouraged
+61	6		Clever						Clever
+62	6		Surprised						Surprised
+63	6		Content						Content
+64	6		Quiet						Quiet
+65	6		Certain						Certain
+66	6		Relaxed						Relaxed
+67	6		Serene						Serene
+68	6		Free and easy						Free and easy
+69	6		Bright						Bright
+70	6		Blessed						Blessed
+71	6		Reassured						Reassured
+72	7		Loving						Loving
+73	7		Considerate						Considerate
+74	7		Affectionate						Affectionate
+75	7		Sensitive						Sensitive
+76	7		Tender						Tender
+77	7		Devoted						Devoted
+78	7		Attracted						Attracted
+79	7		Passionate						Passionate
+80	7		Admiration						Admiring
+81	7		Warm						Warm
+82	7		Touched						Touched
+83	7		Sympathy						Sympathy
+84	7		Close						Close
+85	7		Loved						Loved
+86	7		Comforted						Comforted
+87	7		Drawn toward						Drawn toward
+88	8		Concerned						Concerned
+89	8		Affected						Affected
+90	8		Fascinated						Fascinated
+91	8		Intrigued						Intrigued
+92	8		Absorbed						Absorbed
+93	8		Inquisitive						Inquisitive
+94	8		Nosy						Nosy
+95	8		Snoopy						Snoopy
+96	8		Engrossed						Engrossed
+97	8		Curious						Curious
+98	9		Eager						Eager
+99	9		Keen						Keen
+100	9		Earnest						Earnest
+101	9		Intent						Intent
+102	9		Anxious						Anxious
+103	9		Inspired						Inspired
+104	9		Determined						Determined
+105	9		Excited						Excited
+106	9		Enthusiastic						Enthusiastic
+107	9		Bold						Bold
+108	9		Brave						Brave
+109	9		Daring						Daring
+110	9		Challenged						Challenged
+111	9		Optimistic						Optimistic
+112	9		Re-enforced						Re-enforced
+113	9		Confident						Confident
+114	9		Hopeful						Hopeful
+115	10		Impulsive						Impulsive
+116	10		Free						Free
+117	10		Sure						Sure
+118	10		Certain						Certain
+119	10		Rebellious						Rebellious
+120	10		Unique						Unique
+121	10		Dynamic						Dynamic
+122	10		Tenacious						Tenacious
+123	10		Hardy						Hardy
+124	10		Secure						Secure
+125	0		Angry						Angry
+126	0		Depressed						Depressed
+127	0		Confused						Confused
+128	0		Helpless						Helpless
+129	0		Indifferent						Indifferent
+130	0		Afraid						Afraid
+131	0		Hurt						Hurt
+132	0		Sad						Sad
+133	125		Irritated						Irritated
+134	125		Enraged						Enraged
+135	125		Hostile						Hostile
+136	125		Insulting						Insulting
+137	125		Sore						Sore
+138	125		Annoyed						Annoyed
+139	125		Upset						Upset
+140	125		Hateful						Hateful
+141	125		Unpleasant						Unpleasant
+142	125		Offensive						Offensive
+143	125		Bitter						Bitter
+144	125		Aggressive						Aggressive
+145	125		Resentful						Resentful
+146	125		Inflamed						Inflamed
+147	125		Provoked						Provoked
+148	125		Incensed						Incensed
+149	125		Infuriated						Infuriated
+150	125		Cross						Cross
+151	125		Worked up						Worked up
+152	125		Boiling						Boiling
+153	125		Fuming						Fuming
+154	125		Indignant						Indignant
+155	126		Lousy						Lousy
+156	126		Disappointed						Disappointed
+157	126		Discouraged						Discouraged
+158	126		Ashamed						Ashamed
+159	126		Powerless						Powerless
+160	126		Diminished						Diminished
+161	126		Guilty						Guilty
+162	126		Dissatisfied						Dissatisfied
+163	126		Miserable						Miserable
+164	126		Detestable						Detestable
+165	126		Repugnant						Repugnant
+166	126		Despicable						Despicable
+167	126		Disgusting						Disgusting
+168	126		Abominable						Abominable
+169	126		Terrible						Terrible
+170	126		In despair						Despairing
+171	126		Sulky						Sulky
+172	126		Bad						Bad
+173	126		A sense of loss						A sense of loss
+174	127		Upset						Upset
+175	127		Doubtful						Doubtful
+176	127		Uncertain						Uncertain
+177	127		Indecisive						Indecisive
+178	127		Perplexed						Perplexed
+179	127		Embarrassed						Embarrassed
+180	127		Hesitant						Hesitant
+181	127		Shy						Shy
+182	127		Stupefied						Stupefied
+183	127		Disillusioned						Disillusioned
+184	127		Unbelieving						Unbelieving
+185	127		Skeptical						Skeptical
+186	127		Distrustful						Distrustful
+187	127		Misgiving						Misgiving
+188	127		Lost						Lost
+189	127		Unsure						Unsure
+190	127		Uneasy						Uneasy
+191	127		Pessimistic						Pessimistic
+192	127		Tense						Tense
+193	128		Incapable						Incapable
+194	128		Alone						Alone
+195	128		Paralyzed						Paralyzed
+196	128		Fatigued						Fatigued
+197	128		Useless						Useless
+198	128		Inferior						Inferior
+199	128		Vulnerable						Vulnerable
+200	128		Empty						Empty
+201	128		Forced						Forced
+202	128		Hesitant						Hesitant
+203	128		Despair						Despairing
+204	128		Frustrated						Frustrated
+205	128		Distressed						Distressed
+206	128		Woeful						Woeful
+207	128		Pathetic						Pathetic
+208	128		Tragic						Tragic
+209	128		In a stew						In a stew
+210	128		Dominated						Dominated
+211	129		Insensitive						Insensitive
+212	129		Dull						Dull
+213	129		Nonchalant						Nonchalant
+214	129		Neutral						Neutral
+215	129		Reserved						Reserved
+216	129		Weary						Weary
+217	129		Bored						Bored
+218	129		Preoccupied						Preoccupied
+219	129		Cold						Cold
+220	129		Disinterested						Disinterested
+221	129		Lifeless						Lifeless
+222	130		Fearful						Fearful
+223	130		Terrified						Terrified
+224	130		Suspicious						Suspicious
+225	130		Anxious						Anxious
+226	130		Alarmed						Alarmed
+227	130		Panic						Panic
+228	130		Nervous						Nervous
+229	130		Scared						Scared
+230	130		Worried						Worried
+231	130		Frightened						Frightened
+232	130		Timid						Timid
+233	130		Shaky						Shaky
+234	130		Restless						Restless
+235	130		Doubtful						Doubtful
+236	130		Threatened						Threatened
+237	130		Cowardly						Cowardly
+238	130		Quaking						Quaking
+239	130		Menaced						Menaced
+240	130		Wary						Wary
+241	131		Crushed						Crushed
+242	131		Tormented						Tormented
+243	131		Deprived						Deprived
+244	131		Pained						Pained
+245	131		Tortured						Tortured
+246	131		Dejected						Dejected
+247	131		Rejected						Rejected
+248	131		Injured						Injured
+249	131		Offended						Offended
+250	131		Afflicted						Afflicted
+251	131		Aching						Aching
+252	131		Victimized						Victimized
+253	131		Heartbroken						Heartbroken
+254	131		Agonized						Agonized
+255	131		Appalled						Appalled
+256	131		Humiliated						Humiliated
+257	131		Wronged						Wronged
+258	131		Alienated						Alienated
+259	132		Tearful						Tearful
+260	132		Sorrowful						Sorrowful
+261	132		Pained						Pained
+262	132		Grief						Grief
+263	132		Anguish						Anguished
+264	132		Desolate						Desolate
+265	132		Desperate						Desperate
+266	132		Pessimistic						Pessimistic
+267	132		Unhappy						Unhappy
+268	132		Lonely						Lonely
+269	132		Grieved						Grieved
+270	132		Mournful						Mournful
+271	132		Dismayed						Dismayed

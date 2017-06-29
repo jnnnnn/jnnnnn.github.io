@@ -68,7 +68,8 @@ path {
   var range100 = d3.scaleLinear().range([0, 100]);
   var interval, interval2;
   var duration = 5000;
-
+  var root;
+  
   var stratify = d3.stratify()
     .id(d => d.Index)
     .parentId(d => d.Parent);
@@ -117,7 +118,7 @@ path {
   function update(root) {
     d3.select("div#source").node().innerHTML = 'Source: <a href="'+root.data.Origin+'">'+root.data.Origin+'</a>';
     let paths = svg.selectAll("path")
-      .data(root.descendants(), d => d.data.Move);
+      .data(root.descendants(), d => d.data.Description);
 
     let newPaths = paths.enter().append("path")
       .attr("d", p.shape)
@@ -134,7 +135,7 @@ path {
       .style("fill", d => color(d));
 
     let texts = svg.selectAll("g")
-      .data(root.descendants(), d => d.data.Move);
+      .data(root.descendants(), d => d.data.Description);
 
     let newTexts = texts.enter().append("g")
       .attr("transform", d => "translate(0, 0) rotate(0)");
@@ -146,10 +147,14 @@ path {
       .attr("dominant-baseline", "central");
 
     texts.exit().remove();
-    texts.merge(newTexts)
-      .transition()
+    texts = texts.merge(newTexts);
+
+    texts.transition()
       .duration(5000)
       .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")")
+    
+    texts.selectAll("text")
+      .text(d => d.data.Move);
 
     svg.selectAll("path").node().onclick = () => interval ? stopInterval() : startInterval();
   }
