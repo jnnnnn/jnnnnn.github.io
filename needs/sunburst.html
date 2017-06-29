@@ -12,6 +12,7 @@ path {
   <button type="button" onclick="load('feelings-tree2.tsv')">set 2</button>
   <button type="button" onclick="load('feelings-tree3.tsv')">set 3</button>
   <button type="button" onclick="load('feelings-tree4.tsv')">set 4</button>
+  <div id="source"></div>
   <br />
   <svg />
   <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -94,7 +95,7 @@ path {
     .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
   function load(fname) {    
-    d3.tsv(fname, function(error, rows) {
+    d3.tsv(fname+'?nocache='+Math.random(), function(error, rows) {
       if (error) throw error;
 
       heirarchy = stratify(rows);
@@ -114,6 +115,7 @@ path {
   load('feelings-tree.tsv');
 
   function update(root) {
+    d3.select("div#source").node().innerHTML = 'Source: <a href="'+root.data.Origin+'">'+root.data.Origin+'</a>';
     let paths = svg.selectAll("path")
       .data(root.descendants(), d => d.data.Move);
 
