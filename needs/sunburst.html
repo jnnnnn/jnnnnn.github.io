@@ -68,7 +68,6 @@ path {
 
   var range100 = d3.scaleLinear().range([0, 100]);
   var interval, interval2;
-  var duration = 5000;
   var root;
 
   var stratify = d3.stratify()
@@ -96,8 +95,8 @@ path {
     .append("g")
     .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
-  function load(fname) {    
-    d3.tsv(fname+'?nocache='+Math.random(), function(error, rows) {
+  function load(fname) {
+    d3.tsv(fname + '?nocache=' + Math.random(), function(error, rows) {
       if (error) throw error;
 
       heirarchy = stratify(rows);
@@ -112,12 +111,13 @@ path {
       root.y = 0.0;
 
       update(root);
+      transition(5000);
     });
   }
   load('feelings-tree.tsv');
 
   function update(root) {
-    d3.select("div#source").node().innerHTML = 'Source: <a href="'+root.data.Origin+'">'+root.data.Origin+'</a>';
+    d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
     let paths = svg.selectAll("path")
       .data(root.descendants(), d => d.data.Description);
 
@@ -129,11 +129,6 @@ path {
       .text(d => d.data.Description);
 
     paths.exit().remove();
-    paths.merge(newPaths)
-      .transition()
-      .duration(5000)
-      .attr("d", p.shape)
-      .style("fill", d => color(d));
 
     let texts = svg.selectAll("g")
       .data(root.descendants(), d => d.data.Description);
@@ -150,11 +145,6 @@ path {
 
     texts.exit().remove();
     texts = texts.merge(newTexts);
-
-    texts.transition()
-      .duration(5000)
-      .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")")
-    
     texts.selectAll("text")
       .text(d => d.data.Description);
 
@@ -163,9 +153,8 @@ path {
 
   function pathclick(d) {
     d.selected ^= 1;
-    duration = 500;
     // angle = τ * (1.25 - d.x);
-    transition();
+    transition(500);
   }
 
   // returns true if interval was running
@@ -181,11 +170,10 @@ path {
 
   function startInterval() {
     if (interval) return;
-    duration = 1000;
     interval = d3.interval(function() {
       angle += 0.01;
       angle %= τ;
-      transition();
+      transition(1000);
     }, 1000);
     interval2 = d3.interval(function() {
       let y = projections.radial.y
@@ -193,7 +181,7 @@ path {
     }, 10000);
   }
 
-  function transition(name) {
+  function transition(duration) {
     svg.selectAll("g") // text
       .transition(name)
       .ease(d3.easeLinear)
@@ -249,7 +237,7 @@ path {
   function swapProjection() {
     let restart = stopInterval();
     p = p.name === "radial" ? projections.cartesian : projections.radial;
-    var t = transition();
+    var t = transition(5000);
     if (restart)
       t.on("end", startInterval);
   }
