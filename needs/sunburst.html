@@ -148,7 +148,15 @@ path {
     texts.selectAll("text")
       .text(d => d.data.Description);
 
-    svg.selectAll("path").node().onclick = () => interval ? stopInterval() : startInterval();
+    // clicking root node causes rotation
+    svg.selectAll("path").node().onclick = function() {
+      if (interval) {
+        stopInterval();
+        angle = 0;
+        transition(1000);
+      } else
+        startInterval();
+    };
   }
 
   function pathclick(d) {
