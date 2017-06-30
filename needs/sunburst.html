@@ -87,7 +87,7 @@ path {
       ycolor(d.y)
     );
     if (d.y == 0.0) p = [0, 0]; // root grey
-    return d3.lab(70, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
+    return d3.lab(d.selected ? 80 : 65, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
   }
 
   var svg = d3.select("body").selectAll("svg")
@@ -139,7 +139,8 @@ path {
       .data(root.descendants(), d => d.data.Description);
 
     let newTexts = texts.enter().append("g")
-      .attr("transform", d => "translate(0, 0) rotate(0)");
+      .attr("transform", d => "translate(0, 0) rotate(0)")
+      .on("click", pathclick);
 
     newTexts
       .append("text")
@@ -161,8 +162,9 @@ path {
   }
 
   function pathclick(d) {
-    let result = stopInterval();
-    angle = τ * (1.25 - d.x);
+    d.selected ^= 1;
+    duration = 500;
+    // angle = τ * (1.25 - d.x);
     transition();
   }
 
