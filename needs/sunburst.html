@@ -86,7 +86,7 @@ path {
       ycolor(d.y)
     );
     if (d.y == 0.0) p = [0, 0]; // root grey
-    return d3.lab(d.selected ? 80 : 65, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
+    return d3.lab(d.selected ? 50 : 70, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
   }
 
   var svg = d3.select("body").selectAll("svg")
@@ -144,8 +144,13 @@ path {
       .attr("dominant-baseline", "central");
 
     texts.exit().remove();
+
     texts = texts.merge(newTexts);
     texts.selectAll("text")
+      // this data() is necessary to update the child data elements that don't get recreated. 
+      // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update(). 
+      // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
+      .data(d => [d])
       .text(d => d.data.Description);
 
     // clicking root node causes rotation
@@ -190,11 +195,17 @@ path {
   }
 
   function transition(duration) {
+    var name = "tran";
     svg.selectAll("g") // text
       .transition(name)
       .ease(d3.easeLinear)
       .duration(duration)
       .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")");
+
+    svg.selectAll("text")
+      .transition(name)
+      .duration(duration)
+      .attr("fill", d => d.selected ? "white" : "black");
 
     var result = svg.selectAll("path") // arcs
       .transition(name)
