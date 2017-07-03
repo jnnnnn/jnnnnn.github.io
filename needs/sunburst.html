@@ -114,7 +114,7 @@ path {
       transition(5000);
     });
   }
-  load('feelings-tree.tsv');
+  load(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
 
   function update(root) {
     d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
