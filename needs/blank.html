@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+Needs.html: a tool for helping people express their needs.
+
+License: CC0
+Original Author: Jonathan Newnham
+-->
+<style>
+div#needs div, p {
+  display: flex;
+  justify-content: center;
+}
+</style>
+<title>Rating Tool</title>
+
+<body>
+  <button type="button" onclick="sort_by_response()">sort</button>
+  <div id="errors"></div>
+  <div id="needs"></div>
+  <p style="font-size:36pt">Discuss.</p>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+  var needs_data = []; // filled out from load_rows csv
+  var width = 800;
+  var height = 120;
+  var x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([0, width]);
+  var color = d3.scaleLinear()
+    .domain([0, 0.1, 0.4, 1])
+    .range(["red", "red", d3.color("yellow").darker(), "green"])
+    .interpolate(d3.interpolateLab);
+
+  function init() {
+    let fname = new URL(window.location).searchParams.get("f") || "needs.tsv";
+    d3.tsv(fname, function(error, csv_rows) {
+      if (error)
+        document.getElementById("errors").innerHTML = "Couldn't load " + fname + ": " + error.statusText;
+      else
+        load_rows(csv_rows);
+    });
+  }
+
+  function load_rows(csv_rows) {
+    var url = new URL(window.location);
+    document.getElementById("errors").innerHTML = "";
+    needs_data = csv_rows.map(function(row, i) {
+      return {
+        id: i,
+        name: row.name,
+        response: parseFloat(url.searchParams.get(row.name) || NaN),
+      };
+    });
+
+    layout();
+  }
+
+  function sort_by_response() {
+    needs_data.sort((a, b)=> {
+      if (isNaN(a.response) && isNaN(b.response))
+        return 0;
+      if (isNaN(a.response))
+        return 1;
+      if (isNaN(b.response))
+        return -1;
+      return a.response - b.response;
+    });    
+    layout();
+  }
+
+  function layout() {
+    // remove and re-add all so that everything is in the right order.
+    d3.select("div#needs").selectAll("div").remove();
+    var need_divs = d3.select("div#needs").selectAll("div").data(needs_data).enter()
+      .append("div")
+      .attr("id", d => "need" + d.id);
+    var canvass = need_divs
+      .append("canvas")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("id", d => "need" + d.id)
+      .on("mousedown", onclick)
+      .on("touch", onclick)
+      .on("touchstart", touchstart)
+      .on("touchmove", touchmove)
+    canvass.each(draw_bar);
+
+    // start off some initial animation so new users get the idea
+    if (!needs_data.some(d => d.response >= 0)) {
+      setTimeout(() => demo(0, 8000), 0);
+      for (let i = 0; i < needs_data.length && i < 50; ++i) {
+        needs_data[i].timeout = setTimeout(() => demo(i, 3000 + 500 * i), 8000);
+      }
+    }
+  }
+
+  function demo(id, duration) {
+    var canvas = d3.select("div#need" + id + " canvas").node();
+    d3.select("div#need" + id)
+      .transition("t" + id)
+      .duration(duration)
+      .tween("hint", () => (t => draw_bar_i(canvas, {
+        name: canvas.__data__.name,
+        response: t
+      }, 1 - t)))
+      .on("end", () => draw_bar_i(canvas, canvas.__data__, 0))
+  }
+
+  function draw_bar(datum) {
+    var canvas = d3.select("div#need" + datum.id + " canvas").node();
+    d3.select("div#need" + datum.id)
+      .transition("t" + datum.id)
+      .duration(5000)
+      .tween("hint", () => (t => draw_bar_i(canvas, datum, 1 - t)));
+  }
+
+  function draw_bar_i(canvas, datum, opacity) {
+    var context = canvas.getContext("2d");
+
+    context.font = "36px 'Helvetica'";
+    context.fillStyle = "black";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.shadowColor = "white";
+    context.shadowBlur = 5;
+
+    var r = datum.response; // 0...1
+    context.fillStyle = "black";
+    context.fillRect(0, 0, x(1), height);
+    context.fillStyle = color(r);
+    context.fillRect(r > 0.5 ? 0 : x(r), 0, r > 0.5 ? x(r) : x(1), height);
+
+    context.beginPath();
+    context.moveTo(x(datum.response), 0);
+    context.lineTo(x(datum.response), height);
+    context.strokeStyle = "black";
+    context.lineWidth = 5;
+    context.stroke();
+
+    context.lineWidth = 1.5;
+    context.strokeStyle = "white";
+    context.strokeText(datum.name, x(0.5), height / 2);    
+  }
+
+  function onclick(datum) {
+    let coords = d3.mouse(this);
+    datum.response = x.invert(coords[0]);
+    // cancel demo on touch
+    for (let d of needs_data)
+      clearTimeout(d.timeout); 
+    // for perfectionists:
+    if (datum.response > 0.95)
+      datum.response = 1;
+    if (datum.response < 0.05)
+      datum.response = 0;
+    regenerate_url();
+    d3.select(this).each(draw_bar);
+  }
+
+  function touchstart(datum) {
+    datum.x = d3.event.touches[0].screenX;
+    datum.y = d3.event.touches[0].screenY;
+  }
+
+  function touchmove(datum) {
+    let xmove = Math.abs(datum.x - d3.event.touches[0].screenX);
+    let ymove = Math.abs(datum.y - d3.event.touches[0].screenY);
+    if (xmove > ymove)
+      onclick.call(this, datum);
+  }
+
+  function regenerate_url() {
+    params = "";
+    for (var d of needs_data) {
+      if (d.response >= 0 && d.response <= 1) {
+        params += "&" + encodeURI(d.name) + "=" + d.response.toFixed(2);
+      }
+    }
+    window.history.replaceState({}, "Rating Tool", "index.html?" + params);
+  }
+
+  init();
+  </script>
+</body>
