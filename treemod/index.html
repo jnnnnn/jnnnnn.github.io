@@ -24,4 +24,9 @@
 <body>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="treemod.js"></script>
+  <svg id="chart"></svg>
+  <div id="data">
+    <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here"
+      onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+  </div>
 </body>
