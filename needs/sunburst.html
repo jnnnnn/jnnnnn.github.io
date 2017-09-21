@@ -71,6 +71,7 @@
     var range100 = d3.scaleLinear().range([0, 100]);
     var interval, interval2;
     var root;
+    var datarows;
 
     var stratify = d3.stratify()
       .id(d => d.Index)
@@ -97,8 +98,8 @@
       .append("g")
       .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
-    function load(rows) {
-      heirarchy = stratify(rows);
+    function load() {
+      heirarchy = stratify(datarows);
       heirarchy.count();
       root = partition(heirarchy);
       root.each(d => {
@@ -117,13 +118,15 @@
       var raw = document.getElementById("textdata").value;
       if (!raw)
         return;
-      load(d3.tsvParse(raw));
+      datarows = d3.tsvParse(raw);
+      load();
     }
 
     function loadfile(fname) {
-      d3.tsv(fname + '?nocache=' + Math.random(), function (error, rows) {
+      d3.text(fname + '?nocache=' + Math.random(), function (error, text) {
         if (error) throw error;
-        load(rows);
+        document.getElementById("textdata").value = text;
+        load_text_data();
       });
     }
     loadfile(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
@@ -151,7 +154,11 @@
             let start = d;
             let end = d3.event.sourceEvent.target.__data__;
             if (start == end) return;
-            console.log(start.data.Move, end.data.Move);
+            for (let row of datarows){
+              if (row.Index == start.data.Index)
+                row.Parent = end.data.Index;
+            }
+            load();
           }))
         .attr("transform", d => "translate(0, 0) rotate(0)")
         .on("click", pathclick);
