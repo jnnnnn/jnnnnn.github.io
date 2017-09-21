@@ -201,10 +201,9 @@
     }
 
     function exportText() {
-      /*
-      console.log(datarows);
-      console.log(document.getElementById("textdata").value);
-      */
+      let text = datarows.columns.join('\t') + '\n';
+      text += datarows.map(row => datarows.columns.map(c => row[c]).join('\t')).join('\n');
+      document.getElementById("textdata").value = text;
     }
 
     function pathclick(d) {
