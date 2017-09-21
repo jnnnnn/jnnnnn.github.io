@@ -1,104 +1,103 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-path {
-  stroke: #fff;
-}
+  path {
+    stroke: #fff;
+  }
 </style>
 
 <body>
   <button type="button" onclick="swapProjection()">click me</button>
-  <button type="button" onclick="load('feelings-tree.tsv')">set 1</button>
-  <button type="button" onclick="load('feelings-tree2.tsv')">set 2</button>
-  <button type="button" onclick="load('feelings-tree3.tsv')">set 3</button>
-  <button type="button" onclick="load('feelings-tree4.tsv')">set 4</button>
-  <button type="button" onclick="load('feelings-tree5.tsv')">set 5</button>
+  <button type="button" onclick="loadfile('feelings-tree.tsv')">set 1</button>
+  <button type="button" onclick="loadfile('feelings-tree2.tsv')">set 2</button>
+  <button type="button" onclick="loadfile('feelings-tree3.tsv')">set 3</button>
+  <button type="button" onclick="loadfile('feelings-tree4.tsv')">set 4</button>
+  <button type="button" onclick="loadfile('feelings-tree5.tsv')">set 5</button>
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here"
+    onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
   <div id="source"></div>
   <br />
   <svg />
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
-  var width = 800,
-    height = 800,
-    padding = 10
-  radius = (Math.min(width, height) / 2) - padding;
+    var width = 800,
+      height = 800,
+      padding = 10
+    radius = (Math.min(width, height) / 2) - padding;
 
-  var formatNumber = d3.format(",d");
+    var formatNumber = d3.format(",d");
 
-  var angle = 0.0;
-  var τ = 2 * Math.PI;
-  //var x = d3.scaleLinear().range([0, 2 * Math.PI]);
-  var projections = {
-    radial: {
-      name: "radial",
-      x: a => (a * τ) + angle, // 0..1 -> 0..τ,
-      y: d3.scalePow() // 0..1 -> 0..r
-        .exponent(1.5)
-        .range([0, radius]),
-      shape: d3.arc()
-        .startAngle(d => projections.radial.x(d.x0))
-        .endAngle(d => projections.radial.x(d.x1))
-        .innerRadius(d => Math.max(0, projections.radial.y(d.y0)))
-        .outerRadius(d => Math.max(0, projections.radial.y(d.y1))),
-      translate: d => pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
-      rotate: d => {
-        let θ = projections.radial.x(d.x);
-        return θ * 360 / τ + ((θ % τ) > Math.PI ? 90 : -90);
+    var angle = 0.0;
+    var τ = 2 * Math.PI;
+    //var x = d3.scaleLinear().range([0, 2 * Math.PI]);
+    var projections = {
+      radial: {
+        name: "radial",
+        x: a => (a * τ) + angle, // 0..1 -> 0..τ,
+        y: d3.scalePow() // 0..1 -> 0..r
+          .exponent(1.5)
+          .range([0, radius]),
+        shape: d3.arc()
+          .startAngle(d => projections.radial.x(d.x0))
+          .endAngle(d => projections.radial.x(d.x1))
+          .innerRadius(d => Math.max(0, projections.radial.y(d.y0)))
+          .outerRadius(d => Math.max(0, projections.radial.y(d.y1))),
+        translate: d => pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
+        rotate: d => {
+          let θ = projections.radial.x(d.x);
+          return θ * 360 / τ + ((θ % τ) > Math.PI ? 90 : -90);
+        }
+      },
+      cartesian: {
+        name: "cartesian",
+        x: d3.scaleLinear().range([-width / 2 + padding, width / 2 - padding]),
+        y: d3.scaleLinear().range([-height / 2 + padding, height / 2 - padding]),
+        shape: d => d3.line()
+          .curve(d3.curveLinearClosed)
+          ([
+            [projections.cartesian.x(d.y0), projections.cartesian.y(d.x0)],
+            [projections.cartesian.x(d.y0), projections.cartesian.y(d.x1)],
+            [projections.cartesian.x(d.y1), projections.cartesian.y(d.x1)],
+            [projections.cartesian.x(d.y1), projections.cartesian.y(d.x0)]
+          ]),
+        translate: d => [projections.cartesian.x(d.y), projections.cartesian.y(d.x)],
+        rotate: d => 0
       }
-    },
-    cartesian: {
-      name: "cartesian",
-      x: d3.scaleLinear().range([-width / 2 + padding, width / 2 - padding]),
-      y: d3.scaleLinear().range([-height / 2 + padding, height / 2 - padding]),
-      shape: d => d3.line()
-        .curve(d3.curveLinearClosed)
-        ([
-          [projections.cartesian.x(d.y0), projections.cartesian.y(d.x0)],
-          [projections.cartesian.x(d.y0), projections.cartesian.y(d.x1)],
-          [projections.cartesian.x(d.y1), projections.cartesian.y(d.x1)],
-          [projections.cartesian.x(d.y1), projections.cartesian.y(d.x0)]
-        ]),
-      translate: d => [projections.cartesian.x(d.y), projections.cartesian.y(d.x)],
-      rotate: d => 0
+    };
+    var p = projections.radial;
+    var currentProjection = p.name;
+    var ycolor = d3.scaleLinear().domain([0, 1]).range([1.5 * radius, 0.1 * radius]);
+
+    var range100 = d3.scaleLinear().range([0, 100]);
+    var interval, interval2;
+    var root;
+
+    var stratify = d3.stratify()
+      .id(d => d.Index)
+      .parentId(d => d.Parent);
+
+    var partition = d3.partition();
+
+    var pointRadial = (θ, r) => [(r = +r) * Math.cos(θ -= Math.PI / 2), r * Math.sin(θ)];
+
+    var easeBothWays = f => t => t % 1 < 0.5 ? f(Math.abs(t % 1) * 2) : f(2 * (1 - Math.abs(t % 1)));
+    var cartesianToColorSpace = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
+    var color = d => {
+      var p = pointRadial(
+        (d.x * τ + 10 * angle) % τ,
+        ycolor(d.y)
+      );
+      if (d.y == 0.0) p = [0, 0]; // root grey
+      return d3.lab(d.selected ? 50 : 70, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
     }
-  };
-  var p = projections.radial;
-  var currentProjection = p.name;
-  var ycolor = d3.scaleLinear().domain([0, 1]).range([1.5 * radius, 0.1 * radius]);
 
-  var range100 = d3.scaleLinear().range([0, 100]);
-  var interval, interval2;
-  var root;
+    var svg = d3.select("body").selectAll("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
-  var stratify = d3.stratify()
-    .id(d => d.Index)
-    .parentId(d => d.Parent);
-
-  var partition = d3.partition();
-
-  var pointRadial = (θ, r) => [(r = +r) * Math.cos(θ -= Math.PI / 2), r * Math.sin(θ)];
-
-  var easeBothWays = f => t => t % 1 < 0.5 ? f(Math.abs(t % 1) * 2) : f(2 * (1 - Math.abs(t % 1)));
-  var cartesianToColorSpace = d3.scaleLinear().domain([-radius, radius]).range([-100, 100]);
-  var color = d => {
-    var p = pointRadial(
-      (d.x * τ + 10 * angle) % τ,
-      ycolor(d.y)
-    );
-    if (d.y == 0.0) p = [0, 0]; // root grey
-    return d3.lab(d.selected ? 50 : 70, cartesianToColorSpace(p[0]), cartesianToColorSpace(p[1]));
-  }
-
-  var svg = d3.select("body").selectAll("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
-
-  function load(fname) {
-    d3.tsv(fname + '?nocache=' + Math.random(), function(error, rows) {
-      if (error) throw error;
-
+    function load(rows) {
       heirarchy = stratify(rows);
       heirarchy.count();
       root = partition(heirarchy);
@@ -112,156 +111,169 @@ path {
 
       update(root);
       transition(5000);
-    });
-  }
-  load(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
-
-  function update(root) {
-    d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
-    let paths = svg.selectAll("path")
-      .data(root.descendants(), d => d.data.Description);
-
-    let newPaths = paths.enter().append("path")
-      .attr("d", p.shape)
-      .on("click", pathclick)
-      .style("fill", d => "white");
-    newPaths.append("title")
-      .text(d => d.data.Move);
-
-    paths.exit().remove();
-
-    let texts = svg.selectAll("g")
-      .data(root.descendants(), d => d.data.Description);
-
-    let newTexts = texts.enter().append("g")
-      .attr("transform", d => "translate(0, 0) rotate(0)")
-      .on("click", pathclick);
-
-    newTexts
-      .append("text")
-      .text(d => d.data.Move)
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "central");
-
-    texts.exit().remove();
-
-    texts = texts.merge(newTexts);
-    texts.selectAll("text")
-      // this data() is necessary to update the child data elements that don't get recreated. 
-      // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update(). 
-      // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
-      .data(d => [d])
-      .text(d => d.data.Move);
-
-    // clicking root node causes rotation
-    svg.selectAll("path").node().onclick = function() {
-      if (interval) {
-        stopInterval();
-        angle = 0;
-        transition(1000);
-      } else
-        startInterval();
-    };
-  }
-
-  function pathclick(d) {
-    d.selected ^= 1;
-    // angle = τ * (1.25 - d.x);
-    transition(500);
-  }
-
-  // returns true if interval was running
-  function stopInterval() {
-    let result = !!interval;
-    if (interval) {
-      interval.stop();
-      interval2.stop();
-      interval = null;
     }
-    return result;
-  }
 
-  function startInterval() {
-    if (interval) return;
-    interval = d3.interval(function() {
-      angle += 0.01;
-      angle %= τ;
-      transition(1000);
-    }, 1000);
-    interval2 = d3.interval(function() {
-      let y = projections.radial.y
-      y.exponent() == 1.8 ? y.exponent(1.2) : y.exponent(1.8);
-    }, 10000);
-  }
+    function load_text_data() {
+      var raw = document.getElementById("textdata").value;
+      if (!raw)
+        return;
+      load(d3.tsvParse(raw));
+    }
 
-  function transition(duration, ease) {
-    ease = ease || d3.easeCubic;
-    var name = "tran";
-    svg.selectAll("g") // text
-      .transition(name)
-      .ease(ease)
-      .duration(duration)
-      .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")");
-
-    svg.selectAll("text")
-      .transition(name)
-      .duration(duration)
-      .attr("fill", d => d.selected ? "white" : "black");
-
-    var result = svg.selectAll("path") // arcs
-      .transition(name)
-      .ease(ease)
-      .duration(duration)
-      .style("fill", d => color(d));
-
-    if (p.name === currentProjection)
-      result.attr("d", p.shape);
-    else
-      result.attrTween("d", pathTween(10));
-
-    currentProjection = p.name;
-
-    return result;
-  }
-
-  // https://bl.ocks.org/mbostock/3916621
-  function pathTween(precision) {
-    return function(d) { // factory function
-      var path0 = this,
-        path1 = path0.cloneNode(),
-        n0 = path0.getTotalLength(),
-        n1 = (path1.setAttribute("d", p.shape(d)), path1).getTotalLength();
-
-      // Uniform sampling of distance based on specified precision.
-      var distances = [0],
-        i = 0,
-        dt = precision / Math.max(n0, n1);
-      while ((i += dt) < 1) distances.push(i);
-      distances.push(1);
-
-      // Compute point-interpolators at each distance.
-      var points = distances.map(function(t) {
-        var p0 = path0.getPointAtLength(t * n0),
-          p1 = path1.getPointAtLength(t * n1);
-        return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
+    function loadfile(fname) {
+      d3.tsv(fname + '?nocache=' + Math.random(), function (error, rows) {
+        if (error) throw error;
+        load(rows);
       });
+    }
+    loadfile(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
 
-      return function(t) {
-        return t < 1 ? "M" + points.map(function(p) {
-          return p(t);
-        }).join("L") : p.shape(d);
+    function update(root) {
+      d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
+      let paths = svg.selectAll("path")
+        .data(root.descendants(), d => d.data.Description);
+
+      let newPaths = paths.enter().append("path")
+        .attr("d", p.shape)
+        .on("click", pathclick)
+        .style("fill", d => "white");
+      newPaths.append("title")
+        .text(d => d.data.Move);
+
+      paths.exit().remove();
+
+      let texts = svg.selectAll("g")
+        .data(root.descendants(), d => d.data.Description);
+
+      let newTexts = texts.enter().append("g")
+        .attr("transform", d => "translate(0, 0) rotate(0)")
+        .on("click", pathclick);
+
+      newTexts
+        .append("text")
+        .text(d => d.data.Move)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "central");
+
+      texts.exit().remove();
+
+      texts = texts.merge(newTexts);
+      texts.selectAll("text")
+        // this data() is necessary to update the child data elements that don't get recreated. 
+        // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update(). 
+        // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
+        .data(d => [d])
+        .text(d => d.data.Move);
+
+      // clicking root node causes rotation
+      svg.selectAll("path").node().onclick = function () {
+        if (interval) {
+          stopInterval();
+          angle = 0;
+          transition(1000);
+        } else
+          startInterval();
       };
-    };
-  }
+    }
 
-  function swapProjection() {
-    let restart = stopInterval();
-    p = p.name === "radial" ? projections.cartesian : projections.radial;
-    var t = transition(5000);
-    if (restart)
-      t.on("end", startInterval);
-  }
+    function pathclick(d) {
+      d.selected ^= 1;
+      // angle = τ * (1.25 - d.x);
+      transition(500);
+    }
+
+    // returns true if interval was running
+    function stopInterval() {
+      let result = !!interval;
+      if (interval) {
+        interval.stop();
+        interval2.stop();
+        interval = null;
+      }
+      return result;
+    }
+
+    function startInterval() {
+      if (interval) return;
+      interval = d3.interval(function () {
+        angle += 0.01;
+        angle %= τ;
+        transition(1000);
+      }, 1000);
+      interval2 = d3.interval(function () {
+        let y = projections.radial.y
+        y.exponent() == 1.8 ? y.exponent(1.2) : y.exponent(1.8);
+      }, 10000);
+    }
+
+    function transition(duration, ease) {
+      ease = ease || d3.easeCubic;
+      var name = "tran";
+      svg.selectAll("g") // text
+        .transition(name)
+        .ease(ease)
+        .duration(duration)
+        .attr("transform", d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")");
+
+      svg.selectAll("text")
+        .transition(name)
+        .duration(duration)
+        .attr("fill", d => d.selected ? "white" : "black");
+
+      var result = svg.selectAll("path") // arcs
+        .transition(name)
+        .ease(ease)
+        .duration(duration)
+        .style("fill", d => color(d));
+
+      if (p.name === currentProjection)
+        result.attr("d", p.shape);
+      else
+        result.attrTween("d", pathTween(10));
+
+      currentProjection = p.name;
+
+      return result;
+    }
+
+    // https://bl.ocks.org/mbostock/3916621
+    function pathTween(precision) {
+      return function (d) { // factory function
+        var path0 = this,
+          path1 = path0.cloneNode(),
+          n0 = path0.getTotalLength(),
+          n1 = (path1.setAttribute("d", p.shape(d)), path1).getTotalLength();
+
+        // Uniform sampling of distance based on specified precision.
+        var distances = [0],
+          i = 0,
+          dt = precision / Math.max(n0, n1);
+        while ((i += dt) < 1) distances.push(i);
+        distances.push(1);
+
+        // Compute point-interpolators at each distance.
+        var points = distances.map(function (t) {
+          var p0 = path0.getPointAtLength(t * n0),
+            p1 = path1.getPointAtLength(t * n1);
+          return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
+        });
+
+        return function (t) {
+          return t < 1 ? "M" + points.map(function (p) {
+            return p(t);
+          }).join("L") : p.shape(d);
+        };
+      };
+    }
+
+    function swapProjection() {
+      let restart = stopInterval();
+      p = p.name === "radial" ? projections.cartesian : projections.radial;
+      var t = transition(5000);
+      if (restart)
+        t.on("end", startInterval);
+    }
 
 
-  d3.select(self.frameElement).style("height", height + "px");
+    d3.select(self.frameElement).style("height", height + "px");
   </script>
