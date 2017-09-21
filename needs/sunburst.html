@@ -146,6 +146,13 @@
         .data(root.descendants(), d => d.data.Description);
 
       let newTexts = texts.enter().append("g")
+        .call(d3.drag()
+          .on("end", function (d) {
+            let start = d;
+            let end = d3.event.sourceEvent.target.__data__;
+            if (start == end) return;
+            console.log(start.data.Move, end.data.Move);
+          }))
         .attr("transform", d => "translate(0, 0) rotate(0)")
         .on("click", pathclick);
 
@@ -273,7 +280,6 @@
       if (restart)
         t.on("end", startInterval);
     }
-
 
     d3.select(self.frameElement).style("height", height + "px");
   </script>
