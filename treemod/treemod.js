@@ -1,108 +1,33 @@
-var treeData =
-    {
-        "name": "Top Level",
-        "children": [
-            {
-                "name": "Level 2: A",
-                "children": [
-                    { "name": "Son of A" },
-                    { "name": "Daughter of A" }
-                ]
-            },
-            { "name": "Level 2: B" }
-        ]
-    };
 
 var margin = { top: 20, right: 90, bottom: 30, left: 90 },
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var svg = d3.select("svg")
+var svgg = d3.select("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate("
-    + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var i = 0,
-    duration = 750,
-    root;
-
-var treemap = d3.tree().size([height, width]);
+var duration = 750;
 
 function load_text_data() {
     var raw = document.getElementById("textdata").value;
     if (!raw)
         return;
-    var csv_rows = d3.tsv.parse(raw);
+    var csv_rows = d3.tsvParse(raw);
 
-    var moves = {};
-    var moves_list = [];
-    root = {};
-    root.children = [];
-    var all_tags = d3.set();
-    // construct tree from rows so we can display it
-    for (row of csv_rows) {
-        var first_parent = row.Parent.split(",")[0].trim();
-        if (first_parent === "" || first_parent === "-" || first_parent === "dup")
-            continue;
-        var node = { // 
-            "id": row.Index,
-            "children": [],
-            "x": 0,
-            "y": 0,
-            "tsv": row
-        };
-        moves[row.Index] = node;
-        moves_list.push(node);
-    }
-
-    // second pass is separate in case parent is after child
-    for (node of moves_list) {
-        var parent = moves[node.tsv.Parent.split(",")[0]];
-        if (parent == undefined)
-            parent = root;
-        parent.children.push(node);
-    }
-
-    sort_by_depth(root);
+    var root = d3.stratify()
+        .id(d => d.Index)
+        .parentId(d => d.Parent)
+        (csv_rows);
     update(root);
-}
-
-// Put the nodes with the most children at the end
-function sort_by_depth(node) {
-    var total = 1;
-    if (node.children === undefined) {
-        console.log(node);
-        return total;
-    }
-    for (child of node.children)
-        total += sort_by_depth(child);
-    node.total_children = total;
-    node.children.sort(function (a, b) { return b.total_children - a.total_children; });
-    return total;
-}
-
-root = d3.hierarchy(treeData, function (d) { return d.children; });
-root.x0 = height / 2;
-root.y0 = 0;
-
-root.children.forEach(collapse);
-
-update(root);
-
-function collapse(d) {
-    if (d.children) {
-        d._children = d.children
-        d._children.forEach(collapse)
-        d.children = null
-    }
 }
 
 function update(source) {
 
     // Assigns the x and y position for the nodes
-    var treeData = treemap(root);
+    var treeData = d3.tree().size([height, width])(source);
 
     // Compute the new tree layout.
     var nodes = treeData.descendants(),
@@ -112,10 +37,12 @@ function update(source) {
     nodes.forEach(function (d) { d.y = d.depth * 180 });
 
     // Update the nodes...
-    var node = svg.selectAll('g.node')
-        .data(nodes, function (d) { return d.id || (d.id = ++i); });
+    var node = svgg.selectAll('g.node')
+        .data(nodes);
 
-    var nodeEnter = node.enter().append('g')
+    var nodeEnterList = node.enter();
+
+    var nodeEnter = nodeEnterList.append('g')
         .attr('class', 'node')
         .attr("transform", function (d) {
             return "translate(" + source.y0 + "," + source.x0 + ")";
@@ -168,7 +95,7 @@ function update(source) {
         .style('fill-opacity', 1e-6);
 
     // Update the links...
-    var link = svg.selectAll('path.link')
+    var link = svgg.selectAll('path.link')
         .data(links, function (d) { return d.id; });
 
     var linkEnter = link.enter().insert('path', "g")
