@@ -3,12 +3,6 @@ var margin = { top: 20, right: 90, bottom: 30, left: 90 },
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var svgg = d3.select("svg#chart")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g") // this doesn't seem to work?
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 var duration = 750;
 
 function load_text_data() {
@@ -21,27 +15,30 @@ function load_text_data() {
         .id(d => d.Index)
         .parentId(d => d.Parent)
         (csv_rows);
-    root.x0 = height/2;
+    root.x0 = height / 2;
     root.y0 = 0;
     update(root);
 }
 
 function update(root) {
 
-    // compute and set height
-    d3.select('svg#chart')
-        .attr('width', 960)
-        .attr('height', 500);
-
-    // Assigns the x and y position for the nodes
-    var treeData = d3.tree().size([height, width])(root);
-
-    // Compute the new tree layout.
+    // We need to compute positions for all the nodes...
+    var treeData = d3.tree().nodeSize([20, 100])(root);
     var nodes = treeData.descendants();
     var links = treeData.descendants().slice(1);
 
-    // Update the nodes...
-    var node = d3.select('svg#chart').selectAll('g.node')
+    let height = d3.max(nodes.map(d => d.x))*2.2;
+    let width = d3.max(nodes.map(d => d.y));
+
+    d3.select('svg#chart')
+        .attr('width', width*2+100)
+        .attr('height', height);
+    d3.select('svg#chart g')
+        .attr("transform", "translate(" + 100 + "," + height/2 + ")");
+    root.x0 = height;
+
+    // Now that we know where they should be, add or update the nodes of the graph in the svg chart
+    var node = d3.select('svg#chart g').selectAll('g.node')
         .data(nodes, d => d.id);
 
     var nodeEnterList = node.enter();
@@ -64,7 +61,7 @@ function update(root) {
 
     nodeUpdate.transition()
         .duration(duration)
-        .attr("transform", d=>"translate(" + d.y + "," + d.x + ")");
+        .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
 
     nodeUpdate.select('circle.node')
         .attr('r', 10)
@@ -83,7 +80,7 @@ function update(root) {
         .style('fill-opacity', 1e-6);
 
     // Update the links...
-    var link = svgg.selectAll('path.link')
+    var link = d3.select('svg#chart g').selectAll('path.link')
         .data(links, d => d.id);
 
     var linkEnter = link.enter().insert('path', "g")
@@ -96,7 +93,7 @@ function update(root) {
     var linkUpdate = linkEnter.merge(link);
     linkUpdate.transition()
         .duration(duration)
-        .attr('d', d => diagonal(d, d.parent) );
+        .attr('d', d => diagonal(d, d.parent));
 
     var linkExit = link.exit().transition()
         .duration(duration)
