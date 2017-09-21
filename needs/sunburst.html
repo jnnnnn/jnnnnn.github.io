@@ -17,6 +17,7 @@
     onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
   <div id="source"></div>
   <br />
+  <div id="log"></div>
   <svg />
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
@@ -131,12 +132,31 @@
     }
     loadfile(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
 
+    let draglistener = d3.drag()
+      .on("start", function (d) {
+        d3.select("div#log").append('p').text("Start drag");
+        d3.event.sourceEvent.stopPropagation();
+      })
+      .on("end", function (d) {
+        d3.select("div#log p").remove();
+        let start = d;
+        let end = d3.event.sourceEvent.target.__data__;
+        if (start == end) return;
+        for (let row of datarows) {
+          if (row.Index == start.data.Index)
+            row.Parent = end.data.Index;
+        }
+        exportText();
+        load();
+      });
+
     function update(root) {
       d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
       let paths = svg.selectAll("path")
         .data(root.descendants(), d => d.data.Description);
 
       let newPaths = paths.enter().append("path")
+        .call(draglistener)
         .attr("d", p.shape)
         .on("click", pathclick)
         .style("fill", d => "white");
@@ -149,17 +169,7 @@
         .data(root.descendants(), d => d.data.Description);
 
       let newTexts = texts.enter().append("g")
-        .call(d3.drag()
-          .on("end", function (d) {
-            let start = d;
-            let end = d3.event.sourceEvent.target.__data__;
-            if (start == end) return;
-            for (let row of datarows){
-              if (row.Index == start.data.Index)
-                row.Parent = end.data.Index;
-            }
-            load();
-          }))
+        .call(draglistener)
         .attr("transform", d => "translate(0, 0) rotate(0)")
         .on("click", pathclick);
 
@@ -188,6 +198,13 @@
         } else
           startInterval();
       };
+    }
+
+    function exportText() {
+      /*
+      console.log(datarows);
+      console.log(document.getElementById("textdata").value);
+      */
     }
 
     function pathclick(d) {
