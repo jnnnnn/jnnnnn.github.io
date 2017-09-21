@@ -17,8 +17,8 @@
     onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
   <div id="source"></div>
   <br />
-  <div id="log"></div>
   <svg />
+  <div id="log"></div>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
     var width = 800,
@@ -133,6 +133,7 @@
     loadfile(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
 
     let draglistener = d3.drag()
+      .clickDistance(5)
       .on("start", function (d) {
         d3.select("div#log").append('p').text("Start drag");
         d3.event.sourceEvent.stopPropagation();
@@ -142,9 +143,11 @@
         let start = d;
         let end = d3.event.sourceEvent.target.__data__;
         if (start == end) return;
+        let datasmap = new Map(root.descendants().map(d => [d.data.Index, d]));
         for (let row of datarows) {
-          if (row.Index == start.data.Index)
-            row.Parent = end.data.Index;
+          if (row.Index == start.data.Index || datasmap.get(row.Index).selected)
+            if (row.Index != end.data.Index) 
+              row.Parent = end.data.Index;
         }
         exportText();
         load();
