@@ -133,21 +133,25 @@
     loadfile(new URL(window.location).searchParams.get('data') || 'feelings-tree.tsv');
 
     let draglistener = d3.drag()
-      .clickDistance(5)
       .on("start", function (d) {
         d3.select("div#log").append('p').text("Start drag");
         d3.event.sourceEvent.stopPropagation();
       })
       .on("end", function (d) {
         d3.select("div#log p").remove();
-        let start = d;
-        let end = d3.event.sourceEvent.target.__data__;
-        if (start == end) return;
+        let dstart = d;
+        let dend = d3.event.sourceEvent.target.__data__;
+        if (!dstart || !dend ||
+          !dstart.data || !dend.data ||
+          !dstart.data.Index || !dend.data.Index ||
+          dstart.data.Index == dend.data.Index) {
+          return;
+        }
         let datasmap = new Map(root.descendants().map(d => [d.data.Index, d]));
         for (let row of datarows) {
-          if (row.Index == start.data.Index || datasmap.get(row.Index).selected)
-            if (row.Index != end.data.Index) 
-              row.Parent = end.data.Index;
+          if (row.Index == dstart.data.Index || datasmap.get(row.Index).selected)
+            if (row.Index != dend.data.Index)
+              row.Parent = dend.data.Index;
         }
         exportText();
         load();
@@ -156,7 +160,7 @@
     function update(root) {
       d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
       let paths = svg.selectAll("path")
-        .data(root.descendants(), d => d.data.Description);
+        .data(root.descendants(), d => d.data.Move);
 
       let newPaths = paths.enter().append("path")
         .call(draglistener)
@@ -169,7 +173,7 @@
       paths.exit().remove();
 
       let texts = svg.selectAll("g")
-        .data(root.descendants(), d => d.data.Description);
+        .data(root.descendants(), d => d.data.Move);
 
       let newTexts = texts.enter().append("g")
         .call(draglistener)
