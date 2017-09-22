@@ -15,6 +15,7 @@
   <button type="button" onclick="loadfile('feelings-tree5.tsv')">set 5</button>
   <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here"
     onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+  <input type="checkbox" id="checkboxdraggable" />Draggable
   <div id="source"></div>
   <br />
   <svg />
@@ -141,6 +142,8 @@
         d3.select("div#log p").remove();
         let dstart = d;
         let dend = d3.event.sourceEvent.target.__data__;
+        if (!d3.select("input#checkboxdraggable").node().checked)
+          return;
         if (!dstart || !dend ||
           !dstart.data || !dend.data ||
           !dstart.data.Index || !dend.data.Index ||
