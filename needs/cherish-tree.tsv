@@ -1,0 +1,175 @@
+Index	Parent	Move	Source
+0		Personal Qualities	Original categorization based on John Gottman's list
+1	0	Physical	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+2	0	Intellectual	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+3	0	Emotional	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+4	0	Social	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+5	7	Open to experience	https://en.wikipedia.org/wiki/Personality
+6	2	Conscientious	https://en.wikipedia.org/wiki/Personality
+7	3	Extraversion	https://en.wikipedia.org/wiki/Personality
+8	140	Agreeableness	https://en.wikipedia.org/wiki/Personality
+9	148	Emotional Stability	https://en.wikipedia.org/wiki/Personality
+10	17	Facial Expressiveness	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+11	171	Grooming	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+12	140	Manners	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+13	171	Dress	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+14	17	Diction	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+17	1	Active	
+18	4	Accepting	https://en.wikipedia.org/wiki/Personality_psychology#Personality_theories
+19	140	Adaptable	
+20	7	Adventurous	
+21	72	Ambitious	
+22	148	Appreciative	
+23	4	Authentic	
+24	6	Aware	
+25	53	Balanced	
+26	145	Bold	
+27	145	Brave	
+28	93	Bright	
+29	93	Calm	
+30	145	Capable	
+31	6	Careful	
+32	148	Caring	
+33	71	Cheerful	
+34	139	Clever	
+35	145	Commanding	
+36	148	Compassionate	
+37	145	Confident	
+39	93	Considerate	
+40	145	Courageous	
+41	139	Creative	
+42	139	Curious	
+43	7	Daring	
+44	72	Dedicated	
+45	23	Dependable	
+46	72	Determined	
+47	148	Devoted	
+48	72	Diligent	
+49	72	Disciplined	
+50	139	Discriminating	
+51	7	Dynamic	
+52	71	Eager	
+53	3	Easygoing	
+54	148	Empathetic	
+55	7	Energetic	
+56	7	Enterprising	
+57	23	Ethical	
+58	71	Exuberant	
+59	6	Fair	
+60	140	Fascinating	
+61	7	Feisty	
+62	18	Flexible	
+63	18	Forgiving	
+64	93	Friendly	
+65	71	Fun	
+66	140	Funny	
+67	93	Generous	
+68	148	Gentle	
+69	93	Giving	
+70	145	Gutsy	
+71	3	Happy	
+72	2	Hardworking	
+73	171	Healthy	
+74	23	Honest	
+75	23	Honorable	
+76	93	Humble	
+77	140	Humorous	
+78	53	Idealistic	
+79	139	Imaginative	
+80	145	Independent	
+81	139	Ingenious	
+82	139	Inquisitive	
+83	148	Insightful	
+84	139	Intelligent	
+85	93	Interesting	
+86	139	Intuitive	
+87	139	Inventive	
+88	71	Joyful	
+89	148	Kind	
+90	139	Knowledgeable	
+91	53	Laid-back	
+92	71	Lighthearted	
+93	4	Likable	
+94	71	Lively	
+95	93	Lovable	
+96	93	Loving	
+97	23	Loyal	
+98	148	Mature	
+99	53	Mellow	
+100	72	Motivated	
+101	93	Natural	
+102	6	Neat	
+103	148	Nurturing	
+104	148	Observant	
+105	23	Open-minded	
+106	53	Optimistic	
+107	6	Organized	
+108	23	Original	
+109	7	Outgoing	
+110	148	Patient	
+111	53	Peaceful	
+112	148	Perceptive	
+113	72	Persevering	
+114	72	Persistent	
+115	93	Pleasant	
+116	53	Positive	
+117	72	Practical	
+118	23	Principled	
+119	18	Private	
+120	72	Problem-solving	
+121	140	Proud	
+122	139	Quick-witted	
+123	53	Quiet	
+124	139	Rational	
+125	139	Reasonable	
+126	53	Reflective	
+127	148	Reliable	
+128	145	Resilient	
+129	139	Resourceful	
+130	93	Respectful	
+131	145	Responsible	
+132	145	Self-confident	
+133	72	Self-sacrificing	
+134	145	Self-sufficient	
+135	148	Sensitive	
+136	139	Sharp	
+137	23	Sincere	
+138	139	Skillful	
+139	2	Smart	
+140	4	Sociable	
+141	18	Spiritual	
+142	7	Spontaneous	
+143	145	Stable	
+144	145	Steady	
+145	3	Strong	
+146	72	Studious	
+147	72	Successful	
+148	3	Supportive	
+149	7	Surprising	
+150	148	Sympathetic	
+151	139	Talented	
+152	6	Thorough	
+153	53	Thoughtful	
+154	72	Tireless	
+155	18	Tolerant	
+156	23	Trusting	
+157	93	Trustworthy	
+158	23	Truthful	
+159	148	Understanding	
+160	93	Unique	
+161	93	Unselfish	
+162	93	Upbeat	
+163	17	Vigilant	
+164	93	Warm	
+165	139	Wise	
+166	140	Witty	
+167	23	Worthy	
+168	140	Organising groups	
+169	140	Mediating	
+170	148	Understanding others	
+171	1	Appearance	
+173	171	Fit	
+176	171	Slim	
+177	171	Clean	
+178	171	Voluptuous	
+180	72	Passionate	
