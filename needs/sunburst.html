@@ -4,10 +4,10 @@
   path {
     stroke: #fff;
   }
-
+  
   /* https://stackoverflow.com/a/42613421/412529 wrap list to multiple columns */
-  div#list { 
-    column-width:150px;
+  div#list {
+    column-width: 150px;
   }
 </style>
 
@@ -230,7 +230,9 @@
 
     function exportText() {
       let text = datarows.columns.join('\t') + '\n';
-      text += datarows.map(row => datarows.columns.map(c => row[c]).join('\t')).join('\n');
+      text += root.descendants()
+        .sort((da, db) => d3.ascending(Number(da.data.Index), Number(db.data.Index)))
+        .map(d => datarows.columns.map(c => d.data[c]).join('\t')).join('\n');
       document.getElementById("textdata").value = text;
     }
 
@@ -339,6 +341,31 @@
       var t = transition(5000);
       if (restart)
         t.on("end", startInterval);
+    }
+
+    function depthfirstreindex(d, i) {
+      d.data.Index = (++i).toString();
+      if (d.children) {
+        for (let dc of d.children) {
+          dc.data.Parent = d.data.Index;
+          i = depthfirstreindex(dc, i);
+        }
+      }
+      return i;
+    }
+
+    function breadthfirstreindex(root) {
+      let i = 0;
+      let queue = [root];
+      while (queue.length) {
+        let d = queue.shift();
+        d.data.Index = (++i).toString()
+        if (d.children) {
+          for (let dc of d.children)
+            dc.data.Parent = d.data.Index;
+          queue = queue.concat(d.children);
+        }
+      }
     }
 
     d3.select(self.frameElement).style("height", height + "px");

@@ -1,175 +1,175 @@
-Index	Parent	Move	Source
+Index	Parent	Move	Origin
 0		Personal Qualities	Original categorization based on John Gottman's list
-1	0	Physical	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-2	0	Intellectual	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-3	0	Emotional	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-4	0	Social	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-5	7	Open to experience	https://en.wikipedia.org/wiki/Personality
-6	2	Conscientious	https://en.wikipedia.org/wiki/Personality
-7	3	Extraversion	https://en.wikipedia.org/wiki/Personality
-8	140	Agreeableness	https://en.wikipedia.org/wiki/Personality
-9	148	Emotional Stability	https://en.wikipedia.org/wiki/Personality
-10	17	Facial Expressiveness	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-11	171	Grooming	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-12	140	Manners	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-13	171	Dress	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-14	17	Diction	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
-17	1	Active	
-18	4	Accepting	https://en.wikipedia.org/wiki/Personality_psychology#Personality_theories
-19	140	Adaptable	
-20	7	Adventurous	
-21	72	Ambitious	
-22	148	Appreciative	
-23	4	Authentic	
-24	6	Aware	
-25	53	Balanced	
-26	145	Bold	
-27	145	Brave	
-28	93	Bright	
-29	93	Calm	
-30	145	Capable	
-31	6	Careful	
-32	148	Caring	
-33	71	Cheerful	
-34	139	Clever	
-35	145	Commanding	
-36	148	Compassionate	
-37	145	Confident	
-39	93	Considerate	
-40	145	Courageous	
-41	139	Creative	
-42	139	Curious	
-43	7	Daring	
-44	72	Dedicated	
-45	23	Dependable	
-46	72	Determined	
-47	148	Devoted	
-48	72	Diligent	
-49	72	Disciplined	
-50	139	Discriminating	
-51	7	Dynamic	
-52	71	Eager	
-53	3	Easygoing	
-54	148	Empathetic	
-55	7	Energetic	
-56	7	Enterprising	
-57	23	Ethical	
-58	71	Exuberant	
-59	6	Fair	
-60	140	Fascinating	
-61	7	Feisty	
-62	18	Flexible	
-63	18	Forgiving	
-64	93	Friendly	
-65	71	Fun	
-66	140	Funny	
-67	93	Generous	
-68	148	Gentle	
-69	93	Giving	
-70	145	Gutsy	
-71	3	Happy	
-72	2	Hardworking	
-73	171	Healthy	
-74	23	Honest	
-75	23	Honorable	
-76	93	Humble	
-77	140	Humorous	
-78	53	Idealistic	
-79	139	Imaginative	
-80	145	Independent	
-81	139	Ingenious	
-82	139	Inquisitive	
-83	148	Insightful	
-84	139	Intelligent	
-85	93	Interesting	
-86	139	Intuitive	
-87	139	Inventive	
-88	71	Joyful	
-89	148	Kind	
-90	139	Knowledgeable	
-91	53	Laid-back	
-92	71	Lighthearted	
-93	4	Likable	
-94	71	Lively	
-95	93	Lovable	
-96	93	Loving	
-97	23	Loyal	
-98	148	Mature	
-99	53	Mellow	
-100	72	Motivated	
-101	93	Natural	
-102	6	Neat	
-103	148	Nurturing	
-104	148	Observant	
-105	23	Open-minded	
-106	53	Optimistic	
-107	6	Organized	
-108	23	Original	
-109	7	Outgoing	
-110	148	Patient	
-111	53	Peaceful	
-112	148	Perceptive	
-113	72	Persevering	
-114	72	Persistent	
-115	93	Pleasant	
-116	53	Positive	
-117	72	Practical	
-118	23	Principled	
-119	18	Private	
-120	72	Problem-solving	
-121	140	Proud	
-122	139	Quick-witted	
-123	53	Quiet	
-124	139	Rational	
-125	139	Reasonable	
-126	53	Reflective	
-127	148	Reliable	
-128	145	Resilient	
-129	139	Resourceful	
-130	93	Respectful	
-131	145	Responsible	
-132	145	Self-confident	
-133	72	Self-sacrificing	
-134	145	Self-sufficient	
-135	148	Sensitive	
-136	139	Sharp	
-137	23	Sincere	
-138	139	Skillful	
-139	2	Smart	
-140	4	Sociable	
-141	18	Spiritual	
-142	7	Spontaneous	
-143	145	Stable	
-144	145	Steady	
-145	3	Strong	
-146	72	Studious	
-147	72	Successful	
-148	3	Supportive	
-149	7	Surprising	
-150	148	Sympathetic	
-151	139	Talented	
-152	6	Thorough	
-153	53	Thoughtful	
-154	72	Tireless	
-155	18	Tolerant	
-156	23	Trusting	
-157	93	Trustworthy	
-158	23	Truthful	
-159	148	Understanding	
-160	93	Unique	
-161	93	Unselfish	
-162	93	Upbeat	
-163	17	Vigilant	
-164	93	Warm	
-165	139	Wise	
-166	140	Witty	
-167	23	Worthy	
-168	140	Organising groups	
-169	140	Mediating	
-170	148	Understanding others	
-171	1	Appearance	
-173	171	Fit	
-176	171	Slim	
-177	171	Clean	
-178	171	Voluptuous	
-180	72	Passionate	
+2	0	Physical	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+3	0	Intellectual	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+4	0	Emotional	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+5	0	Social	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+6	2	Active	John Gottman
+7	2	Appearance	John Gottman
+8	3	Conscientious	https://en.wikipedia.org/wiki/Personality
+9	3	Hardworking	John Gottman
+10	3	Smart	John Gottman
+11	4	Extraversion	https://en.wikipedia.org/wiki/Personality
+12	4	Easygoing	John Gottman
+13	4	Happy	John Gottman
+14	4	Strong	John Gottman
+15	4	Supportive	John Gottman
+16	5	Accepting	https://en.wikipedia.org/wiki/Personality_psychology#Personality_theories
+17	5	Authentic	John Gottman
+18	5	Likable	John Gottman
+19	5	Sociable	John Gottman
+20	6	Facial Expressiveness	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+21	6	Diction	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+22	6	Vigilant	John Gottman
+23	7	Grooming	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+24	7	Dress	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+25	7	Healthy	John Gottman
+26	7	Fit	John Gottman
+27	7	Slim	John Gottman
+28	7	Clean	John Gottman
+29	7	Voluptuous	John Gottman
+30	8	Aware	John Gottman
+31	8	Careful	John Gottman
+32	8	Fair	John Gottman
+33	8	Neat	John Gottman
+34	8	Organized	John Gottman
+35	8	Thorough	John Gottman
+36	9	Ambitious	John Gottman
+37	9	Dedicated	John Gottman
+38	9	Determined	John Gottman
+39	9	Diligent	John Gottman
+40	9	Disciplined	John Gottman
+41	9	Motivated	John Gottman
+42	9	Persevering	John Gottman
+43	9	Persistent	John Gottman
+44	9	Practical	John Gottman
+45	9	Problem-solving	John Gottman
+46	9	Self-sacrificing	John Gottman
+47	9	Studious	John Gottman
+48	9	Successful	John Gottman
+49	9	Tireless	John Gottman
+50	9	Passionate	John Gottman
+51	10	Clever	John Gottman
+52	10	Creative	John Gottman
+53	10	Curious	John Gottman
+54	10	Discriminating	John Gottman
+55	10	Imaginative	John Gottman
+56	10	Ingenious	John Gottman
+57	10	Inquisitive	John Gottman
+58	10	Intelligent	John Gottman
+59	10	Intuitive	John Gottman
+60	10	Inventive	John Gottman
+61	10	Knowledgeable	John Gottman
+62	10	Quick-witted	John Gottman
+63	10	Rational	John Gottman
+64	10	Reasonable	John Gottman
+65	10	Resourceful	John Gottman
+66	10	Sharp	John Gottman
+67	10	Skillful	John Gottman
+68	10	Talented	John Gottman
+69	10	Wise	John Gottman
+70	11	Open to experience	https://en.wikipedia.org/wiki/Personality
+71	11	Adventurous	John Gottman
+72	11	Daring	John Gottman
+73	11	Dynamic	John Gottman
+74	11	Energetic	John Gottman
+75	11	Enterprising	John Gottman
+76	11	Feisty	John Gottman
+77	11	Outgoing	John Gottman
+78	11	Spontaneous	John Gottman
+79	11	Surprising	John Gottman
+80	12	Balanced	John Gottman
+81	12	Idealistic	John Gottman
+82	12	Laid-back	John Gottman
+83	12	Mellow	John Gottman
+84	12	Optimistic	John Gottman
+85	12	Peaceful	John Gottman
+86	12	Positive	John Gottman
+87	12	Quiet	John Gottman
+88	12	Reflective	John Gottman
+89	12	Thoughtful	John Gottman
+90	13	Cheerful	John Gottman
+91	13	Eager	John Gottman
+92	13	Exuberant	John Gottman
+93	13	Fun	John Gottman
+94	13	Joyful	John Gottman
+95	13	Lighthearted	John Gottman
+96	13	Lively	John Gottman
+97	14	Bold	John Gottman
+98	14	Brave	John Gottman
+99	14	Capable	John Gottman
+100	14	Commanding	John Gottman
+101	14	Confident	John Gottman
+102	14	Courageous	John Gottman
+103	14	Gutsy	John Gottman
+104	14	Independent	John Gottman
+105	14	Resilient	John Gottman
+106	14	Responsible	John Gottman
+107	14	Self-confident	John Gottman
+108	14	Self-sufficient	John Gottman
+109	14	Stable	John Gottman
+110	14	Steady	John Gottman
+111	15	Emotional Stability	https://en.wikipedia.org/wiki/Personality
+112	15	Appreciative	John Gottman
+113	15	Caring	John Gottman
+114	15	Compassionate	John Gottman
+115	15	Devoted	John Gottman
+116	15	Empathetic	John Gottman
+117	15	Gentle	John Gottman
+118	15	Insightful	John Gottman
+119	15	Kind	John Gottman
+120	15	Mature	John Gottman
+121	15	Nurturing	John Gottman
+122	15	Observant	John Gottman
+123	15	Patient	John Gottman
+124	15	Perceptive	John Gottman
+125	15	Reliable	John Gottman
+126	15	Sensitive	John Gottman
+127	15	Sympathetic	John Gottman
+128	15	Understanding	John Gottman
+129	15	Understanding others	
+130	16	Flexible	John Gottman
+131	16	Forgiving	John Gottman
+132	16	Private	John Gottman
+133	16	Spiritual	John Gottman
+134	16	Tolerant	John Gottman
+135	17	Dependable	John Gottman
+136	17	Ethical	John Gottman
+137	17	Honest	John Gottman
+138	17	Honorable	John Gottman
+139	17	Loyal	John Gottman
+140	17	Open-minded	John Gottman
+141	17	Original	John Gottman
+142	17	Principled	John Gottman
+143	17	Sincere	John Gottman
+144	17	Trusting	John Gottman
+145	17	Truthful	John Gottman
+146	17	Worthy	John Gottman
+147	18	Bright	John Gottman
+148	18	Calm	John Gottman
+149	18	Considerate	John Gottman
+150	18	Friendly	John Gottman
+151	18	Generous	John Gottman
+152	18	Giving	John Gottman
+153	18	Humble	John Gottman
+154	18	Interesting	John Gottman
+155	18	Lovable	John Gottman
+156	18	Loving	John Gottman
+157	18	Natural	John Gottman
+158	18	Pleasant	John Gottman
+159	18	Respectful	John Gottman
+160	18	Trustworthy	John Gottman
+161	18	Unique	John Gottman
+162	18	Unselfish	John Gottman
+163	18	Upbeat	John Gottman
+164	18	Warm	John Gottman
+165	19	Agreeableness	https://en.wikipedia.org/wiki/Personality
+166	19	Manners	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
+167	19	Adaptable	John Gottman
+168	19	Fascinating	John Gottman
+169	19	Funny	John Gottman
+170	19	Humorous	John Gottman
+171	19	Proud	John Gottman
+172	19	Witty	John Gottman
+173	19	Organising groups	
+174	19	Mediating	
