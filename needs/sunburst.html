@@ -4,6 +4,11 @@
   path {
     stroke: #fff;
   }
+
+  /* https://stackoverflow.com/a/42613421/412529 wrap list to multiple columns */
+  div#list { 
+    column-width:150px;
+  }
 </style>
 
 <body>
@@ -20,6 +25,9 @@
   <div id="source"></div>
   <br />
   <svg />
+  <div id="list">
+    <ul></ul>
+  </div>
   <div id="log"></div>
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script>
@@ -160,13 +168,14 @@
         exportText();
         load();
       });
-    let mouseover = function(d) {
+    let mouseover = function (d) {
       if (d3.event.shiftKey) {
         d.selected = 1;
+        update_selection_display();
         transition(100);
       }
     }
-    
+
     function update(root) {
       d3.select("div#source").node().innerHTML = 'Source: <a href="' + root.data.Origin + '">' + root.data.Origin + '</a>';
       let paths = svg.selectAll("path")
@@ -228,7 +237,16 @@
     function pathclick(d) {
       d.selected ^= 1;
       // angle = τ * (1.25 - d.x);
+      update_selection_display();
       transition(500);
+    }
+
+    // Show a list of the selected elements separately for saving
+    function update_selection_display() {
+      let ds = root.descendants().filter(d => d.selected);
+      let lis = d3.select("div#list ul").selectAll("li").data(ds, d => d.data.Index);
+      lis.enter().append("li").text(d => d.data.Move);
+      lis.exit().remove();
     }
 
     // returns true if interval was running
