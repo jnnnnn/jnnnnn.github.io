@@ -12,13 +12,15 @@
 </style>
 
 <body>
-  <button type="button" onclick="swapProjection()">box/circle</button>
   <button type="button" onclick="loadfile('feelings-tree.tsv')">feelings-nouns-simple</button>
   <button type="button" onclick="loadfile('feelings-tree2.tsv')">feelings-adj</button>
   <button type="button" onclick="loadfile('feelings-tree3.tsv')">feelings-nouns</button>
   <button type="button" onclick="loadfile('feelings-tree4.tsv')">feeelings-lots</button>
   <button type="button" onclick="loadfile('feelings-tree5.tsv')">feelings-detail</button>
+  <button type="button" onclick="loadfile('feelings-tree6.tsv')">feelings-2level</button>
   <button type="button" onclick="loadfile('cherish-tree.tsv')">cherish</button>
+  <br />
+  <button type="button" onclick="swapProjection()">box/circle</button>
   <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here"
     onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
   <input type="checkbox" id="checkboxdraggable" />Draggable
