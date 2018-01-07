@@ -7,37 +7,13 @@
 <style>
 button { font-size:14pt; }
 </style>
-
 </head>
-<body style="width:100% padding:0pt margin:0pt">
-<div id="descriptive">
-Don't forget:
-<ul>
-<li>Be safe and respectful (physical and mental safety are both important)</li>
-<li>Have fun. Don't do something if it isn't fun.</li>
-</ul>
-</div>
-
-<h3>Variation generator</h3>
-<div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
-<div id="index"></div>
-<button type="button" onclick="random_variation()">Random variation</button>
-<button type="button" onclick="vary()">Alter variation</button>
-<button type="button" onclick="next()">Next variation</button>
-<button type="button" onclick="update_description()">Show generator options</button>
-<div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
-
 <script>
 function chooseAtRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-var choices = [
-"stroke,lick,suck,tickle,fondle,massage,squeeze".split(","),
-"palm,lips,chest,tummy,sex parts,close to sex parts,sex parts,close to sex parts,toes,knees,hip bones,shoulders".split(","),
-",,,,,,,,with ice,with your sex parts,with your feet,with your eyelashes".split(","),
-",,,,,,,,slowly,slowly,quickly,firmly,upside-down".split(","),
-];
+var choices = [["a", "b", "c"],["1","2","3"]];
 
 var variant = choices.map(function() { return ""; });
 var totalpossibilities = 0;
@@ -61,15 +37,9 @@ function update_screen() {
   document.getElementById("index").innerHTML = possibility_index() + " / " + totalpossibilities;
 }
 
-function update_description() {
-  var desc = document.createElement("ul");
-  desc.innerHTML = "The generator selects from the following options (with equal probability):";
-  for (var i = 0; i < choices.length; i++) {
-    var item = document.createElement("li");
-    item.innerHTML = choices[i];
-    desc.appendChild(item);
-  }
-  document.getElementById("descriptive").appendChild(desc);
+function load_new_choices() {
+  choices = document.getElementById("choices").value.split('\n').map(x => x.split(","));
+  return choices;
 }
 
 function uniques(arr) {
@@ -108,5 +78,29 @@ function possibility_dedex(value) {
 }
 
 </script>
+<body style="width:100% padding:0pt margin:0pt" onload="load_new_choices()">
+<div id="descriptive">
+Don't forget:
+<ul>
+<li>Be safe and respectful (physical and mental safety are both important)</li>
+<li>Have fun. Don't do something if it isn't fun.</li>
+</ul>
+</div>
+
+<h3>Variation generator</h3>
+<div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
+<div id="index"></div>
+<button type="button" onclick="random_variation()">Random variation</button>
+<button type="button" onclick="vary()">Alter variation</button>
+<button type="button" onclick="next()">Next variation</button>
+<button type="button" onclick="load_new_choices()">Load new choices</button>
+<textarea id="choices">
+tickle,massage,stroke,squeeze,lick,suck,fondle
+palm,lips,chest,tummy,sex parts,close to sex parts,sex parts,close to sex parts,toes,knees,hip bones,shoulders
+,,,,,,,,with ice,with your sex parts,with your feet,with your eyelashes
+,,,,,,,,slowly,slowly,quickly,firmly,upside-down
+</textarea>
+<div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
+
 </body>
 </html>
