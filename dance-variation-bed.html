@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Pleasing Variation</title>
+<style>
+button { font-size:14pt; }
+</style>
+
+</head>
+<body style="width:100% padding:0pt margin:0pt">
+<div id="descriptive">
+Don't forget:
+<ul>
+<li>Be safe and respectful (physical and mental safety are both important)</li>
+<li>Have fun. Don't do something if it isn't fun.</li>
+</ul>
+</div>
+
+<h3>Variation generator</h3>
+<div id="randvar" style="padding:1em; font-size:16pt; width:80%; height:60px"></div>
+<div id="index"></div>
+<button type="button" onclick="random_variation()">Random variation</button>
+<button type="button" onclick="vary()">Alter variation</button>
+<button type="button" onclick="next()">Next variation</button>
+<button type="button" onclick="update_description()">Show generator options</button>
+<div style="height:300px"></div> <!-- padding at the bottom to allow scrolling past the end -->
+
+<script>
+function chooseAtRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+var choices = [
+"stroke,lick,suck,tickle,fondle,massage,squeeze".split(","),
+"palm,lips,chest,tummy,sex parts,close to sex parts,sex parts,close to sex parts,toes,knees,hip bones,shoulders".split(","),
+",,,,,,,,with ice,with your sex parts,with your feet,with your eyelashes".split(","),
+",,,,,,,,slowly,slowly,quickly,firmly,upside-down".split(","),
+];
+
+var variant = choices.map(function() { return ""; });
+var totalpossibilities = 0;
+
+function vary() {  
+  var thing_to_vary = Math.floor(Math.random() * choices.length);
+  variant[thing_to_vary] = chooseAtRandom(choices[thing_to_vary]);
+  update_screen();  
+}
+
+function random_variation() {
+  for (var i = 0; i < choices.length; i++) {
+    variant[i] = chooseAtRandom(choices[i]);
+  }
+  update_screen();
+}
+
+function update_screen() {
+  var div = document.getElementById("randvar");
+  div.innerHTML = variant.join(" ")
+  document.getElementById("index").innerHTML = possibility_index() + " / " + totalpossibilities;
+}
+
+function update_description() {
+  var desc = document.createElement("ul");
+  desc.innerHTML = "The generator selects from the following options (with equal probability):";
+  for (var i = 0; i < choices.length; i++) {
+    var item = document.createElement("li");
+    item.innerHTML = choices[i];
+    desc.appendChild(item);
+  }
+  document.getElementById("descriptive").appendChild(desc);
+}
+
+function uniques(arr) {
+  return arr.filter(
+    function(value, index, self) { 
+      return self.indexOf(value) === index; 
+    });
+}
+
+function next() {
+  possibility_dedex(possibility_index() + 1);
+  update_screen();
+}
+
+function possibility_index() {
+  var value = 0;
+  var base = 1;
+  for (var i = 0; i < choices.length; i++) {
+    value += base * uniques(choices[i]).indexOf(variant[i]);
+    base *= uniques(choices[i]).length;
+  }
+
+  totalpossibilities = base;
+  return value;
+}
+
+function possibility_dedex(value) {
+  var base = totalpossibilities;
+
+  for (var i = choices.length - 1; i >= 0; i--) {
+    base /= uniques(choices[i]).length;
+    variant[i] = uniques(choices[i])[Math.floor(value/base)];
+    value %= base;
+  }
+  return variant;
+}
+
+</script>
+</body>
+</html>
