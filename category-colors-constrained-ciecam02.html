@@ -41,8 +41,8 @@ p { max-width: 40em; }
   <form id="fc" onsubmit="force.start(); return false;" style="display:inline">     
     <pre>(note: d3.jab("white") = {J: 100, a: 0, b: 0})</pre>
     <h4>Allowed colors:</h4>
-    <textarea class="side" id="constrainttext">function constraint(jab) {
-  return jab.J > 45 && jab.J < 95;
+    <textarea class="side" id="constrainttext">function constraint({J, a, b}) {
+  return J > 45 && J < 95;
 }</textarea>
     <input type="button" value="Start" onclick="initcolors();"/>
     <input type="button" value="Pause" onclick="if(sorting) sorting=false; else {sorting=true; sortcolors();}"/>
@@ -56,26 +56,26 @@ p { max-width: 40em; }
   <h4>Some example constraints</h4>
   <pre>
 // All colours with integer J.a.b. values
-function constraint(jab) { 
+function constraint({J, a, b}) { 
   return true;
 }
 
 // Constant distance to a given colour:
-function constraint(jab) {   
+function constraint({J, a, b}) {   
   var centre = d3.jab(120, 20, 20); // J, a, b
-  var dist = jab_dist(centre, jab);
+  var dist = jab_dist(centre, d3.jab(J, a, b));
   return (75 < dist && dist < 76);
 }
 
 // other functions..
-return 30*30 < jab.a*jab.a+jab.b*jab.b ; // No greys
-return jab.a + jab.b < 10; // no red
-return jab.J < 30; // dark
-return 80 < jab.J; // light
-return jab_dist(jab, d3.jab("blue")) < 50; // blues
-return jab_dist(jab, d3.jab("red")) < 50; // reds
-return jab_dist(jab, d3.jab("#00ff00")) > 70; // no greens
-return jab.rgb().r > 230; // Strong red channel
+return 30*30 < a*a+b*b ; // No greys
+return a + b < 10; // no red
+return J < 30; // dark
+return 80 < J; // light
+return jab_dist(d3.jab(J, a, b), d3.jab("blue")) < 50; // blues
+return jab_dist(d3.jab(J, a, b), d3.jab("red")) < 50; // reds
+return jab_dist(d3.jab(J, a, b), d3.jab("#00ff00")) > 70; // no greens
+return rgb().r > 230; // Strong red channel
   </pre>
   </div>
 </div>
