@@ -43,7 +43,7 @@
   <input type="checkbox" id="checkboxdraggable" />Draggable
   <div id="source"></div>
   <br />
-  <svg />
+  <svg></svg>
   <div id="list">
     <ul></ul>
   </div>
@@ -244,7 +244,9 @@
         .on("mouseover", mouseover)
         .attr("d", p.shape)
         .on("click", pathclick)
-        .style("fill", d => "white");
+        .style("fill", d => "white")
+        .style("stroke", "#fff")
+        .style("stroke-width", 1);
       newPaths.append("title").text(d => d.data.Move);
 
       paths.exit().remove();
