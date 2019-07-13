@@ -935,17 +935,17 @@ Index	Parent	Start	Move	End	Tags	Origin	Date	Video	Description
 942	-	Close hold	Half 360 + rondez	Close hold opened		Romina	2017-04-10		
 943	-	Close hold opened	Girl walk forward	Close hold		Romina	2017-04-10		
 944	570,861	Close hold	Double turn + neck roll	Neck hold		Romina	2017-04-10		Girl turns very fast, leaving time for boy to put hand on neck to lead headroll on last two beats
-945	29	Close hold	Bolero basic 	Close hold 		Sibf	2017-04-28		Pause on two, no tap
+945	29	Close hold	Bolero basic 	Close hold		Sibf	2017-04-28		Pause on two, no tap
 946	834	Embrace	Chest isolations (guided) 	Embrace	body	Brazil girl 	2017-04-29		
 947	946	Embrace	Chest isolations (bowed)	Embrace	body, hard	Brazil girl 	2017-04-29		
 948	-	Embrace	Kizomba butt	Embrace		Brazil girl 	2017-04-29		Boy leads by pulling in chest with back of hand slightly and also doing the move so that the girl can mirror. Stick butt out, up, then lock back in neutral. Upper body still. 
 949	-	Crosshand	Girl walk forward 	Crosshand		Carlos y Chloe	2017-04-29		
-950	117	Crosshand	Arm sweep	Double neck hold 		Carlos y Chloe	2017-04-29		Move girl's hands to her shoulders so that her elbows are sticking out, then put your hands inside her elbows and sweep her arms around in a big circle. Place her hands on your waist and your forearms on her shoulders (hands behind her head) 
-951	296	Double neck hold 	Slow swoop step	Double neck hold	fun	Carlos y Chloe	2017-04-29		Step side to side, dropping low on odd counts. 
-952	899	Double neck hold	Neck and body roll	Open hold 		Carlos y Chloe	2017-04-29		Lead a neck roll, but press down on shoulder and drop your own body so that she bows under the neck roll
-953	159,190	Crosshand	Girl behind tangle	Open hold 	turn	Carlos y Chloe	2017-04-29		Girl turn then boy half turn on 7,8. Boy hammerlocks his right arm under girl's arm to lock GRA in place against his side. Swap hands then boy ducks under his right arm (girl's left arm) 
-954	951	Open hold 	Arm sweep butt swoops	Open hold 	fun	Carlos y Chloe	2017-04-29		Turn girl, then with other hand, hold it up and half-time step side to side, while swooping body and throwing her hands from up to down. 
-955	-	Neck hold	Hair inspection 	Close hold 	weird	Carlos y Chloe	2017-04-29		Get close and drag her hair past your face (don't sniff it). Only try this on friends, most girls don't like people touching their hair. 
+950	117	Crosshand	Arm sweep	Double neck hold		Carlos y Chloe	2017-04-29		Move girl's hands to her shoulders so that her elbows are sticking out, then put your hands inside her elbows and sweep her arms around in a big circle. Place her hands on your waist and your forearms on her shoulders (hands behind her head) 
+951	296	Double neck hold	Slow swoop step	Double neck hold	fun	Carlos y Chloe	2017-04-29		Step side to side, dropping low on odd counts. 
+952	899	Double neck hold	Neck and body roll	Open hold		Carlos y Chloe	2017-04-29		Lead a neck roll, but press down on shoulder and drop your own body so that she bows under the neck roll
+953	159,190	Crosshand	Girl behind tangle	Open hold	turn	Carlos y Chloe	2017-04-29		Girl turn then boy half turn on 7,8. Boy hammerlocks his right arm under girl's arm to lock GRA in place against his side. Swap hands then boy ducks under his right arm (girl's left arm) 
+954	951	Open hold	Arm sweep butt swoops	Open hold	fun	Carlos y Chloe	2017-04-29		Turn girl, then with other hand, hold it up and half-time step side to side, while swooping body and throwing her hands from up to down. 
+955	-	Neck hold	Hair inspection 	Close hold	weird	Carlos y Chloe	2017-04-29		Get close and drag her hair past your face (don't sniff it). Only try this on friends, most girls don't like people touching their hair. 
 956	800	Boy wrap	Slide through legs horizontal spin	Titanic	aerial, elite, fun, hard	youtube	2017-06-01	https://youtu.be/UV8dHYsP028?t=2m8s	Girl squats down behind boy, crosses her hands, then slides through his legs because he pulls her, feet first. She has a lot of momentum and spins horizontally before landing in front of him.
 964	175	Open hold	Gunshot	Arm locked		Garduce	2017-06-06		Elbow up and over her arm, then pin her arm against your side with your elbow (not in your armpit because that's gross)
 957	964	Arm locked	Pull into cuddle	Open hold	body	Garduce	2017-06-06		 lock her arm to your side with your elbow and pull her forwards. Each has a hand on the bac the of the other's neck. Triangle step (grind step) the open. Good after a tricky move. 
