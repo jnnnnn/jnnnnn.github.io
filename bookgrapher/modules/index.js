@@ -38,7 +38,7 @@ let state = {
   simulation: simulation
 };
 
-const dragstarted = () => {
+const dragstarted = state => () => {
   if (!d3.event.active) {
     state.simulation.alphaTarget(0.3).restart();
   }
@@ -46,12 +46,12 @@ const dragstarted = () => {
   d3.event.subject.fy = state.transform.invertY(d3.event.y);
 };
 
-const dragged = () => {
+const dragged = state => () => {
   d3.event.subject.fx = state.transform.invertX(d3.event.x);
   d3.event.subject.fy = state.transform.invertY(d3.event.y);
 };
 
-const dragended = () => {
+const dragended = state => () => {
   if (!d3.event.active) {
     state.simulation.alphaTarget(0);
   }
@@ -68,6 +68,7 @@ const drawNode = d => {
 
 const simulationUpdate = state => () => {
   context.save();
+  const { transform } = state;
 
   context.clearRect(0, 0, graphWidth, height);
   context.translate(transform.x, transform.y);
@@ -86,6 +87,7 @@ const simulationUpdate = state => () => {
 };
 
 const dragsubject = state => () => {
+  const { transform } = state;
   for (let node of state.nodes) {
     const dx = transform.invertX(d3.event.x) - node.x;
     const dy = transform.invertY(d3.event.y) - node.y;
@@ -101,30 +103,31 @@ const dragsubject = state => () => {
 
 const createGraph = async () => {
   const data = await d3.json("data.json");
+  state.nodes = data.nodes;
+  state.edges = data.edges;
 
   d3.select(graphCanvas)
     .call(
       d3
         .drag()
-        .subject(dragsubject(data))
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended)
+        .subject(dragsubject(state))
+        .on("start", dragstarted(state))
+        .on("drag", dragged(state))
+        .on("end", dragended(state))
     )
     .call(
       d3
         .zoom()
         .scaleExtent([1 / 10, 8])
         .on("zoom", () => {
-          transform = d3.event.transform;
-          console.log(transform);
-          simulationUpdate(data);
+          state.transform = d3.event.transform;
+          simulationUpdate(state);
         })
     );
 
-  simulation.nodes(data.nodes).on("tick", simulationUpdate(data));
+  simulation.nodes(data.nodes).on("tick", simulationUpdate(state));
 
-  simulation.force("link").links(data.edges);
+  simulation.force("link").links(state.edges);
 };
 
 createGraph();
