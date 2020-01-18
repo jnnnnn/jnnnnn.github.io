@@ -1,7 +1,5 @@
 "use strict";
-import {} from "./drag.js";
-
-const radius = 5;
+import { dragstarted, dragged, dragended, dragsubject } from "./drag.js";
 
 const height = window.innerHeight;
 const graphWidth = window.innerWidth;
@@ -20,7 +18,10 @@ const simulation = d3
   .force("center", d3.forceCenter(graphWidth / 2, height / 2))
   .force("x", d3.forceX(graphWidth / 2).strength(0.1))
   .force("y", d3.forceY(height / 2).strength(0.1))
-  .force("charge", d3.forceManyBody().strength(-50))
+  .force(
+    "charge",
+    d3.forceManyBody().strength(d => -10 * (d.radius || 5))
+  )
   .force(
     "link",
     d3
@@ -38,29 +39,9 @@ let state = {
   simulation: simulation
 };
 
-const dragstarted = state => () => {
-  if (!d3.event.active) {
-    state.simulation.alphaTarget(0.3).restart();
-  }
-  d3.event.subject.fx = state.transform.invertX(d3.event.x);
-  d3.event.subject.fy = state.transform.invertY(d3.event.y);
-};
-
-const dragged = state => () => {
-  d3.event.subject.fx = state.transform.invertX(d3.event.x);
-  d3.event.subject.fy = state.transform.invertY(d3.event.y);
-};
-
-const dragended = state => () => {
-  if (!d3.event.active) {
-    state.simulation.alphaTarget(0);
-  }
-  d3.event.subject.fx = null;
-  d3.event.subject.fy = null;
-};
-
 const drawNode = d => {
   context.beginPath();
+  const radius = d.radius || 5;
   context.arc(d.x, d.y, radius, 0, 2 * Math.PI, true);
   context.fillStyle = d.col || "black";
   context.fill();
@@ -84,21 +65,6 @@ const simulationUpdate = state => () => {
   state.nodes.forEach(drawNode);
 
   context.restore();
-};
-
-const dragsubject = state => () => {
-  const { transform } = state;
-  for (let node of state.nodes) {
-    const dx = transform.invertX(d3.event.x) - node.x;
-    const dy = transform.invertY(d3.event.y) - node.y;
-
-    if (dx * dx + dy * dy < radius * radius) {
-      node.x = transform.applyX(node.x);
-      node.y = transform.applyY(node.y);
-
-      return node;
-    }
-  }
 };
 
 const createGraph = async () => {

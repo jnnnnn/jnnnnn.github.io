@@ -17,3 +17,7 @@ Started! Base a simple chart on https://bl.ocks.org/jodyphelan/5dc989637045a0f48
 OK, let's just get a canvas on the page. I don't want to use SVG because the performance gets bad and working out what was clicked on gets tricky.
 
 Oh, if I have a script in the body it has to go after any of the elements it references, otherwise the browser won't find them in the DOM.
+
+Investigating whether I can do it in 3d? Maybe... https://bl.ocks.org/vasturiano/f59675656258d3f490e9faa40828c0e7 is pretty cool. Exploring that network of bl.ocks shows some interesting bl.ocks that are linked to several others.
+
+Starting to make sure everything stays manageable. No unit tests yet, but global state is explicit now and I have started moving related functions (the drag handlers) into separate files.
