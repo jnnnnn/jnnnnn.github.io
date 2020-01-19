@@ -11,23 +11,23 @@ const graphCanvas = d3
   .attr("height", height + "px")
   .node();
 
-const context = graphCanvas.getContext("2d");
+const ctx = graphCanvas.getContext("2d");
 
+const size = node => 12 - node.level;
+
+const chargeStrength = node => -1 * Math.pow(size(node), 3);
 const simulation = d3
   .forceSimulation()
-  .force("center", d3.forceCenter(graphWidth / 2, height / 2))
+  //.force("center", d3.forceCenter(graphWidth / 2, height / 2))
   .force("x", d3.forceX(graphWidth / 2).strength(0.1))
   .force("y", d3.forceY(height / 2).strength(0.1))
-  .force(
-    "charge",
-    d3.forceManyBody().strength(d => -10 * (d.radius || 5))
-  )
+  .force("charge", d3.forceManyBody().strength(chargeStrength))
   .force(
     "link",
     d3
       .forceLink()
-      .strength(1)
       .id(d => d.id)
+      .distance(100)
   )
   .alphaTarget(0)
   .alphaDecay(0.05);
@@ -40,31 +40,38 @@ let state = {
 };
 
 const drawNode = d => {
-  context.beginPath();
+  ctx.beginPath();
   const radius = d.radius || 5;
-  context.arc(d.x, d.y, radius, 0, 2 * Math.PI, true);
-  context.fillStyle = d.col || "black";
-  context.fill();
+  ctx.arc(d.x, d.y, radius, 0, 2 * Math.PI, true);
+  ctx.fillStyle = d.col || "#ddd";
+  ctx.fill();
+
+  ctx.fillStyle = "black";
+  ctx.font = 24 / d.level + "px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(d.text, d.x, d.y);
+};
+
+const drawEdge = d => {
+  ctx.beginPath();
+  ctx.moveTo(d.source.x, d.source.y);
+  ctx.lineTo(d.target.x, d.target.y);
+  ctx.strokeStyle = "#ddd";
+  ctx.stroke();
 };
 
 const simulationUpdate = state => () => {
-  context.save();
+  ctx.save();
   const { transform } = state;
 
-  context.clearRect(0, 0, graphWidth, height);
-  context.translate(transform.x, transform.y);
-  context.scale(transform.k, transform.k);
+  ctx.clearRect(0, 0, graphWidth, height);
+  ctx.translate(transform.x, transform.y);
+  ctx.scale(transform.k, transform.k);
 
-  state.edges.forEach(d => {
-    context.beginPath();
-    context.moveTo(d.source.x, d.source.y);
-    context.lineTo(d.target.x, d.target.y);
-    context.stroke();
-  });
-
+  state.edges.forEach(drawEdge);
   state.nodes.forEach(drawNode);
 
-  context.restore();
+  ctx.restore();
 };
 
 const createGraph = async () => {
