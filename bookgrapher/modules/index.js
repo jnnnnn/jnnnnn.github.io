@@ -39,7 +39,7 @@ let state = {
   simulation: simulation
 };
 
-const drawNode = d => {
+const drawNode = state => d => {
   ctx.beginPath();
   const radius = d.radius || 5;
   ctx.arc(d.x, d.y, radius, 0, 2 * Math.PI, true);
@@ -52,7 +52,7 @@ const drawNode = d => {
   ctx.fillText(d.text, d.x, d.y);
 };
 
-const drawEdge = d => {
+const drawEdge = state => d => {
   ctx.beginPath();
   ctx.moveTo(d.source.x, d.source.y);
   ctx.lineTo(d.target.x, d.target.y);
@@ -60,7 +60,7 @@ const drawEdge = d => {
   ctx.stroke();
 };
 
-const simulationUpdate = state => () => {
+const draw = state => () => {
   ctx.save();
   const { transform } = state;
 
@@ -68,8 +68,8 @@ const simulationUpdate = state => () => {
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
-  state.edges.forEach(drawEdge);
-  state.nodes.forEach(drawNode);
+  state.edges.forEach(drawEdge(state));
+  state.nodes.forEach(drawNode(state));
 
   ctx.restore();
 };
@@ -79,26 +79,25 @@ const createGraph = async () => {
   state.nodes = data.nodes;
   state.edges = data.edges;
 
-  d3.select(graphCanvas)
-    .call(
-      d3
-        .drag()
-        .subject(dragsubject(state))
-        .on("start", dragstarted(state))
-        .on("drag", dragged(state))
-        .on("end", dragended(state))
-    )
-    .call(
-      d3
-        .zoom()
-        .scaleExtent([1 / 10, 8])
-        .on("zoom", () => {
-          state.transform = d3.event.transform;
-          simulationUpdate(state);
-        })
-    );
+  d3.select(graphCanvas).call(
+    d3
+      .drag()
+      .subject(dragsubject(state))
+      .on("start", dragstarted(state))
+      .on("drag", dragged(state))
+      .on("end", dragended(state))
+  );
+  d3.select(graphCanvas).call(
+    d3
+      .zoom()
+      .scaleExtent([0.1, 8])
+      .on("zoom", () => {
+        state.transform = d3.event.transform;
+        draw(state)();
+      })
+  );
 
-  simulation.nodes(data.nodes).on("tick", simulationUpdate(state));
+  simulation.nodes(data.nodes).on("tick", draw(state));
 
   simulation.force("link").links(state.edges);
 };
