@@ -48,13 +48,28 @@ let state = {
   selection: undefined,
   ctx,
   width,
-  height
+  height,
+  mouse: { x: 0, y: 0 }
 };
 
 const click = state => () => {
   const subject = dragsubject(state)();
   console.log(subject);
 };
+
+const mousemove = state => () => {
+  const [screenX, screenY] = d3.mouse(d3.event.currentTarget);
+  state.mouse = {
+    x: state.transform.invertX(screenX),
+    y: state.transform.invertY(screenY)
+  };
+};
+
+const keydown = state => () => {
+  console.log(d3.event);
+  console.log();
+};
+d3.select("body").on("keydown", keydown(state));
 
 const createGraph = async () => {
   const data = await d3.json("data.json");
@@ -64,6 +79,8 @@ const createGraph = async () => {
   const canvas = d3.select(graphCanvas);
 
   canvas.on("click", click(state));
+
+  canvas.on("mousemove", mousemove(state));
 
   canvas.call(
     d3

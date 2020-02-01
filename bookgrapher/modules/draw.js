@@ -20,7 +20,9 @@ const drawEdge = ctx => e => {
 };
 
 const drawOverlay = (ctx, state) => {};
-const drawSelection = (ctx, state) => {};
+const drawSelection = (ctx, state) => {
+  ctx.fillText("mouse", state.mouse.x, state.mouse.y);
+};
 
 export const draw = state => () => {
   const { transform, ctx, width, height } = state;
