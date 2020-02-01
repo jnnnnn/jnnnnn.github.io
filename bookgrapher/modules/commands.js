@@ -66,3 +66,14 @@ const removeEdge = state => (source, target) => {
   );
   updateEdges(state)(fewerEdges);
 };
+
+const edit = state => (source, target) => {
+  const node = target || source;
+  if (!node) return;
+
+  const textarea = document.createElement("textarea");
+  textarea.className = "centered";
+  document.body.append(textarea);
+  textarea.focus();
+  mutate(state)({ edit: node });
+};
