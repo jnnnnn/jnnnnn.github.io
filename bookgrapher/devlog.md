@@ -33,3 +33,9 @@ Implemented link and unlink commands. Unlink not working properly.
 ## 2020-02-02
 
 Got a little confused, thought state.edges was a list of pairs of ids, but it's actually pairs of (pointers to) real nodes.
+
+Next step is an "edit" command to change text, then a "new node" command will be easy, then resizing nodes (with `+` and `-` or maybe shift+zoom?)
+
+The edit command is a little tricky because the edit box has to appear and disappear. `state` could have an "editingNode" value? Yeah, seems reasonable.
+
+Work out proper state mutation foundation first, so that we have an undo stack.

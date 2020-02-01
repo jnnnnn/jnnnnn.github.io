@@ -1,27 +1,31 @@
-import { findNodeAtCoords } from "./model.js";
+import { findNodeAtCoords, mutate } from "./model.js";
 
 export const keydown = state => key => {
+  const target = findNodeAtCoords(state)(state.mouse); // maybe null
+  const source = state.selected;
   switch (key) {
     case "s":
-      select(state);
+      select(state)(target);
       break;
     case "l":
-      link(state);
+      link(state)(source, target);
       break;
     case "u":
-      unlink(state);
+      unlink(state)(source, target);
+      break;
+    case "e":
+      edit(state)(source, target);
       break;
   }
 };
 
-const select = state => {
-  state.selected = findNodeAtCoords(state)(state.mouse);
+const select = state => target => {
+  mutate(state)({ selected: target });
 };
 
-const link = state => {
-  const target = findNodeAtCoords(state)(state.mouse);
-  if (target && state.selected && target !== state.selected) {
-    addEdge(state)(state.selected, target);
+const link = state => (source, target) => {
+  if (target && source && target !== source) {
+    addEdge(state)(source, target);
   }
 };
 
@@ -36,28 +40,29 @@ const addEdge = state => (source, target) => {
   ) {
     return;
   }
-  state.edges = [...state.edges, { source, target }];
-  console.log(state.edges);
-  state.simulation.force("link").links(state.edges);
+
+  updateEdges(state)([...state.edges, { source, target }]);
 };
 
-const unlink = state => {
-  const target = findNodeAtCoords(state)(state.mouse);
-  if (target && state.selected && target !== state.selected) {
-    removeEdge(state)(state.selected, target);
+const updateEdges = state => edges => {
+  mutate(state)({ edges });
+  state.simulation.force("link").links(state.edges);
+  state.simulation.alpha(0.3).restart();
+};
+
+const unlink = state => (source, target) => {
+  if (target && source && target !== source) {
+    removeEdge(state)(source, target);
   }
 };
 
 const removeEdge = state => (source, target) => {
-  console.log("removing edges", source.id, target.id);
-  console.log(state.edges.map(e => [e.source, e.target]));
-  state.edges = state.edges.filter(
+  const fewerEdges = state.edges.filter(
     e =>
       !(
         (e.source === source && e.target === target) ||
         (e.target === source && e.source == target)
       )
   );
-  console.log(state.edges);
-  state.simulation.force("link").links(state.edges);
+  updateEdges(state)(fewerEdges);
 };
