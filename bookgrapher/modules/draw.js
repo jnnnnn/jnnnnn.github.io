@@ -9,7 +9,7 @@ const drawNode = state => n => {
   ctx.fill();
 
   ctx.fillStyle = "black";
-  ctx.font = size(n) + "px Arial";
+  ctx.font = size(n) * 2 + "px Arial";
   ctx.textAlign = "center";
   ctx.fillText(n.text, n.x, n.y);
 };
