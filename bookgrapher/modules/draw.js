@@ -1,13 +1,15 @@
+import { size } from "./model.js";
+
 const drawNode = state => n => {
   const { ctx } = state;
   ctx.beginPath();
-  const radius = n.radius || 5;
+  const radius = size(n);
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
   ctx.fillStyle = n.col || "#ddd";
   ctx.fill();
 
   ctx.fillStyle = "black";
-  ctx.font = 40 / Math.pow(2, n.level) + "px Arial";
+  ctx.font = size(n) + "px Arial";
   ctx.textAlign = "center";
   ctx.fillText(n.text, n.x, n.y);
 };
@@ -25,7 +27,7 @@ const drawSelection = state => ctx => {
   const n = state.selected;
   if (!n) return;
   ctx.beginPath();
-  const radius = (n.radius || 5) * 2;
+  const radius = size(n);
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
   ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
   ctx.fill();

@@ -39,3 +39,5 @@ Next step is an "edit" command to change text, then a "new node" command will be
 The edit command is a little tricky because the edit box has to appear and disappear. `state` could have an "editingNode" value? Yeah, seems reasonable.
 
 Work out proper state mutation foundation first, so that we have an undo stack.
+
+Change scaling to be truly quadratic so that zoom down to very small levels still works.

@@ -1,6 +1,6 @@
 export const findNodeAtCoords = state => ({ x, y }) => {
   for (let node of state.nodes) {
-    const radius = node.radius || 5;
+    const radius = size(node);
     const dx = x - node.x;
     const dy = y - node.y;
     if (dx * dx + dy * dy < radius * radius) {
@@ -28,3 +28,5 @@ export const mutate = state => stateMapper => {
       throw "Invalid state assignment";
   }
 };
+
+export const size = node => 40 / Math.pow(2, node.level || 12);
