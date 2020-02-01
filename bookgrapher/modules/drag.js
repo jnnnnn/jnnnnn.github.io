@@ -27,6 +27,12 @@ export const dragsubject = state => () => {
     const radius = node.radius || 5;
 
     if (dx * dx + dy * dy < radius * radius) {
+      // The tricky part is the need to distinguish between two coordinate
+      // spaces: the world coordinates used to position the circles, and the
+      // pointer coordinates representing the mouse or touches. The drag
+      // behavior doesn’t know the view is being transformed by the zoom
+      // behavior, so we must convert between the two coordinate spaces.
+      // https://bl.ocks.org/mbostock/2b534b091d80a8de39219dd076b316cd
       node.x = transform.applyX(node.x);
       node.y = transform.applyY(node.y);
 
