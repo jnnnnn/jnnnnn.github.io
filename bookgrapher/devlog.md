@@ -25,3 +25,5 @@ Starting to make sure everything stays manageable. No unit tests yet, but global
 ## 2020-02-01
 
 Working on stuff. Mouse following. Key press. Worked out the difference between screen space and model space. Screen space changes when we zoom or pan, but model space doesn't. Forces are calculated in model space. The nodes have values in model space. Rendering is done in model space but with the zoom/pan transform applied to the canvas graphics context.
+
+Implemented selection. Currently selected node is stored in model and drawn differently.

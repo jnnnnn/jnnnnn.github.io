@@ -3,7 +3,7 @@ const drawNode = state => n => {
   ctx.beginPath();
   const radius = n.radius || 5;
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
-  ctx.fillStyle = n === state.selected ? "red" : n.col || "#ddd";
+  ctx.fillStyle = n.col || "#ddd";
   ctx.fill();
 
   ctx.fillStyle = "black";
@@ -20,9 +20,15 @@ const drawEdge = ctx => e => {
   ctx.stroke();
 };
 
-const drawOverlay = (ctx, state) => {};
-const drawSelection = (ctx, state) => {
-  ctx.fillText("mouse", state.mouse.x, state.mouse.y);
+const drawOverlay = state => ctx => {};
+const drawSelection = state => ctx => {
+  const n = state.selected;
+  if (!n) return;
+  ctx.beginPath();
+  const radius = (n.radius || 5) * 2;
+  ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
+  ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+  ctx.fill();
 };
 
 export const draw = state => () => {
@@ -36,7 +42,7 @@ export const draw = state => () => {
 
   state.edges.forEach(drawEdge(ctx));
   state.nodes.forEach(drawNode(state));
-  drawSelection(ctx, state);
+  drawSelection(state)(ctx);
 
   ctx.restore();
 
