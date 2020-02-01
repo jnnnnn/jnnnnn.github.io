@@ -66,8 +66,10 @@ const mousemove = state => () => {
 };
 
 const keydown = state => () => {
-  console.log(d3.event);
-  console.log();
+  switch (d3.event.key) {
+    case "s": // select
+      break;
+  }
 };
 d3.select("body").on("keydown", keydown(state));
 
