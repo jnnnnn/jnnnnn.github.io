@@ -15,8 +15,15 @@ const graphCanvas = d3
 const ctx = graphCanvas.getContext("2d");
 
 const size = node => 12 - node.level;
+const distance = edge => {
+  const sum = Math.pow(2, size(edge.source)) + Math.pow(2, size(edge.target));
+  return sum / 3000;
+};
 
-const chargeStrength = node => -1 * Math.pow(size(node), 3);
+// Because this makes size 12 nodes have a reasonable amount of charge strength
+// (~1000) for a linkdistance of 100
+const chargeStrength = node => -4 * Math.pow(size(node) * 3, 2);
+
 const simulation = d3
   .forceSimulation()
   //.force("center", d3.forceCenter(graphWidth / 2, height / 2))
@@ -28,7 +35,7 @@ const simulation = d3
     d3
       .forceLink()
       .id(d => d.id)
-      .distance(100)
+      .distance(distance)
   )
   .alphaTarget(0)
   .alphaDecay(0.05);
@@ -61,7 +68,6 @@ const createGraph = async () => {
   canvas.call(
     d3
       .drag(canvas)
-      //.container(canvas)
       .subject(dragsubject(state))
       .on("start", dragstarted(state))
       .on("drag", dragged(state))
