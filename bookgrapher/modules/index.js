@@ -1,6 +1,7 @@
 "use strict";
 import { dragstarted, dragged, dragended, dragsubject } from "./drag.js";
 import { draw } from "./draw.js";
+import { keydown } from "./commands.js";
 
 const height = window.innerHeight;
 const width = window.innerWidth;
@@ -65,13 +66,10 @@ const mousemove = state => () => {
   };
 };
 
-const keydown = state => () => {
-  switch (d3.event.key) {
-    case "s": // select
-      break;
-  }
-};
-d3.select("body").on("keydown", keydown(state));
+d3.select("body").on("keydown", () => {
+  keydown(state)(d3.event.key);
+  draw(state)();
+});
 
 const createGraph = async () => {
   const data = await d3.json("data.json");

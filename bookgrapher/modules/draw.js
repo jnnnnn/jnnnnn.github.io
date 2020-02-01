@@ -1,8 +1,9 @@
-const drawNode = ctx => n => {
+const drawNode = state => n => {
+  const { ctx } = state;
   ctx.beginPath();
   const radius = n.radius || 5;
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
-  ctx.fillStyle = n.col || "#ddd";
+  ctx.fillStyle = n === state.selected ? "red" : n.col || "#ddd";
   ctx.fill();
 
   ctx.fillStyle = "black";
@@ -34,7 +35,7 @@ export const draw = state => () => {
   ctx.scale(transform.k, transform.k);
 
   state.edges.forEach(drawEdge(ctx));
-  state.nodes.forEach(drawNode(ctx));
+  state.nodes.forEach(drawNode(state));
   drawSelection(ctx, state);
 
   ctx.restore();
