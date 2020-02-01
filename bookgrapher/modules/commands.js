@@ -30,13 +30,14 @@ const addEdge = state => (source, target) => {
   if (
     state.edges.find(
       e =>
-        (e.source === source.id && e.target === target.id) ||
-        (e.target === source.id && e.source == target.id)
+        (e.source === source && e.target === target) ||
+        (e.target === source && e.source == target)
     )
   ) {
     return;
   }
-  state.edges = [...state.edges, { source: source.id, target: target.id }];
+  state.edges = [...state.edges, { source, target }];
+  console.log(state.edges);
   state.simulation.force("link").links(state.edges);
 };
 
@@ -49,12 +50,12 @@ const unlink = state => {
 
 const removeEdge = state => (source, target) => {
   console.log("removing edges", source.id, target.id);
-  console.log(state.edges);
+  console.log(state.edges.map(e => [e.source, e.target]));
   state.edges = state.edges.filter(
     e =>
       !(
-        (e.source === source.id && e.target === target.id) ||
-        (e.target === source.id && e.source == target.id)
+        (e.source === source && e.target === target) ||
+        (e.target === source && e.source == target)
       )
   );
   console.log(state.edges);

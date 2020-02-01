@@ -27,3 +27,9 @@ Starting to make sure everything stays manageable. No unit tests yet, but global
 Working on stuff. Mouse following. Key press. Worked out the difference between screen space and model space. Screen space changes when we zoom or pan, but model space doesn't. Forces are calculated in model space. The nodes have values in model space. Rendering is done in model space but with the zoom/pan transform applied to the canvas graphics context.
 
 Implemented selection. Currently selected node is stored in model and drawn differently.
+
+Implemented link and unlink commands. Unlink not working properly.
+
+## 2020-02-02
+
+Got a little confused, thought state.edges was a list of pairs of ids, but it's actually pairs of (pointers to) real nodes.
