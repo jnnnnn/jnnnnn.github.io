@@ -12,9 +12,20 @@ export const findNodeAtCoords = state => ({ x, y }) => {
 };
 
 const stateHistory = [];
+const redoStack = [];
 
 export const undo = state => {
+  if (stateHistory.length === 0) return;
+  redoStack.push({ ...state });
   const restoredState = stateHistory.pop();
+  Object.assign(state, restoredState);
+};
+
+export const redo = state => {
+  console.log("redo", redoStack);
+  if (redoStack.length === 0) return;
+  stateHistory.push({ ...state });
+  const restoredState = redoStack.pop();
   Object.assign(state, restoredState);
 };
 

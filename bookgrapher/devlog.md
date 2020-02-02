@@ -121,3 +121,11 @@ Do that and then push to github.
 It's called "fixed" nodes in d3 force graphs. Unfortunately the guide I found first was out of date (v3). In v5 you need to use `fx` and `fy` to pin nodes. The drag code that I started from uses this already, and was rudely clearing these properties which messed me up a bit.
 
 OK, done. Push! Exciting!
+
+Still need to implement redo. done.
+
+Would also like to implement copy/paste (to/from JSON) but that's a project for another time.
+
+Also SVG Export.
+
+Also I need to write up some documentation.

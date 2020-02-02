@@ -3,6 +3,7 @@ import {
   mutate,
   mutateNode,
   undo,
+  redo,
   addNode,
   removeEdge,
   addEdge,
@@ -31,7 +32,9 @@ export const keydown = state => key => {
       edit(state)(source, target);
       break;
     case "z":
-      undo(state);
+    case "Z":
+      if (d3.event.ctrlKey && d3.event.shiftKey) redo(state);
+      else if (d3.event.ctrlKey) undo(state);
       resetSimulation(state)();
       break;
     case "Delete":
