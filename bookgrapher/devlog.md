@@ -52,3 +52,15 @@ I tried to fix these places but it's still going blank after updating a node. I 
 Unfortunately, using react means using a javascript compiler. I don't want to do that. The preact docs talk about alternatives to transpiling. https://preactjs.com/guide/v10/getting-started#no-build-tools-route . Basically tagged templates. It looks good but I don't know how long editor support for it will last. https://github.com/developit/htm
 
 I will keep this in mind for a rewrite but I'm going to just try and fix my bug for now.
+
+Printing out the complete state before and after the mutation shows that the only thing that changed is the node's text. Everything else was copied correctly. Perhaps something was copied that shouldn't have been?
+
+Ah, just trying to mutate the existing node also doesn't work. So there is some other problem.
+
+Oh shit.
+
+```js
+document.body.remove(textarea);
+```
+
+This actually removes the body. lol.

@@ -73,13 +73,15 @@ const edit = state => (source, target) => {
 
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
+  textarea.value = node.text;
+  d3.event.stopPropagation(); // we don't need this but here for reference
+  d3.event.preventDefault(); // this stops the "keypress" event getting triggered and adding an e to the value
   document.body.append(textarea);
-  d3.event.stopPropagation();
   textarea.focus();
+  textarea.select();
 
   textarea.onblur = focusEvent => {
-    document.body.remove(textarea);
     mutateNode(state)(node, { text: textarea.value });
-    console.log(state);
+    textarea.remove();
   };
 };
