@@ -119,3 +119,12 @@ export const removeEdge = state => (source, target) => {
   mutate(state)({ edges });
   resetSimulation(state);
 };
+
+export const removeNode = state => node => {
+  const edges = state.edges.filter(
+    e => !(e.source === node || e.target === node)
+  );
+  const nodes = state.nodes.filter(n => n !== node);
+  mutate(state)({ nodes, edges });
+  resetSimulation(state);
+};

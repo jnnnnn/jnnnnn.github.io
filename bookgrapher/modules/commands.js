@@ -5,7 +5,8 @@ import {
   undo,
   addNode,
   removeEdge,
-  addEdge
+  addEdge,
+  removeNode
 } from "./model.js";
 
 export const keydown = state => key => {
@@ -29,6 +30,7 @@ export const keydown = state => key => {
       break;
     case "Delete":
     case "Backspace":
+    case "d":
       remove(state)(source, target);
       break;
     default:
@@ -38,6 +40,10 @@ export const keydown = state => key => {
 
 const select = state => (source, target) => {
   mutate(state)({ selected: target });
+};
+
+const remove = state => (source, target) => {
+  if (target) removeNode(state)(target);
 };
 
 const link = state => (source, target) => {
@@ -79,5 +85,3 @@ const edit = state => (source, target) => {
     keyEvent.stopPropagation();
   };
 };
-
-const remove = state => (source, target) => {};
