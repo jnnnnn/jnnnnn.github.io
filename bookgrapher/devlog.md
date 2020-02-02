@@ -74,10 +74,14 @@ Noticed my first bug: the selected node doesn't get updated when we replace a no
 Last things to do are:
 
 - new node (done)
-- delete node
-- resize node
+- delete node (done)
+- resize node (super easy)
 - persist state
-- Should new node be "n" or "e" over an empty space? try "e" to start with
+- Should new node be "n" or "e" over an empty space? try "e" to start with (done)
 - Clicking a node should select it.
 - A new node should be linked to the selected one if an existing node was selected. New nodes should be one size smaller than their parent by default.
 - Creating a new node not linked to anything should also select it.
+
+Clicking nodes is a little tricky because the click happens in index.js. I initially started calling into the select command directly but it would be better to have the click handler itself in index.js.
+
+Also, almost every mutation of state requires the simulation to be restarted so do that.

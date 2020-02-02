@@ -14,7 +14,6 @@ const stateHistory = [];
 export const undo = state => {
   const restoredState = stateHistory.pop();
   Object.assign(state, restoredState);
-  resetSimulation(state);
 };
 
 // Not quite properly implemented but good enough. Ideally it would not be
@@ -43,7 +42,6 @@ export const addNode = state => (values, parent) => {
       ? [...state.edges, { source: parent, target: newNode }]
       : state.edges
   });
-  resetSimulation(state);
 };
 
 export const mutateNode = state => (node, mutation) => {
@@ -58,14 +56,6 @@ export const mutateNode = state => (node, mutation) => {
     edges: replaceNodeInEdges(state.edges, node, node2),
     selected: state.selected === node ? node2 : state.selected
   });
-
-  resetSimulation(state);
-};
-
-export const resetSimulation = state => {
-  state.simulation.nodes(state.nodes);
-  state.simulation.force("link").links(state.edges);
-  state.simulation.alpha(0.3).restart();
 };
 
 const replaceNodeInEdges = (edges, oldNode, newNode) => {
@@ -105,7 +95,6 @@ export const addEdge = state => (source, target) => {
   }
 
   mutate(state)({ edges: [...state.edges, { source, target }] });
-  resetSimulation(state);
 };
 
 export const removeEdge = state => (source, target) => {
@@ -117,7 +106,6 @@ export const removeEdge = state => (source, target) => {
       )
   );
   mutate(state)({ edges });
-  resetSimulation(state);
 };
 
 export const removeNode = state => node => {
@@ -126,5 +114,4 @@ export const removeNode = state => node => {
   );
   const nodes = state.nodes.filter(n => n !== node);
   mutate(state)({ nodes, edges });
-  resetSimulation(state);
 };

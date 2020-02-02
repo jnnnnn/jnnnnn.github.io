@@ -1,7 +1,7 @@
 "use strict";
 import { dragstarted, dragged, dragended, dragsubject } from "./drag.js";
 import { draw } from "./draw.js";
-import { keydown } from "./commands.js";
+import { keydown, click } from "./commands.js";
 import { size } from "./model.js";
 
 const height = window.innerHeight;
@@ -49,11 +49,6 @@ let state = {
   width,
   height,
   mouse: { x: 0, y: 0 }
-};
-
-const click = state => () => {
-  const subject = dragsubject(state)();
-  console.log(subject);
 };
 
 const mousemove = state => () => {

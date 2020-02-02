@@ -27,6 +27,7 @@ export const keydown = state => key => {
       break;
     case "z":
       undo(state);
+      resetSimulation(state)();
       break;
     case "Delete":
     case "Backspace":
@@ -35,32 +36,49 @@ export const keydown = state => key => {
       break;
     case "+":
       mutateNode(state)(target, { ...target, level: target.level - 1 });
+      resetSimulation(state)();
       break;
     case "-":
       mutateNode(state)(target, { ...target, level: target.level + 1 });
+      resetSimulation(state)();
       break;
     default:
       console.log("No command for ", key, d3.event);
   }
 };
 
+export const click = state => () => {
+  const modelCoords = {
+    x: state.transform.invertX(d3.event.x),
+    y: state.transform.invertY(d3.event.y)
+  };
+  const target = state.simulation.find(modelCoords.x, modelCoords.y);
+  if (target) select(state)(null, target);
+};
+
 const select = state => (source, target) => {
   mutate(state)({ selected: target });
+  resetSimulation(state)(0);
 };
 
 const remove = state => (source, target) => {
-  if (target) removeNode(state)(target);
+  if (target) {
+    removeNode(state)(target);
+    resetSimulation(state)();
+  }
 };
 
 const link = state => (source, target) => {
   if (target && source && target !== source) {
     addEdge(state)(source, target);
+    resetSimulation(state)();
   }
 };
 
 const unlink = state => (source, target) => {
   if (target && source && target !== source) {
     removeEdge(state)(source, target);
+    resetSimulation(state)();
   }
 };
 
@@ -81,6 +99,7 @@ const edit = state => (source, target) => {
     if (target) mutateNode(state)(target, { text: textarea.value });
     else addNode(state)({ text: textarea.value, ...coords }, source);
     textarea.remove();
+    resetSimulation(state)();
   };
   textarea.onblur = finishEditing;
 
@@ -90,4 +109,10 @@ const edit = state => (source, target) => {
     // stop key presses from triggering other commands by bubbling up to the body
     keyEvent.stopPropagation();
   };
+};
+
+const resetSimulation = state => (energy = 0.3) => {
+  state.simulation.nodes(state.nodes);
+  state.simulation.force("link").links(state.edges);
+  state.simulation.alpha(energy).restart();
 };
