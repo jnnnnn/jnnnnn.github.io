@@ -8,6 +8,7 @@ import {
   addEdge,
   removeNode
 } from "./model.js";
+import { draw } from "./draw.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
@@ -35,12 +36,10 @@ export const keydown = state => key => {
       remove(state)(source, target);
       break;
     case "+":
-      mutateNode(state)(target, { ...target, level: target.level - 1 });
-      resetSimulation(state)();
+      resize(state)(-1)(source, target);
       break;
     case "-":
-      mutateNode(state)(target, { ...target, level: target.level + 1 });
-      resetSimulation(state)();
+      resize(state)(+1)(source, target);
       break;
     default:
       console.log("No command for ", key, d3.event);
@@ -54,6 +53,16 @@ export const click = state => () => {
   };
   const target = state.simulation.find(modelCoords.x, modelCoords.y);
   if (target) select(state)(null, target);
+};
+
+const resize = state => delta => (source, target) => {
+  const node = target || source;
+  if (!node) return;
+  mutateNode(state)(node, {
+    ...node,
+    level: Math.min(Math.max(node.level + delta, 1), 10)
+  });
+  resetSimulation(state)(0);
 };
 
 const select = state => (source, target) => {
@@ -114,5 +123,6 @@ const edit = state => (source, target) => {
 const resetSimulation = state => (energy = 0.3) => {
   state.simulation.nodes(state.nodes);
   state.simulation.force("link").links(state.edges);
-  state.simulation.alpha(energy).restart();
+  if (energy > 0) state.simulation.alpha(energy).restart();
+  else draw(state)();
 };
