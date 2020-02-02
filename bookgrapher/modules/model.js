@@ -29,4 +29,28 @@ export const mutate = state => stateMapper => {
   }
 };
 
+export const mutateNode = state => (node, values) => {
+  const node2 = { ...node, ...values };
+  const nodes = [...state.nodes];
+  const i = nodes.indexOf(node);
+  if (i < 0) throw "node to update not found";
+  nodes[i] = node2;
+
+  mutate(state)({ nodes, edges: replaceNodeInEdges(state.edges, node, node2) });
+
+  state.simulation.nodes(state.nodes);
+  state.simulation.force("link").links(state.edges);
+  state.simulation.alpha(0.3).restart();
+};
+
+const replaceNodeInEdges = (edges, oldNode, newNode) => {
+  return edges.map(edge => {
+    if (edge.source === oldNode)
+      return { source: newNode, target: edge.target };
+    else if (edge.target === oldNode)
+      return { source: edge.source, target: newNode };
+    else return edge;
+  });
+};
+
 export const size = node => 40 / Math.pow(2, node.level || 12);

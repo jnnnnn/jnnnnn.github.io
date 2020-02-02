@@ -100,7 +100,8 @@ const createGraph = async () => {
       })
   );
 
-  simulation.nodes(state.nodes).on("tick", draw(state));
+  simulation.nodes(state.nodes);
+  simulation.on("tick", draw(state));
   simulation.force("link").links(state.edges);
 };
 

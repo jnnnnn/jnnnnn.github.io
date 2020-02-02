@@ -41,3 +41,14 @@ The edit command is a little tricky because the edit box has to appear and disap
 Work out proper state mutation foundation first, so that we have an undo stack.
 
 Change scaling to be truly quadratic so that zoom down to very small levels still works.
+
+Got the edit box appearing. CSS is cool and good. Replacing a node is tricky, there are lots of links to it everywhere:
+
+- edge .source and .target
+- simulation
+
+I tried to fix these places but it's still going blank after updating a node. I think it might be time to use a better state management pattern; updating everything that needs it is starting to become so error-prone that it's slowing me down.
+
+Unfortunately, using react means using a javascript compiler. I don't want to do that. The preact docs talk about alternatives to transpiling. https://preactjs.com/guide/v10/getting-started#no-build-tools-route . Basically tagged templates. It looks good but I don't know how long editor support for it will last. https://github.com/developit/htm
+
+I will keep this in mind for a rewrite but I'm going to just try and fix my bug for now.

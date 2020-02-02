@@ -1,4 +1,4 @@
-import { findNodeAtCoords, mutate } from "./model.js";
+import { findNodeAtCoords, mutate, mutateNode } from "./model.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
@@ -74,6 +74,12 @@ const edit = state => (source, target) => {
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
   document.body.append(textarea);
+  d3.event.stopPropagation();
   textarea.focus();
-  mutate(state)({ edit: node });
+
+  textarea.onblur = focusEvent => {
+    document.body.remove(textarea);
+    mutateNode(state)(node, { text: textarea.value });
+    console.log(state);
+  };
 };
