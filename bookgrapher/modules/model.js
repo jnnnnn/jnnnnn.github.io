@@ -11,6 +11,12 @@ export const findNodeAtCoords = state => ({ x, y }) => {
 
 const stateHistory = [];
 
+export const undo = state => {
+  const restoredState = stateHistory.pop();
+  Object.assign(state, restoredState);
+  resetSimulation(state);
+};
+
 // Not quite properly implemented but good enough. Ideally it would not be
 // possible to touch things that are conceptually immutable but that would
 // result in more levels of indirection so nah.
@@ -38,6 +44,10 @@ export const mutateNode = state => (node, values) => {
 
   mutate(state)({ nodes, edges: replaceNodeInEdges(state.edges, node, node2) });
 
+  resetSimulation(state);
+};
+
+const resetSimulation = state => {
   state.simulation.nodes(state.nodes);
   state.simulation.force("link").links(state.edges);
   state.simulation.alpha(0.3).restart();

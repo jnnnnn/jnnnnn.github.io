@@ -16,6 +16,9 @@ export const keydown = state => key => {
     case "e":
       edit(state)(source, target);
       break;
+    case "z":
+      undo(state);
+      break;
   }
 };
 
