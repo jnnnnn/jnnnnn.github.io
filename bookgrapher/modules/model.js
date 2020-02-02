@@ -20,15 +20,15 @@ export const undo = state => {
 // Not quite properly implemented but good enough. Ideally it would not be
 // possible to touch things that are conceptually immutable but that would
 // result in more levels of indirection so nah.
-export const mutate = state => stateMapper => {
+export const mutate = state => mutation => {
   const oldState = { ...state };
   stateHistory.push(oldState);
-  switch (typeof stateMapper) {
+  switch (typeof mutation) {
     case "function":
-      Object.assign(state, stateMapper(oldState));
+      Object.assign(state, mutation(oldState));
       break;
     case "object":
-      Object.assign(state, stateMapper);
+      Object.assign(state, mutation);
       break;
     default:
       throw "Invalid state assignment";
@@ -46,8 +46,8 @@ export const addNode = state => (values, parent) => {
   resetSimulation(state);
 };
 
-export const mutateNode = state => (node, values) => {
-  const node2 = { ...node, ...values };
+export const mutateNode = state => (node, mutation) => {
+  const node2 = { ...node, ...mutation };
   const nodes = [...state.nodes];
   const i = nodes.indexOf(node);
   if (i < 0) throw "node to update not found";
