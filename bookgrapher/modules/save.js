@@ -40,16 +40,7 @@ export const importState = exportedObj => {
         source: nodemap.get(e.source),
         target: nodemap.get(e.target)
       };
-    })
+    }),
+    selected: undefined
   };
-};
-
-export const dropFile = state => async dropEvent => {
-  // don't want to load a json file as a document :/
-  dropEvent.preventDefault();
-  const json = await dropEvent.dataTransfer.files[0].text();
-
-  JSON.parse(json);
-
-  console.log(json);
 };

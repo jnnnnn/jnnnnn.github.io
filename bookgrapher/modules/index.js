@@ -1,9 +1,14 @@
 "use strict";
 import { dragstarted, dragged, dragended, dragsubject } from "./drag.js";
 import { draw } from "./draw.js";
-import { keydown, click, mousemove, resetSimulation } from "./commands.js";
+import {
+  keydown,
+  click,
+  mousemove,
+  dropFile,
+  resetSimulation
+} from "./commands.js";
 import { size, load } from "./model.js";
-import { dropFile } from "./save.js";
 
 const height = window.innerHeight;
 const width = window.innerWidth;
@@ -89,6 +94,7 @@ const createGraph = () => {
 
   simulation.on("tick", draw(state));
   load(state);
+  resetSimulation(state)();
 };
 
 createGraph();

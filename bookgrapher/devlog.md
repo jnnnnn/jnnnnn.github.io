@@ -110,4 +110,4 @@ Had a lot of trouble with the es6 map interface. Types would have made it much e
 
 Serializing to local storage now working, deserializes correctly on load.
 
-Drag and drop using the same JSON format is almost there too.
+Drag and drop using the same JSON format is almost there too. Done.

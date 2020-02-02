@@ -9,7 +9,7 @@ import {
   removeNode
 } from "./model.js";
 import { draw } from "./draw.js";
-import { save } from "./save.js";
+import { save, importState } from "./save.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
@@ -137,4 +137,15 @@ export const mousemove = state => () => {
     x: state.transform.invertX(screenX),
     y: state.transform.invertY(screenY)
   };
+};
+
+export const dropFile = state => async dropEvent => {
+  // don't want to load a json file as a document. I almost feel like this is
+  // something the browser should do.
+  dropEvent.preventDefault();
+
+  const json = await dropEvent.dataTransfer.files[0].text();
+  const importedState = importState(JSON.parse(json));
+  mutate(state)(importedState);
+  resetSimulation(state)();
 };
