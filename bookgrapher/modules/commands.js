@@ -33,6 +33,12 @@ export const keydown = state => key => {
     case "d":
       remove(state)(source, target);
       break;
+    case "+":
+      mutateNode(state)(target, { ...target, level: target.level - 1 });
+      break;
+    case "-":
+      mutateNode(state)(target, { ...target, level: target.level + 1 });
+      break;
     default:
       console.log("No command for ", key, d3.event);
   }
