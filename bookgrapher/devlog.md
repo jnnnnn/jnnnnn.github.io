@@ -70,3 +70,14 @@ Finished the undo implementation by restoring state off the stack. Works first t
 Improving editing behaviour: ctrl+enter saves, escape cancels.
 
 Noticed my first bug: the selected node doesn't get updated when we replace a node by editing it.
+
+Last things to do are:
+
+- new node
+- delete node
+- resize node
+- persist state
+- Should new node be "n" or "e" over an empty space? try "e" to start with
+- Clicking a node should select it.
+- A new node should be linked to the selected one if an existing node was selected. New nodes should be one size smaller than their parent by default.
+- Creating a new node not linked to anything should also select it.

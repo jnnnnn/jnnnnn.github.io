@@ -35,6 +35,17 @@ export const mutate = state => stateMapper => {
   }
 };
 
+export const addNode = state => (values, parent) => {
+  const newNode = createNode(state)(values, parent);
+  mutate(state)({
+    nodes: [...state.nodes, newNode],
+    edges: parent
+      ? [...state.edges, { source: parent, target: newNode }]
+      : state.edges
+  });
+  resetSimulation(state);
+};
+
 export const mutateNode = state => (node, values) => {
   const node2 = { ...node, ...values };
   const nodes = [...state.nodes];
@@ -51,7 +62,7 @@ export const mutateNode = state => (node, values) => {
   resetSimulation(state);
 };
 
-const resetSimulation = state => {
+export const resetSimulation = state => {
   state.simulation.nodes(state.nodes);
   state.simulation.force("link").links(state.edges);
   state.simulation.alpha(0.3).restart();
@@ -68,3 +79,15 @@ const replaceNodeInEdges = (edges, oldNode, newNode) => {
 };
 
 export const size = node => 40 / Math.pow(2, node.level || 12);
+
+let largestId = 0;
+export const createNode = state => (values, parent) => {
+  // avoid collisions between node IDs by keeping track of the largest ID we've seen
+  largestId = 1 + Math.max(largestId, ...state.nodes.map(n => n.id));
+
+  return {
+    id: largestId,
+    level: parent ? parent.level + 1 : 1,
+    ...values
+  };
+};

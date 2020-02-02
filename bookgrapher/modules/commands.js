@@ -1,4 +1,10 @@
-import { findNodeAtCoords, mutate, mutateNode, undo } from "./model.js";
+import {
+  findNodeAtCoords,
+  mutate,
+  mutateNode,
+  undo,
+  addNode
+} from "./model.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
@@ -71,12 +77,10 @@ const removeEdge = state => (source, target) => {
 };
 
 const edit = state => (source, target) => {
-  const node = target || source;
-  if (!node) return;
-
+  // we might create it here but it is not added to the model until finishEditing
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
-  textarea.value = node.text;
+  textarea.value = target ? target.text : "";
   document.body.append(textarea);
   textarea.focus();
   textarea.select();
@@ -84,7 +88,8 @@ const edit = state => (source, target) => {
   d3.event.preventDefault();
 
   const finishEditing = () => {
-    mutateNode(state)(node, { text: textarea.value });
+    if (target) mutateNode(state)(target, { text: textarea.value });
+    else addNode(state)({ text: textarea.value }, source);
     textarea.remove();
   };
   textarea.onblur = finishEditing;
