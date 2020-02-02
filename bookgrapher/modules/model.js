@@ -42,7 +42,11 @@ export const mutateNode = state => (node, values) => {
   if (i < 0) throw "node to update not found";
   nodes[i] = node2;
 
-  mutate(state)({ nodes, edges: replaceNodeInEdges(state.edges, node, node2) });
+  mutate(state)({
+    nodes,
+    edges: replaceNodeInEdges(state.edges, node, node2),
+    selected: state.selected === node ? node2 : state.selected
+  });
 
   resetSimulation(state);
 };

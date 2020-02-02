@@ -45,7 +45,6 @@ let state = {
   nodes: [],
   edges: [],
   simulation: simulation,
-  selection: undefined,
   ctx,
   width,
   height,

@@ -67,4 +67,6 @@ This actually removes the body. lol.
 
 Finished the undo implementation by restoring state off the stack. Works first try.
 
-Improving editing behaviour: ctrl+enter saves, escape cancels
+Improving editing behaviour: ctrl+enter saves, escape cancels.
+
+Noticed my first bug: the selected node doesn't get updated when we replace a node by editing it.
