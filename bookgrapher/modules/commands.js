@@ -124,9 +124,17 @@ const edit = state => (source, target) => {
   };
 };
 
-const resetSimulation = state => (energy = 0.3) => {
+export const resetSimulation = state => (energy = 0.3) => {
   state.simulation.nodes(state.nodes);
   state.simulation.force("link").links(state.edges);
   if (energy > 0) state.simulation.alpha(energy).restart();
   else draw(state)();
+};
+
+export const mousemove = state => () => {
+  const [screenX, screenY] = d3.mouse(d3.event.currentTarget);
+  state.mouse = {
+    x: state.transform.invertX(screenX),
+    y: state.transform.invertY(screenY)
+  };
 };

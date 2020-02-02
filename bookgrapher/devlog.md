@@ -97,3 +97,17 @@ Things to do:
 - and center the text vertically on the nodes
 
 Saving a file works. I should be persisting state in localStorage. Not sure how often to do that though.
+
+Figuring out drag and drop for opening files. Following https://hacks.mozilla.org/2009/12/file-drag-and-drop-in-firefox-3-6/ .
+
+Easier than having a "browse" button. Should also implement copy and paste though.
+
+Selecting a bunch of nodes could be useful. Maybe shift-click?
+
+Strangely, drag and drop doesn't work unless you also `preventDefault` on the `dragover` event. Weird.
+
+Had a lot of trouble with the es6 map interface. Types would have made it much easier. It's a shame typescript requires transpilation.
+
+Serializing to local storage now working, deserializes correctly on load.
+
+Drag and drop using the same JSON format is almost there too.

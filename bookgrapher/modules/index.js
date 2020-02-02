@@ -1,8 +1,9 @@
 "use strict";
 import { dragstarted, dragged, dragended, dragsubject } from "./drag.js";
 import { draw } from "./draw.js";
-import { keydown, click } from "./commands.js";
-import { size } from "./model.js";
+import { keydown, click, mousemove, resetSimulation } from "./commands.js";
+import { size, load } from "./model.js";
+import { dropFile } from "./save.js";
 
 const height = window.innerHeight;
 const width = window.innerWidth;
@@ -51,24 +52,16 @@ let state = {
   mouse: { x: 0, y: 0 }
 };
 
-const mousemove = state => () => {
-  const [screenX, screenY] = d3.mouse(d3.event.currentTarget);
-  state.mouse = {
-    x: state.transform.invertX(screenX),
-    y: state.transform.invertY(screenY)
-  };
-};
-
 d3.select("body").on("keydown", () => {
   keydown(state)(d3.event.key);
   draw(state)();
 });
 
-const createGraph = async () => {
-  const data = await d3.json("data.json");
-  state.nodes = data.nodes;
-  state.edges = data.edges;
+const dz = document.getElementById("graphDiv");
+dz.addEventListener("dragover", e => e.preventDefault(), true);
+dz.addEventListener("drop", dropFile(state), true);
 
+const createGraph = () => {
   const canvas = d3.select(graphCanvas);
 
   canvas.on("click", click(state));
@@ -94,9 +87,8 @@ const createGraph = async () => {
       })
   );
 
-  simulation.nodes(state.nodes);
   simulation.on("tick", draw(state));
-  simulation.force("link").links(state.edges);
+  load(state);
 };
 
 createGraph();

@@ -1,3 +1,5 @@
+import { exportState, importState } from "./save.js";
+
 export const findNodeAtCoords = state => ({ x, y }) => {
   for (let node of state.nodes) {
     const radius = size(node);
@@ -32,6 +34,13 @@ export const mutate = state => mutation => {
     default:
       throw "Invalid state assignment";
   }
+
+  window.localStorage["chart"] = JSON.stringify(exportState(state));
+};
+
+export const load = state => {
+  const importedState = importState(JSON.parse(window.localStorage["chart"]));
+  mutate(state)(importedState);
 };
 
 export const addNode = state => (values, parent) => {
