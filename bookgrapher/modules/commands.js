@@ -1,4 +1,4 @@
-import { findNodeAtCoords, mutate, mutateNode } from "./model.js";
+import { findNodeAtCoords, mutate, mutateNode, undo } from "./model.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
@@ -77,14 +77,22 @@ const edit = state => (source, target) => {
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
   textarea.value = node.text;
-  d3.event.stopPropagation(); // we don't need this but here for reference
-  d3.event.preventDefault(); // this stops the "keypress" event getting triggered and adding an e to the value
   document.body.append(textarea);
   textarea.focus();
   textarea.select();
+  // stop this keyDown generating a keyPress and overwriting the value with "e"
+  d3.event.preventDefault();
 
-  textarea.onblur = focusEvent => {
+  const finishEditing = () => {
     mutateNode(state)(node, { text: textarea.value });
     textarea.remove();
+  };
+  textarea.onblur = finishEditing;
+
+  textarea.onkeydown = keyEvent => {
+    if (keyEvent.key === "Escape") textarea.remove();
+    if (keyEvent.key === "Enter" && keyEvent.ctrlKey) finishEditing();
+    // stop key presses from triggering other commands by bubbling up to the body
+    keyEvent.stopPropagation();
   };
 };

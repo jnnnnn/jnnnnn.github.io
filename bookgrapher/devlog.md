@@ -64,3 +64,7 @@ document.body.remove(textarea);
 ```
 
 This actually removes the body. lol.
+
+Finished the undo implementation by restoring state off the stack. Works first try.
+
+Improving editing behaviour: ctrl+enter saves, escape cancels
