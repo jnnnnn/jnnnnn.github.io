@@ -85,3 +85,15 @@ Last things to do are:
 Clicking nodes is a little tricky because the click happens in index.js. I initially started calling into the select command directly but it would be better to have the click handler itself in index.js.
 
 Also, almost every mutation of state requires the simulation to be restarted so do that.
+
+Clicking works.
+
+Things to do:
+
+- I think the last thing left to do is persist state.
+- Oh, and make the lines not draw all the way to the nodes.
+- And make newlines work so nodes can have several rows
+- and maybe get rid of the circles
+- and center the text vertically on the nodes
+
+Saving a file works. I should be persisting state in localStorage. Not sure how often to do that though.

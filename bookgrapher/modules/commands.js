@@ -9,13 +9,17 @@ import {
   removeNode
 } from "./model.js";
 import { draw } from "./draw.js";
+import { save } from "./save.js";
 
 export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mouse); // maybe null
   const source = state.selected;
   switch (key) {
     case "s":
-      select(state)(source, target);
+      if (d3.event.ctrlKey) {
+        event.preventDefault();
+        save(state);
+      } else select(state)(source, target);
       break;
     case "l":
       link(state)(source, target);
