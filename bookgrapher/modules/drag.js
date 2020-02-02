@@ -17,8 +17,10 @@ export const dragended = state => () => {
   if (!d3.event.active) {
     state.simulation.alphaTarget(0);
   }
-  d3.event.subject.fx = null;
-  d3.event.subject.fy = null;
+  if (!d3.event.subject.fixed) {
+    d3.event.subject.fx = null;
+    d3.event.subject.fy = null;
+  }
 };
 
 export const dragsubject = state => () => {

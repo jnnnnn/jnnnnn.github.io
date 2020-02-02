@@ -45,6 +45,9 @@ export const keydown = state => key => {
     case "-":
       resize(state)(+1)(source, target);
       break;
+    case "f":
+      fix(state)(source, target);
+      break;
     default:
       console.log("No command for ", key, d3.event);
   }
@@ -148,4 +151,16 @@ export const dropFile = state => async dropEvent => {
   const importedState = importState(JSON.parse(json));
   mutate(state)(importedState);
   resetSimulation(state)();
+};
+
+const fix = state => (source, target) => {
+  const node = target || source;
+  if (!node) return;
+  const fixed = !node.fixed;
+  mutateNode(state)(node, {
+    fixed,
+    fx: fixed ? node.x : null,
+    fy: fixed ? node.y : null
+  });
+  resetSimulation(state)(0);
 };
