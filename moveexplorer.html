@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Dance move explorer</title>
 
@@ -13,45 +13,61 @@
         padding: 3px;
       }
       div.moveList {
-        border-color: #AAF;
+        border-color: #aaf;
       }
       div.position {
-        border-color: #8C8;
+        border-color: #8c8;
         background-color: white;
       }
       div.move {
-        border-color: #55F;
-        text-align: center; 
+        border-color: #55f;
+        text-align: center;
         background-color: white;
       }
-      div.move:after { /* ensures that contained floats are contained */
+      div.move:after {
+        /* ensures that contained floats are contained */
         content: " ";
-        display: block; 
-        height: 0; 
+        display: block;
+        height: 0;
         clear: both;
       }
-      div.start { float: left;}
-      div.end { float:right;}
-      div.focus { margin-top: 10px; margin-bottom: 10px; }
+      div.start {
+        float: left;
+      }
+      div.end {
+        float: right;
+      }
+      div.focus {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
       .link {
         fill: none;
         stroke: #eee;
         stroke-width: 2px;
       }
-      div.movebox + div.movebox { margin-top: 10px; }
+      div.movebox + div.movebox {
+        margin-top: 10px;
+      }
       p.movetext {
-        clear:both;
+        clear: both;
       }
       div.focus p.movetext {
         font-weight: bold;
       }
-      div.similar { background-color: #AAF; }
-      div.simpler { background-color: #AFA; }
-      div.complex { background-color: #FAA; }
-      div.topbox { 
-        display: inline; 
+      div.similar {
+        background-color: #aaf;
       }
-      p { 
+      div.simpler {
+        background-color: #afa;
+      }
+      div.complex {
+        background-color: #faa;
+      }
+      div.topbox {
+        display: inline;
+      }
+      p {
         margin: 0px;
         padding: 0px;
         border: 0px;
@@ -61,384 +77,474 @@
         margin-right: 1em;
       }
 
-      html, body {
+      html,
+      body {
         padding: 0;
         margin: 0;
-        height: 99%; 
+        height: 99%;
       }
-
     </style>
-
   </head>
 
   <body>
+    <h3 style="display:inline">Dance move explorer</h3>
+    <div id="data" style="display:inline">
+      <textarea
+        id="textdata"
+        style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;"
+        placeholder="paste from spreadsheet here"
+        onchange="load_text_data();"
+        onkeyup="load_text_data();"
+      ></textarea>
+    </div>
+    <div id="move" class="topbox"></div>
+    <div id="position" class="topbox"></div>
+    <div id="history" class="topbox"></div>
 
-<h3 style="display:inline">Dance move explorer</h3>
-<div id="data" style="display:inline">
-  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>  
-</div>
-<div id="move" class="topbox"></div>
-<div id="position" class="topbox"></div>
-<div id="history" class="topbox"></div>
+    <!-- load the d3.js library (for layout/animation) -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 
-<!-- load the d3.js library (for layout/animation) --> 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-  
-<script>
-var color = d3.scale.category20();
+    <script>
+      var color = d3.scale.category20();
 
-var i = 0;
-var positions;
-var moves = {};
-var moves_list = [];
-var root_move = { //
-    "key": "root",
-    "parent": "null",
-    "children": [],
-    "parent_ids": [],
-    "tsv": { 
-      "Start": "",
-      "Move": "",
-      "End": "",
-      "Description": "",
-      "Index": "",
-      "Parent": "",
-      "Tags": "",
-      "Video": ""
-    }
-  };
+      var i = 0;
+      var positions;
+      var moves = {};
+      var moves_list = [];
+      var root_move = {
+        //
+        key: "root",
+        parent: "null",
+        children: [],
+        parent_ids: [],
+        tsv: {
+          Start: "",
+          Move: "",
+          End: "",
+          Description: "",
+          Index: "",
+          Parent: "",
+          Tags: "",
+          Video: ""
+        }
+      };
 
-function init() {  
-  d3.tsv("bachata_moves.txt", function(error, csv_rows) {
-    if (error) {
-      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
-      return;
-    }
-    
-    load_rows(csv_rows);
+      function init() {
+        d3.tsv("bachata_moves.txt", function(error, csv_rows) {
+          if (error) {
+            document.getElementById("errors").innerHTML =
+              "Couldn't load " + datafile + ": " + error.statusText;
+            return;
+          }
 
-    var moveid = getUrlVars()["move"];
-    var pos = getUrlVars()["pos"];
-    if (moveid in moves)
-      update_as_move(moves[moveid]);
-    else if (pos) {
-      update_as_position(pos);
-    }
-    else
-      update_as_move(moves_list[0]);
-  });
-}
+          load_rows(csv_rows);
 
-// http://stackoverflow.com/a/20097994/412529
-function getUrlVars() {
-  var vars = {};
-  window.location.href.replace(/[?&]+([^=]+)=([^&]*)/gi, 
-    (m,key,value) => vars[decodeURIComponent(key)] = decodeURIComponent(value));
-  return vars;
-}
-
-function load_rows(csv_rows) {
-  moves = {};
-  moves_list = [];
-  root_move.children = [];
-  var all_tags = d3.set();
-  // construct tree from rows so we can display it
-  for (row of csv_rows) {
-    var first_parent = row.Parent.split(",")[0].trim();
-    if (first_parent === "" || first_parent === "-" || first_parent === "dup")
-      continue;
-    var key = row.Start + " → " + row.Move + " → " + row.End;
-    var node = { // 
-      "key": key,
-      "children": [],
-      "id": row.Index,
-      "x": 0,
-      "y": 0,
-      "tsv": row,      
-    };
-    moves[row.Index] = node;
-    moves_list.push(node);
-    node.tags = [];
-    if (row.Tags)
-      for (tag of row.Tags.toLowerCase().replace(/ /g, "").split(',')) {  
-        all_tags.add(tag);
-        node.tags.push(tag);
+          var moveid = getUrlVars()["move"];
+          var pos = getUrlVars()["pos"];
+          if (moveid in moves) update_as_move(moves[moveid]);
+          else if (pos) {
+            update_as_position(pos);
+          } else update_as_move(moves_list[0]);
+        });
       }
-  }
 
-  // second pass is separate in case parent is after child
-  for (node of moves_list) {    
-    node.parent_ids = node.tsv.Parent.split(",").filter(id => id in moves);
-    var parent = moves[node.tsv.Parent.split(",")[0]];
-    if (parent == undefined) 
-      parent = root_move;
-    parent.children.push(node);    
-  }
+      // http://stackoverflow.com/a/20097994/412529
+      function getUrlVars() {
+        var vars = {};
+        window.location.href.replace(
+          /[?&]+([^=]+)=([^&]*)/gi,
+          (m, key, value) =>
+            (vars[decodeURIComponent(key)] = decodeURIComponent(value))
+        );
+        return vars;
+      }
 
-  sort_by_depth(root_move);
+      function load_rows(csv_rows) {
+        moves = {};
+        moves_list = [];
+        root_move.children = [];
+        var all_tags = d3.set();
+        // construct tree from rows so we can display it
+        for (row of csv_rows) {
+          var first_parent = row.Parent.split(",")[0].trim();
+          if (
+            first_parent === "" ||
+            first_parent === "-" ||
+            first_parent === "dup"
+          )
+            continue;
+          var key = row.Start + " → " + row.Move + " → " + row.End;
+          var node = {
+            //
+            key: key,
+            children: [],
+            id: row.Index,
+            x: 0,
+            y: 0,
+            tsv: row
+          };
+          moves[row.Index] = node;
+          moves_list.push(node);
+          node.tags = [];
+          if (row.Tags)
+            for (tag of row.Tags.toLowerCase()
+              .replace(/ /g, "")
+              .split(",")) {
+              all_tags.add(tag);
+              node.tags.push(tag);
+            }
+        }
 
-  var start_positions = csv_rows.map(row => row.Start);
-  var end_positions = csv_rows.map(row => row.End);
-  positions = d3.set(start_positions.concat(end_positions)).values();
- 
-  // colours from http://jnnnnn.github.io/category-colors-constrained.html
-  color = d3.scale.ordinal()
-      .domain(all_tags)
-      .range(["#1596ff", "#14e302", "#ff5d13", "#ff1bfe", "#bcc99c", "#e970a1", "#ebbf07", "#08d6f7", "#07dc8c", "#6fa207", "#d082fe", "#cf7f57", "#cabee5", "#17a68d", "#ff5960", "#ff43c5", "#a69334", "#dc830e", "#ac8c86", "#6a9ba8", "#68a45b", "#9c87d7", "#0cb734", "#6fbdfd", "#fca7f5", "#ffa6a8", "#88d905", "#b7cd65", "#bfcd19", "#f8b766", "#bb82a7", "#8ad1c5", "#eaba96", "#d85bff", "#ff7e4e", "#82d86e", "#75d7a1", "#dc68c6", "#bdc2c1", "#8786fe", "#a39262", "#749d7f", "#ff5485", "#e56e78", "#0fdad1", "#8292c3", "#d6c478", "#dac44c"]);
-}
+        // second pass is separate in case parent is after child
+        for (node of moves_list) {
+          node.parent_ids = node.tsv.Parent.split(",").filter(
+            id => id in moves
+          );
+          var parent = moves[node.tsv.Parent.split(",")[0]];
+          if (parent == undefined) parent = root_move;
+          parent.children.push(node);
+        }
 
-function sort_by_depth(node) {
-  var total = 1;
+        sort_by_depth(root_move);
 
-  if (node.children === undefined) {
-    console.log(node);
-    return total;
-  }
+        var start_positions = csv_rows.map(row => row.Start);
+        var end_positions = csv_rows.map(row => row.End);
+        positions = d3.set(start_positions.concat(end_positions)).values();
 
-  for (child of node.children)
-    total += sort_by_depth(child);
-  node.total_children = total - 1;
+        // colours from http://jnnnnn.github.io/category-colors-constrained.html
+        color = d3.scale
+          .ordinal()
+          .domain(all_tags)
+          .range([
+            "#1596ff",
+            "#14e302",
+            "#ff5d13",
+            "#ff1bfe",
+            "#bcc99c",
+            "#e970a1",
+            "#ebbf07",
+            "#08d6f7",
+            "#07dc8c",
+            "#6fa207",
+            "#d082fe",
+            "#cf7f57",
+            "#cabee5",
+            "#17a68d",
+            "#ff5960",
+            "#ff43c5",
+            "#a69334",
+            "#dc830e",
+            "#ac8c86",
+            "#6a9ba8",
+            "#68a45b",
+            "#9c87d7",
+            "#0cb734",
+            "#6fbdfd",
+            "#fca7f5",
+            "#ffa6a8",
+            "#88d905",
+            "#b7cd65",
+            "#bfcd19",
+            "#f8b766",
+            "#bb82a7",
+            "#8ad1c5",
+            "#eaba96",
+            "#d85bff",
+            "#ff7e4e",
+            "#82d86e",
+            "#75d7a1",
+            "#dc68c6",
+            "#bdc2c1",
+            "#8786fe",
+            "#a39262",
+            "#749d7f",
+            "#ff5485",
+            "#e56e78",
+            "#0fdad1",
+            "#8292c3",
+            "#d6c478",
+            "#dac44c"
+          ]);
+      }
 
-  node.children.sort(function(a, b) { return b.total_children - a.total_children; });  
+      function sort_by_depth(node) {
+        var total = 1;
 
-  return total;
-}
+        if (node.children === undefined) {
+          console.log(node);
+          return total;
+        }
 
-function create_move_divs(move_data, move_wrapper_div) {
-  var div_box = move_wrapper_div.appendChild(document.createElement("div"));
-  div_box.className = "movebox";
+        for (child of node.children) total += sort_by_depth(child);
+        node.total_children = total - 1;
 
-  var div_move = div_box.appendChild(document.createElement("div"));
-  div_move.className = "boxed move";
-  var move_p = div_move.appendChild(document.createElement("p"));
-  move_p.innerHTML = move_data.tsv.Move;
-  move_p.className = "movetext";
+        node.children.sort(function(a, b) {
+          return b.total_children - a.total_children;
+        });
 
-  function move_click(event) { 
-    var move_data = event.currentTarget._move_data;
-    update_as_move(move_data);
-    var state = {"move": move_data.tsv.Index, "x": window.scrollX, "y": window.scrollY};
-    window.history.pushState(state, move_data.key, "?move="+move_data.tsv.Index);
-    window,scrollTo(0,0);
-    event.stopPropagation();
-  }
-  div_move._move_data = move_data;
-  div_move.addEventListener("click", move_click);
+        return total;
+      }
 
-  function position_click(event) { 
-    var position_str = event.currentTarget._position;
-    update_as_position(position_str);     
-    var state = {"position": position_str, "x": window.scrollX, "y": window.scrollY};
-    window.history.pushState(state, position_str, "?pos="+position_str);
-    window.scrollTo(0,0);
-    event.stopPropagation();
-  }
+      function create_move_divs(move_data, move_wrapper_div) {
+        var div_box = move_wrapper_div.appendChild(
+          document.createElement("div")
+        );
+        div_box.className = "movebox";
 
-  var div_start = div_move.appendChild(document.createElement("div"));
-  div_start.className = "boxed position start";
-  div_start.innerHTML = move_data.tsv.Start +"  →";
-  div_start._position = move_data.tsv.Start;
-  div_start.addEventListener("click", position_click);
+        var div_move = div_box.appendChild(document.createElement("div"));
+        div_move.className = "boxed move";
+        var move_p = div_move.appendChild(document.createElement("p"));
+        move_p.innerHTML = move_data.tsv.Move;
+        move_p.className = "movetext";
 
-  var div_end = div_move.appendChild(document.createElement("div"));
-  div_end.className = "boxed position end";
-  div_end.innerHTML = " → " + move_data.tsv.End;
-  div_end._position = move_data.tsv.End;
-  div_end.addEventListener("click", position_click);
-  
-  function tag_click(event) {
-    var tag_str = event.currentTarget._tag;
-    update_as_tag(tag_str);
-    var state = {"tag": tag_str, "x": window.scrollX, "y": window.scrollY};
-    window.history.pushState(state, tag_str, "?tag="+tag_str);
-    window,scrollTo(0,0);
-    event.stopPropagation();
-  }
+        function move_click(event) {
+          var move_data = event.currentTarget._move_data;
+          update_as_move(move_data);
+          var state = {
+            move: move_data.tsv.Index,
+            x: window.scrollX,
+            y: window.scrollY
+          };
+          window.history.pushState(
+            state,
+            move_data.key,
+            "?move=" + move_data.tsv.Index
+          );
+          window, scrollTo(0, 0);
+          event.stopPropagation();
+        }
+        div_move._move_data = move_data;
+        div_move.addEventListener("click", move_click);
 
-  var div_tags = div_move.appendChild(document.createElement("div"));
-  for (tag of move_data.tags) {
-    var p_tag = div_tags.appendChild(document.createElement("p"));
-    p_tag.className = "tag";
-    p_tag.setAttribute("style", "color:"+color(tag));
-    p_tag.innerHTML = tag;
-    p_tag._tag = tag;
-    if (move_wrapper_div.className.includes("focus"))
-      p_tag.addEventListener("click", tag_click);
-  }
+        function position_click(event) {
+          var position_str = event.currentTarget._position;
+          update_as_position(position_str);
+          var state = {
+            position: position_str,
+            x: window.scrollX,
+            y: window.scrollY
+          };
+          window.history.pushState(state, position_str, "?pos=" + position_str);
+          window.scrollTo(0, 0);
+          event.stopPropagation();
+        }
 
-  return div_move;
-}
+        var div_start = div_move.appendChild(document.createElement("div"));
+        div_start.className = "boxed position start";
+        div_start.innerHTML = move_data.tsv.Start + "  →";
+        div_start._position = move_data.tsv.Start;
+        div_start.addEventListener("click", position_click);
 
-function update_as_move(move_data) {
-  // redraw the screen.
-  document.getElementById("move").innerHTML = "";
-  document.getElementById("position").innerHTML = "";
-  var move_topbox = document.getElementById("move");
-  move_topbox.className = "movewrapper topbox";  
- 
-  var parents = move_data.parent_ids.map(id => moves[id]);
-  if (!parents.length)
-    parents = [root_move];
-  var similars = [];
-  for (parent of parents) {
-    Array.prototype.push.apply(similars, parent.children);
-  }
+        var div_end = div_move.appendChild(document.createElement("div"));
+        div_end.className = "boxed position end";
+        div_end.innerHTML = " → " + move_data.tsv.End;
+        div_end._position = move_data.tsv.End;
+        div_end.addEventListener("click", position_click);
 
-  var div_simpler = move_topbox.appendChild(document.createElement("div"));
-  div_simpler.className = "boxed moveList simpler";
-  div_simpler.innerHTML = "Simpler variations: "
-  for (parent of parents) {
-    if (parent === root_move) continue;
-    var div_link_move = create_move_divs(parent, div_simpler);
-  }  
+        function tag_click(event) {
+          var tag_str = event.currentTarget._tag;
+          update_as_tag(tag_str);
+          var state = { tag: tag_str, x: window.scrollX, y: window.scrollY };
+          window.history.pushState(state, tag_str, "?tag=" + tag_str);
+          window, scrollTo(0, 0);
+          event.stopPropagation();
+        }
 
-  var div_move_wrapper_inner = move_topbox.appendChild(document.createElement("div"));
-  div_move_wrapper_inner.className = "boxed focus";
-  var div_move = create_move_divs(move_data, div_move_wrapper_inner);  
-  var div_desc = div_move.appendChild(document.createElement("p"));
-  div_desc.innerHTML = move_data.tsv.Description;
-  if (move_data.tsv.Video) {
-    var video_link = div_move.appendChild(document.createElement("a"));
-    video_link.innerHTML = "image / video";
-    video_link.setAttribute("href", move_data.tsv.Video);
-  }
+        var div_tags = div_move.appendChild(document.createElement("div"));
+        for (tag of move_data.tags) {
+          var p_tag = div_tags.appendChild(document.createElement("p"));
+          p_tag.className = "tag";
+          p_tag.setAttribute("style", "color:" + color(tag));
+          p_tag.innerHTML = tag;
+          p_tag._tag = tag;
+          if (move_wrapper_div.className.includes("focus"))
+            p_tag.addEventListener("click", tag_click);
+        }
 
-  var div_complex = move_topbox.appendChild(document.createElement("div"));
-  div_complex.className = "boxed moveList complex";
-  div_complex.innerHTML = "Complex variations: ";
-  for (complex of move_data.children) 
-    create_move_divs(complex, div_complex);
+        return div_move;
+      }
 
-  var div_similar = move_topbox.appendChild(document.createElement("div"));  
-  div_similar.className = "boxed moveList similar";
-  div_similar.innerHTML = "Similar moves: ";
-  for (similar of similars) {
-    if (similar === move_data) continue;
-    var div_link_move = create_move_divs(similar, div_similar);
-  }    
-}
+      function update_as_move(move_data) {
+        // redraw the screen.
+        document.getElementById("move").innerHTML = "";
+        document.getElementById("position").innerHTML = "";
+        var move_topbox = document.getElementById("move");
+        move_topbox.className = "movewrapper topbox";
 
-function update_as_position(position_str) {
-  // redraw the screen
-  document.getElementById("move").innerHTML = "";
-  document.getElementById("position").innerHTML = "";
-  var position_topbox = document.getElementById("position");
-  position_topbox.className = "positionwrapper topbox";   
+        var parents = move_data.parent_ids.map(id => moves[id]);
+        if (!parents.length) parents = [root_move];
+        var similars = [];
+        for (parent of parents) {
+          Array.prototype.push.apply(similars, parent.children);
+        }
 
-  var position_basic = moves_list.filter(move => 
-       move.tsv.Start === position_str 
-    && move.tsv.End === position_str 
-    && move.tsv.Move === "Basic"
-  )[0];
+        var div_simpler = move_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_simpler.className = "boxed moveList simpler";
+        div_simpler.innerHTML = "Simpler variations: ";
+        for (parent of parents) {
+          if (parent === root_move) continue;
+          var div_link_move = create_move_divs(parent, div_simpler);
+        }
 
-  if (position_basic) {
-    var div_move_wrapper_inner = position_topbox.appendChild(document.createElement("div"));
-    div_move_wrapper_inner.className = "boxed focus";
-    var div_move = create_move_divs(position_basic, div_move_wrapper_inner);  
-    var div_desc = div_move.appendChild(document.createElement("p"));
-    div_desc.innerHTML = position_basic.tsv.Description;
-    if (position_basic.tsv.Video) {
-      var video_link = div_move.appendChild(document.createElement("a"));
-      video_link.innerHTML = "image / video";
-      video_link.setAttribute("href", position_basic.tsv.Video);
-    }
-  }
+        var div_move_wrapper_inner = move_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_move_wrapper_inner.className = "boxed focus";
+        var div_move = create_move_divs(move_data, div_move_wrapper_inner);
+        var div_desc = div_move.appendChild(document.createElement("p"));
+        div_desc.innerHTML = move_data.tsv.Description;
+        if (move_data.tsv.Video) {
+          var video_link = div_move.appendChild(document.createElement("a"));
+          video_link.innerHTML = "image / video";
+          video_link.setAttribute("href", move_data.tsv.Video);
+        }
 
-  var starts = [];
-  var ends = [];
-  var loops = [];
-  for (move of moves_list) {
-    if (move.tsv.Start === position_str) {
-      if (move.tsv.End === position_str) 
-        loops.push(move);
-      else
-        starts.push(move);
-    } else if (move.tsv.End === position_str)
-      ends.push(move);
-  }
-  starts.sort((a,b) => a.tsv.End.localeCompare(b.tsv.End));
-  ends.sort((a,b) => a.key.localeCompare(b.key));
-  loops.sort((a,b) => a.key.localeCompare(b.key));
+        var div_complex = move_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_complex.className = "boxed moveList complex";
+        div_complex.innerHTML = "Complex variations: ";
+        for (complex of move_data.children)
+          create_move_divs(complex, div_complex);
 
-  var div_position_moves = position_topbox.appendChild(document.createElement("div"));  
-  div_position_moves.className = "boxed moveList similar";
-  div_position_moves.innerHTML = "Moves starting from " + position_str + ":";
+        var div_similar = move_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_similar.className = "boxed moveList similar";
+        div_similar.innerHTML = "Similar moves: ";
+        for (similar of similars) {
+          if (similar === move_data) continue;
+          var div_link_move = create_move_divs(similar, div_similar);
+        }
+      }
 
-  var div_position_moves2 = position_topbox.appendChild(document.createElement("div"));  
-  div_position_moves2.className = "boxed moveList similar";
-  div_position_moves2.innerHTML = "Moves staying in " + position_str + ":";
+      function update_as_position(position_str) {
+        // redraw the screen
+        document.getElementById("move").innerHTML = "";
+        document.getElementById("position").innerHTML = "";
+        var position_topbox = document.getElementById("position");
+        position_topbox.className = "positionwrapper topbox";
 
-  var div_position_moves3 = position_topbox.appendChild(document.createElement("div"));  
-  div_position_moves3.className = "boxed moveList similar";
-  div_position_moves3.innerHTML = "Moves ending in " + position_str + ":";
+        var position_basic = moves_list.filter(
+          move =>
+            move.tsv.Start === position_str &&
+            move.tsv.End === position_str &&
+            move.tsv.Move === "Basic"
+        )[0];
 
-  for (move of starts)
-    create_move_divs(move, div_position_moves);
-  for (move of loops)
-    create_move_divs(move, div_position_moves2);
-  for (move of ends)
-    create_move_divs(move, div_position_moves3);
-}
+        if (position_basic) {
+          var div_move_wrapper_inner = position_topbox.appendChild(
+            document.createElement("div")
+          );
+          div_move_wrapper_inner.className = "boxed focus";
+          var div_move = create_move_divs(
+            position_basic,
+            div_move_wrapper_inner
+          );
+          var div_desc = div_move.appendChild(document.createElement("p"));
+          div_desc.innerHTML = position_basic.tsv.Description;
+          if (position_basic.tsv.Video) {
+            var video_link = div_move.appendChild(document.createElement("a"));
+            video_link.innerHTML = "image / video";
+            video_link.setAttribute("href", position_basic.tsv.Video);
+          }
+        }
 
-function update_as_tag(tag_str) {  
-  // redraw the screen
-  document.getElementById("move").innerHTML = "";
-  document.getElementById("position").innerHTML = "";
-  var position_topbox = document.getElementById("position");
-  position_topbox.className = "tagwrapper topbox";
+        var starts = [];
+        var ends = [];
+        var loops = [];
+        for (move of moves_list) {
+          if (move.tsv.Start === position_str) {
+            if (move.tsv.End === position_str) loops.push(move);
+            else starts.push(move);
+          } else if (move.tsv.End === position_str) ends.push(move);
+        }
+        starts.sort((a, b) => a.tsv.End.localeCompare(b.tsv.End));
+        ends.sort((a, b) => a.key.localeCompare(b.key));
+        loops.sort((a, b) => a.key.localeCompare(b.key));
 
-  var div_tags = position_topbox.appendChild(document.createElement("div"));  
-  div_tags.className = "boxed moveList similar";
-  div_tags.innerHTML = "Moves tagged '" + tag_str + "':";  
-  for (move of moves_list) {
-    for (tag of move.tags) {
-      if (tag_str === tag)
-        create_move_divs(move, div_tags);
-    }
-  }
-}
+        var div_position_moves = position_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_position_moves.className = "boxed moveList similar";
+        div_position_moves.innerHTML =
+          "Moves starting from " + position_str + ":";
 
-window.onpopstate = function(event) {
-  if ("move" in event.state) {
-    update_as_move(moves[event.state.move]);
-  } 
-  if ("position" in event.state) {
-    update_as_position(event.state.position);
-  }
-  if ("tag" in event.state) {
-    update_as_tag(event.state.tag);
-  }
-  window.scrollTo(event.state.x, event.state.y);
-}
+        var div_position_moves2 = position_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_position_moves2.className = "boxed moveList similar";
+        div_position_moves2.innerHTML =
+          "Moves staying in " + position_str + ":";
 
-function load_text_data() {
-  var raw = document.getElementById("textdata").value;
-  if (!raw)
-    return;
-  var csv_rows = d3.tsv.parse(raw);
-  load_rows(csv_rows);
-  update_as_move(moves_list[0]);
-  document.getElementById("textdata").value = "";
-}
+        var div_position_moves3 = position_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_position_moves3.className = "boxed moveList similar";
+        div_position_moves3.innerHTML = "Moves ending in " + position_str + ":";
 
-function onkeypress()
-{
-  // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
-  // finding keyCodes: http://jsfiddle.net/qAHC2/292/
-  switch(d3.event.keyCode) {
-    default:
-      console.log(d3.event.keyCode);
-      break;
-  };
-  d3.event.stopPropagation();
-}
+        for (move of starts) create_move_divs(move, div_position_moves);
+        for (move of loops) create_move_divs(move, div_position_moves2);
+        for (move of ends) create_move_divs(move, div_position_moves3);
+      }
 
-d3.select("body")
-    .on("keydown", onkeypress);
+      function update_as_tag(tag_str) {
+        // redraw the screen
+        document.getElementById("move").innerHTML = "";
+        document.getElementById("position").innerHTML = "";
+        var position_topbox = document.getElementById("position");
+        position_topbox.className = "tagwrapper topbox";
 
-init();
+        var div_tags = position_topbox.appendChild(
+          document.createElement("div")
+        );
+        div_tags.className = "boxed moveList similar";
+        div_tags.innerHTML = "Moves tagged '" + tag_str + "':";
+        for (move of moves_list) {
+          for (tag of move.tags) {
+            if (tag_str === tag) create_move_divs(move, div_tags);
+          }
+        }
+      }
 
-</script>
-  
+      window.onpopstate = function(event) {
+        if ("move" in event.state) {
+          update_as_move(moves[event.state.move]);
+        }
+        if ("position" in event.state) {
+          update_as_position(event.state.position);
+        }
+        if ("tag" in event.state) {
+          update_as_tag(event.state.tag);
+        }
+        window.scrollTo(event.state.x, event.state.y);
+      };
+
+      function load_text_data() {
+        var raw = document.getElementById("textdata").value;
+        if (!raw) return;
+        var csv_rows = d3.tsv.parse(raw);
+        load_rows(csv_rows);
+        update_as_move(moves_list[0]);
+        document.getElementById("textdata").value = "";
+      }
+
+      function onkeypress() {
+        // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
+        // finding keyCodes: http://jsfiddle.net/qAHC2/292/
+        switch (d3.event.keyCode) {
+          default:
+            console.log(d3.event.keyCode);
+            break;
+        }
+        d3.event.stopPropagation();
+      }
+
+      d3.select("body").on("keydown", onkeypress);
+
+      init();
+    </script>
   </body>
 </html>

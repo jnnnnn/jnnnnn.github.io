@@ -129,3 +129,7 @@ Would also like to implement copy/paste (to/from JSON) but that's a project for 
 Also SVG Export.
 
 Also I need to write up some documentation.
+
+## 2020-03-02
+
+Documentation written as a quick little markdown file. Sadly, the browser doesn't render it. It'd be great if we never had to convert markdown to html for browsers to display it.
