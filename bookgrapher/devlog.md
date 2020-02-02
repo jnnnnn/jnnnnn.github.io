@@ -73,7 +73,7 @@ Noticed my first bug: the selected node doesn't get updated when we replace a no
 
 Last things to do are:
 
-- new node
+- new node (done)
 - delete node
 - resize node
 - persist state

@@ -91,3 +91,31 @@ export const createNode = state => (values, parent) => {
     ...values
   };
 };
+
+export const addEdge = state => (source, target) => {
+  // don't add duplicate edges, it makes the simulation wonky
+  if (
+    state.edges.find(
+      e =>
+        (e.source === source && e.target === target) ||
+        (e.target === source && e.source == target)
+    )
+  ) {
+    return;
+  }
+
+  mutate(state)({ edges: [...state.edges, { source, target }] });
+  resetSimulation(state);
+};
+
+export const removeEdge = state => (source, target) => {
+  const edges = state.edges.filter(
+    e =>
+      !(
+        (e.source === source && e.target === target) ||
+        (e.target === source && e.source == target)
+      )
+  );
+  mutate(state)({ edges });
+  resetSimulation(state);
+};
