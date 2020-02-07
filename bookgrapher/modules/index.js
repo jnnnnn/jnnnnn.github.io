@@ -10,17 +10,7 @@ import {
 } from "./commands.js";
 import { size, load } from "./model.js";
 
-const height = window.innerHeight;
-const width = window.innerWidth;
-
-const graphCanvas = d3
-  .select("#graphDiv")
-  .append("canvas")
-  .attr("width", width + "px")
-  .attr("height", height + "px")
-  .node();
-
-const ctx = graphCanvas.getContext("2d");
+const canvas = document.querySelector("div#graphDiv > canvas");
 
 const distance = edge => {
   return 10 * (size(edge.source) + size(edge.target));
@@ -32,9 +22,6 @@ const chargeStrength = node => -200 * size(node);
 
 const simulation = d3
   .forceSimulation()
-  //.force("center", d3.forceCenter(graphWidth / 2, height / 2))
-  .force("x", d3.forceX(width / 2).strength(0.1))
-  .force("y", d3.forceY(height / 2).strength(0.1))
   .force("charge", d3.forceManyBody().strength(chargeStrength))
   .force(
     "link",
@@ -51,11 +38,33 @@ let state = {
   nodes: [],
   edges: [],
   simulation: simulation,
-  ctx,
-  width,
-  height,
-  mouse: { x: 0, y: 0 }
+  // these values are shared by all state objects
+  mutables: {
+    ctx: canvas.getContext("2d"),
+    width: 100,
+    height: 100,
+    mouse: { x: 0, y: 0 }
+  }
 };
+
+const resize = () => {
+  state.mutables.width = canvas.clientWidth;
+  state.mutables.height = canvas.clientHeight;
+
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
+  simulation
+    .force("x", d3.forceX((state.mutables.width || 100) / 2).strength(0.1))
+    .force("y", d3.forceY((state.mutables.height || 100) / 2).strength(0.1))
+    .alpha(0.3)
+    .restart();
+
+  console.log(`resize to ${state.mutables.width} x ${state.mutables.height}`);
+  state.mutables.ctx = canvas.getContext("2d");
+};
+
+window.addEventListener("resize", resize);
 
 d3.select("body").on("keydown", () => {
   keydown(state)(d3.event.key);
@@ -67,24 +76,24 @@ dz.addEventListener("dragover", e => e.preventDefault(), true);
 dz.addEventListener("drop", dropFile(state), true);
 
 const createGraph = () => {
-  const canvas = d3.select(graphCanvas);
+  const canvasS = d3.select(canvas);
 
-  canvas.on("click", click(state));
+  canvasS.on("click", click(state));
 
-  canvas.on("mousemove", mousemove(state));
+  canvasS.on("mousemove", mousemove(state));
 
-  canvas.call(
+  canvasS.call(
     d3
-      .drag(canvas)
+      .drag(canvasS)
       .subject(dragsubject(state))
       .on("start", dragstarted(state))
       .on("drag", dragged(state))
       .on("end", dragended(state))
   );
 
-  canvas.call(
+  canvasS.call(
     d3
-      .zoom(canvas)
+      .zoom(canvasS)
       .scaleExtent([0.1, 8])
       .on("zoom", () => {
         state.transform = d3.event.transform;
@@ -92,6 +101,7 @@ const createGraph = () => {
       })
   );
 
+  resize();
   simulation.on("tick", draw(state));
   load(state);
   resetSimulation(state)();

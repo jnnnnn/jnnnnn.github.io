@@ -13,7 +13,7 @@ import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
 
 export const keydown = state => key => {
-  const target = findNodeAtCoords(state)(state.mouse); // maybe null
+  const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
   const source = state.selected;
   switch (key) {
     case "s":
@@ -105,10 +105,10 @@ const edit = state => (source, target) => {
   // we might create it here but it is not added to the model until finishEditing
   const textarea = document.createElement("textarea");
   // save mouse coords for create later
-  const coords = state.mouse;
+  const coords = state.mutables.mouse;
   textarea.className = "centered";
   textarea.value = target ? target.text : "";
-  document.body.append(textarea);
+  document.getElementById("graphDiv").append(textarea);
   textarea.focus();
   textarea.select();
   // stop this keyDown generating a keyPress and overwriting the value with "e"
@@ -139,7 +139,7 @@ export const resetSimulation = state => (energy = 0.3) => {
 
 export const mousemove = state => () => {
   const [screenX, screenY] = d3.mouse(d3.event.currentTarget);
-  state.mouse = {
+  state.mutables.mouse = {
     x: state.transform.invertX(screenX),
     y: state.transform.invertY(screenY)
   };

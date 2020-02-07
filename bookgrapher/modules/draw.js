@@ -1,7 +1,7 @@
 import { size } from "./model.js";
 
 const drawNode = state => n => {
-  const { ctx } = state;
+  const ctx = state.mutables.ctx;
 
   if (!n.fixed) {
     ctx.beginPath();
@@ -24,7 +24,6 @@ const drawEdge = ctx => e => {
   ctx.stroke();
 };
 
-const drawOverlay = state => ctx => {};
 const drawSelection = state => ctx => {
   const n = state.selected;
   if (!n) return;
@@ -36,7 +35,8 @@ const drawSelection = state => ctx => {
 };
 
 export const draw = state => () => {
-  const { transform, ctx, width, height } = state;
+  const { transform, mutables } = state;
+  const { ctx, width, height } = mutables;
 
   ctx.save();
 
@@ -48,9 +48,5 @@ export const draw = state => () => {
   state.nodes.forEach(drawNode(state));
   drawSelection(state)(ctx);
 
-  ctx.restore();
-
-  ctx.save();
-  drawOverlay(ctx, state);
   ctx.restore();
 };
