@@ -8,6 +8,7 @@ const drawNode = state => n => {
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
   ctx.fillStyle = n.col || "#ddd";
   ctx.strokeStyle = n.col || "#ddd";
+  ctx.lineWidth = radius / 10;
   n.fixed ? ctx.fill() : ctx.stroke();
 
   drawText(state)(n, size(n) * 2);
@@ -83,6 +84,7 @@ export const draw = state => () => {
   ctx.save();
 
   ctx.clearRect(0, 0, width, height);
+  drawOverlay(ctx);
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
@@ -91,4 +93,15 @@ export const draw = state => () => {
   drawSelection(state)(ctx);
 
   ctx.restore();
+};
+
+const defaultFont = Number(
+  getComputedStyle(document.body, null).fontSize.replace(/[^\d]/g, "")
+);
+
+const drawOverlay = ctx => {
+  ctx.fillStyle = "black";
+  ctx.font = defaultFont + "px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("For help, press /", 0, defaultFont);
 };

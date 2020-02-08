@@ -24,12 +24,6 @@ export const keydown = state => key => {
         save(state);
       } else select(state)(source, target);
       break;
-    case "o":
-      if (d3.event.ctrlKey) {
-        event.preventDefault();
-        alert("Please use drag-and-drop to open a file.");
-      }
-      break;
     case "l":
       editEdge(state)(source, target);
       break;
@@ -62,10 +56,16 @@ export const keydown = state => key => {
     case "r":
       resetZoom(state);
       break;
-
+    case "/":
+      showHelp();
+      break;
     default:
       console.log("No command for ", key, d3.event);
   }
+};
+
+const showHelp = () => {
+  window.location = "modules/commands.js";
 };
 
 const resetZoom = state => {
