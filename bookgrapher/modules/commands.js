@@ -65,7 +65,8 @@ export const keydown = state => key => {
 };
 
 const showHelp = () => {
-  window.location = "modules/commands.js";
+  window.location =
+    "https://github.com/jnnnnn/jnnnnn.github.io/tree/master/bookgrapher";
 };
 
 const resetZoom = state => {

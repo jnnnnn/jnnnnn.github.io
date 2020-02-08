@@ -13,3 +13,9 @@ This is a tool for quickly producing concept diagrams at maximum speed.
 | Ctrl(Shift)Z | Undo (Redo)                        |
 
 For full details, see [commands.js](./modules/commands.js)
+
+## Saving and Loading
+
+The current diagram is saved to the page's localStorage.
+
+You can export a json file of the diagram using Ctrl+S, and load from a file by dragging-and-dropping the file onto the diagram.
