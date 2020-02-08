@@ -10,17 +10,24 @@ const drawNode = state => n => {
   ctx.strokeStyle = n.col || "#ddd";
   n.fixed ? ctx.fill() : ctx.stroke();
 
+  drawText(state)(n, size(n) * 2);
+};
+
+const drawText = state => (obj, fontSize) => {
+  const ctx = state.mutables.ctx;
   ctx.fillStyle = "black";
-  ctx.font = size(n) * 2 + "px Arial";
+  ctx.font = fontSize + "px Arial";
   ctx.textAlign = "center";
 
-  if (!n.lines) n.lines = n.text.split("\n");
-  n.lines.forEach((line, index) => {
-    ctx.fillText(line, n.x, n.y + index * size(n) * 2);
+  if (!obj.lines) obj.lines = obj.text.split("\n");
+  obj.lines.forEach((line, index) => {
+    ctx.fillText(line, obj.x, obj.y + index * fontSize);
   });
 };
 
-const drawEdge = ctx => e => {
+const drawEdge = state => e => {
+  const ctx = state.mutables.ctx;
+
   ctx.beginPath();
 
   const x1 = e.source.x;
@@ -50,6 +57,13 @@ const drawEdge = ctx => e => {
   ctx.lineTo(cx, cy);
   ctx.fillStyle = "#0003";
   ctx.fill();
+
+  if (e.text) {
+    e.x = 0.5 * (ux + cx);
+    e.y = 0.5 * (uy + cy);
+    const fontSize = 2 * Math.min(size(e.source), size(e.target));
+    drawText(state)(e, fontSize);
+  }
 };
 
 const drawSelection = state => ctx => {
@@ -72,7 +86,7 @@ export const draw = state => () => {
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
-  state.edges.forEach(drawEdge(ctx));
+  state.edges.forEach(drawEdge(state));
   state.nodes.forEach(drawNode(state));
   drawSelection(state)(ctx);
 

@@ -78,6 +78,15 @@ export const mutateNode = state => (node, mutation) => {
   });
 };
 
+export const mutateEdge = state => (edge, mutation) => {
+  const edges = [...state.edges];
+  const i = edges.indexOf(edge);
+  if (i < 0) throw "node to update not found";
+  edges[i] = { ...edge, ...mutation, lines: undefined };
+
+  mutate(state)({ edges });
+};
+
 const replaceNodeInEdges = (edges, oldNode, newNode) => {
   return edges.map(edge => {
     if (edge.source === oldNode)
@@ -88,7 +97,7 @@ const replaceNodeInEdges = (edges, oldNode, newNode) => {
   });
 };
 
-export const size = node => 40 / Math.pow(2, node.level || 12);
+export const size = node => 40 / Math.pow(2, node.level);
 
 let largestId = 0;
 export const createNode = state => (values, parent) => {
@@ -102,17 +111,16 @@ export const createNode = state => (values, parent) => {
   };
 };
 
+export const findEdge = state => (source, target) =>
+  state.edges.find(
+    e =>
+      (e.source === source && e.target === target) ||
+      (e.target === source && e.source == target)
+  );
+
 export const addEdge = state => (source, target, values) => {
   // don't add duplicate edges, it makes the simulation wonky
-  if (
-    state.edges.find(
-      e =>
-        (e.source === source && e.target === target) ||
-        (e.target === source && e.source == target)
-    )
-  ) {
-    return;
-  }
+  if (findEdge(state)(source, target)) return;
 
   mutate(state)({ edges: [...state.edges, { source, target, ...values }] });
 };

@@ -7,7 +7,9 @@ import {
   addNode,
   removeEdge,
   addEdge,
-  removeNode
+  removeNode,
+  findEdge,
+  mutateEdge
 } from "./model.js";
 import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
@@ -23,7 +25,7 @@ export const keydown = state => key => {
       } else select(state)(source, target);
       break;
     case "l":
-      link(state)(source, target);
+      editEdge(state)(source, target);
       break;
     case "u":
       unlink(state)(source, target);
@@ -87,11 +89,20 @@ const remove = state => (source, target) => {
   }
 };
 
-const link = state => (source, target) => {
-  if (target && source && target !== source) {
-    addEdge(state)(source, target);
-    resetSimulation(state)();
-  }
+const editEdge = state => (source, target) => {
+  if (!(target && source && target !== source)) return;
+
+  const existing = findEdge(state)(source, target);
+
+  promptText({
+    startText: existing ? existing.text : "",
+    confirm: value => {
+      if (existing)
+        mutateEdge(state)(existing, { source, target, text: value });
+      else addEdge(state)(source, target, { text: value });
+      resetSimulation(state)();
+    }
+  });
 };
 
 const unlink = state => (source, target) => {
