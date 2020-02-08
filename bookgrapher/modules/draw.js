@@ -3,13 +3,13 @@ import { size } from "./model.js";
 const drawNode = state => n => {
   const ctx = state.mutables.ctx;
 
-  if (!n.fixed) {
-    ctx.beginPath();
-    const radius = size(n);
-    ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
-    ctx.fillStyle = n.col || "#ddd";
-    ctx.fill();
-  }
+  ctx.beginPath();
+  const radius = size(n);
+  ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
+  ctx.fillStyle = n.col || "#ddd";
+  ctx.strokeStyle = n.col || "#ddd";
+  n.fixed ? ctx.fill() : ctx.stroke();
+
   ctx.fillStyle = "black";
   ctx.font = size(n) * 2 + "px Arial";
   ctx.textAlign = "center";
@@ -18,10 +18,34 @@ const drawNode = state => n => {
 
 const drawEdge = ctx => e => {
   ctx.beginPath();
-  ctx.moveTo(e.source.x, e.source.y);
-  ctx.lineTo(e.target.x, e.target.y);
-  ctx.strokeStyle = "#ddd";
-  ctx.stroke();
+
+  const x1 = e.source.x;
+  const y1 = e.source.y;
+  const x2 = e.target.x;
+  const y2 = e.target.y;
+
+  const r1 = 3 * size(e.source);
+  const r2 = 3 * size(e.target);
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const mag = Math.sqrt(dx * dx + dy * dy);
+  const sthatx = dx / mag;
+  const sthaty = dy / mag;
+  const ux = x1 + r1 * sthatx;
+  const uy = y1 + r1 * sthaty;
+  const ax = ux - (r1 / 3) * sthaty;
+  const ay = uy + (r1 / 3) * sthatx;
+  const bx = ux + (r1 / 3) * sthaty;
+  const by = uy - (r1 / 3) * sthatx;
+  const cx = x2 - r2 * sthatx;
+  const cy = y2 - r2 * sthaty;
+
+  ctx.moveTo(ax, ay);
+  ctx.lineTo(bx, by);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = "#0003";
+  ctx.fill();
 };
 
 const drawSelection = state => ctx => {
