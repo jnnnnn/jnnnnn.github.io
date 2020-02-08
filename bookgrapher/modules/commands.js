@@ -102,29 +102,42 @@ const unlink = state => (source, target) => {
 };
 
 const edit = state => (source, target) => {
-  // we might create it here but it is not added to the model until finishEditing
-  const textarea = document.createElement("textarea");
   // save mouse coords for create later
   const coords = state.mutables.mouse;
+
+  promptText({
+    startText: target ? target.text : "",
+    confirm: value => {
+      if (target) mutateNode(state)(target, { text: value });
+      else addNode(state)({ text: value, ...coords }, source);
+      resetSimulation(state)();
+    }
+  });
+};
+
+const promptText = ({ startText, confirm, cancel }) => {
+  // we might create it here but it is not added to the model until confirm
+  const textarea = document.createElement("textarea");
   textarea.className = "centered";
-  textarea.value = target ? target.text : "";
+  textarea.value = startText;
   document.getElementById("graphDiv").append(textarea);
   textarea.focus();
   textarea.select();
   // stop this keyDown generating a keyPress and overwriting the value with "e"
   d3.event.preventDefault();
 
-  const finishEditing = () => {
-    if (target) mutateNode(state)(target, { text: textarea.value });
-    else addNode(state)({ text: textarea.value, ...coords }, source);
+  const abort = () => {
     textarea.remove();
-    resetSimulation(state)();
+    if (cancel) cancel();
   };
-  textarea.onblur = finishEditing;
+  textarea.onblur = abort;
 
   textarea.onkeydown = keyEvent => {
-    if (keyEvent.key === "Escape") textarea.remove();
-    if (keyEvent.key === "Enter" && keyEvent.ctrlKey) finishEditing();
+    if (keyEvent.key === "Escape") abort();
+    if (keyEvent.key === "Enter") {
+      confirm(textarea.value);
+      textarea.remove();
+    }
     // stop key presses from triggering other commands by bubbling up to the body
     keyEvent.stopPropagation();
   };
