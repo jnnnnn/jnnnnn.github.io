@@ -41,8 +41,11 @@ export const keydown = state => key => {
       break;
     case "Delete":
     case "Backspace":
+    case "D":
     case "d":
-      remove(state)(source, target);
+      d3.event.preventDefault();
+      if (d3.event.shiftKey) deleteAll(state);
+      else remove(state)(source, target);
       break;
     case "+":
       resize(state)(-1)(source, target);
@@ -67,6 +70,11 @@ export const keydown = state => key => {
 const showHelp = () => {
   window.location =
     "https://github.com/jnnnnn/jnnnnn.github.io/tree/master/bookgrapher";
+};
+
+const deleteAll = state => {
+  mutate(state)({ nodes: [], edges: [] });
+  resetSimulation(state)();
 };
 
 const resetZoom = state => {
@@ -102,8 +110,9 @@ const select = state => (source, target) => {
 };
 
 const remove = state => (source, target) => {
-  if (target) {
-    removeNode(state)(target);
+  const node = target || source;
+  if (node) {
+    removeNode(state)(node);
     resetSimulation(state)();
   }
 };
