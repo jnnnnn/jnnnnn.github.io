@@ -13,8 +13,9 @@ const drawNode = state => n => {
   ctx.fillStyle = "black";
   ctx.font = size(n) * 2 + "px Arial";
   ctx.textAlign = "center";
-  const lines = n.text.split("\n");
-  lines.forEach((line, index) => {
+
+  if (!n.lines) n.lines = n.text.split("\n");
+  n.lines.forEach((line, index) => {
     ctx.fillText(line, n.x, n.y + index * size(n) * 2);
   });
 };

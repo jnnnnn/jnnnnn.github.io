@@ -65,7 +65,7 @@ export const addNode = state => (values, parent) => {
 };
 
 export const mutateNode = state => (node, mutation) => {
-  const node2 = { ...node, ...mutation };
+  const node2 = { ...node, ...mutation, lines: undefined };
   const nodes = [...state.nodes];
   const i = nodes.indexOf(node);
   if (i < 0) throw "node to update not found";
