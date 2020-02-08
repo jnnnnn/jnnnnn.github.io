@@ -28,7 +28,11 @@ export const exportState = state => ({
     y: n.y,
     fixed: !!n.fixed
   })),
-  edges: state.edges.map(e => ({ source: e.source.id, target: e.target.id }))
+  edges: state.edges.map(e => ({
+    ...e,
+    source: e.source.id,
+    target: e.target.id
+  }))
 });
 
 // convert an exported object into the internal state representation
@@ -43,6 +47,7 @@ export const importState = exportedObj => {
     nodes,
     edges: exportedObj.edges.map(e => {
       return {
+        ...e,
         source: nodemap.get(e.source),
         target: nodemap.get(e.target)
       };

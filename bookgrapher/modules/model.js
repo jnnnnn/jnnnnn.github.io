@@ -81,9 +81,9 @@ export const mutateNode = state => (node, mutation) => {
 const replaceNodeInEdges = (edges, oldNode, newNode) => {
   return edges.map(edge => {
     if (edge.source === oldNode)
-      return { source: newNode, target: edge.target };
+      return { ...edge, source: newNode, target: edge.target };
     else if (edge.target === oldNode)
-      return { source: edge.source, target: newNode };
+      return { ...edge, source: edge.source, target: newNode };
     else return edge;
   });
 };
@@ -102,7 +102,7 @@ export const createNode = state => (values, parent) => {
   };
 };
 
-export const addEdge = state => (source, target) => {
+export const addEdge = state => (source, target, values) => {
   // don't add duplicate edges, it makes the simulation wonky
   if (
     state.edges.find(
@@ -114,7 +114,7 @@ export const addEdge = state => (source, target) => {
     return;
   }
 
-  mutate(state)({ edges: [...state.edges, { source, target }] });
+  mutate(state)({ edges: [...state.edges, { source, target, ...values }] });
 };
 
 export const removeEdge = state => (source, target) => {
