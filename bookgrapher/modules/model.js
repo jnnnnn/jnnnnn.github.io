@@ -133,5 +133,6 @@ export const removeNode = state => node => {
     e => !(e.source === node || e.target === node)
   );
   const nodes = state.nodes.filter(n => n !== node);
-  mutate(state)({ nodes, edges });
+  const selectedO = state.selected === node ? { selected: null } : {};
+  mutate(state)({ nodes, edges, ...selectedO });
 };
