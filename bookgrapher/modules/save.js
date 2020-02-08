@@ -3,7 +3,6 @@ export const save = state => {
   const blob = new Blob([JSON.stringify(object)], {
     type: "application/json"
   });
-  console.log("saving", blob);
   saveFile(blob, "bookchart.json");
 };
 

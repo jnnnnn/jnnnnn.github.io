@@ -22,7 +22,6 @@ export const undo = state => {
 };
 
 export const redo = state => {
-  console.log("redo", redoStack);
   if (redoStack.length === 0) return;
   stateHistory.push({ ...state });
   const restoredState = redoStack.pop();

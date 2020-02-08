@@ -24,6 +24,12 @@ export const keydown = state => key => {
         save(state);
       } else select(state)(source, target);
       break;
+    case "o":
+      if (d3.event.ctrlKey) {
+        event.preventDefault();
+        alert("Please use drag-and-drop to open a file.");
+      }
+      break;
     case "l":
       editEdge(state)(source, target);
       break;
@@ -31,7 +37,7 @@ export const keydown = state => key => {
       unlink(state)(source, target);
       break;
     case "e":
-      edit(state)(source, target);
+      editNode(state)(source, target);
       break;
     case "z":
     case "Z":
@@ -53,9 +59,21 @@ export const keydown = state => key => {
     case "f":
       fix(state)(source, target);
       break;
+    case "r":
+      resetZoom(state);
+      break;
+
     default:
       console.log("No command for ", key, d3.event);
   }
+};
+
+const resetZoom = state => {
+  d3.select(state.mutables.canvas).call(
+    state.mutables.zoom.transform,
+    d3.zoomIdentity
+  );
+  draw(state)();
 };
 
 export const click = state => () => {
@@ -72,7 +90,7 @@ const resize = state => delta => (source, target) => {
   if (!node) return;
   mutateNode(state)(node, {
     ...node,
-    level: Math.min(Math.max(node.level + delta, 1), 10)
+    level: Math.min(Math.max(node.level + delta, -3), 10)
   });
   resetSimulation(state)(0);
 };
@@ -95,6 +113,7 @@ const editEdge = state => (source, target) => {
   const existing = findEdge(state)(source, target);
 
   promptText({
+    placeholder: "Edge label",
     startText: existing ? existing.text : "",
     confirm: value => {
       if (existing)
@@ -112,11 +131,12 @@ const unlink = state => (source, target) => {
   }
 };
 
-const edit = state => (source, target) => {
+const editNode = state => (source, target) => {
   // save mouse coords for create later
   const coords = state.mutables.mouse;
 
   promptText({
+    placeholder: "Node label",
     startText: target ? target.text : "",
     confirm: value => {
       if (target) mutateNode(state)(target, { text: value });
@@ -126,7 +146,7 @@ const edit = state => (source, target) => {
   });
 };
 
-const promptText = ({ startText, confirm, cancel }) => {
+const promptText = ({ startText, confirm, cancel, placeholder }) => {
   // we might create it here but it is not added to the model until confirm
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
@@ -134,6 +154,7 @@ const promptText = ({ startText, confirm, cancel }) => {
   document.getElementById("graphDiv").append(textarea);
   textarea.focus();
   textarea.select();
+  textarea.placeholder = placeholder;
   // stop this keyDown generating a keyPress and overwriting the value with "e"
   d3.event.preventDefault();
 

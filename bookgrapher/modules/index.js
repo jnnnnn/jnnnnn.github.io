@@ -40,12 +40,21 @@ let state = {
   simulation: simulation,
   // these values are shared by all state objects
   mutables: {
+    canvas,
     ctx: canvas.getContext("2d"),
     width: 100,
     height: 100,
     mouse: { x: 0, y: 0 }
   }
 };
+
+state.mutables.zoom = d3
+  .zoom(canvas)
+  .scaleExtent([0.1, 8])
+  .on("zoom", () => {
+    state.transform = d3.event.transform;
+    draw(state)();
+  });
 
 const resize = () => {
   state.mutables.width = canvas.clientWidth;
@@ -60,7 +69,6 @@ const resize = () => {
     .alpha(0.3)
     .restart();
 
-  console.log(`resize to ${state.mutables.width} x ${state.mutables.height}`);
   state.mutables.ctx = canvas.getContext("2d");
 };
 
@@ -91,15 +99,7 @@ const createGraph = () => {
       .on("end", dragended(state))
   );
 
-  canvasS.call(
-    d3
-      .zoom(canvasS)
-      .scaleExtent([0.1, 8])
-      .on("zoom", () => {
-        state.transform = d3.event.transform;
-        draw(state)();
-      })
-  );
+  canvasS.call(state.mutables.zoom);
 
   resize();
   simulation.on("tick", draw(state));
