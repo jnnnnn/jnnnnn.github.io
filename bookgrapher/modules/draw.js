@@ -13,7 +13,10 @@ const drawNode = state => n => {
   ctx.fillStyle = "black";
   ctx.font = size(n) * 2 + "px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(n.text, n.x, n.y);
+  const lines = n.text.split("\n");
+  lines.forEach((line, index) => {
+    ctx.fillText(line, n.x, n.y + index * size(n) * 2);
+  });
 };
 
 const drawEdge = ctx => e => {

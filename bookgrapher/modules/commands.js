@@ -134,7 +134,7 @@ const promptText = ({ startText, confirm, cancel }) => {
 
   textarea.onkeydown = keyEvent => {
     if (keyEvent.key === "Escape") abort();
-    if (keyEvent.key === "Enter") {
+    if (keyEvent.key === "Enter" && !keyEvent.shiftKey) {
       confirm(textarea.value);
       textarea.remove();
     }
