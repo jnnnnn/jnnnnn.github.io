@@ -58,7 +58,7 @@ export const addNode = state => (values, parent) => {
   mutate(state)({
     nodes: [...state.nodes, newNode],
     edges: parent
-      ? [...state.edges, { source: parent, target: newNode }]
+      ? [...state.edges, { source: newNode, target: parent }]
       : state.edges
   });
 };
@@ -105,7 +105,7 @@ export const createNode = state => (values, parent) => {
 
   return {
     id: largestId,
-    level: parent ? parent.level + 1 : 1,
+    level: parent ? parent.level : 1,
     ...values
   };
 };
