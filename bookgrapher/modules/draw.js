@@ -67,6 +67,52 @@ const drawEdge = state => e => {
   }
 };
 
+const drawEdgeArrow = state => e => {
+  const ctx = state.mutables.ctx;
+
+  ctx.beginPath();
+
+  const x1 = e.source.x;
+  const y1 = e.source.y;
+  const x2 = e.target.x;
+  const y2 = e.target.y;
+
+  const r1 = size(e.source);
+  const r2 = size(e.target);
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const mag = Math.sqrt(dx * dx + dy * dy);
+  const sthatx = dx / mag;
+  const sthaty = dy / mag;
+  const ux = x1 + 4 * r1 * sthatx;
+  const uy = y1 + 4 * r1 * sthaty;
+  const ax = ux - r1 * sthaty;
+  const ay = uy + r1 * sthatx;
+  const bx = ux + r1 * sthaty;
+  const by = uy - r1 * sthatx;
+  const cx = x2 - 3 * r2 * sthatx;
+  const cy = y2 - 3 * r2 * sthaty;
+  const ex = x1 + 3 * r1 * sthatx;
+  const ey = y1 + 3 * r1 * sthaty;
+
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(ax, ay);
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(bx, by);
+  ctx.moveTo(ex, ey);
+  ctx.lineTo(cx, cy);
+  ctx.lineStyle = "#0003";
+  ctx.stroke();
+
+  if (e.text) {
+    e.x = 0.5 * (ux + cx);
+    e.y = 0.5 * (uy + cy);
+    const fontSize = 2 * Math.min(size(e.source), size(e.target));
+    drawText(state)(e, fontSize);
+  }
+};
+
 const drawSelection = state => ctx => {
   const n = state.selected;
   if (!n) return;
@@ -88,7 +134,7 @@ export const draw = state => () => {
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
-  state.edges.forEach(drawEdge(state));
+  state.edges.forEach(drawEdgeArrow(state));
   state.nodes.forEach(drawNode(state));
   drawSelection(state)(ctx);
 
