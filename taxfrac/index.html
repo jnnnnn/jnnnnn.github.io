@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<style type="text/css">
+  html,
+  body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .line {
+    fill: none;
+    stroke: #fa0;
+    stroke-width: 3;
+  }
+  .line2 {
+    fill: none;
+    stroke: #4c0;
+    stroke-width: 3;
+  }
+  .dot {
+    fill: #fa0;
+    stroke: #fff;
+  }
+  .dot2 {
+    fill: #4c0;
+    stroke: #fff;
+  }
+  div#description {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+  }
+</style>
+
+<body>
+  <svg></svg>
+  <div id="description"></div>
+</body>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+  const margin = { top: 50, right: 50, bottom: 50, left: 50 },
+    width = window.innerWidth - margin.left - margin.right,
+    height = window.innerHeight - margin.top - margin.bottom;
+
+  const brackets = [
+    { end: 18200, taxRate: 0.0 },
+    { end: 37000, taxRate: 0.19 },
+    { end: 90000, taxRate: 0.325 },
+    { end: 180000, taxRate: 0.37 },
+    { end: 300000, taxRate: 0.45 }
+  ];
+
+  const transform = d3.zoomIdentity;
+
+  const xmax = 300000;
+  const ymax = xmax;
+
+  const points = [{ income: 0, tax: 0 }];
+  for (const bracket of brackets) {
+    const start = points[points.length - 1];
+    const thisBracketTax = (bracket.end - start.income) * bracket.taxRate;
+    points.push({ income: bracket.end, tax: start.tax + thisBracketTax });
+  }
+  const dataset = points.map(p => ({ x: p.income, y: p.tax }));
+  const dataset2 = points.map(p => ({ x: p.income, y: p.income }));
+
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, xmax])
+    .range([0, width]);
+  const yScale = d3
+    .scaleLinear()
+    .domain([0, ymax])
+    .range([height, 0]);
+
+  const incomeToTax = d3
+    .scaleLinear()
+    .domain(dataset.map(d => d.x))
+    .range(dataset.map(d => d.y));
+
+  const line = d3
+    .line()
+    .x(d => xScale(d.x))
+    .y(d => yScale(d.y));
+
+  const mousemove = () => {
+    const income = xScale.invert(d3.event.clientX - margin.left);
+    const tax = incomeToTax(income);
+    const percentage = (100 * tax) / income;
+    const text = `at an income of $${Math.round(income)}, you pay $${Math.round(
+      tax
+    )} tax (${Math.round(percentage)}%)`;
+    document.querySelector("div#description").innerHTML = text;
+
+    d3.select("#taxi").remove();
+    const hover = d3.select("#hover");
+    hover
+      .append("path")
+      .attr("id", "taxi")
+      .attr("class", "line")
+      .attr(
+        "d",
+        line([
+          { x: income, y: 0 },
+          { x: income, y: tax }
+        ])
+      );
+    d3.select("#incomei").remove();
+    hover
+      .append("path")
+      .attr("id", "incomei")
+      .attr("class", "line2")
+      .attr(
+        "d",
+        line([
+          { x: income, y: tax },
+          { x: income, y: income }
+        ])
+      );
+  };
+  const svg = d3
+    .select("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .on("mousemove", mousemove)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .attr("id", "graph");
+
+  svg
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("fill", "#fff");
+
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale));
+
+  svg.append("g").call(d3.axisLeft(yScale));
+
+  svg
+    .append("path")
+    .attr("class", "line")
+    .attr("d", line(dataset));
+
+  svg
+    .append("path")
+    .attr("class", "line2")
+    .attr("d", line(dataset2));
+
+  svg
+    .selectAll(".dot")
+    .data(dataset)
+    .enter()
+    .append("circle")
+    .attr("class", "dot")
+    .attr("cx", d => xScale(d.x))
+    .attr("cy", d => yScale(d.y))
+    .attr("r", 5);
+  svg
+    .selectAll(".dot2")
+    .data(dataset2)
+    .enter()
+    .append("circle")
+    .attr("class", "dot2")
+    .attr("cx", d => xScale(d.x))
+    .attr("cy", d => yScale(d.y))
+    .attr("r", 5);
+
+  svg.append("g").attr("id", "hover");
+</script>
