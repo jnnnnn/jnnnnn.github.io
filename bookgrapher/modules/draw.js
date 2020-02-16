@@ -72,13 +72,13 @@ const drawEdgeArrow = state => e => {
 
   ctx.beginPath();
 
-  const x1 = e.source.x;
-  const y1 = e.source.y;
-  const x2 = e.target.x;
-  const y2 = e.target.y;
+  const x1 = e.target.x;
+  const y1 = e.target.y;
+  const x2 = e.source.x;
+  const y2 = e.source.y;
 
-  const r1 = size(e.source);
-  const r2 = size(e.target);
+  const r1 = size(e.target);
+  const r2 = size(e.source);
 
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -102,7 +102,7 @@ const drawEdgeArrow = state => e => {
   ctx.lineTo(bx, by);
   ctx.moveTo(ex, ey);
   ctx.lineTo(cx, cy);
-  ctx.lineStyle = "#0003";
+  ctx.strokeStyle = "#0005";
   ctx.stroke();
 
   if (e.text) {
