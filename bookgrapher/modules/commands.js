@@ -18,6 +18,8 @@ export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
   const source = state.selected;
   switch (key) {
+    case "c":
+      state.command = !state.command;
     case "s":
       if (d3.event.ctrlKey) {
         event.preventDefault();

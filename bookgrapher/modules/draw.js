@@ -130,7 +130,7 @@ export const draw = state => () => {
   ctx.save();
 
   ctx.clearRect(0, 0, width, height);
-  drawOverlay(ctx);
+  drawOverlay(state)(ctx);
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
@@ -145,8 +145,8 @@ const defaultFont = Number(
   getComputedStyle(document.body, null).fontSize.replace(/[^\d]/g, "")
 );
 
-const drawOverlay = ctx => {
-  ctx.fillStyle = "black";
+const drawOverlay = state => ctx => {
+  ctx.fillStyle = state.command ? "red" : "black";
   ctx.font = defaultFont + "px Arial";
   ctx.textAlign = "left";
   ctx.fillText("For help, press /", 0, defaultFont);
