@@ -12,6 +12,10 @@ const drawNode = state => n => {
   n.fixed ? ctx.fill() : ctx.stroke();
 
   drawText(state)(n, size(n) * 2);
+
+  if (state.command) {
+    ctx.fillText(n.id, n.x, n.y - size(n) * 2);
+  }
 };
 
 const drawText = state => (obj, fontSize) => {
@@ -150,4 +154,7 @@ const drawOverlay = state => ctx => {
   ctx.font = defaultFont + "px Arial";
   ctx.textAlign = "left";
   ctx.fillText("For help, press /", 0, defaultFont);
+
+  if (state.command) {
+  }
 };

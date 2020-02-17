@@ -65,6 +65,8 @@ export const keydown = state => key => {
       showHelp();
       break;
     default:
+      if (key >= "0" && key <= "9") {
+      }
       console.log("No command for ", key, d3.event);
   }
 };
