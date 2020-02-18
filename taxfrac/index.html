@@ -148,7 +148,7 @@
       .attr("class", "tax")
       .attr("x", xScale(income))
       .attr("y", yScale(tax / 2))
-      .text(`Tax: ${Math.round(tax)}`);
+      .text(`Tax: $${Math.round(tax)}`);
 
     d3.select("#incomet").remove();
     hover
@@ -157,7 +157,7 @@
       .attr("class", "income")
       .attr("x", xScale(income))
       .attr("y", yScale(tax + (income - tax) / 2))
-      .text(`income: ${Math.round(income)}`);
+      .text(`You keep: $${Math.round(income)}`);
 
     d3.select("#effec").remove();
     hover
