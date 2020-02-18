@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <head>
-  <title>Progressive Taxation in Australia 2020</title>
+  <title>Progressive Taxation</title>
 </head>
 
 <style type="text/css">
@@ -46,13 +46,25 @@
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom;
 
-  const brackets = [
+  const bracketsAU = [
     { end: 18200, taxRate: 0.0 },
     { end: 37000, taxRate: 0.19 },
     { end: 90000, taxRate: 0.325 },
     { end: 180000, taxRate: 0.37 },
-    { end: 300000, taxRate: 0.45 }
+    { end: 300000000, taxRate: 0.45 }
   ];
+
+  const bracketsUS = [
+    { end: 9700, taxRate: 0.1 },
+    { end: 39475, taxRate: 0.12 },
+    { end: 84200, taxRate: 0.22 },
+    { end: 160725, taxRate: 0.24 },
+    { end: 204100, taxRate: 0.32 },
+    { end: 510300, taxRate: 0.35 },
+    { end: 100000000, taxRate: 0.37 }
+  ];
+
+  const brackets = bracketsAU;
 
   const transform = d3.zoomIdentity;
 
@@ -90,10 +102,17 @@
   const mousemove = () => {
     const income = xScale.invert(d3.event.clientX - margin.left);
     const tax = incomeToTax(income);
-    const percentage = (100 * tax) / income;
-    const text = `at an income of $${Math.round(income)}, you pay $${Math.round(
-      tax
-    )} tax (${Math.round(percentage)}%)`;
+    const percentage = Math.round((100 * tax) / income);
+    const bracket = brackets.filter(b => b.end > income)[0];
+    const text = `
+      <p>
+        at an income of $${Math.round(income)},
+        you pay $${Math.round(tax)} tax (${percentage}%)
+      </p>
+      <p>
+        You are in the ${bracket.taxRate * 100}% bracket.
+      </p>
+      `;
     document.querySelector("div#description").innerHTML = text;
 
     d3.select("#taxi").remove();
@@ -121,6 +140,32 @@
           { x: income, y: income }
         ])
       );
+
+    d3.select("#taxt").remove();
+    hover
+      .append("text")
+      .attr("id", "taxt")
+      .attr("class", "tax")
+      .attr("x", xScale(income))
+      .attr("y", yScale(tax / 2))
+      .text(`Tax: ${Math.round(tax)}`);
+
+    d3.select("#incomet").remove();
+    hover
+      .append("text")
+      .attr("id", "incomet")
+      .attr("class", "income")
+      .attr("x", xScale(income))
+      .attr("y", yScale(tax + (income - tax) / 2))
+      .text(`income: ${Math.round(income)}`);
+
+    d3.select("#effec").remove();
+    hover
+      .append("text")
+      .attr("id", "effec")
+      .attr("x", xScale(income))
+      .attr("y", yScale(tax))
+      .text(`You pay ${percentage}% tax`);
   };
   const svg = d3
     .select("svg")
@@ -131,13 +176,7 @@
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
     .attr("id", "graph");
 
-  svg
-    .append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", width)
-    .attr("height", height)
-    .attr("fill", "#fff");
+  svg.append("rect").attr({ x: 0, y: 0, width, height, fill: "#fff" });
 
   svg
     .append("g")
