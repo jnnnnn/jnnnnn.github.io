@@ -134,7 +134,6 @@ export const draw = state => () => {
   ctx.save();
 
   ctx.clearRect(0, 0, width, height);
-  drawOverlay(state)(ctx);
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
@@ -143,6 +142,8 @@ export const draw = state => () => {
   drawSelection(state)(ctx);
 
   ctx.restore();
+
+  drawOverlay(state)(ctx);
 };
 
 const defaultFont = Number(
@@ -156,5 +157,9 @@ const drawOverlay = state => ctx => {
   ctx.fillText("For help, press /", 0, defaultFont);
 
   if (state.command) {
+    let i = 2;
+    for (const [key, value] of Object.entries(state.mutables.settings)) {
+      ctx.fillText(`${key}: ${value}`, 0, defaultFont * i++);
+    }
   }
 };

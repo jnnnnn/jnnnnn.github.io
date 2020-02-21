@@ -65,10 +65,41 @@ export const keydown = state => key => {
       showHelp();
       break;
     default:
-      if (key >= "0" && key <= "9") {
-      }
-      console.log("No command for ", key, d3.event);
+      numberAction(state)(key);
   }
+};
+
+const numberAction = state => key => {
+  switch (key) {
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      const newval = (state.mutables.settings.commandstr || "") + key;
+      state.mutables.settings.commandstr = newval;
+      if (searchSelect(state)(newval)) {
+        state.mutables.settings.commandstr = "";
+      }
+      break;
+    case "Escape":
+      state.mutables.settings.commandstr = "";
+      break;
+  }
+  console.log("No command for ", key, d3.event);
+};
+
+const searchSelect = state => keystr => {
+  const target = state.nodes.find(n => n.id == keystr);
+  if (target) {
+    select(state)(null, target);
+  }
+  return !!target;
 };
 
 const showHelp = () => {
