@@ -45,7 +45,7 @@ let state = {
     width: 100,
     height: 100,
     mouse: { x: 0, y: 0 },
-    settings: { arrowsForward: false, defaultNodeSize: 2 }
+    cmd: {}
   }
 };
 
@@ -65,8 +65,8 @@ const resize = () => {
   canvas.height = canvas.clientHeight;
 
   simulation
-    .force("x", d3.forceX((state.mutables.width || 100) / 2).strength(0.1))
-    .force("y", d3.forceY((state.mutables.height || 100) / 2).strength(0.1))
+    .force("x", d3.forceX((state.mutables.width || 100) / 2).strength(0.01))
+    .force("y", d3.forceY((state.mutables.height || 100) / 2).strength(0.01))
     .alpha(0.3)
     .restart();
 

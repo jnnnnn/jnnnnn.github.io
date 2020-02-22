@@ -15,7 +15,7 @@ import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
 
 export const keydown = state => key => {
-  if (state.command && commandMode(state)(key)) {
+  if (state.mutables.cmd.on && commandMode(state)(key)) {
     return;
   }
   const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
@@ -24,7 +24,7 @@ export const keydown = state => key => {
     case "a":
       state.mutables.arrowsForward = !state.mutables.arrowsForward;
     case "c":
-      state.command = !state.command;
+      state.mutables.cmd.on = !state.mutables.cmd.on;
     case "s":
       if (d3.event.ctrlKey) {
         event.preventDefault();
@@ -72,6 +72,9 @@ export const keydown = state => key => {
     case "r":
       resetZoom(state);
       break;
+    case "R":
+      resetSimulation(state)(1);
+      break;
     case "/":
       showHelp();
       break;
@@ -82,13 +85,13 @@ export const keydown = state => key => {
 
 const commandMode = state => key => {
   const startCommand = state => command => {
-    state.command = command;
-    state.commandSource = state.selected;
-    state.mutables.settings.commandstr = "";
+    state.mutables.cmd.action = command;
+    state.mutables.cmd.source = state.selected;
+    state.mutables.cmd.lookup = "";
   };
   switch (key) {
     case "c":
-      state.command = !state.command;
+      state.mutables.cmd.on = !state.mutables.cmd.on;
       break;
     case "0":
     case "1":
@@ -100,9 +103,8 @@ const commandMode = state => key => {
     case "7":
     case "8":
     case "9":
-      const newval = (state.mutables.settings.commandstr || "") + key;
-      state.mutables.settings.commandstr = newval;
-      searchSelect(state)(newval);
+      state.mutables.cmd.lookup = (state.mutables.cmd.lookup || "") + key;
+      searchSelect(state);
       break;
     case "Escape":
       clearCommand(state);
@@ -128,9 +130,9 @@ const commandMode = state => key => {
 };
 
 const completeCommand = state => {
-  const source = state.commandSource;
+  const source = state.mutables.cmd.source;
   const target = state.selected;
-  switch (state.command) {
+  switch (state.mutables.cmd.action) {
     case "link":
       link(state)(source, target, "");
       break;
@@ -144,12 +146,13 @@ const completeCommand = state => {
 };
 
 const clearCommand = state => {
-  state.mutables.settings.commandstr = "";
-  state.command = !!state.command;
-  state.commandSource = undefined;
+  state.mutables.cmd.lookup = "";
+  state.mutables.cmd.source = undefined;
+  state.mutables.cmd.action = "";
 };
 
-const searchSelect = state => keystr => {
+const searchSelect = state => {
+  const keystr = state.mutables.cmd.lookup;
   const target = state.nodes.find(n => n.id == keystr);
   if (target) {
     select(state)(null, target);
@@ -251,12 +254,12 @@ const cmdAddNode = state => (source, target) => {
 };
 
 const editNode = state => (source, target) => {
-  if (!target) return;
+  if (!source) return;
   promptText({
     placeholder: "Node label",
-    startText: target.text,
+    startText: source.text,
     confirm: value => {
-      mutateNode(state)(target, { text: value });
+      mutateNode(state)(source, { text: value });
       resetSimulation(state)();
     }
   });

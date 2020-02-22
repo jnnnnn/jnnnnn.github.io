@@ -13,7 +13,7 @@ const drawNode = state => n => {
 
   drawText(state)(n, size(n) * 2);
 
-  if (state.command) {
+  if (state.mutables.cmd.on) {
     ctx.fillText(n.id, n.x, n.y - size(n) * 2);
   }
 };
@@ -151,17 +151,15 @@ const defaultFont = Number(
 );
 
 const drawOverlay = state => ctx => {
-  ctx.fillStyle = state.command ? "red" : "black";
+  ctx.fillStyle = state.mutables.cmd.on ? "red" : "black";
   ctx.font = defaultFont + "px Arial";
   ctx.textAlign = "left";
   ctx.fillText("For help, press /", 0, defaultFont);
 
-  if (state.command) {
+  if (state.mutables.cmd.on) {
     let i = 2;
-    for (const [key, value] of Object.entries(state.mutables)) {
-      try {
-        ctx.fillText(`${key}: ${JSON.stringify(value)}`, 0, defaultFont * i++);
-      } catch {}
+    for (const [key, value] of Object.entries(state.mutables.cmd)) {
+      ctx.fillText(`${key}: ${JSON.stringify(value)}`, 0, defaultFont * i++);
     }
   }
 };
