@@ -44,7 +44,8 @@ let state = {
     ctx: canvas.getContext("2d"),
     width: 100,
     height: 100,
-    mouse: { x: 0, y: 0 }
+    mouse: { x: 0, y: 0 },
+    settings: { arrowsForward: false, defaultNodeSize: 2 }
   }
 };
 
