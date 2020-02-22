@@ -53,16 +53,6 @@ export const load = state => {
   mutate(state)(importedState);
 };
 
-export const addNode = state => (values, parent) => {
-  const newNode = createNode(state)(values, parent);
-  mutate(state)({
-    nodes: [...state.nodes, newNode],
-    edges: parent
-      ? [...state.edges, { source: newNode, target: parent }]
-      : state.edges
-  });
-};
-
 export const mutateNode = state => (node, mutation) => {
   const node2 = { ...node, ...mutation, lines: undefined };
   const nodes = [...state.nodes];

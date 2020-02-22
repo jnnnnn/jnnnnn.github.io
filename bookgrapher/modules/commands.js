@@ -4,12 +4,12 @@ import {
   mutateNode,
   undo,
   redo,
-  addNode,
   removeEdge,
   addEdge,
   removeNode,
   findEdge,
-  mutateEdge
+  mutateEdge,
+  createNode
 } from "./model.js";
 import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
@@ -22,9 +22,11 @@ export const keydown = state => key => {
   const source = state.selected;
   switch (key) {
     case "a":
-      state.mutables.arrowsForward = !state.mutables.arrowsForward;
+      state.mutables.cmd.arrowsForward = !state.mutables.cmd.arrowsForward;
+      break;
     case "c":
       state.mutables.cmd.on = !state.mutables.cmd.on;
+      break;
     case "s":
       if (d3.event.ctrlKey) {
         event.preventDefault();
@@ -44,7 +46,7 @@ export const keydown = state => key => {
       editNode(state)(source, target);
       break;
     case "n":
-      cmdAddNode(state)(source, target);
+      addNode(state)(source, target);
       break;
     case "z":
     case "Z":
@@ -242,12 +244,32 @@ const unlink = state => (source, target) => {
   }
 };
 
-const cmdAddNode = state => (source, target) => {
+const addNodeModel = state => (source, target, text) => {
+  const { x, y } = state.mutables.mouse;
+  const current = source;
+  // if we have a currently selected node, make the new one the same size.
+  const newNode = createNode(state)({ text, x, y }, current);
+
+  // As a user, I like for new nodes to automatically link the new node to the
+  // current one
+  const newEdge = !source
+    ? undefined
+    : state.mutables.cmd.arrowsForward
+    ? { source: source, target: newNode }
+    : { source: newNode, target: source };
+
+  mutate(state)({
+    nodes: [...state.nodes, newNode],
+    edges: newEdge ? [...state.edges, newEdge] : state.edges
+  });
+};
+
+const addNode = state => (source, target) => {
   promptText({
     placeholder: "Node label",
     startText: "",
-    confirm: value => {
-      addNode(state)({ text: value, ...state.mutables.mouse }, source);
+    confirm: text => {
+      addNodeModel(state)(source, target, text);
       resetSimulation(state)();
     }
   });
