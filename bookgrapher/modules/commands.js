@@ -21,6 +21,8 @@ export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
   const source = state.selected;
   switch (key) {
+    case "a":
+      state.mutables.arrowsForward = !state.mutables.arrowsForward;
     case "c":
       state.command = !state.command;
     case "s":
@@ -29,8 +31,11 @@ export const keydown = state => key => {
         save(state);
       } else select(state)(source, target);
       break;
-    case "l":
+    case "L":
       editEdge(state)(source, target);
+      break;
+    case "l":
+      link(state)(source, target, "");
       break;
     case "u":
       unlink(state)(source, target);
@@ -94,13 +99,33 @@ const commandMode = state => key => {
     case "Escape":
       clearCommand(state);
       return true;
+    case "l":
+      state.command = "link";
+      state.commandSource = state.selected;
+      state.mutables.settings.commandstr = "";
+      break;
+    case "Enter":
+      completeCommand(state);
+      break;
     default:
       return false;
   }
 };
 
+const completeCommand = state => {
+  const source = state.commandSource;
+  const target = state.selected;
+  switch (state.command) {
+    case "link":
+      link(state)(source, target, "");
+      break;
+  }
+};
+
 const clearCommand = state => {
   state.mutables.settings.commandstr = "";
+  state.command = !!state.command;
+  state.commandSource = undefined;
 };
 
 const searchSelect = state => keystr => {
@@ -161,21 +186,29 @@ const remove = state => (source, target) => {
   }
 };
 
+const differentNodes = (source, target) => {
+  return target && source && target !== source;
+};
+
 const editEdge = state => (source, target) => {
-  if (!(target && source && target !== source)) return;
-
+  if (!differentNodes(source, target)) return;
   const existing = findEdge(state)(source, target);
-
   promptText({
     placeholder: "Edge label",
     startText: existing ? existing.text : "",
-    confirm: value => {
-      if (existing)
-        mutateEdge(state)(existing, { source, target, text: value });
-      else addEdge(state)(source, target, { text: value });
-      resetSimulation(state)();
-    }
+    confirm: text => link(source, target, text)
   });
+};
+
+const link = state => (source, target, text) => {
+  if (!differentNodes(source, target)) return;
+  const existing = findEdge(state)(source, target);
+  if (existing) {
+    mutateEdge(state)(existing, { source, target, text });
+  } else {
+    addEdge(state)(source, target, { text });
+  }
+  resetSimulation(state)();
 };
 
 const unlink = state => (source, target) => {
