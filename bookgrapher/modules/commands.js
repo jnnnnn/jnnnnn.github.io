@@ -15,6 +15,9 @@ import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
 
 export const keydown = state => key => {
+  if (state.command && commandMode(state)(key)) {
+    return;
+  }
   const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
   const source = state.selected;
   switch (key) {
@@ -65,12 +68,15 @@ export const keydown = state => key => {
       showHelp();
       break;
     default:
-      numberAction(state)(key);
+      console.log(`No action for ${key} defined.`, d3.event);
   }
 };
 
-const numberAction = state => key => {
+const commandMode = state => key => {
   switch (key) {
+    case "c":
+      state.command = !state.command;
+      return true;
     case "0":
     case "1":
     case "2":
@@ -83,15 +89,18 @@ const numberAction = state => key => {
     case "9":
       const newval = (state.mutables.settings.commandstr || "") + key;
       state.mutables.settings.commandstr = newval;
-      if (searchSelect(state)(newval)) {
-        state.mutables.settings.commandstr = "";
-      }
-      break;
+      searchSelect(state)(newval);
+      return true;
     case "Escape":
-      state.mutables.settings.commandstr = "";
-      break;
+      clearCommand(state);
+      return true;
+    default:
+      return false;
   }
-  console.log("No command for ", key, d3.event);
+};
+
+const clearCommand = state => {
+  state.mutables.settings.commandstr = "";
 };
 
 const searchSelect = state => keystr => {

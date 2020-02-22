@@ -158,8 +158,8 @@ const drawOverlay = state => ctx => {
 
   if (state.command) {
     let i = 2;
-    for (const [key, value] of Object.entries(state.mutables.settings)) {
-      ctx.fillText(`${key}: ${value}`, 0, defaultFont * i++);
+    for (const [key, value] of Object.entries(state.mutables)) {
+      ctx.fillText(`${key}: ${JSON.stringify(value)}`, 0, defaultFont * i++);
     }
   }
 };
