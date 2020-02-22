@@ -43,6 +43,9 @@ export const keydown = state => key => {
     case "e":
       editNode(state)(source, target);
       break;
+    case "n":
+      cmdAddNode(state)(source, target);
+      break;
     case "z":
     case "Z":
       if (d3.event.ctrlKey && d3.event.shiftKey) redo(state);
@@ -78,10 +81,15 @@ export const keydown = state => key => {
 };
 
 const commandMode = state => key => {
+  const startCommand = state => command => {
+    state.command = command;
+    state.commandSource = state.selected;
+    state.mutables.settings.commandstr = "";
+  };
   switch (key) {
     case "c":
       state.command = !state.command;
-      return true;
+      break;
     case "0":
     case "1":
     case "2":
@@ -95,21 +103,28 @@ const commandMode = state => key => {
       const newval = (state.mutables.settings.commandstr || "") + key;
       state.mutables.settings.commandstr = newval;
       searchSelect(state)(newval);
-      return true;
+      break;
     case "Escape":
       clearCommand(state);
-      return true;
+      break;
     case "l":
-      state.command = "link";
-      state.commandSource = state.selected;
-      state.mutables.settings.commandstr = "";
+      startCommand(state)("link");
+      break;
+    case "L":
+      startCommand(state)("Link");
+      break;
+    case "u":
+      startCommand(state)("unlink");
       break;
     case "Enter":
       completeCommand(state);
+      clearCommand(state);
       break;
     default:
       return false;
   }
+  draw(state)();
+  return true;
 };
 
 const completeCommand = state => {
@@ -118,6 +133,12 @@ const completeCommand = state => {
   switch (state.command) {
     case "link":
       link(state)(source, target, "");
+      break;
+    case "Link":
+      editEdge(state)(source, target);
+      break;
+    case "unlink":
+      unlink(state)(source, target);
       break;
   }
 };
@@ -196,7 +217,7 @@ const editEdge = state => (source, target) => {
   promptText({
     placeholder: "Edge label",
     startText: existing ? existing.text : "",
-    confirm: text => link(source, target, text)
+    confirm: text => link(state)(source, target, text)
   });
 };
 
@@ -212,22 +233,30 @@ const link = state => (source, target, text) => {
 };
 
 const unlink = state => (source, target) => {
-  if (target && source && target !== source) {
+  if (differentNodes(source, target)) {
     removeEdge(state)(source, target);
     resetSimulation(state)();
   }
 };
 
-const editNode = state => (source, target) => {
-  // save mouse coords for create later
-  const coords = state.mutables.mouse;
-
+const cmdAddNode = state => (source, target) => {
   promptText({
     placeholder: "Node label",
-    startText: target ? target.text : "",
+    startText: "",
     confirm: value => {
-      if (target) mutateNode(state)(target, { text: value });
-      else addNode(state)({ text: value, ...coords }, source);
+      addNode(state)({ text: value, ...state.mutables.mouse }, source);
+      resetSimulation(state)();
+    }
+  });
+};
+
+const editNode = state => (source, target) => {
+  if (!target) return;
+  promptText({
+    placeholder: "Node label",
+    startText: target.text,
+    confirm: value => {
+      mutateNode(state)(target, { text: value });
       resetSimulation(state)();
     }
   });
