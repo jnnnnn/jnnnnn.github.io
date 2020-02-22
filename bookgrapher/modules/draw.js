@@ -137,6 +137,8 @@ export const draw = state => () => {
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
+  drawOrigin(state)(ctx);
+
   state.edges.forEach(drawEdgeArrow(state));
   state.nodes.forEach(drawNode(state));
   drawSelection(state)(ctx);
@@ -162,4 +164,15 @@ const drawOverlay = state => ctx => {
       ctx.fillText(`${key}: ${JSON.stringify(value)}`, 0, defaultFont * i++);
     }
   }
+};
+
+const drawOrigin = state => ctx => {
+  ctx.moveTo(-100, 0);
+  ctx.lineTo(100, 0);
+  ctx.moveTo(0, -100);
+  ctx.lineTo(0, 100);
+  ctx.fillStyle = "#0000ff55";
+  ctx.strokeStyle;
+  ctx.lineWidth = 1 / state.transform.k;
+  ctx.stroke();
 };
