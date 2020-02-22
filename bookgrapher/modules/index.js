@@ -65,8 +65,8 @@ const resize = () => {
   canvas.height = canvas.clientHeight;
 
   simulation
-    .force("x", d3.forceX((state.mutables.width || 100) / 2).strength(0.01))
-    .force("y", d3.forceY((state.mutables.height || 100) / 2).strength(0.01))
+    .force("x", d3.forceX((state.mutables.width || 100) / 2).strength(0.03))
+    .force("y", d3.forceY((state.mutables.height || 100) / 2).strength(0.03))
     .alpha(0.3)
     .restart();
 
