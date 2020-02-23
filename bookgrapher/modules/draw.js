@@ -1,8 +1,6 @@
 import { size } from "./model.js";
 
-const drawNode = state => n => {
-  const ctx = state.mutables.ctx;
-
+const drawNodeCircle = (ctx, n) => {
   ctx.beginPath();
   const radius = size(n);
   ctx.fillStyle = n.col || "#aaa";
@@ -11,6 +9,14 @@ const drawNode = state => n => {
   ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
 
   n.fixed ? ctx.fill() : ctx.stroke();
+};
+
+const drawNode = state => n => {
+  const ctx = state.mutables.ctx;
+
+  if (!state.mutables.cmd.present) {
+    drawNodeCircle(ctx, n);
+  }
 
   drawText(state)(n, size(n) * 2);
 
@@ -90,6 +96,8 @@ const drawEdgeArrow = state => e => {
   const mag = Math.sqrt(dx * dx + dy * dy);
   const sthatx = dx / mag;
   const sthaty = dy / mag;
+  const ex = x1 + 3 * r1 * sthatx;
+  const ey = y1 + 3 * r1 * sthaty;
   const ux = x1 + 4 * r1 * sthatx;
   const uy = y1 + 4 * r1 * sthaty;
   const ax = ux - r1 * sthaty;
@@ -98,8 +106,6 @@ const drawEdgeArrow = state => e => {
   const by = uy - r1 * sthatx;
   const cx = x2 - 3 * r2 * sthatx;
   const cy = y2 - 3 * r2 * sthaty;
-  const ex = x1 + 3 * r1 * sthatx;
-  const ey = y1 + 3 * r1 * sthaty;
 
   ctx.moveTo(ex, ey);
   ctx.lineTo(ax, ay);
@@ -107,6 +113,7 @@ const drawEdgeArrow = state => e => {
   ctx.lineTo(bx, by);
   ctx.moveTo(ex, ey);
   ctx.lineTo(cx, cy);
+  ctx.lineWidth = 2;
   ctx.strokeStyle = "#0008";
   ctx.stroke();
 
@@ -138,10 +145,13 @@ export const draw = state => () => {
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
-  drawOrigin(state)(ctx);
+  if (!state.mutables.cmd.present) {
+    drawOrigin(state)(ctx);
+  }
 
   state.edges.forEach(drawEdgeArrow(state));
   state.nodes.forEach(drawNode(state));
+
   drawSelection(state)(ctx);
 
   ctx.restore();

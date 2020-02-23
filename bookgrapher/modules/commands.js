@@ -77,6 +77,9 @@ export const keydown = state => key => {
     case "R":
       resetSimulation(state)(1);
       break;
+    case "p":
+      state.mutables.cmd.present = !state.mutables.cmd.present;
+      break;
     case "/":
       showHelp();
       break;
