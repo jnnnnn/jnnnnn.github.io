@@ -1,4 +1,6 @@
-This is a tool for quickly producing concept diagrams at maximum speed.
+# QuickGraph
+
+This is a tool for quickly producing directed graph diagrams at maximum speed.
 
 ## Keys
 
