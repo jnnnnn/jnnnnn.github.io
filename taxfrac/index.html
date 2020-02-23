@@ -2,252 +2,29 @@
 <meta charset="utf-8" />
 <head>
   <title>Progressive Taxation</title>
+  <link rel="stylesheet" href="index.css" />
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script type="module" src="index.js"></script>
 </head>
-
-<style type="text/css">
-  html,
-  body {
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    display: grid;
-
-    grid-template-areas:
-      "controls"
-      "graph"
-      "description";
-
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-gap: 10px;
-
-    height: 100vh;
-  }
-  div#controls {
-    grid-area: "controls";
-  }
-  div#graph {
-    grid-area: "graph";
-  }
-  div#description {
-    grid-area: "description";
-  }
-  .income {
-    fill: #4c0;
-    stroke: #4c0;
-  }
-  .tax {
-    fill: #fa0;
-    stroke: #fa0;
-  }
-  .line {
-    fill: none;
-    stroke-width: 2;
-  }
-  .dot {
-    stroke: #fff;
-  }
-  div#description {
-    position: absolute;
-    left: 100px;
-    top: 100px;
-  }
-</style>
 
 <body>
   <div id="controls">
-    <form>
-      <label for="dataset">Dataset</label>
-      <select id="dataset">
-        <option>AU 2020</option>
-        <option>US 2020</option>
-      </select>
+    <form onsubmit="return false;">
+      <div>
+        <label for="dataset">Dataset</label>
+        <select id="dataset">
+          <option value="au-2020">AU 2020</option>
+          <option value="us-2020">US 2020</option>
+        </select>
+      </div>
+      <div>
+        <label for="maxincome">Graph Maximum Income:</label>
+        <!--https://stackoverflow.com/a/31712438/412529-->
+        <input id="maxincome" type="range" max="10" value="2" />
+        <input id="maxincomev" type="number" width="4em" value="300000" />
+      </div>
     </form>
   </div>
-  <div id="graph">
-    <svg></svg>
-  </div>
+  <div id="graph"></div>
   <div id="description"></div>
 </body>
-
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script>
-  // todo: fix this
-  const supportsTouch = "ontouchstart" in window || navigator.msMaxTouchPoints;
-
-  const graphdiv = document.querySelector("div#graph");
-  const margin = { top: 50, right: 50, bottom: 50, left: 50 },
-    width = graphdiv.clientWidth - margin.left - margin.right,
-    height = graphdiv.clientHeight - margin.top - margin.bottom;
-
-  const bracketsAU = [
-    { end: 18200, taxRate: 0.0 },
-    { end: 37000, taxRate: 0.19 },
-    { end: 90000, taxRate: 0.325 },
-    { end: 180000, taxRate: 0.37 },
-    { end: 300000, taxRate: 0.45 }
-  ];
-
-  const bracketsUS = [
-    { end: 9700, taxRate: 0.1 },
-    { end: 39475, taxRate: 0.12 },
-    { end: 84200, taxRate: 0.22 },
-    { end: 160725, taxRate: 0.24 },
-    { end: 204100, taxRate: 0.32 },
-    { end: 510300, taxRate: 0.35 },
-    { end: 1000000, taxRate: 0.37 }
-  ];
-
-  const brackets = bracketsAU;
-
-  const xmax = 300000;
-  const ymax = xmax;
-
-  const points = [{ income: 0, tax: 0 }];
-  for (const bracket of brackets) {
-    const start = points[points.length - 1];
-    const thisBracketTax = (bracket.end - start.income) * bracket.taxRate;
-    points.push({ income: bracket.end, tax: start.tax + thisBracketTax });
-  }
-  const dataset = points.map(p => ({ x: p.income, y: p.tax }));
-  const dataset2 = points.map(p => ({ x: p.income, y: p.income }));
-
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, xmax])
-    .range([0, width]);
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, ymax])
-    .range([height, 0]);
-
-  const incomeToTax = d3
-    .scaleLinear()
-    .domain(dataset.map(d => d.x))
-    .range(dataset.map(d => d.y));
-
-  const line = d3
-    .line()
-    .x(d => xScale(d.x))
-    .y(d => yScale(d.y));
-
-  const mousemove = () => {
-    const income = xScale.invert(d3.event.clientX - margin.left);
-    const tax = incomeToTax(income);
-    const percentage = Math.round((100 * tax) / income);
-    const bracket = brackets.filter(b => b.end > income)[0];
-    const text = `
-      <p>
-        at an income of $${Math.round(income)},
-        you pay $${Math.round(tax)} tax (${percentage}%)
-      </p>
-      <p>
-        You are in the ${(bracket ? bracket.taxRate : 0) * 100}% bracket.
-      </p>
-      `;
-
-    document.querySelector("div#description").innerHTML = text;
-
-    d3.select("#taxi").remove();
-    const hover = d3.select("#hover");
-    hover
-      .append("path")
-      .attr("id", "taxi")
-      .attr("class", "tax line")
-      .attr(
-        "d",
-        line([
-          { x: income, y: 0 },
-          { x: income, y: tax }
-        ])
-      );
-    d3.select("#incomei").remove();
-    hover
-      .append("path")
-      .attr("id", "incomei")
-      .attr("class", "income line")
-      .attr(
-        "d",
-        line([
-          { x: income, y: tax },
-          { x: income, y: income }
-        ])
-      );
-
-    d3.select("#taxt").remove();
-    hover
-      .append("text")
-      .attr("id", "taxt")
-      .attr("class", "tax")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax / 2))
-      .text(`Tax: $${Math.round(tax)}`);
-
-    d3.select("#incomet").remove();
-    hover
-      .append("text")
-      .attr("id", "incomet")
-      .attr("class", "income")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax + (income - tax) / 2))
-      .text(`You keep: $${Math.round(income - tax)}`);
-
-    d3.select("#effec").remove();
-    hover
-      .append("text")
-      .attr("id", "effec")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax))
-      .text(`You pay ${percentage}% tax`);
-  };
-  const svg = d3
-    .select("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .on(supportsTouch ? "touchmove" : "mousemove", mousemove)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    .attr("id", "graph");
-
-  svg.append("rect").attr({ x: 0, y: 0, width, height, fill: "#fff" });
-
-  svg
-    .append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xScale));
-
-  svg.append("g").call(d3.axisLeft(yScale));
-
-  svg
-    .append("path")
-    .attr("class", "tax line")
-    .attr("d", line(dataset));
-
-  svg
-    .append("path")
-    .attr("class", "income line")
-    .attr("d", line(dataset2));
-
-  svg
-    .selectAll(".dot")
-    .data(dataset)
-    .enter()
-    .append("circle")
-    .attr("class", "tax dot")
-    .attr("cx", d => xScale(d.x))
-    .attr("cy", d => yScale(d.y))
-    .attr("r", 3);
-  svg
-    .selectAll(".dot2")
-    .data(dataset2)
-    .enter()
-    .append("circle")
-    .attr("class", "income dot")
-    .attr("cx", d => xScale(d.x))
-    .attr("cy", d => yScale(d.y))
-    .attr("r", 3);
-
-  svg.append("g").attr("id", "hover");
-</script>

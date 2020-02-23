@@ -1,0 +1,47 @@
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+form {
+  display: block;
+}
+body {
+  display: grid;
+
+  grid-template-areas:
+    "controls"
+    "graph";
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-gap: 10px;
+
+  height: 100vh;
+}
+div#controls {
+  grid-area: "controls";
+}
+div#graph {
+  grid-area: "graph";
+}
+.income {
+  fill: #4c0;
+  stroke: #4c0;
+}
+.tax {
+  fill: #fa0;
+  stroke: #fa0;
+}
+.line {
+  fill: none;
+  stroke-width: 2;
+}
+.dot {
+  stroke: #fff;
+}
+div#description {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+}
