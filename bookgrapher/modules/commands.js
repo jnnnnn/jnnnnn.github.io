@@ -80,6 +80,10 @@ export const keydown = state => key => {
     case "p":
       state.mutables.cmd.present = !state.mutables.cmd.present;
       break;
+    case "g":
+      state.mutables.cmd.gravity = !state.mutables.cmd.gravity;
+      resetSimulation(state)();
+      break;
     case "/":
       showHelp();
       break;
@@ -95,13 +99,6 @@ const commandMode = state => key => {
     state.mutables.cmd.lookup = "";
   };
   switch (key) {
-    case "c":
-      state.mutables.cmd.on = !state.mutables.cmd.on;
-      break;
-    case "g":
-      state.mutables.cmd.gravity = !state.mutables.cmd.gravity;
-      resetSimulation(state)();
-      break;
     case "0":
     case "1":
     case "2":

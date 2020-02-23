@@ -16,6 +16,8 @@ This is a tool for quickly producing concept diagrams at maximum speed.
 | r                 | Reset view                                    |
 | Shift + R         | Briefly reheat the simulation                 |
 | c                 | Enter (or exit) **Command Mode**              |
+| p                 | Toggle "Present" mode                         |
+| Shift + F         | Arrows to new nodes point forward             |
 
 For full details, see [commands.js](./modules/commands.js)
 
@@ -30,4 +32,5 @@ You can export a json file of the diagram using Ctrl+S, and load from a file by 
 In Command Mode, you can perform several actions using just the keyboard:
 
 - Type a node's number followed by the Enter key to select it.
-- Use the `link`, `unlink`, and `Link with text` commands.
+- Use the `link`, `unlink`, and `Link with text` commands by selecting a second
+  node and pressing Enter when the node you want to link to is selected.
