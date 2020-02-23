@@ -91,21 +91,23 @@ const drawEdgeArrow = state => e => {
   const r1 = size(e.target);
   const r2 = size(e.source);
 
+  const a = 1;
+  const d = 5;
   const dx = x2 - x1;
   const dy = y2 - y1;
   const mag = Math.sqrt(dx * dx + dy * dy);
   const sthatx = dx / mag;
   const sthaty = dy / mag;
-  const ex = x1 + 3 * r1 * sthatx;
-  const ey = y1 + 3 * r1 * sthaty;
-  const ux = x1 + 4 * r1 * sthatx;
-  const uy = y1 + 4 * r1 * sthaty;
-  const ax = ux - r1 * sthaty;
-  const ay = uy + r1 * sthatx;
-  const bx = ux + r1 * sthaty;
-  const by = uy - r1 * sthatx;
-  const cx = x2 - 3 * r2 * sthatx;
-  const cy = y2 - 3 * r2 * sthaty;
+  const ex = x1 + d * r1 * sthatx;
+  const ey = y1 + d * r1 * sthaty;
+  const ux = ex + a * r1 * sthatx;
+  const uy = ey + a * r1 * sthaty;
+  const ax = ux - a * r1 * sthaty;
+  const ay = uy + a * r1 * sthatx;
+  const bx = ux + a * r1 * sthaty;
+  const by = uy - a * r1 * sthatx;
+  const cx = x2 - d * r2 * sthatx;
+  const cy = y2 - d * r2 * sthaty;
 
   ctx.moveTo(ex, ey);
   ctx.lineTo(ax, ay);

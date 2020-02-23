@@ -21,7 +21,7 @@ export const keydown = state => key => {
   const target = findNodeAtCoords(state)(state.mutables.mouse); // maybe null
   const source = state.selected;
   switch (key) {
-    case "a":
+    case "F":
       state.mutables.cmd.arrowsForward = !state.mutables.cmd.arrowsForward;
       break;
     case "c":
