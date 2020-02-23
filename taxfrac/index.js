@@ -37,93 +37,33 @@ const createGraph = (brackets, maxincome) => {
   const taxpoints = points.map(p => ({ x: p.income, y: p.tax }));
   const incomepoints = points.map(p => ({ x: p.income, y: p.income }));
 
-  const xScale = d3
+  const x = d3
     .scaleLinear()
     .domain([0, xmax])
     .range([0, width]);
-  const yScale = d3
+  const y = d3
     .scaleLinear()
     .domain([0, ymax])
     .range([height, 0]);
 
-  const incomeToTax = d3
-    .scaleLinear()
-    .domain(taxpoints.map(d => d.x))
-    .range(taxpoints.map(d => d.y));
-
   const line = d3
     .line()
-    .x(d => xScale(d.x))
-    .y(d => yScale(d.y));
+    .x(d => x(d.x))
+    .y(d => y(d.y));
 
-  const mousemove = () => {
-    const income = xScale.invert(d3.event.clientX - margin.left);
+  const mousemove = taxpoints => () => {
+    const incomeToTax = d3
+      .scaleLinear()
+      .domain(taxpoints.map(d => d.x))
+      .range(taxpoints.map(d => d.y));
+    const income = x.invert(d3.event.clientX - margin.left);
     const tax = incomeToTax(income);
     const percentage = Math.round((100 * tax) / income);
     const bracket = brackets.filter(b => b.end > income)[0];
-    const text = `
-          <p>
-            at an income of $${Math.round(income)},
-            you pay $${Math.round(tax)} tax (${percentage}%)
-          </p>
-          <p>
-            You are in the ${(bracket ? bracket.taxRate : 0) * 100}% bracket.
-          </p>
-          `;
-
-    document.querySelector("div#description").innerHTML = text;
-
-    d3.select("#taxi").remove();
-    const hover = d3.select("#hover");
-    hover
-      .append("path")
-      .attr("id", "taxi")
-      .attr("class", "tax line")
-      .attr(
-        "d",
-        line([
-          { x: income, y: 0 },
-          { x: income, y: tax }
-        ])
-      );
-    d3.select("#incomei").remove();
-    hover
-      .append("path")
-      .attr("id", "incomei")
-      .attr("class", "income line")
-      .attr(
-        "d",
-        line([
-          { x: income, y: tax },
-          { x: income, y: income }
-        ])
-      );
-
-    d3.select("#taxt").remove();
-    hover
-      .append("text")
-      .attr("id", "taxt")
-      .attr("class", "tax")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax / 2))
-      .text(`Tax: $${Math.round(tax)}`);
-
-    d3.select("#incomet").remove();
-    hover
-      .append("text")
-      .attr("id", "incomet")
-      .attr("class", "income")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax + (income - tax) / 2))
-      .text(`You keep: $${Math.round(income - tax)}`);
-
-    d3.select("#effec").remove();
-    hover
-      .append("text")
-      .attr("id", "effec")
-      .attr("x", xScale(income))
-      .attr("y", yScale(tax))
-      .text(`You pay ${percentage}% tax`);
+    const taxBracketRate = (bracket ? bracket.taxRate : 0) * 100;
+    updateDescription(income, tax, percentage, taxBracketRate);
+    updateHoverLines(line, income, tax);
+    updateHoverTexts(income, tax, percentage, x, y);
   };
   d3.select("svg").remove();
   d3.select("#graph").append("svg");
@@ -131,7 +71,7 @@ const createGraph = (brackets, maxincome) => {
     .select("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-    .on(supportsTouch ? "touchmove" : "mousemove", mousemove)
+    .on(supportsTouch ? "touchmove" : "mousemove", mousemove(taxpoints))
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
     .attr("id", "graph");
@@ -141,9 +81,9 @@ const createGraph = (brackets, maxincome) => {
   svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xScale));
+    .call(d3.axisBottom(x));
 
-  svg.append("g").call(d3.axisLeft(yScale));
+  svg.append("g").call(d3.axisLeft(y));
 
   svg
     .append("path")
@@ -161,8 +101,8 @@ const createGraph = (brackets, maxincome) => {
     .enter()
     .append("circle")
     .attr("class", "tax dot")
-    .attr("cx", d => xScale(d.x))
-    .attr("cy", d => yScale(d.y))
+    .attr("cx", d => x(d.x))
+    .attr("cy", d => y(d.y))
     .attr("r", 3);
   svg
     .selectAll(".dot2")
@@ -170,11 +110,80 @@ const createGraph = (brackets, maxincome) => {
     .enter()
     .append("circle")
     .attr("class", "income dot")
-    .attr("cx", d => xScale(d.x))
-    .attr("cy", d => yScale(d.y))
+    .attr("cx", d => x(d.x))
+    .attr("cy", d => y(d.y))
     .attr("r", 3);
 
   svg.append("g").attr("id", "hover");
+};
+
+const updateHoverTexts = (income, tax, percentage, x, y) => {
+  const hover = d3.select("#hover");
+  d3.select("#taxt").remove();
+  hover
+    .append("text")
+    .attr("id", "taxt")
+    .attr("class", "tax")
+    .attr("x", x(income))
+    .attr("y", y(tax / 2))
+    .text(`Tax: $${Math.round(tax)}`);
+
+  d3.select("#incomet").remove();
+  hover
+    .append("text")
+    .attr("id", "incomet")
+    .attr("class", "income")
+    .attr("x", x(income))
+    .attr("y", y(tax + (income - tax) / 2))
+    .text(`You keep: $${Math.round(income - tax)}`);
+
+  d3.select("#effec").remove();
+  hover
+    .append("text")
+    .attr("id", "effec")
+    .attr("x", x(income))
+    .attr("y", y(tax))
+    .text(`You pay ${percentage}% tax`);
+};
+
+const updateHoverLines = (line, income, tax) => {
+  const hover = d3.select("#hover");
+  d3.select("#taxi").remove();
+  hover
+    .append("path")
+    .attr("id", "taxi")
+    .attr("class", "tax line")
+    .attr(
+      "d",
+      line([
+        { x: income, y: 0 },
+        { x: income, y: tax }
+      ])
+    );
+  d3.select("#incomei").remove();
+  hover
+    .append("path")
+    .attr("id", "incomei")
+    .attr("class", "income line")
+    .attr(
+      "d",
+      line([
+        { x: income, y: tax },
+        { x: income, y: income }
+      ])
+    );
+};
+
+const updateDescription = (income, tax, percentage, taxBracketRate) => {
+  document.querySelector("div#description").innerHTML = `
+  <p>
+    at an income of $${Math.round(income)},
+    you pay $${Math.round(tax)} tax (${percentage}%)
+  </p>
+  <p>
+    You are in the ${taxBracketRate}% bracket.
+  </p>
+  `;
 };
 
 createGraph(bracketsAU, document.querySelector("#maxincomev").value);
