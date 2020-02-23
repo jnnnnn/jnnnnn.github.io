@@ -6,30 +6,35 @@ const margin = { top: 50, right: 50, bottom: 50, left: 50 },
   width = graphdiv.clientWidth - margin.left - margin.right,
   height = graphdiv.clientHeight - margin.top - margin.bottom;
 
-const bracketsAU = [
-  { end: 18200, taxRate: 0.0 },
-  { end: 37000, taxRate: 0.19 },
-  { end: 90000, taxRate: 0.325 },
-  { end: 180000, taxRate: 0.37 },
-  { end: 1000000000, taxRate: 0.45 }
-];
-
-const bracketsUS = [
-  { end: 9700, taxRate: 0.1 },
-  { end: 39475, taxRate: 0.12 },
-  { end: 84200, taxRate: 0.22 },
-  { end: 160725, taxRate: 0.24 },
-  { end: 204100, taxRate: 0.32 },
-  { end: 510300, taxRate: 0.35 },
-  { end: 1000000000, taxRate: 0.37 }
-];
+const dataSets = {
+  "au-2020": [
+    { end: 18200, taxRate: 0.0 },
+    { end: 37000, taxRate: 0.19 },
+    { end: 90000, taxRate: 0.325 },
+    { end: 180000, taxRate: 0.37 },
+    { end: 1000000000, taxRate: 0.45 }
+  ],
+  "us-2020": [
+    { end: 9700, taxRate: 0.1 },
+    { end: 39475, taxRate: 0.12 },
+    { end: 84200, taxRate: 0.22 },
+    { end: 160725, taxRate: 0.24 },
+    { end: 204100, taxRate: 0.32 },
+    { end: 510300, taxRate: 0.35 },
+    { end: 1000000000, taxRate: 0.37 }
+  ],
+  "uk-2020": [
+    { end: 12500, taxRate: 0.0 },
+    { end: 50000, taxRate: 0.2 },
+    { end: 150000, taxRate: 0.4 },
+    { end: 1000000000, taxRate: 0.45 }
+  ]
+};
 
 const getParameters = () => {
+  const bracketKey = document.querySelector("#dataset").value;
   return {
-    brackets:
-      document.querySelector("#dataset").value === "us-2020"
-        ? bracketsUS
-        : bracketsAU,
+    brackets: dataSets[bracketKey],
     maxIncome: document.querySelector("#maxincomev").value
   };
 };
@@ -89,16 +94,26 @@ const createGraph = () => {
 
   svg.append("rect").attr({ x: 0, y: 0, width, height, fill: "#fff" });
 
-  svg
-    .append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-
-  svg.append("g").call(d3.axisLeft(y));
+  updateAxes(svg, width, height, x, y);
 
   updateLines(svg, line, taxpoints, incomepoints, x, y);
 
   svg.append("g").attr("id", "hover");
+};
+
+const updateAxes = (svg, width, height, x, y) => {
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .append("text")
+    .text("taxable income")
+    .attr("id", "xlabel")
+    .attr("x", width / 2)
+    .attr("y", (margin.bottom * 2) / 3)
+    .attr("fill", "black");
+
+  svg.append("g").call(d3.axisLeft(y));
 };
 
 const updateLines = (svg, line, taxpoints, incomepoints, x, y) => {
@@ -192,7 +207,7 @@ const updateHoverLines = (line, income, tax) => {
 const updateDescription = (income, tax, percentage, taxBracketRate) => {
   document.querySelector("div#description").innerHTML = `
   <p>
-    at an income of $${Math.round(income)},
+    at a (taxable) income of $${Math.round(income)},
     you pay $${Math.round(tax)} tax (${percentage}%)
   </p>
   <p>
