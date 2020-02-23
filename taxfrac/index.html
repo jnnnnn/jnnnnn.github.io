@@ -9,21 +9,17 @@
 
 <body>
   <div id="controls">
-    <form onsubmit="return false;">
-      <div>
-        <label for="dataset">Dataset</label>
-        <select id="dataset">
-          <option value="au-2020">AU 2020</option>
-          <option value="us-2020">US 2020</option>
-        </select>
-      </div>
-      <div>
-        <label for="maxincome">Graph Maximum Income:</label>
-        <!--https://stackoverflow.com/a/31712438/412529-->
-        <input id="maxincome" type="range" max="10" value="2" />
-        <input id="maxincomev" type="number" width="4em" value="300000" />
-      </div>
-    </form>
+    <div>
+      <label for="dataset">Dataset: </label>
+      <select id="dataset">
+        <option value="au-2020">AU 2020</option>
+        <option value="us-2020">US 2020</option>
+      </select>
+    </div>
+    <div>
+      <label for="maxincomev">Max Income: </label>
+      <input id="maxincomev" type="number" width="4em" value="300000" />
+    </div>
   </div>
   <div id="graph"></div>
   <div id="description"></div>

@@ -11,7 +11,7 @@ const bracketsAU = [
   { end: 37000, taxRate: 0.19 },
   { end: 90000, taxRate: 0.325 },
   { end: 180000, taxRate: 0.37 },
-  { end: 300000, taxRate: 0.45 }
+  { end: 1000000000, taxRate: 0.45 }
 ];
 
 const bracketsUS = [
@@ -21,11 +21,22 @@ const bracketsUS = [
   { end: 160725, taxRate: 0.24 },
   { end: 204100, taxRate: 0.32 },
   { end: 510300, taxRate: 0.35 },
-  { end: 1000000, taxRate: 0.37 }
+  { end: 1000000000, taxRate: 0.37 }
 ];
 
-const createGraph = (brackets, maxincome) => {
-  const xmax = maxincome;
+const getParameters = () => {
+  return {
+    brackets:
+      document.querySelector("#dataset").value === "us-2020"
+        ? bracketsUS
+        : bracketsAU,
+    maxIncome: document.querySelector("#maxincomev").value
+  };
+};
+
+const createGraph = () => {
+  const { brackets, maxIncome } = getParameters();
+  const xmax = maxIncome;
   const ymax = xmax;
 
   const points = [{ income: 0, tax: 0 }];
@@ -190,4 +201,7 @@ const updateDescription = (income, tax, percentage, taxBracketRate) => {
   `;
 };
 
-createGraph(bracketsAU, document.querySelector("#maxincomev").value);
+createGraph();
+
+document.querySelector("#maxincomev").addEventListener("change", createGraph);
+document.querySelector("#dataset").addEventListener("change", createGraph);

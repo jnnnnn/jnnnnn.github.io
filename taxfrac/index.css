@@ -4,9 +4,6 @@ body {
   margin: 0;
   padding: 0;
 }
-form {
-  display: block;
-}
 body {
   display: grid;
 
@@ -21,6 +18,8 @@ body {
 }
 div#controls {
   grid-area: "controls";
+  display: flex;
+  justify-content: space-evenly;
 }
 div#graph {
   grid-area: "graph";
