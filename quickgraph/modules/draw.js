@@ -122,7 +122,7 @@ const drawEdgeArrow = state => e => {
   if (e.text) {
     e.x = 0.5 * (ux + cx);
     e.y = 0.5 * (uy + cy);
-    const fontSize = 2 * Math.min(size(e.source), size(e.target));
+    const fontSize = 1.5 * Math.min(size(e.source), size(e.target));
     drawText(state)(e, fontSize);
   }
 };
