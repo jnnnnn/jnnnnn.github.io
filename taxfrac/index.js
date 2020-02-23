@@ -25,7 +25,7 @@ const bracketsUS = [
 ];
 
 const createGraph = (brackets, maxincome) => {
-  const xmax = 300000;
+  const xmax = maxincome;
   const ymax = xmax;
 
   const points = [{ income: 0, tax: 0 }];
@@ -51,7 +51,7 @@ const createGraph = (brackets, maxincome) => {
     .x(d => x(d.x))
     .y(d => y(d.y));
 
-  const mousemove = taxpoints => () => {
+  const mousemove = () => {
     const incomeToTax = d3
       .scaleLinear()
       .domain(taxpoints.map(d => d.x))
@@ -66,15 +66,15 @@ const createGraph = (brackets, maxincome) => {
     updateHoverTexts(income, tax, percentage, x, y);
   };
   d3.select("svg").remove();
-  d3.select("#graph").append("svg");
+  d3.select("div#graph").append("svg");
   const svg = d3
     .select("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-    .on(supportsTouch ? "touchmove" : "mousemove", mousemove(taxpoints))
+    .on(supportsTouch ? "touchmove" : "mousemove", mousemove)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    .attr("id", "graph");
+    .attr("id", "chart");
 
   svg.append("rect").attr({ x: 0, y: 0, width, height, fill: "#fff" });
 
@@ -85,6 +85,12 @@ const createGraph = (brackets, maxincome) => {
 
   svg.append("g").call(d3.axisLeft(y));
 
+  updateLines(svg, line, taxpoints, incomepoints, x, y);
+
+  svg.append("g").attr("id", "hover");
+};
+
+const updateLines = (svg, line, taxpoints, incomepoints, x, y) => {
   svg
     .append("path")
     .attr("class", "tax line")
@@ -113,8 +119,6 @@ const createGraph = (brackets, maxincome) => {
     .attr("cx", d => x(d.x))
     .attr("cy", d => y(d.y))
     .attr("r", 3);
-
-  svg.append("g").attr("id", "hover");
 };
 
 const updateHoverTexts = (income, tax, percentage, x, y) => {
