@@ -328,7 +328,7 @@ const promptText = ({ startText, confirm, cancel, placeholder }) => {
   // we might create it here but it is not added to the model until confirm
   const textarea = document.createElement("textarea");
   textarea.className = "centered";
-  textarea.value = startText;
+  textarea.value = startText || "";
   document.getElementById("graphDiv").append(textarea);
   textarea.focus();
   textarea.select();
