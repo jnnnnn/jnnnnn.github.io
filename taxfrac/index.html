@@ -11,6 +11,29 @@
     margin: 0;
     padding: 0;
   }
+  body {
+    display: grid;
+
+    grid-template-areas:
+      "controls"
+      "graph"
+      "description";
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-gap: 10px;
+
+    height: 100vh;
+  }
+  div#controls {
+    grid-area: "controls";
+  }
+  div#graph {
+    grid-area: "graph";
+  }
+  div#description {
+    grid-area: "description";
+  }
   .income {
     fill: #4c0;
     stroke: #4c0;
@@ -34,24 +57,37 @@
 </style>
 
 <body>
-  <svg></svg>
+  <div id="controls">
+    <form>
+      <label for="dataset">Dataset</label>
+      <select id="dataset">
+        <option>AU 2020</option>
+        <option>US 2020</option>
+      </select>
+    </form>
+  </div>
+  <div id="graph">
+    <svg></svg>
+  </div>
   <div id="description"></div>
 </body>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
+  // todo: fix this
   const supportsTouch = "ontouchstart" in window || navigator.msMaxTouchPoints;
 
+  const graphdiv = document.querySelector("div#graph");
   const margin = { top: 50, right: 50, bottom: 50, left: 50 },
-    width = window.innerWidth - margin.left - margin.right,
-    height = window.innerHeight - margin.top - margin.bottom;
+    width = graphdiv.clientWidth - margin.left - margin.right,
+    height = graphdiv.clientHeight - margin.top - margin.bottom;
 
   const bracketsAU = [
     { end: 18200, taxRate: 0.0 },
     { end: 37000, taxRate: 0.19 },
     { end: 90000, taxRate: 0.325 },
     { end: 180000, taxRate: 0.37 },
-    { end: 300000000, taxRate: 0.45 }
+    { end: 300000, taxRate: 0.45 }
   ];
 
   const bracketsUS = [
@@ -61,12 +97,10 @@
     { end: 160725, taxRate: 0.24 },
     { end: 204100, taxRate: 0.32 },
     { end: 510300, taxRate: 0.35 },
-    { end: 100000000, taxRate: 0.37 }
+    { end: 1000000, taxRate: 0.37 }
   ];
 
   const brackets = bracketsAU;
-
-  const transform = d3.zoomIdentity;
 
   const xmax = 300000;
   const ymax = xmax;
@@ -110,9 +144,10 @@
         you pay $${Math.round(tax)} tax (${percentage}%)
       </p>
       <p>
-        You are in the ${bracket.taxRate * 100}% bracket.
+        You are in the ${(bracket ? bracket.taxRate : 0) * 100}% bracket.
       </p>
       `;
+
     document.querySelector("div#description").innerHTML = text;
 
     d3.select("#taxi").remove();
