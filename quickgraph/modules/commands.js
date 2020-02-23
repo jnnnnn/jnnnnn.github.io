@@ -10,9 +10,9 @@ import {
   findEdge,
   mutateEdge,
   createNode
-} from "./model.js.js";
-import { draw } from "./draw.js.js";
-import { save, importState } from "./save.js.js";
+} from "./model.js";
+import { draw } from "./draw.js";
+import { save, importState } from "./save.js";
 
 export const keydown = state => key => {
   if (state.mutables.cmd.on && commandMode(state)(key)) {
@@ -69,7 +69,8 @@ export const keydown = state => key => {
       resize(state)(+1)(source, target);
       break;
     case "f":
-      fix(state)(source, target);
+      if (d3.event.ctrlKey) search(state);
+      else fix(state)(source, target);
       break;
     case "r":
       resetZoom(state);
@@ -149,6 +150,20 @@ const completeCommand = state => {
       unlink(state)(source, target);
       break;
   }
+};
+
+const search = state => {
+  promptText({
+    placeholder: "search string",
+    confirm: text => {
+      const re = new RegExp(text);
+      const matches = state.nodes.filter(n => re.test(n.text));
+      if (matches.length) {
+        state.selected = matches[0];
+      }
+      draw(state)();
+    }
+  });
 };
 
 const clearCommand = state => {

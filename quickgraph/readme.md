@@ -20,6 +20,7 @@ This is a tool for quickly producing directed graph diagrams at maximum speed.
 | c                 | Enter (or exit) **Command Mode**              |
 | p                 | Toggle "Present" mode                         |
 | Shift + F         | Arrows to new nodes point forward             |
+| Ctrl + f          | Find node (search text)                       |
 
 For full details, see [commands.js](./modules/commands.js)
 
