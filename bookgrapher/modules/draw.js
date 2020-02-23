@@ -167,6 +167,8 @@ const drawOverlay = state => ctx => {
 };
 
 const drawOrigin = state => ctx => {
+  ctx.save();
+
   ctx.moveTo(-100, 0);
   ctx.lineTo(100, 0);
   ctx.moveTo(0, -100);
@@ -175,4 +177,6 @@ const drawOrigin = state => ctx => {
   ctx.strokeStyle;
   ctx.lineWidth = 1 / state.transform.k;
   ctx.stroke();
+
+  ctx.restore();
 };
