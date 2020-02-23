@@ -10,9 +10,9 @@ import {
   findEdge,
   mutateEdge,
   createNode
-} from "./model.js";
-import { draw } from "./draw.js";
-import { save, importState } from "./save.js";
+} from "./model.js.js";
+import { draw } from "./draw.js.js";
+import { save, importState } from "./save.js.js";
 
 export const keydown = state => key => {
   if (state.mutables.cmd.on && commandMode(state)(key)) {
