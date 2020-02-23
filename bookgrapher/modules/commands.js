@@ -176,17 +176,28 @@ const deleteAll = state => {
   resetSimulation(state)();
 };
 
-const resetZoom = state => {
+export const resetZoom = state => {
   const canvas = state.mutables.canvas;
-  const defaultTransform = d3.zoomIdentity.translate(
-    canvas.clientWidth / 2,
-    canvas.clientHeight / 2
-  );
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  let transform = d3.zoomIdentity.translate(width / 2, height / 2);
+  if (state.nodes.length) {
+    const xs = state.nodes.map(n => n.x);
+    const ys = state.nodes.map(n => n.y);
+    const x0 = Math.min(...xs);
+    const x1 = Math.max(...xs);
+    const y0 = Math.min(...ys);
+    const y1 = Math.max(...ys);
+    transform = d3.zoomIdentity
+      .translate(width / 2, height / 2)
+      .scale(Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
+      .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+  }
 
   d3.select(canvas)
     .transition()
     .duration(750)
-    .call(state.mutables.zoom.transform, defaultTransform);
+    .call(state.mutables.zoom.transform, transform);
 
   draw(state)();
 };
@@ -334,7 +345,6 @@ const forceGravity = state => alpha => {
 };
 
 export const resetSimulation = state => (energy = 0.3) => {
-  console.log(state);
   const sim = state.simulation;
   const g = state.mutables.cmd.gravity;
   sim.nodes(state.nodes);
