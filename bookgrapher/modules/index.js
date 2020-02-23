@@ -49,12 +49,6 @@ let state = {
   }
 };
 
-const defaultTransform = {
-  k: 1,
-  x: canvas.clientWidth / 2,
-  y: canvas.clientHeight / 2
-};
-
 state.mutables.zoom = d3
   .zoom(canvas)
   .scaleExtent([0.1, 8])
@@ -62,8 +56,6 @@ state.mutables.zoom = d3
     state.transform = d3.event.transform;
     draw(state)();
   });
-
-d3.select(canvas).call(state.mutables.zoom.transform, defaultTransform);
 
 const resize = () => {
   state.mutables.width = canvas.clientWidth;

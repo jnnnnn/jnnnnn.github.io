@@ -5,10 +5,11 @@ const drawNode = state => n => {
 
   ctx.beginPath();
   const radius = size(n);
-  ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
-  ctx.fillStyle = n.col || "#ddd";
-  ctx.strokeStyle = n.col || "#ddd";
+  ctx.fillStyle = n.col || "#aaa";
+  ctx.strokeStyle = n.col || "#aaa";
   ctx.lineWidth = radius / 10;
+  ctx.arc(n.x, n.y, radius, 0, 2 * Math.PI, true);
+
   n.fixed ? ctx.fill() : ctx.stroke();
 
   drawText(state)(n, size(n) * 2);
@@ -106,7 +107,7 @@ const drawEdgeArrow = state => e => {
   ctx.lineTo(bx, by);
   ctx.moveTo(ex, ey);
   ctx.lineTo(cx, cy);
-  ctx.strokeStyle = "#0005";
+  ctx.strokeStyle = "#0008";
   ctx.stroke();
 
   if (e.text) {
@@ -167,16 +168,12 @@ const drawOverlay = state => ctx => {
 };
 
 const drawOrigin = state => ctx => {
-  ctx.save();
-
+  ctx.beginPath();
   ctx.moveTo(-100, 0);
   ctx.lineTo(100, 0);
   ctx.moveTo(0, -100);
   ctx.lineTo(0, 100);
-  ctx.fillStyle = "#0000ff55";
-  ctx.strokeStyle;
+  ctx.strokeStyle = "#0088";
   ctx.lineWidth = 1 / state.transform.k;
   ctx.stroke();
-
-  ctx.restore();
 };

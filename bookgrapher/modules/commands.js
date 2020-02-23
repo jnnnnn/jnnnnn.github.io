@@ -95,6 +95,10 @@ const commandMode = state => key => {
     case "c":
       state.mutables.cmd.on = !state.mutables.cmd.on;
       break;
+    case "g":
+      state.mutables.cmd.gravity = !state.mutables.cmd.gravity;
+      resetSimulation(state)();
+      break;
     case "0":
     case "1":
     case "2":
@@ -173,10 +177,17 @@ const deleteAll = state => {
 };
 
 const resetZoom = state => {
-  d3.select(state.mutables.canvas).call(
-    state.mutables.zoom.transform,
-    d3.zoomIdentity
+  const canvas = state.mutables.canvas;
+  const defaultTransform = d3.zoomIdentity.translate(
+    canvas.clientWidth / 2,
+    canvas.clientHeight / 2
   );
+
+  d3.select(canvas)
+    .transition()
+    .duration(750)
+    .call(state.mutables.zoom.transform, defaultTransform);
+
   draw(state)();
 };
 
@@ -316,10 +327,23 @@ const promptText = ({ startText, confirm, cancel, placeholder }) => {
   };
 };
 
+const forceGravity = state => alpha => {
+  for (const n of state.nodes) {
+    n.vy += 10 * alpha;
+  }
+};
+
 export const resetSimulation = state => (energy = 0.3) => {
-  state.simulation.nodes(state.nodes);
-  state.simulation.force("link").links(state.edges);
-  if (energy > 0) state.simulation.alpha(energy).restart();
+  console.log(state);
+  const sim = state.simulation;
+  const g = state.mutables.cmd.gravity;
+  sim.nodes(state.nodes);
+  sim.force("link").links(state.edges);
+  sim.force("x", g ? null : d3.forceX(0).strength(0.03));
+  sim.force("y", g ? null : d3.forceY(0).strength(0.03));
+  sim.force("gravity", g ? forceGravity(state) : null);
+
+  if (energy > 0) sim.alpha(energy).restart();
   else draw(state)();
 };
 
