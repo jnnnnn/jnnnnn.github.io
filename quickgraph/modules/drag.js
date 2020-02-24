@@ -1,6 +1,6 @@
 import { findNodeAtCoords } from "./model.js";
 
-export const dragstarted = state => () => {
+export const dragstarted = (state) => () => {
   if (!d3.event.active) {
     state.simulation.alphaTarget(0.3).restart();
   }
@@ -8,12 +8,12 @@ export const dragstarted = state => () => {
   d3.event.subject.fy = state.transform.invertY(d3.event.y);
 };
 
-export const dragged = state => () => {
+export const dragged = (state) => () => {
   d3.event.subject.fx = state.transform.invertX(d3.event.x);
   d3.event.subject.fy = state.transform.invertY(d3.event.y);
 };
 
-export const dragended = state => () => {
+export const dragended = (state) => () => {
   if (!d3.event.active) {
     state.simulation.alphaTarget(0);
   }
@@ -23,7 +23,7 @@ export const dragended = state => () => {
   }
 };
 
-export const dragsubject = state => () => {
+export const dragsubject = (state) => () => {
   const { transform } = state;
 
   // The tricky part is the need to distinguish between two coordinate spaces:

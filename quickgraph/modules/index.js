@@ -6,19 +6,20 @@ import {
   click,
   mousemove,
   dropFile,
-  resetSimulation
+  resetSimulation,
+  resetZoom,
 } from "./commands.js";
 import { size, load } from "./model.js";
 
 const canvas = document.querySelector("div#graphDiv > canvas");
 
-const distance = edge => {
+const distance = (edge) => {
   return 10 * (size(edge.source) + size(edge.target));
 };
 
 // Because this makes size 12 nodes have a reasonable amount of charge strength
 // (~1000) for a linkdistance of 100
-const chargeStrength = node => -200 * size(node);
+const chargeStrength = (node) => -200 * size(node);
 
 const simulation = d3
   .forceSimulation()
@@ -27,7 +28,7 @@ const simulation = d3
     "link",
     d3
       .forceLink()
-      .id(d => d.id)
+      .id((d) => d.id)
       .distance(distance)
   )
   .alphaTarget(0)
@@ -45,8 +46,8 @@ let state = {
     width: 100,
     height: 100,
     mouse: { x: 0, y: 0 },
-    cmd: {}
-  }
+    cmd: {},
+  },
 };
 
 state.mutables.zoom = d3
@@ -81,7 +82,7 @@ d3.select("body").on("keydown", () => {
 });
 
 const dz = document.getElementById("graphDiv");
-dz.addEventListener("dragover", e => e.preventDefault(), true);
+dz.addEventListener("dragover", (e) => e.preventDefault(), true);
 dz.addEventListener("drop", dropFile(state), true);
 
 const createGraph = () => {
@@ -106,6 +107,7 @@ const createGraph = () => {
   simulation.on("tick", draw(state));
   load(state);
   resetSimulation(state)();
+  resetZoom(state);
 };
 
 createGraph();

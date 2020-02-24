@@ -11,7 +11,7 @@ const drawNodeCircle = (ctx, n) => {
   n.fixed ? ctx.fill() : ctx.stroke();
 };
 
-const drawNode = state => n => {
+const drawNode = (state) => (n) => {
   const ctx = state.mutables.ctx;
 
   if (!state.mutables.cmd.present) {
@@ -25,7 +25,7 @@ const drawNode = state => n => {
   }
 };
 
-const drawText = state => (obj, fontSize) => {
+const drawText = (state) => (obj, fontSize) => {
   const ctx = state.mutables.ctx;
   ctx.fillStyle = "black";
   ctx.font = fontSize + "px Arial";
@@ -37,7 +37,7 @@ const drawText = state => (obj, fontSize) => {
   });
 };
 
-const drawEdge = state => e => {
+const drawEdge = (state) => (e) => {
   const ctx = state.mutables.ctx;
 
   ctx.beginPath();
@@ -78,7 +78,7 @@ const drawEdge = state => e => {
   }
 };
 
-const drawEdgeArrow = state => e => {
+const drawEdgeArrow = (state) => (e) => {
   const ctx = state.mutables.ctx;
 
   ctx.beginPath();
@@ -127,7 +127,7 @@ const drawEdgeArrow = state => e => {
   }
 };
 
-const drawSelection = state => ctx => {
+const drawSelection = (state) => (ctx) => {
   const n = state.selected;
   if (!n) return;
   ctx.beginPath();
@@ -137,7 +137,7 @@ const drawSelection = state => ctx => {
   ctx.fill();
 };
 
-export const draw = state => () => {
+export const draw = (state) => () => {
   const { transform, mutables } = state;
   const { ctx, width, height } = mutables;
 
@@ -165,7 +165,7 @@ const defaultFont = Number(
   getComputedStyle(document.body, null).fontSize.replace(/[^\d]/g, "")
 );
 
-const drawOverlay = state => ctx => {
+const drawOverlay = (state) => (ctx) => {
   ctx.fillStyle = state.mutables.cmd.on ? "red" : "black";
   ctx.font = defaultFont + "px Arial";
   ctx.textAlign = "left";
@@ -179,7 +179,7 @@ const drawOverlay = state => ctx => {
   }
 };
 
-const drawOrigin = state => ctx => {
+const drawOrigin = (state) => (ctx) => {
   ctx.beginPath();
   ctx.moveTo(-100, 0);
   ctx.lineTo(100, 0);

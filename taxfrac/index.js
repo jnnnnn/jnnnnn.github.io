@@ -14,6 +14,13 @@ const dataSets = {
     { end: 180000, taxRate: 0.37 },
     { end: 1000000000, taxRate: 0.45 }
   ],
+  "au-2021": [
+    { end: 18200, taxRate: 0.0 },
+    { end: 45000, taxRate: 0.19 },
+    { end: 120000, taxRate: 0.325 },
+    { end: 180000, taxRate: 0.37 },
+    { end: 1000000000, taxRate: 0.45 }
+  ],
   "us-2020": [
     { end: 9700, taxRate: 0.1 },
     { end: 39475, taxRate: 0.12 },

@@ -9,12 +9,12 @@ import {
   removeNode,
   findEdge,
   mutateEdge,
-  createNode
+  createNode,
 } from "./model.js";
 import { draw } from "./draw.js";
 import { save, importState } from "./save.js";
 
-export const keydown = state => key => {
+export const keydown = (state) => (key) => {
   if (state.mutables.cmd.on && commandMode(state)(key)) {
     return;
   }
@@ -93,8 +93,8 @@ export const keydown = state => key => {
   }
 };
 
-const commandMode = state => key => {
-  const startCommand = state => command => {
+const commandMode = (state) => (key) => {
+  const startCommand = (state) => (command) => {
     state.mutables.cmd.action = command;
     state.mutables.cmd.source = state.selected;
     state.mutables.cmd.lookup = "";
@@ -136,7 +136,7 @@ const commandMode = state => key => {
   return true;
 };
 
-const completeCommand = state => {
+const completeCommand = (state) => {
   const source = state.mutables.cmd.source;
   const target = state.selected;
   switch (state.mutables.cmd.action) {
@@ -152,29 +152,29 @@ const completeCommand = state => {
   }
 };
 
-const search = state => {
+const search = (state) => {
   promptText({
     placeholder: "search string",
-    confirm: text => {
+    confirm: (text) => {
       const re = new RegExp(text);
-      const matches = state.nodes.filter(n => re.test(n.text));
+      const matches = state.nodes.filter((n) => re.test(n.text));
       if (matches.length) {
         state.selected = matches[0];
       }
       draw(state)();
-    }
+    },
   });
 };
 
-const clearCommand = state => {
+const clearCommand = (state) => {
   state.mutables.cmd.lookup = "";
   state.mutables.cmd.source = undefined;
   state.mutables.cmd.action = "";
 };
 
-const searchSelect = state => {
+const searchSelect = (state) => {
   const keystr = state.mutables.cmd.lookup;
-  const target = state.nodes.find(n => n.id == keystr);
+  const target = state.nodes.find((n) => n.id == keystr);
   if (target) {
     select(state)(null, target);
   }
@@ -183,22 +183,22 @@ const searchSelect = state => {
 
 const showHelp = () => {
   window.location =
-    "https://github.com/jnnnnn/jnnnnn.github.io/tree/master/bookgrapher";
+    "https://github.com/jnnnnn/jnnnnn.github.io/tree/master/quickgraph";
 };
 
-const deleteAll = state => {
+const deleteAll = (state) => {
   mutate(state)({ nodes: [], edges: [] });
   resetSimulation(state)();
 };
 
-export const resetZoom = state => {
+export const resetZoom = (state) => {
   const canvas = state.mutables.canvas;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
   let transform = d3.zoomIdentity.translate(width / 2, height / 2);
   if (state.nodes.length) {
-    const xs = state.nodes.map(n => n.x);
-    const ys = state.nodes.map(n => n.y);
+    const xs = state.nodes.map((n) => n.x);
+    const ys = state.nodes.map((n) => n.y);
     const x0 = Math.min(...xs);
     const x1 = Math.max(...xs);
     const y0 = Math.min(...ys);
@@ -217,31 +217,31 @@ export const resetZoom = state => {
   draw(state)();
 };
 
-export const click = state => () => {
+export const click = (state) => () => {
   const modelCoords = {
     x: state.transform.invertX(d3.event.x),
-    y: state.transform.invertY(d3.event.y)
+    y: state.transform.invertY(d3.event.y),
   };
   const target = state.simulation.find(modelCoords.x, modelCoords.y);
   if (target) select(state)(null, target);
 };
 
-const resize = state => delta => (source, target) => {
+const resize = (state) => (delta) => (source, target) => {
   const node = target || source;
   if (!node) return;
   mutateNode(state)(node, {
     ...node,
-    level: Math.min(Math.max(node.level + delta, -3), 10)
+    level: Math.min(Math.max(node.level + delta, -3), 10),
   });
   resetSimulation(state)(0);
 };
 
-const select = state => (source, target) => {
+const select = (state) => (source, target) => {
   mutate(state)({ selected: target });
   resetSimulation(state)(0);
 };
 
-const remove = state => (source, target) => {
+const remove = (state) => (source, target) => {
   const node = target || source;
   if (node) {
     removeNode(state)(node);
@@ -253,17 +253,17 @@ const differentNodes = (source, target) => {
   return target && source && target !== source;
 };
 
-const editEdge = state => (source, target) => {
+const editEdge = (state) => (source, target) => {
   if (!differentNodes(source, target)) return;
   const existing = findEdge(state)(source, target);
   promptText({
     placeholder: "Edge label",
     startText: existing ? existing.text : "",
-    confirm: text => link(state)(source, target, text)
+    confirm: (text) => link(state)(source, target, text),
   });
 };
 
-const link = state => (source, target, text) => {
+const link = (state) => (source, target, text) => {
   if (!differentNodes(source, target)) return;
   const existing = findEdge(state)(source, target);
   if (existing) {
@@ -274,14 +274,14 @@ const link = state => (source, target, text) => {
   resetSimulation(state)();
 };
 
-const unlink = state => (source, target) => {
+const unlink = (state) => (source, target) => {
   if (differentNodes(source, target)) {
     removeEdge(state)(source, target);
     resetSimulation(state)();
   }
 };
 
-const addNodeModel = state => (source, target, text) => {
+const addNodeModel = (state) => (source, target, text) => {
   const { x, y } = state.mutables.mouse;
   const current = source;
   // if we have a currently selected node, make the new one the same size.
@@ -297,30 +297,30 @@ const addNodeModel = state => (source, target, text) => {
 
   mutate(state)({
     nodes: [...state.nodes, newNode],
-    edges: newEdge ? [...state.edges, newEdge] : state.edges
+    edges: newEdge ? [...state.edges, newEdge] : state.edges,
   });
 };
 
-const addNode = state => (source, target) => {
+const addNode = (state) => (source, target) => {
   promptText({
     placeholder: "Node label",
     startText: "",
-    confirm: text => {
+    confirm: (text) => {
       addNodeModel(state)(source, target, text);
       resetSimulation(state)();
-    }
+    },
   });
 };
 
-const editNode = state => (source, target) => {
+const editNode = (state) => (source, target) => {
   if (!source) return;
   promptText({
     placeholder: "Node label",
     startText: source.text,
-    confirm: value => {
+    confirm: (value) => {
       mutateNode(state)(source, { text: value });
       resetSimulation(state)();
-    }
+    },
   });
 };
 
@@ -342,7 +342,7 @@ const promptText = ({ startText, confirm, cancel, placeholder }) => {
   };
   textarea.onblur = abort;
 
-  textarea.onkeydown = keyEvent => {
+  textarea.onkeydown = (keyEvent) => {
     if (keyEvent.key === "Escape") abort();
     if (keyEvent.key === "Enter" && !keyEvent.shiftKey) {
       confirm(textarea.value);
@@ -353,13 +353,13 @@ const promptText = ({ startText, confirm, cancel, placeholder }) => {
   };
 };
 
-const forceGravity = state => alpha => {
+const forceGravity = (state) => (alpha) => {
   for (const n of state.nodes) {
     n.vy += 10 * alpha;
   }
 };
 
-export const resetSimulation = state => (energy = 0.3) => {
+export const resetSimulation = (state) => (energy = 0.3) => {
   const sim = state.simulation;
   const g = state.mutables.cmd.gravity;
   sim.nodes(state.nodes);
@@ -372,15 +372,15 @@ export const resetSimulation = state => (energy = 0.3) => {
   else draw(state)();
 };
 
-export const mousemove = state => () => {
+export const mousemove = (state) => () => {
   const [screenX, screenY] = d3.mouse(d3.event.currentTarget);
   state.mutables.mouse = {
     x: state.transform.invertX(screenX),
-    y: state.transform.invertY(screenY)
+    y: state.transform.invertY(screenY),
   };
 };
 
-export const dropFile = state => async dropEvent => {
+export const dropFile = (state) => async (dropEvent) => {
   // don't want to load a json file as a document. I almost feel like this is
   // something the browser should do.
   dropEvent.preventDefault();
@@ -391,14 +391,14 @@ export const dropFile = state => async dropEvent => {
   resetSimulation(state)();
 };
 
-const fix = state => (source, target) => {
+const fix = (state) => (source, target) => {
   const node = target || source;
   if (!node) return;
   const fixed = !node.fixed;
   mutateNode(state)(node, {
     fixed,
     fx: fixed ? node.x : null,
-    fy: fixed ? node.y : null
+    fy: fixed ? node.y : null,
   });
   resetSimulation(state)(0);
 };

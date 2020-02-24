@@ -130,6 +130,28 @@ Also SVG Export.
 
 Also I need to write up some documentation.
 
-## 2020-03-02
+## 2020-02-03
 
 Documentation written as a quick little markdown file. Sadly, the browser doesn't render it. It'd be great if we never had to convert markdown to html for browsers to display it.
+
+## 2020-02-27
+
+Todos:
+
+- Command Mode should show available commands
+- Multiselect support (find, shift-select)
+- Finding a node (or nodes) should zoom to them if they are off screen
+- Export to dotfile
+- don't set 'fixed' in export unless it is true; round coords for more concise output
+- node scaling more gradual, differences are too visible
+- edges too long (?)
+- node text wraps automatically (at spaces) to be as square as possible
+- deleting a node should also remove it from selection
+
+Trying to get tex-linebreak compiled as an es6 module. ugh.
+
+## 2021-01-03
+
+Link to correct docs.
+
+Pretty usable for what I want it for.
