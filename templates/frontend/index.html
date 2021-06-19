@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Title</title>
+    </head>
+    <body>
+        <script type="module">
+            import {
+                html,
+                render,
+            } from "https://unpkg.com/htm/preact/index.mjs?module";
+
+            const App = (props) => html`
+                <h1>Hello ${props.name}!</h1>
+                <${Table} columns=${["A", "B", "C"]} rows=${[1, 2, 3, 4, 5]} />
+            `;
+
+            const Table = (props) => html`<table>
+                ${props.rows.map(Row(props))}
+            <//>`;
+
+            const Row = (props) => (r) =>
+                html`<tr>
+                    <td>${r}<//>
+                    ${props.columns.map(Column)}
+                <//>`;
+
+            const Column = (c) => html`<td>${c}<//>`;
+
+            render(html`<${App} name="World" />`, document.body);
+        </script>
+    </body>
+</html>
