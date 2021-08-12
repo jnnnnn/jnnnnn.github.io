@@ -12,14 +12,21 @@ const dataSets = {
     { end: 37000, taxRate: 0.19 },
     { end: 90000, taxRate: 0.325 },
     { end: 180000, taxRate: 0.37 },
-    { end: 1000000000, taxRate: 0.45 }
+    { end: 1000000000, taxRate: 0.45 },
   ],
   "au-2021": [
     { end: 18200, taxRate: 0.0 },
     { end: 45000, taxRate: 0.19 },
     { end: 120000, taxRate: 0.325 },
     { end: 180000, taxRate: 0.37 },
-    { end: 1000000000, taxRate: 0.45 }
+    { end: 1000000000, taxRate: 0.45 },
+  ],
+  "nz-2021": [
+    { end: 14000, taxRate: 0.105 },
+    { end: 48000, taxRate: 0.175 },
+    { end: 70000, taxRate: 0.3 },
+    { end: 180000, taxRate: 0.33 },
+    { end: 1000000000, taxRate: 0.39 },
   ],
   "us-2020": [
     { end: 9700, taxRate: 0.1 },
@@ -28,21 +35,21 @@ const dataSets = {
     { end: 160725, taxRate: 0.24 },
     { end: 204100, taxRate: 0.32 },
     { end: 510300, taxRate: 0.35 },
-    { end: 1000000000, taxRate: 0.37 }
+    { end: 1000000000, taxRate: 0.37 },
   ],
   "uk-2020": [
     { end: 12500, taxRate: 0.0 },
     { end: 50000, taxRate: 0.2 },
     { end: 150000, taxRate: 0.4 },
-    { end: 1000000000, taxRate: 0.45 }
-  ]
+    { end: 1000000000, taxRate: 0.45 },
+  ],
 };
 
 const getParameters = () => {
   const bracketKey = document.querySelector("#dataset").value;
   return {
     brackets: dataSets[bracketKey],
-    maxIncome: document.querySelector("#maxincomev").value
+    maxIncome: document.querySelector("#maxincomev").value,
   };
 };
 
@@ -57,32 +64,26 @@ const createGraph = () => {
     const thisBracketTax = (bracket.end - start.income) * bracket.taxRate;
     points.push({ income: bracket.end, tax: start.tax + thisBracketTax });
   }
-  const taxpoints = points.map(p => ({ x: p.income, y: p.tax }));
-  const incomepoints = points.map(p => ({ x: p.income, y: p.income }));
+  const taxpoints = points.map((p) => ({ x: p.income, y: p.tax }));
+  const incomepoints = points.map((p) => ({ x: p.income, y: p.income }));
 
-  const x = d3
-    .scaleLinear()
-    .domain([0, xmax])
-    .range([0, width]);
-  const y = d3
-    .scaleLinear()
-    .domain([0, ymax])
-    .range([height, 0]);
+  const x = d3.scaleLinear().domain([0, xmax]).range([0, width]);
+  const y = d3.scaleLinear().domain([0, ymax]).range([height, 0]);
 
   const line = d3
     .line()
-    .x(d => x(d.x))
-    .y(d => y(d.y));
+    .x((d) => x(d.x))
+    .y((d) => y(d.y));
 
   const mousemove = () => {
     const incomeToTax = d3
       .scaleLinear()
-      .domain(taxpoints.map(d => d.x))
-      .range(taxpoints.map(d => d.y));
+      .domain(taxpoints.map((d) => d.x))
+      .range(taxpoints.map((d) => d.y));
     const income = x.invert(d3.event.clientX - margin.left);
     const tax = incomeToTax(income);
     const percentage = Math.round((100 * tax) / income);
-    const bracket = brackets.filter(b => b.end > income)[0];
+    const bracket = brackets.filter((b) => b.end > income)[0];
     const taxBracketRate = (bracket ? bracket.taxRate : 0) * 100;
     updateDescription(income, tax, percentage, taxBracketRate);
     updateHoverLines(line, income, tax);
@@ -124,15 +125,9 @@ const updateAxes = (svg, width, height, x, y) => {
 };
 
 const updateLines = (svg, line, taxpoints, incomepoints, x, y) => {
-  svg
-    .append("path")
-    .attr("class", "tax line")
-    .attr("d", line(taxpoints));
+  svg.append("path").attr("class", "tax line").attr("d", line(taxpoints));
 
-  svg
-    .append("path")
-    .attr("class", "income line")
-    .attr("d", line(incomepoints));
+  svg.append("path").attr("class", "income line").attr("d", line(incomepoints));
 
   svg
     .selectAll(".dot")
@@ -140,8 +135,8 @@ const updateLines = (svg, line, taxpoints, incomepoints, x, y) => {
     .enter()
     .append("circle")
     .attr("class", "tax dot")
-    .attr("cx", d => x(d.x))
-    .attr("cy", d => y(d.y))
+    .attr("cx", (d) => x(d.x))
+    .attr("cy", (d) => y(d.y))
     .attr("r", 3);
   svg
     .selectAll(".dot2")
@@ -149,8 +144,8 @@ const updateLines = (svg, line, taxpoints, incomepoints, x, y) => {
     .enter()
     .append("circle")
     .attr("class", "income dot")
-    .attr("cx", d => x(d.x))
-    .attr("cy", d => y(d.y))
+    .attr("cx", (d) => x(d.x))
+    .attr("cy", (d) => y(d.y))
     .attr("r", 3);
 };
 
@@ -194,7 +189,7 @@ const updateHoverLines = (line, income, tax) => {
       "d",
       line([
         { x: income, y: 0 },
-        { x: income, y: tax }
+        { x: income, y: tax },
       ])
     );
   d3.select("#incomei").remove();
@@ -206,7 +201,7 @@ const updateHoverLines = (line, income, tax) => {
       "d",
       line([
         { x: income, y: tax },
-        { x: income, y: income }
+        { x: income, y: income },
       ])
     );
 };
