@@ -7,10 +7,17 @@ License: CC0
 Original Author: Jonathan Newnham
 -->
 <style>
+/* 
 div#needs {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around
+} 
+*/
+div#needs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(800px, auto));
+  justify-items: center;
 }
 </style>
 <title>Needs Tool</title>
