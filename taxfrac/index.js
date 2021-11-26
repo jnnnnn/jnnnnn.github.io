@@ -1,6 +1,3 @@
-// todo: fix this
-const supportsTouch = "ontouchstart" in window || navigator.msMaxTouchPoints;
-
 const graphdiv = document.querySelector("div#graph");
 const margin = { top: 50, right: 50, bottom: 50, left: 50 },
   width = graphdiv.clientWidth - margin.left - margin.right,
@@ -75,13 +72,24 @@ const createGraph = () => {
     .x((d) => x(d.x))
     .y((d) => y(d.y));
 
-  const mousemove = () => {
+  const interact = ({ clientX }) => {
+    const income = x.invert(clientX - margin.left);
+    updateIncome(income);
+    document.querySelector("#currentincomev").value = Math.round(income);
+  };
+  document.querySelector("#currentincomev").addEventListener("change", (e) => {
+    const income = e.target.value;
+    updateIncome(income);
+  });
+  const updateIncome = (income) => {
     const incomeToTax = d3
       .scaleLinear()
       .domain(taxpoints.map((d) => d.x))
       .range(taxpoints.map((d) => d.y));
-    const income = x.invert(d3.event.clientX - margin.left);
     const tax = incomeToTax(income);
+    update(income, tax);
+  };
+  const update = (income, tax) => {
     const percentage = Math.round((100 * tax) / income);
     const bracket = brackets.filter((b) => b.end > income)[0];
     const taxBracketRate = (bracket ? bracket.taxRate : 0) * 100;
@@ -89,13 +97,16 @@ const createGraph = () => {
     updateHoverLines(line, income, tax);
     updateHoverTexts(income, tax, percentage, x, y);
   };
+  const mousemove = () => interact(d3.event);
+  const touchmove = () => interact(d3.event.targetTouches[0]);
   d3.select("svg").remove();
   d3.select("div#graph").append("svg");
   const svg = d3
     .select("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-    .on(supportsTouch ? "touchmove" : "mousemove", mousemove)
+    .on("mousemove", mousemove)
+    .on("touchmove", touchmove)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
     .attr("id", "chart");

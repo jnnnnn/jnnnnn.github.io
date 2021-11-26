@@ -44,3 +44,45 @@ div#description {
   left: 100px;
   top: 100px;
 }
+
+:root {
+  --bp-small: 48em; /* 768px */
+  --bp-medium: 64em; /* 1024px */
+  --bp-large: 85.375em; /* 1366px */
+  --bp-xlarge: 120em; /* 1920px */
+  --bp-xxlarge: 160em; /* 2560px */
+
+  --base-font-size: 1em;
+  --base-line-height: 1.5;
+  --header-line-height: 1.25;
+}
+
+body {
+  font-size: var(--base-font-size);
+  line-height: var(--base-line-height);
+}
+
+@media screen and (min-width: var(--bp-medium)) {
+  body {
+    font-size: calc(var(--base-font-size) * 1.25);
+    line-height: calc(var(--base-line-height) * 1.25);
+  }
+}
+
+@media screen and (min-width: var(--bp-large)) {
+  body {
+    font-size: calc(var(--base-font-size) * 1.5);
+  }
+}
+
+@media screen and (min-width: var(--bp-xlarge)) {
+  body {
+    font-size: calc(var(--base-font-size) * 1.75);
+  }
+}
+
+@media screen and (min-width: var(--bp-xxlarge)) {
+  body {
+    font-size: calc(var(--base-font-size) * 2);
+  }
+}
