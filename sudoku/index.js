@@ -9,7 +9,6 @@ const UNSOLVED = 0x1ff << 1;
 const defaultboard = [...Array(9 * 9)].map(() => UNSOLVED);
 const App = () => {
   const [board, setBoard] = useState(defaultboard);
-  const [savedBoard, setSavedBoard] = useState(defaultboard);
   const setCell = (cellIndex) => (e) => {
     const newBoard = copy(board);
     const number = parseInt(e.target.value);
@@ -23,11 +22,9 @@ const App = () => {
 
   return html`<${Board} ...${{ board, setCell }} />
     <button onClick=${() => setBoard(defaultboard)}>Reset</button>
-    <button id="solve" onClick=${() => setBoard(backtrack(board, 0))}>
-      Solve
-    </button>
+    <button id="solve" onClick=${() => setBoard(trySolve(board))}>Solve</button>
     <button onClick=${() => setSavedBoard(board)}>Save</button>
-    <button onClick=${() => setBoard(savedBoard)}>Load</button> `;
+    <button onClick=${() => setBoard(getSavedBoard())}>Load</button> `;
 };
 
 const Board = ({ board, setCell }) => {
@@ -45,12 +42,25 @@ const Board = ({ board, setCell }) => {
 };
 
 const copy = (board) => [...board];
+
+const trySolve = (board) => {
+  const newBoard = copy(board);
+  const solved = solve(newBoard);
+  if (solved) {
+    return newBoard;
+  }
+  console.log(`Solve failed.`);
+  return board;
+};
+
 const backtrack = (board, cellIndex) => {
-  if (board.some((cell) => cell === 0)) return null; // invalid, time to backtrack
+  console.log(`Backtrack cell ${cellIndexToRowCol(cellIndex)}`);
+  if (!boardValid(board)) return null; // invalid, time to backtrack
   if (cellIndex >= 9 * 9) return board; // finished iterating/recursing, complete.
   if (solvedCells.has(board[cellIndex])) return backtrack(board, cellIndex + 1); // current cell already solved, continue
   for (let value = 1; value <= 9; value++) {
     if (board[cellIndex] & (1 << value)) {
+      console.log(`Try ${value} in cell ${cellIndexToRowCol(cellIndex)}`);
       const newBoard = copy(board);
       if (!simpleSolve(newBoard, cellIndex, value)) continue;
       let result = backtrack(newBoard, cellIndex + 1);
@@ -60,6 +70,8 @@ const backtrack = (board, cellIndex) => {
   return null;
 };
 
+const boardValid = (board) => !board.some((cell) => cell === 0);
+
 const solvedCells = new Map(
   [...new Array(9)].map((_, i) => [1 << (i + 1), i + 1])
 );
@@ -67,30 +79,68 @@ const solvedCells = new Map(
 // eliminate this option from other cells in row/column/square
 // return true if board is still valid
 const simpleSolve = (board, cellindex, value) => {
+  console.log(
+    `Simple solve ${value} in cell ${cellIndexToRowCol(cellindex)}...`
+  );
   const row = (cellindex / 9) >> 0;
   const col = cellindex - row * 9;
   for (let i = 0; i < 9; i++) {
     const boxrow = ((row / 3) >> 0) * 3 + ((i / 3) >> 0);
     const boxcol = ((col / 3) >> 0) * 3 + (i % 3);
-    if (!checkRemove(board, row * 9 + i, value)) return false;
-    if (!checkRemove(board, i * 9 + col, value)) return false;
-    if (!checkRemove(board, boxrow * 9 + boxcol, value)) return false;
+    if (!checkRemove(board, cellindex, row * 9 + i, value)) return false;
+    if (!checkRemove(board, cellindex, i * 9 + col, value)) return false;
+    if (!checkRemove(board, cellindex, boxrow * 9 + boxcol, value))
+      return false;
   }
   board[row * 9 + col] = 1 << value;
+  console.log(
+    `Simple solve ${value} in cell ${cellIndexToRowCol(cellindex)} completed.`
+  );
   return true;
 };
 
-// Remove the given possibility from the given cell. 
+// Remove the given possibility from the given cell.
 // If this solves the cell, propagate the solved cell to other cells in the same row/column/square
-const checkRemove = (board, cellIndex, value) => {
+const checkRemove = (board, causingCellIndex, cellIndex, value) => {
+  if (causingCellIndex == cellIndex) return true;
+  console.log(
+    `Checkremove tests ${value} in cell ${cellIndexToRowCol(cellIndex)}...`
+  );
   const already = solvedCells.has(board[cellIndex]);
   board[cellIndex] &= ~(1 << value);
-  if (board[cellIndex] === 0) return false;
-  if (!already && solvedCells.has(board[cellIndex]))
-    return simpleSolve(board, cellIndex, value);
+  if (board[cellIndex] === 0) {
+    console.log(
+      `Checkremove rejects ${value} in cell ${cellIndexToRowCol(cellIndex)}`
+    );
+    return false;
+  }
+  if (!already && solvedCells.has(board[cellIndex])) {
+    console.log(
+      `Checkremove solves ${value} in cell ${cellIndexToRowCol(cellIndex)}`
+    );
+    return simpleSolve(board, cellIndex, solvedCells.get(board[cellIndex]));
+  }
+  console.log(
+    `Checkremove accepts ${value} in cell ${cellIndexToRowCol(cellIndex)}`
+  );
   return true;
+};
+
+const cellIndexToRowCol = (cellIndex) => {
+  const row = (cellIndex / 9) >> 0;
+  const col = cellIndex - row * 9;
+  return [row + 1, col + 1];
+};
+
+// save the board to local storage
+const setSavedBoard = (board) => {
+  localStorage.setItem("sudoku", JSON.stringify(board));
+};
+
+// retrieve the saved board from local storage
+const getSavedBoard = () => {
+  const savedBoard = localStorage.getItem("sudoku");
+  return savedBoard ? JSON.parse(savedBoard) : defaultboard;
 };
 
 render(html`<${App} />`, document.body);
-
-setTimeout(() => document.getElementById("solve").click(), 1000);
