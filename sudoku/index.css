@@ -1,4 +1,26 @@
 input {
-    width: 1em;
-    height: 1em;
+  width: 1em;
+  height: 1em;
+  text-align: center;
 }
+
+/* grid expands to fit contents */
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, min-content);
+  width: fit-content;
+  background-color: #888
+}
+
+.cell {
+  padding: 0.0em;
+}
+
+.cell:nth-child(3), .cell:nth-child(6) {
+    padding-right: 0.2em
+}
+
+.cell:nth-child(27), .cell:nth-child(54) {
+    padding-bottom: 0.2em
+  }
+  
