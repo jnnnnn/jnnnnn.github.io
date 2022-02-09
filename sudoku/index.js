@@ -64,7 +64,7 @@ const trySolve = (board) => {
   console.log(`Full simple completed.`);
   const solved = backtrack(newBoard);
   if (solved) {
-    return newBoard;
+    return solved;
   }
   console.log(`Solve failed.`);
   return board;
@@ -83,10 +83,11 @@ const log = (depth, cellIndex, value, message) => {
   );
 };
 
+// try whatever possibilities are still available in the first cell we find
 const backtrack = (board, cellIndex = 0, depth = 0) => {
-  log(depth, cellIndex, "", "backtrack");
-  if (!boardValid(board)) return null; // invalid, time to backtrack
   if (cellIndex >= 9 * 9) return board; // finished iterating/recursing, complete.
+  log(depth, cellIndex, "", "backtrack");
+  if (!boardValid(board)) return null; // invalid, go back up the stack and try something else
   if (solvedCells.has(board[cellIndex]))
     return backtrack(board, cellIndex + 1, depth + 1); // current cell already solved, continue
   for (let value = 1; value <= 9; value++) {
@@ -161,7 +162,12 @@ const checkRemove = (board, causingcellIndex, cellIndex, value, depth) => {
   }
   if (!already && solvedCells.has(board[cellIndex])) {
     log(depth, cellIndex, value, "checkRemove solves into ");
-    return simpleSolve(board, cellIndex, solvedCells.get(board[cellIndex]), depth + 1);
+    return simpleSolve(
+      board,
+      cellIndex,
+      solvedCells.get(board[cellIndex]),
+      depth + 1
+    );
   }
   if (board[cellIndex] !== previous) {
     log(depth, cellIndex, value, "checkRemove removes ");
