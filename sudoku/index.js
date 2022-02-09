@@ -59,6 +59,7 @@ const cellToText = (cell) => {
 };
 
 const trySolve = (board) => {
+  console.clear();
   const newBoard = copy(board);
   fullSimple(newBoard);
   console.log(`Full simple completed.`);
@@ -87,7 +88,6 @@ const log = (depth, cellIndex, value, message) => {
 const backtrack = (board, cellIndex = 0, depth = 0) => {
   if (cellIndex >= 9 * 9) return board; // finished iterating/recursing, complete.
   log(depth, cellIndex, "", "backtrack");
-  if (!boardValid(board)) return null; // invalid, go back up the stack and try something else
   if (solvedCells.has(board[cellIndex]))
     return backtrack(board, cellIndex + 1, depth + 1); // current cell already solved, continue
   for (let value = 1; value <= 9; value++) {
@@ -101,8 +101,6 @@ const backtrack = (board, cellIndex = 0, depth = 0) => {
   }
   return null;
 };
-
-const boardValid = (board) => !board.some((cell) => cell === 0);
 
 const solvedCells = new Map([
   [1 << 1, 1],
@@ -127,7 +125,7 @@ const fullSimple = (board) => {
   }
 };
 
-// eliminate this option from other cells in row/column/square
+// eliminate this possibility from other cells in row/column/square
 // return true if board is still valid
 const simpleSolve = (board, cellIndex, value, depth) => {
   log(depth, cellIndex, value, "simpleSolve");
@@ -185,7 +183,5 @@ const getSavedBoard = () => {
   const savedBoard = localStorage.getItem("sudoku");
   return savedBoard ? JSON.parse(savedBoard) : defaultboard;
 };
-
-console.clear();
 
 render(html`<${App} />`, document.body);
