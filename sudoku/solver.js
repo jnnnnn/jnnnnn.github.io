@@ -1,12 +1,9 @@
 export const trySolve = (board) => {
   console.clear();
   const newBoard = copy(board);
-  fullSimple(newBoard);
-  console.log(`Full simple completed.`);
+  simpleSolveGrid(newBoard);
   const solved = backtrack(newBoard);
-  if (solved) {
-    return solved;
-  }
+  if (solved) return solved;
   console.log(`Solve failed.`);
   return board;
 };
@@ -36,7 +33,7 @@ const backtrack = (board, cellIndex = 0, depth = 0) => {
     if (board[cellIndex] & (1 << value)) {
       log(depth, cellIndex, value, "try");
       const newBoard = copy(board);
-      if (!simpleSolve(newBoard, cellIndex, value, depth + 1)) continue;
+      if (!simpleSolveCell(newBoard, cellIndex, value, depth + 1)) continue;
       let result = backtrack(newBoard, cellIndex + 1, depth + 1);
       if (result) return result;
     }
@@ -56,11 +53,11 @@ export const solvedCells = new Map([
   [1 << 9, 9],
 ]);
 
-const fullSimple = (board) => {
+const simpleSolveGrid = (board) => {
   for (let cellIndex = 0; cellIndex < 9 * 9; cellIndex++) {
     if (solvedCells.has(board[cellIndex])) {
       const number = solvedCells.get(board[cellIndex]);
-      if (!simpleSolve(board, cellIndex, number, 0)) {
+      if (!simpleSolveCell(board, cellIndex, number, 0)) {
         log(0, cellIndex, number, "full simple failed");
       }
     }
@@ -69,7 +66,7 @@ const fullSimple = (board) => {
 
 // eliminate this possibility from other cells in row/column/square
 // return true if board is still valid
-const simpleSolve = (board, cellIndex, value, depth) => {
+const simpleSolveCell = (board, cellIndex, value, depth) => {
   log(depth, cellIndex, value, "simpleSolve");
   const row = (cellIndex / 9) >> 0;
   const col = cellIndex - row * 9;
@@ -103,7 +100,7 @@ const checkRemove = (board, causingcellIndex, cellIndex, value, depth) => {
   if (!already && solvedCells.has(board[cellIndex])) {
     const number = solvedCells.get(board[cellIndex]);
     log(depth, cellIndex, number, "checkRemove solved");
-    return simpleSolve(board, cellIndex, number, depth + 1);
+    return simpleSolveCell(board, cellIndex, number, depth + 1);
   }
   if (board[cellIndex] !== previous) {
     log(depth, cellIndex, value, "checkRemove removes ");

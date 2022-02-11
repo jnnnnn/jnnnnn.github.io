@@ -34,7 +34,7 @@ const Board = ({ board, setCell }) => {
     ${board.map(
       (cell, cellIndex) => html`<div class="cell">
         <input
-          type="number"
+          type="text"
           value=${cellToText(cell)}
           onInput=${setCell(cellIndex)}
         />
