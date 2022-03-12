@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="567.50922mm"
-   height="444.37424mm"
-   viewBox="0 0 567.50923 444.37422"
+   width="589.56079mm"
+   height="469.89661mm"
+   viewBox="0 0 589.56082 469.89659"
    version="1.1"
    id="svg8"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
    sodipodi:docname="oauth-pkce.svg"
    inkscape:export-filename="C:\Users\jnewnham\Desktop\oauth-pkce.png"
    inkscape:export-xdpi="128"
-   inkscape:export-ydpi="128">
+   inkscape:export-ydpi="128"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2">
     <linearGradient
        id="linearGradient4925"
-       osb:paint="solid">
+       inkscape:swatch="solid">
       <stop
          style="stop-color:#65ff7a;stop-opacity:1;"
          offset="0"
@@ -321,22 +320,24 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="338.98142"
-     inkscape:cy="726.81516"
+     inkscape:zoom="0.39437884"
+     inkscape:cx="1479.5418"
+     inkscape:cy="851.97268"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1842"
-     inkscape:window-height="1171"
-     inkscape:window-x="69"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1" />
+     fit-margin-top="10"
+     fit-margin-left="10"
+     fit-margin-right="10"
+     fit-margin-bottom="10"
+     inkscape:window-width="1656"
+     inkscape:window-height="1058"
+     inkscape:window-x="65"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0"
+     lock-margins="true" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -345,7 +346,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -353,7 +353,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(238.88112,80.175962)">
+     transform="translate(248.88112,90.028684)">
     <rect
        style="opacity:0.397306;fill:#7065ff;fill-opacity:1;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stop-color:#000000"
        id="rect5240-6"
@@ -394,6 +394,22 @@
          y="46.156563"
          style="text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan2542">with &quot;Pixie&quot;</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="-155.36597"
+       y="-69.822433"
+       id="text12-6"><tspan
+         sodipodi:role="line"
+         x="-155.36597"
+         y="-69.822433"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan2542-4">PKCE Explained:</tspan><tspan
+         sodipodi:role="line"
+         x="-155.36597"
+         y="-56.593307"
+         style="text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan16130">Proof Key for Code Exchange</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -537,7 +553,7 @@
          style="font-size:5.29167px;text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1510-8">5. return </tspan><tspan
          sodipodi:role="line"
-         x="68.398529"
+         x="68.487671"
          y="137.81934"
          style="font-size:5.29167px;text-align:center;text-anchor:middle;stroke-width:0.264583"
          id="tspan1831">AC </tspan></text>
@@ -677,7 +693,7 @@
          x="229.44418"
          y="101.45766"
          style="font-size:5.29167px;text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan2397-4">9. send request</tspan><tspan
+         id="tspan2397-4">9. send requests</tspan><tspan
          sodipodi:role="line"
          x="229.44418"
          y="108.07224"
@@ -829,7 +845,7 @@
          x="52.547909"
          y="-69.540985"
          style="stroke-width:0.132291"
-         id="tspan2102"></tspan><tspan
+         id="tspan2102" /><tspan
          sodipodi:role="line"
          x="52.547909"
          y="-62.926422"
@@ -839,7 +855,7 @@
          x="52.547909"
          y="-56.311863"
          style="stroke-width:0.132291"
-         id="tspan2106">   is PKCE)</tspan><tspan
+         id="tspan2106">   is the point of PKCE)</tspan><tspan
          sodipodi:role="line"
          x="52.547909"
          y="-49.6973"
@@ -872,311 +888,259 @@
          id="tspan2118">   can't be stolen by client-side attacks (this is a major feature of</tspan><tspan
          sodipodi:role="line"
          x="52.547909"
-         y="-10.009926"
+         y="-10.009925"
          style="stroke-width:0.132291"
          id="tspan2120">   Authorization Code Flow)</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:5.29165px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.132291"
+       style="font-style:normal;font-weight:normal;font-size:5.29165px;line-height:1.25;font-family:sans-serif;white-space:pre;inline-size:223.949;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.132291"
        x="-238.88112"
        y="30.856207"
        id="text2264"><tspan
-         sodipodi:role="line"
-         id="tspan2262"
          x="-238.88112"
          y="30.856207"
-         style="stroke-width:0.132291"></tspan><tspan
-         sodipodi:role="line"
+         id="tspan43346">
+</tspan><tspan
          x="-238.88112"
          y="37.470768"
-         style="stroke-width:0.132291"
-         id="tspan2266">Description of process:</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43348">Description of process:
+</tspan><tspan
          x="-238.88112"
          y="44.085331"
-         style="stroke-width:0.132291"
-         id="tspan2268"></tspan><tspan
-         sodipodi:role="line"
+         id="tspan43350">
+</tspan><tspan
          x="-238.88112"
          y="50.699894"
-         style="stroke-width:0.132291"
-         id="tspan2270">0. The backend developer registers or obtains a client_secret (red diamond) from</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43354">0. The backend developer registers or obtains a <tspan
+   style="font-weight:bold"
+   id="tspan43352">client_secret</tspan> (red diamond) from
+</tspan><tspan
          x="-238.88112"
          y="57.314457"
-         style="stroke-width:0.132291"
-         id="tspan2272">   the OAuth provider, and stores it in their backend. This is like a password</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43356">   the OAuth provider, and stores it in their backend. This is like a password
+</tspan><tspan
          x="-238.88112"
          y="63.92902"
-         style="stroke-width:0.132291"
-         id="tspan2274">   that the backend uses to prove to the Oauth provider that it is really the</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43358">   that the backend uses to prove to the Oauth provider that it is really the
+</tspan><tspan
          x="-238.88112"
-         y="70.543579"
-         style="stroke-width:0.132291"
-         id="tspan2276">   app that is asking for access. This password is only ever sent to the OAuth</tspan><tspan
-         sodipodi:role="line"
+         y="70.543583"
+         id="tspan43360">   app that is asking for access. This password is only ever sent to the OAuth
+</tspan><tspan
          x="-238.88112"
-         y="77.158142"
-         style="stroke-width:0.132291"
-         id="tspan2278">   provider, never through the browser.</tspan><tspan
-         sodipodi:role="line"
+         y="77.158146"
+         id="tspan43362">   provider, never through the browser.
+</tspan><tspan
          x="-238.88112"
-         y="83.772705"
-         style="stroke-width:0.132291"
-         id="tspan2280">1. The backend generates a random string (the &quot;nonce&quot;). It saves the nonce for</tspan><tspan
-         sodipodi:role="line"
+         y="83.772709"
+         id="tspan43366">1. The backend generates a random string (the &quot;<tspan
+   style="font-weight:bold"
+   id="tspan43364">nonce</tspan>&quot;). It saves the nonce for
+</tspan><tspan
          x="-238.88112"
-         y="90.387268"
-         style="stroke-width:0.132291"
-         id="tspan2282">   later. (green oval).</tspan><tspan
-         sodipodi:role="line"
+         y="90.387272"
+         id="tspan43370">   later. (green oval). This is the &quot;<tspan
+   style="font-weight:bold"
+   id="tspan43368">Proof Key</tspan>&quot;.
+</tspan><tspan
          x="-238.88112"
-         y="97.001831"
-         style="stroke-width:0.132291"
-         id="tspan2284">2. The backend causes the browser to redirect to the Oauth provider's</tspan><tspan
-         sodipodi:role="line"
+         y="97.001835"
+         id="tspan43372">2. The backend causes the browser to redirect to the Oauth provider's
+</tspan><tspan
          x="-238.88112"
-         y="103.61639"
-         style="stroke-width:0.132291"
-         id="tspan2286">   authorization endpoint, and provides a hash of the &quot;nonce&quot; (checked oval).</tspan><tspan
-         sodipodi:role="line"
+         y="103.6164"
+         id="tspan43376">   authorization endpoint, and provides a <tspan
+   style="font-weight:bold"
+   id="tspan43374">hash of the &quot;nonce&quot;</tspan> (checked oval).
+</tspan><tspan
          x="-238.88112"
          y="110.23096"
-         style="stroke-width:0.132291"
-         id="tspan2288">3. The browser sends the hash of the &quot;nonce&quot; to the Oauth provider, which it</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43378">3. The browser sends the hash of the &quot;nonce&quot; to the Oauth provider, which it
+</tspan><tspan
          x="-238.88112"
          y="116.84552"
-         style="stroke-width:0.132291"
-         id="tspan2290">   keeps for later.</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43380">   keeps for later.
+</tspan><tspan
          x="-238.88112"
-         y="123.46008"
-         style="stroke-width:0.132291"
-         id="tspan2292">4. The OAuth provider asks the user if they want to grant access, and then</tspan><tspan
-         sodipodi:role="line"
+         y="123.46009"
+         id="tspan43382">4. The OAuth provider asks the user if they want to grant access, and then
+</tspan><tspan
          x="-238.88112"
          y="130.07465"
-         style="stroke-width:0.132291"
-         id="tspan2294">   generates a new Authorization Code (the &quot;AC&quot;). It saves the AC with the</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43386">   generates a new <tspan
+   style="font-weight:bold"
+   id="tspan43384">Authorization Code</tspan> (the &quot;AC&quot;). It saves the AC with the
+</tspan><tspan
          x="-238.88112"
          y="136.68921"
-         style="stroke-width:0.132291"
-         id="tspan2296">   hashed nonce. The AC and nonce can only be used once (to prevent replay</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43388">   hashed nonce. The AC and nonce can only be used once (to prevent replay
+</tspan><tspan
          x="-238.88112"
-         y="143.30377"
-         style="stroke-width:0.132291"
-         id="tspan2298">   attacks).</tspan><tspan
-         sodipodi:role="line"
+         y="143.30378"
+         id="tspan43390">   attacks).
+</tspan><tspan
          x="-238.88112"
-         y="149.91833"
-         style="stroke-width:0.132291"
-         id="tspan2300">5. The OAuth provider redirects the user back to the webapp. This is the part</tspan><tspan
-         sodipodi:role="line"
+         y="149.91834"
+         id="tspan43392">5. The OAuth provider redirects the user back to the webapp. This is the part
+</tspan><tspan
          x="-238.88112"
-         y="156.53288"
-         style="stroke-width:0.132291"
-         id="tspan2302">   that can get hijacked and leak the AC. Without the nonce, however, there's no</tspan><tspan
-         sodipodi:role="line"
+         y="156.5329"
+         id="tspan43394">   that can get hijacked and leak the AC. Without the nonce, however, there's no
+</tspan><tspan
          x="-238.88112"
-         y="163.14745"
-         style="stroke-width:0.132291"
-         id="tspan2304">   point.</tspan><tspan
-         sodipodi:role="line"
+         y="163.14747"
+         id="tspan43396">   point.
+</tspan><tspan
          x="-238.88112"
-         y="169.76201"
-         style="stroke-width:0.132291"
-         id="tspan2306">6. The webapp's frontend (the browser) sends the AC to the backend. This is</tspan><tspan
-         sodipodi:role="line"
+         y="169.76203"
+         id="tspan43398">6. The webapp's frontend (the browser) sends the AC to the backend. This is
+</tspan><tspan
          x="-238.88112"
-         y="176.37657"
-         style="stroke-width:0.132291"
-         id="tspan2308">   usually the `/oauth/token` endpoint. This is the step that often gets</tspan><tspan
-         sodipodi:role="line"
+         y="176.37659"
+         id="tspan43400">   usually the `/oauth/token` endpoint. This is the step that often gets
+</tspan><tspan
          x="-238.88112"
-         y="182.99113"
-         style="stroke-width:0.132291"
-         id="tspan2310">   hijacked on mobiles, when the &quot;browser&quot; is actually another app and a</tspan><tspan
-         sodipodi:role="line"
+         y="182.99115"
+         id="tspan43402">   hijacked on mobiles, when the &quot;browser&quot; is actually another app and a
+</tspan><tspan
          x="-238.88112"
-         y="189.6057"
-         style="stroke-width:0.132291"
-         id="tspan2312">   malicious app registers as the &quot;url handler&quot; for the backend.</tspan><tspan
-         sodipodi:role="line"
+         y="189.60572"
+         id="tspan43404">   malicious app registers as the &quot;url handler&quot; for the backend.
+</tspan><tspan
          x="-238.88112"
-         y="196.22026"
-         style="stroke-width:0.132291"
-         id="tspan2314">7. The backend can finally redeem the AC for an access token. The Oauth provider</tspan><tspan
-         sodipodi:role="line"
+         y="196.22028"
+         id="tspan43408">7. The backend can finally redeem the AC for an <tspan
+   style="font-weight:bold"
+   id="tspan43406">access token</tspan> (blue rectangle).
+</tspan><tspan
          x="-238.88112"
-         y="202.83482"
-         style="stroke-width:0.132291"
-         id="tspan2316">   checks the client_secret to make sure the backend is who they say they are,</tspan><tspan
-         sodipodi:role="line"
+         y="202.83484"
+         id="tspan43410">    The Oauth provider checks the client_secret to make sure the backend is who
+</tspan><tspan
          x="-238.88112"
-         y="209.44939"
-         style="stroke-width:0.132291"
-         id="tspan2318">   and also makes sure that the provided nonce hashes to the stored hash that is</tspan><tspan
-         sodipodi:role="line"
+         y="209.44941"
+         id="tspan43412">    they say they are, and also makes sure that the provided nonce hashes to the
+</tspan><tspan
          x="-238.88112"
-         y="216.06395"
-         style="stroke-width:0.132291"
-         id="tspan2320">   associated with the AC.</tspan><tspan
-         sodipodi:role="line"
+         y="216.06397"
+         id="tspan43414">    stored hash that is associated with the AC.
+</tspan><tspan
          x="-238.88112"
-         y="222.67851"
-         style="stroke-width:0.132291"
-         id="tspan2322">8. If the backend is who they say they are, and the nonce hashes to the stored</tspan><tspan
-         sodipodi:role="line"
+         y="222.67853"
+         id="tspan43416">8. If the backend is who they say they are, and the nonce hashes to the stored
+</tspan><tspan
          x="-238.88112"
-         y="229.29308"
-         style="stroke-width:0.132291"
-         id="tspan2324">   nonce, then the backend finally gets its access token.</tspan><tspan
-         sodipodi:role="line"
+         y="229.2931"
+         id="tspan43418">   nonce, then the backend finally gets its access token.
+</tspan><tspan
          x="-238.88112"
-         y="235.90764"
-         style="stroke-width:0.132291"
-         id="tspan2326">9. The backend can then use the permissions the user has granted in step 3/4/5</tspan><tspan
-         sodipodi:role="line"
+         y="235.90766"
+         id="tspan43420">9. The backend can then use the permissions the user has granted in step 3/4/5
+</tspan><tspan
          x="-238.88112"
-         y="242.5222"
-         style="stroke-width:0.132291"
-         id="tspan2328">   to make requests to another service.</tspan><tspan
-         sodipodi:role="line"
+         y="242.52222"
+         id="tspan43422">   to make requests to another service.
+</tspan><tspan
          x="-238.88112"
-         y="249.13676"
-         style="stroke-width:0.132291"
-         id="tspan2330">10. The other service checks the JWT signature to make sure the contents are</tspan><tspan
-         sodipodi:role="line"
+         y="249.13678"
+         id="tspan43424">10. The other service checks the JWT signature to make sure the contents are
+</tspan><tspan
          x="-238.88112"
-         y="255.75133"
-         style="stroke-width:0.132291"
-         id="tspan2332">    approved by the OAuth provider (and thus that the user has granted</tspan><tspan
-         sodipodi:role="line"
+         y="255.75135"
+         id="tspan43426">    approved by the OAuth provider (and thus that the user has granted
+</tspan><tspan
          x="-238.88112"
-         y="262.36588"
-         style="stroke-width:0.132291"
-         id="tspan2334">    permissions).</tspan></text>
+         y="262.36591"
+         id="tspan43428">    permissions).</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:5.29165px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.132291"
+       style="font-style:normal;font-weight:normal;font-size:5.29165px;line-height:1.25;font-family:sans-serif;white-space:pre;inline-size:220.201;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.132291"
        x="89.24292"
        y="229.68517"
        id="text2338"><tspan
-         sodipodi:role="line"
-         id="tspan2336"
          x="89.24292"
          y="229.68517"
-         style="stroke-width:0.132291"></tspan><tspan
-         sodipodi:role="line"
+         id="tspan43430">
+</tspan><tspan
          x="89.24292"
          y="236.29973"
-         style="stroke-width:0.132291"
-         id="tspan2340">Why?</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43432">Why?
+</tspan><tspan
          x="89.24292"
-         y="242.91429"
-         style="stroke-width:0.132291"
-         id="tspan2342"></tspan><tspan
-         sodipodi:role="line"
+         y="242.9143"
+         id="tspan43434">
+</tspan><tspan
          x="89.24292"
-         y="249.52885"
-         style="stroke-width:0.132291"
-         id="tspan2344">This flow is about letting the user grant some permissions to the webapp for</tspan><tspan
-         sodipodi:role="line"
+         y="249.52886"
+         id="tspan43436">This flow is about letting the user grant some permissions to the webapp for
+</tspan><tspan
          x="89.24292"
-         y="256.1434"
-         style="stroke-width:0.132291"
-         id="tspan2346">talking to another service. For example, your webapp might want to read your</tspan><tspan
-         sodipodi:role="line"
+         y="256.14342"
+         id="tspan43438">talking to another service. For example, your webapp might want to read your
+</tspan><tspan
          x="89.24292"
          y="262.75797"
-         style="stroke-width:0.132291"
-         id="tspan2348">Gmail contacts, but you don't want to give the webapp your Google password. So</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43440">Gmail contacts, but you don't want to give the webapp your Google password. So
+</tspan><tspan
          x="89.24292"
          y="269.37253"
-         style="stroke-width:0.132291"
-         id="tspan2350">instead, the webapp can get an Access Token with certain permissions that it can</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43442">instead, the webapp can get an Access Token with certain permissions that it can
+</tspan><tspan
          x="89.24292"
-         y="275.98709"
-         style="stroke-width:0.132291"
-         id="tspan2352">talk to Gmail with.</tspan><tspan
-         sodipodi:role="line"
+         y="275.9871"
+         id="tspan43444">talk to Gmail with.
+</tspan><tspan
          x="89.24292"
-         y="282.60165"
-         style="stroke-width:0.132291"
-         id="tspan2354"></tspan><tspan
-         sodipodi:role="line"
+         y="282.60166"
+         id="tspan43446">
+</tspan><tspan
          x="89.24292"
          y="289.21622"
-         style="stroke-width:0.132291"
-         id="tspan2356">The next problem is that browsers often let Access Tokens get stolen, so we</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43448">The next problem is that browsers often let Access Tokens get stolen (thorugh </tspan><tspan
          x="89.24292"
          y="295.83078"
-         style="stroke-width:0.132291"
-         id="tspan2358">don't want to send it through there. Instead, we will use the browser to request</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43450">URLs or Javascript), so we don't want to send it through there. Instead, we will </tspan><tspan
          x="89.24292"
-         y="302.44534"
-         style="stroke-width:0.132291"
-         id="tspan2360">an Authorization Code. This is where the Oauth provider makes sure the user is</tspan><tspan
-         sodipodi:role="line"
+         y="302.44535"
+         id="tspan43452">use the browser to request an Authorization Code. This is where the Oauth </tspan><tspan
          x="89.24292"
          y="309.05991"
-         style="stroke-width:0.132291"
-         id="tspan2362">OK with granting access. Then, the backend can obtain the Access Token directly</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43454">provider (Google in our example) makes sure the user is OK with granting access. </tspan><tspan
          x="89.24292"
          y="315.67447"
-         style="stroke-width:0.132291"
-         id="tspan2364">from the Oauth provider (without going through the browser).</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43456">Then, the backend can obtain the Access Token directly from the Oauth provider </tspan><tspan
          x="89.24292"
-         y="322.28903"
-         style="stroke-width:0.132291"
-         id="tspan2366"></tspan><tspan
-         sodipodi:role="line"
+         y="322.28904"
+         id="tspan43458">(without going through the browser).
+</tspan><tspan
          x="89.24292"
-         y="328.90359"
-         style="stroke-width:0.132291"
-         id="tspan2368">We also add a client_secret to make sure that no-one else can pretend to be our</tspan><tspan
-         sodipodi:role="line"
+         y="328.9036"
+         id="tspan43460">
+</tspan><tspan
          x="89.24292"
          y="335.51816"
-         style="stroke-width:0.132291"
-         id="tspan2370">webapp backend.</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43462">We also add a client_secret to make sure that no-one else can pretend to be our
+</tspan><tspan
          x="89.24292"
-         y="342.13272"
-         style="stroke-width:0.132291"
-         id="tspan2372"></tspan><tspan
-         sodipodi:role="line"
+         y="342.13273"
+         id="tspan43464">webapp backend.
+</tspan><tspan
          x="89.24292"
-         y="348.74728"
-         style="stroke-width:0.132291"
-         id="tspan2374">Unfortunately, the Authorization Code is almost as good as an Access Token, as</tspan><tspan
-         sodipodi:role="line"
+         y="348.74729"
+         id="tspan43466">
+</tspan><tspan
          x="89.24292"
          y="355.36185"
-         style="stroke-width:0.132291"
-         id="tspan2376">anyone can send it to the backend and get granted access. So we add the PKCE</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43468">Unfortunately, the Authorization Code is almost as good as an Access Token, as
+</tspan><tspan
          x="89.24292"
          y="361.97641"
-         style="stroke-width:0.132291"
-         id="tspan2378">&quot;pixie&quot; nonce as well, as explained above.</tspan><tspan
-         sodipodi:role="line"
+         id="tspan43470">anyone can send it to the backend and get granted access. So we add the PKCE
+</tspan><tspan
          x="89.24292"
-         y="368.59097"
-         style="stroke-width:0.132291"
-         id="tspan2380" /></text>
+         y="368.59098"
+         id="tspan43472">&quot;pixie&quot; nonce as well, as explained above.
+</tspan></text>
     <rect
        style="opacity:0.397306;fill:#ff6565;fill-opacity:1;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stop-color:#000000"
        id="rect5351-7"
@@ -1197,8 +1161,8 @@
        id="rect5240-0"
        width="13.229166"
        height="7.4650226"
-       x="-97.329041"
-       y="190.88022"
+       x="-55.262794"
+       y="190.51122"
        ry="0" />
     <g
        id="g2004-1"
@@ -1231,14 +1195,14 @@
        id="rect5351-6"
        width="7.0870538"
        height="7.0870538"
-       x="329.70963"
-       y="125.51594"
+       x="335.58957"
+       y="130.86133"
        transform="rotate(45)" />
     <ellipse
        style="opacity:0.397306;fill:#65ff7a;fill-opacity:1;stroke-width:0.264999;stroke-miterlimit:4;stroke-dasharray:none;stop-color:#000000"
        id="path2931-2-3-5"
-       cx="117.17245"
-       cy="359.78833"
+       cx="114.14864"
+       cy="365.45798"
        rx="7.3499122"
        ry="4.4099469" />
   </g>
