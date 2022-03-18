@@ -35,7 +35,7 @@
   <button type="button" onclick="swapProjection()">box/circle</button>
   <textarea
     id="textdata"
-    style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;"
+    style="height: 1.5em; width: 20em; overflow-x: hidden; opacity: 0.5"
     placeholder="paste from spreadsheet here"
     onchange="load_text_data();"
     onkeyup="load_text_data();"
@@ -63,23 +63,23 @@
     var projections = {
       radial: {
         name: "radial",
-        x: a => a * τ + angle, // 0..1 -> 0..τ,
+        x: (a) => a * τ + angle, // 0..1 -> 0..τ,
         y: d3
           .scalePow() // 0..1 -> 0..r
           .exponent(1.5)
           .range([0, radius]),
         shape: d3
           .arc()
-          .startAngle(d => projections.radial.x(d.x0))
-          .endAngle(d => projections.radial.x(d.x1))
-          .innerRadius(d => Math.max(0, projections.radial.y(d.y0)))
-          .outerRadius(d => Math.max(0, projections.radial.y(d.y1))),
-        translate: d =>
+          .startAngle((d) => projections.radial.x(d.x0))
+          .endAngle((d) => projections.radial.x(d.x1))
+          .innerRadius((d) => Math.max(0, projections.radial.y(d.y0)))
+          .outerRadius((d) => Math.max(0, projections.radial.y(d.y1))),
+        translate: (d) =>
           pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
-        rotate: d => {
+        rotate: (d) => {
           let θ = projections.radial.x(d.x);
           return (θ * 360) / τ + (θ % τ > Math.PI ? 90 : -90);
-        }
+        },
       },
       cartesian: {
         name: "cartesian",
@@ -87,19 +87,19 @@
         y: d3
           .scaleLinear()
           .range([-height / 2 + padding, height / 2 - padding]),
-        shape: d =>
+        shape: (d) =>
           d3.line().curve(d3.curveLinearClosed)([
             [projections.cartesian.x(d.y0), projections.cartesian.y(d.x0)],
             [projections.cartesian.x(d.y0), projections.cartesian.y(d.x1)],
             [projections.cartesian.x(d.y1), projections.cartesian.y(d.x1)],
-            [projections.cartesian.x(d.y1), projections.cartesian.y(d.x0)]
+            [projections.cartesian.x(d.y1), projections.cartesian.y(d.x0)],
           ]),
-        translate: d => [
+        translate: (d) => [
           projections.cartesian.x(d.y),
-          projections.cartesian.y(d.x)
+          projections.cartesian.y(d.x),
         ],
-        rotate: d => 0
-      }
+        rotate: (d) => 0,
+      },
     };
     var p = projections.radial;
     var currentProjection = p.name;
@@ -115,23 +115,23 @@
 
     var stratify = d3
       .stratify()
-      .id(d => d.Index)
-      .parentId(d => d.Parent);
+      .id((d) => d.Index)
+      .parentId((d) => d.Parent);
 
     var partition = d3.partition();
 
     var pointRadial = (θ, r) => [
       (r = +r) * Math.cos((θ -= Math.PI / 2)),
-      r * Math.sin(θ)
+      r * Math.sin(θ),
     ];
 
-    var easeBothWays = f => t =>
+    var easeBothWays = (f) => (t) =>
       t % 1 < 0.5 ? f(Math.abs(t % 1) * 2) : f(2 * (1 - Math.abs(t % 1)));
     var cartesianToColorSpace = d3
       .scaleLinear()
       .domain([-radius, radius])
       .range([-100, 100]);
-    var color = d => {
+    var color = (d) => {
       var p = pointRadial((d.x * τ + 10 * angle) % τ, ycolor(d.y));
       if (d.y == 0.0) p = [0, 0]; // root grey
       return d3.lab(
@@ -153,7 +153,7 @@
       heirarchy = stratify(datarows);
       heirarchy.count();
       root = partition(heirarchy);
-      root.each(d => {
+      root.each((d) => {
         d.x = (d.x0 + d.x1) / 2;
         d.y = (d.y0 + d.y1) / 2;
       });
@@ -173,7 +173,7 @@
     }
 
     function loadfile(fname) {
-      d3.text(fname + "?nocache=" + Math.random(), function(error, text) {
+      d3.text(fname + "?nocache=" + Math.random(), function (error, text) {
         if (error) throw error;
         document.getElementById("textdata").value = text;
         load_text_data();
@@ -185,13 +185,11 @@
 
     let draglistener = d3
       .drag()
-      .on("start", function(d) {
-        d3.select("div#log")
-          .append("p")
-          .text("Start drag");
+      .on("start", function (d) {
+        d3.select("div#log").append("p").text("Start drag");
         d3.event.sourceEvent.stopPropagation();
       })
-      .on("end", function(d) {
+      .on("end", function (d) {
         d3.select("div#log p").remove();
         let dstart = d;
         let dend = d3.event.sourceEvent.target.__data__;
@@ -207,7 +205,9 @@
         ) {
           return;
         }
-        let datasmap = new Map(root.descendants().map(d => [d.data.Index, d]));
+        let datasmap = new Map(
+          root.descendants().map((d) => [d.data.Index, d])
+        );
         for (let row of datarows) {
           if (
             row.Index == dstart.data.Index ||
@@ -218,7 +218,7 @@
         exportText();
         load();
       });
-    let mouseover = function(d) {
+    let mouseover = function (d) {
       if (d3.event.shiftKey) {
         d.selected = 1;
         update_selection_display();
@@ -233,9 +233,10 @@
         '">' +
         root.data.Origin +
         "</a>";
-      let paths = svg
-        .selectAll("path")
-        .data(root.descendants(), d => d.data.Move);
+
+      const key = (d) => d.data.Move.toLowerCase().replace("dis", "d").replace("con", "cn").slice(0, 4);
+
+      let paths = svg.selectAll("path").data(root.descendants(), key);
 
       let newPaths = paths
         .enter()
@@ -244,26 +245,26 @@
         .on("mouseover", mouseover)
         .attr("d", p.shape)
         .on("click", pathclick)
-        .style("fill", d => "white")
+        .style("fill", (d) => "white")
         .style("stroke", "#fff")
         .style("stroke-width", 1);
-      newPaths.append("title").text(d => d.data.Move);
+      newPaths.append("title").text((d) => d.data.Move);
 
       paths.exit().remove();
 
-      let texts = svg.selectAll("g").data(root.descendants(), d => d.data.Move);
+      let texts = svg.selectAll("g").data(root.descendants(), key);
 
       let newTexts = texts
         .enter()
         .append("g")
         .call(draglistener)
         .on("mouseover", mouseover)
-        .attr("transform", d => "translate(0, 0) rotate(0)")
+        .attr("transform", (d) => "translate(0, 0) rotate(0)")
         .on("click", pathclick);
 
       newTexts
         .append("text")
-        .text(d => d.data.Move)
+        .text((d) => d.data.Move)
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "central");
 
@@ -275,11 +276,11 @@
         // this data() is necessary to update the child data elements that don't get recreated.
         // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update().
         // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
-        .data(d => [d])
-        .text(d => d.data.Move);
+        .data((d) => [d])
+        .text((d) => d.data.Move);
 
       // clicking root node causes rotation
-      svg.selectAll("path").node().onclick = function() {
+      svg.selectAll("path").node().onclick = function () {
         if (interval) {
           stopInterval();
           angle = 0;
@@ -295,7 +296,7 @@
         .sort((da, db) =>
           d3.ascending(Number(da.data.Index), Number(db.data.Index))
         )
-        .map(d => datarows.columns.map(c => d.data[c]).join("\t"))
+        .map((d) => datarows.columns.map((c) => d.data[c]).join("\t"))
         .join("\n");
       document.getElementById("textdata").value = text;
     }
@@ -309,15 +310,15 @@
 
     // Show a list of the selected elements separately for saving
     function update_selection_display() {
-      let ds = root.descendants().filter(d => d.selected);
+      let ds = root.descendants().filter((d) => d.selected);
       let lis = d3
         .select("div#list ul")
         .selectAll("li")
-        .data(ds, d => d.data.Index);
+        .data(ds, (d) => d.data.Index);
       lis
         .enter()
         .append("li")
-        .text(d => d.data.Move);
+        .text((d) => d.data.Move);
       lis.exit().remove();
     }
 
@@ -334,12 +335,12 @@
 
     function startInterval() {
       if (interval) return;
-      interval = d3.interval(function() {
+      interval = d3.interval(function () {
         angle += 0.01;
         angle %= τ;
         transition(1000);
       }, 1000);
-      interval2 = d3.interval(function() {
+      interval2 = d3.interval(function () {
         let y = projections.radial.y;
         y.exponent() == 1.8 ? y.exponent(1.2) : y.exponent(1.8);
       }, 10000);
@@ -355,21 +356,21 @@
         .duration(duration)
         .attr(
           "transform",
-          d => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")"
+          (d) => "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")"
         );
 
       svg
         .selectAll("text")
         .transition(name)
         .duration(duration)
-        .attr("fill", d => (d.selected ? "white" : "black"));
+        .attr("fill", (d) => (d.selected ? "white" : "black"));
 
       var result = svg
         .selectAll("path") // arcs
         .transition(name)
         .ease(ease)
         .duration(duration)
-        .style("fill", d => color(d));
+        .style("fill", (d) => color(d));
 
       if (p.name === currentProjection) result.attr("d", p.shape);
       else result.attrTween("d", pathTween(10));
@@ -381,7 +382,7 @@
 
     // https://bl.ocks.org/mbostock/3916621
     function pathTween(precision) {
-      return function(d) {
+      return function (d) {
         // factory function
         var path0 = this,
           path1 = path0.cloneNode(),
@@ -396,17 +397,17 @@
         distances.push(1);
 
         // Compute point-interpolators at each distance.
-        var points = distances.map(function(t) {
+        var points = distances.map(function (t) {
           var p0 = path0.getPointAtLength(t * n0),
             p1 = path1.getPointAtLength(t * n1);
           return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
         });
 
-        return function(t) {
+        return function (t) {
           return t < 1
             ? "M" +
                 points
-                  .map(function(p) {
+                  .map(function (p) {
                     return p(t);
                   })
                   .join("L")
