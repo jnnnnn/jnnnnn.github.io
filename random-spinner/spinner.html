@@ -12,18 +12,7 @@
 </style>
 
 <body>
-  <textarea
-    id="textdata"
-    style="height: 1.5em; width: 20em; overflow-x: hidden; opacity: 0.5"
-    placeholder="paste from spreadsheet here"
-    onchange="load_text_data();"
-    onkeyup="load_text_data();"
-  ></textarea>
-  <svg></svg>
-  <div id="list">
-    <ul></ul>
-  </div>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     var width = 800,
       height = 800,
@@ -65,22 +54,12 @@
 
     var range100 = d3.scaleLinear().range([0, 100]);
     var root;
-    var datarows;
-
-    var stratify = d3
-      .stratify()
-      .id((d) => d.Index)
-      .parentId((d) => d.Parent);
-
-    var partition = d3.partition();
 
     var pointRadial = (θ, r) => [
       (r = +r) * Math.cos((θ -= Math.PI / 2)),
       r * Math.sin(θ),
     ];
 
-    var easeBothWays = (f) => (t) =>
-      t % 1 < 0.5 ? f(Math.abs(t % 1) * 2) : f(2 * (1 - Math.abs(t % 1)));
     var cartesianToColorSpace = d3
       .scaleLinear()
       .domain([-radius, radius])
@@ -103,14 +82,15 @@
       .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    function load() {
-      heirarchy = stratify(datarows);
+    function load(rows) {
+      heirarchy = d3.hierarchy({ name: "root", children: rows });
       heirarchy.count();
-      root = partition(heirarchy);
-      root.each((d) => {
+      root = d3.partition()(heirarchy);
+
+      for (const d of rows) {
         d.x = (d.x0 + d.x1) / 2;
         d.y = (d.y0 + d.y1) / 2;
-      });
+      }
       // root node centred and not rotated
       root.x = 0.25;
       root.y = 0.0;
@@ -122,24 +102,18 @@
     function load_text_data() {
       var raw = document.getElementById("textdata").value;
       if (!raw) return;
-      datarows = raw
-      load();
+      const datarows = raw
+        .split("\n")
+        .map((t, i) => ({ RowName: t, RowIndex: i, value: 1 }));
+      load(datarows);
     }
-y
 
     function update(root) {
-      d3.select("div#source").node().innerHTML =
-        'Source: <a href="' +
-        root.data.Origin +
-        '">' +
-        root.data.Origin +
-        "</a>";
+      const key = (d) => d.data.RowIndex;
 
-      const key = (d) => d.data.Move.toLowerCase().replace("dis", "d").replace("con", "cn").slice(0, 4);
+      const paths = svg.selectAll("path").data(root.children, key);
 
-      let paths = svg.selectAll("path").data(root.descendants(), key);
-
-      let newPaths = paths
+      const newPaths = paths
         .enter()
         .append("path")
         .attr("d", p.shape)
@@ -147,13 +121,13 @@ y
         .style("fill", (d) => "white")
         .style("stroke", "#fff")
         .style("stroke-width", 1);
-      newPaths.append("title").text((d) => d.data.Move);
+      newPaths.append("title").text((d) => d.data.RowName);
 
       paths.exit().remove();
 
-      let texts = svg.selectAll("g").data(root.descendants(), key);
+      const texts = svg.selectAll("g").data(root.children, key);
 
-      let newTexts = texts
+      const newTexts = texts
         .enter()
         .append("g")
         .attr("transform", (d) => "translate(0, 0) rotate(0)")
@@ -161,40 +135,26 @@ y
 
       newTexts
         .append("text")
-        .text((d) => d.data.Move)
+        .text((d) => d.data.RowName)
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "central");
 
       texts.exit().remove();
 
-      texts = texts.merge(newTexts);
       texts
+        .merge(newTexts)
         .selectAll("text")
         // this data() is necessary to update the child data elements that don't get recreated.
         // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update().
         // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
         .data((d) => [d])
-        .text((d) => d.data.Move);
+        .text((d) => d.data.RowName);
     }
 
     function pathclick(d) {
       d.selected ^= 1;
       update_selection_display();
       transition(500);
-    }
-
-    // Show a list of the selected elements separately for saving
-    function update_selection_display() {
-      let ds = root.descendants().filter((d) => d.selected);
-      let lis = d3
-        .select("div#list ul")
-        .selectAll("li")
-        .data(ds, (d) => d.data.Index);
-      lis
-        .enter()
-        .append("li")
-        .text((d) => d.data.Move);
-      lis.exit().remove();
     }
 
     function transition(duration, ease) {
@@ -231,71 +191,19 @@ y
       return result;
     }
 
-    // https://bl.ocks.org/mbostock/3916621
-    function pathTween(precision) {
-      return function (d) {
-        // factory function
-        var path0 = this,
-          path1 = path0.cloneNode(),
-          n0 = path0.getTotalLength(),
-          n1 = (path1.setAttribute("d", p.shape(d)), path1).getTotalLength();
-
-        // Uniform sampling of distance based on specified precision.
-        var distances = [0],
-          i = 0,
-          dt = precision / Math.max(n0, n1);
-        while ((i += dt) < 1) distances.push(i);
-        distances.push(1);
-
-        // Compute point-interpolators at each distance.
-        var points = distances.map(function (t) {
-          var p0 = path0.getPointAtLength(t * n0),
-            p1 = path1.getPointAtLength(t * n1);
-          return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
-        });
-
-        return function (t) {
-          return t < 1
-            ? "M" +
-                points
-                  .map(function (p) {
-                    return p(t);
-                  })
-                  .join("L")
-            : p.shape(d);
-        };
-      };
-    }
-
-    function swapProjection() {
-      p = p.name === "radial" ? projections.cartesian : projections.radial;
-      var t = transition(5000);
-    }
-
-    function depthfirstreindex(d, i) {
-      d.data.Index = (++i).toString();
-      if (d.children) {
-        for (let dc of d.children) {
-          dc.data.Parent = d.data.Index;
-          i = depthfirstreindex(dc, i);
-        }
-      }
-      return i;
-    }
-
-    function breadthfirstreindex(root) {
-      let i = 0;
-      let queue = [root];
-      while (queue.length) {
-        let d = queue.shift();
-        d.data.Index = (++i).toString();
-        if (d.children) {
-          for (let dc of d.children) dc.data.Parent = d.data.Index;
-          queue = queue.concat(d.children);
-        }
-      }
-    }
-
     d3.select(self.frameElement).style("height", height + "px");
   </script>
+
+  <textarea
+    id="textdata"
+    style="height: 1.5em; width: 20em; overflow-x: hidden; opacity: 0.5"
+    placeholder="paste from spreadsheet here"
+    onchange="load_text_data();"
+    onkeyup="load_text_data();"
+  ></textarea>
+
+  <svg></svg>
+  <div id="list">
+    <ul></ul>
+  </div>
 </body>
