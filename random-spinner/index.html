@@ -12,6 +12,7 @@
 </style>
 
 <body>
+  <svg></svg>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     var width = 800,
@@ -38,13 +39,12 @@
           .outerRadius((d) => Math.max(0, projections.radial.y(d.y1))),
         translate: (d) =>
           pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
-        rotate: (d) => d * 360,
+        rotate: (d) => d.x * 360,
       },
     };
     var p = projections.radial;
     const project = (d) =>
       "translate(" + p.translate(d) + ") rotate(" + p.rotate(d) + ")";
-    var currentProjection = p.name;
     var ycolor = d3
       .scaleLinear()
       .domain([0, 1])
@@ -52,15 +52,13 @@
 
     var root;
 
-    var pointRadial = (θ, r) => [
-      (r = +r) * Math.cos((θ -= Math.PI / 2)),
-      r * Math.sin(θ),
-    ];
+    var pointRadial = (θ, r) => [r * Math.cos(θ), r * Math.sin(θ)];
 
     var cartesianToColorSpace = d3
       .scaleLinear()
       .domain([-radius, radius])
       .range([-100, 100]);
+
     var color = (d) => {
       var p = pointRadial((d.x * τ) % τ, ycolor(d.y));
       if (d.y == 0.0) p = [0, 0]; // root grey
@@ -85,7 +83,7 @@
       heirarchy.count();
       root = d3.partition()(heirarchy);
       // compute centers of each node
-      for (const d of rows) {
+      for (const d of root.children) {
         d.x = (d.x0 + d.x1) / 2;
         d.y = (d.y0 + d.y1) / 2;
       }
@@ -99,26 +97,18 @@
     function load_text_data() {
       var raw = document.getElementById("textdata").value;
       if (!raw) return;
-      const datarows = raw
-        .split("\n")
-        .map((t, i) => ({ RowName: t, RowIndex: i, value: 1 }));
+      const datarows = raw.split("\n");
       load(datarows);
     }
 
-    const key = (d) => d.data.RowIndex;
-
     function update(root) {
       const t = svg.transition().duration(750);
-
-      svg
+      console.log(root);
+      const groups = svg
         .selectAll("g")
-        .data(root.children, key)
+        .data(root.children)
         .join((enter) => {
-          const newGroups = enter
-            .append("g")
-            .attr("transform", (d) => "translate(0, 0) rotate(0)")
-            .each((d) => console.log("group created", d));
-          newGroups.transition(t).attr("transform", project);
+          const newGroups = enter.append("g");
           const newTexts = newGroups
             .append("text")
             .attr("text-anchor", "middle")
@@ -126,14 +116,23 @@
             .attr("fill", "black");
           const newPaths = newGroups
             .append("path")
-            .attr("d", p.shape)
             .style("stroke", "#fff")
-            .style("stroke-width", 1)
-            .style("fill", color);
+            .style("stroke-width", 1);
           return newGroups;
-        })
+        });
+
+      groups.attr("transform", project);
+
+      groups
+        .selectAll("path")
+        .data((d) => d)
+        .attr("d", p.shape)
+        .style("fill", color);
+
+      groups
         .selectAll("text")
-        .text((d) => d.data.RowName);
+        .data((d) => d)
+        .text((d) => d.data);
     }
 
     d3.select(self.frameElement).style("height", height + "px");
@@ -147,7 +146,6 @@
     onkeyup="load_text_data();"
   ></textarea>
 
-  <svg></svg>
   <div id="list">
     <ul></ul>
   </div>
