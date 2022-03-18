@@ -11,7 +11,7 @@
   }
 </style>
 
-<body>
+<body onload="load_text_data();">
   <svg></svg>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
@@ -33,8 +33,8 @@
           .range([0, radius]),
         shape: d3
           .arc()
-          .startAngle((d) => projections.radial.x(d.x0))
-          .endAngle((d) => projections.radial.x(d.x1))
+          .startAngle((d) => projections.radial.x(d.x0) + τ / 4)
+          .endAngle((d) => projections.radial.x(d.x1) + τ / 4)
           .innerRadius((d) => Math.max(0, projections.radial.y(d.y0)))
           .outerRadius((d) => Math.max(0, projections.radial.y(d.y1))),
         translate: (d) =>
@@ -103,34 +103,40 @@
 
     function update(root) {
       const t = svg.transition().duration(750);
-      console.log(root);
       const groups = svg
-        .selectAll("g")
+        .selectChildren() // top level <g>s only (excluding  text <g>s)
         .data(root.children)
         .join((enter) => {
           const newGroups = enter.append("g");
-          const newTexts = newGroups
-            .append("text")
-            .attr("text-anchor", "middle")
-            .attr("dominant-baseline", "central")
-            .attr("fill", "black");
           const newPaths = newGroups
             .append("path")
             .style("stroke", "#fff")
             .style("stroke-width", 1);
+          const newTexts = newGroups
+            .append("g")
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .attr("fill", "black");
           return newGroups;
         });
 
-      groups.attr("transform", project);
-
       groups
-        .selectAll("path")
+        .selectChildren("path")
         .data((d) => d)
+        .transition(t)
         .attr("d", p.shape)
         .style("fill", color);
 
       groups
-        .selectAll("text")
+        .selectChildren("g")
+        .data((d) => d)
+        .transition(t)
+        .attr("transform", project);
+
+      groups
+        .selectChildren("g")
+        .selectChildren("text")
         .data((d) => d)
         .text((d) => d.data);
     }
