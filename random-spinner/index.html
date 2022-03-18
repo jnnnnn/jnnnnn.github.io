@@ -108,41 +108,57 @@
       load(datarows);
     }
 
+    const key = (d) => d.data.RowIndex;
+
     function update(root) {
-      const key = (d) => d.data.RowIndex;
+      updatePaths(root);
+      updateTexts(root);
+    }
 
-      const paths = svg.selectAll("path").data(root.children, key);
+    function updatPaths(root) {
+      const paths = svg
+        .selectAll("path")
+        .data(root.children, key)
+        .join(
+          (enter) => {
+            const newPaths = enter
+              .append("path")
+              .attr("d", p.shape)
+              .on("click", pathclick)
+              .style("fill", (d) => "white")
+              .style("stroke", "#fff")
+              .style("stroke-width", 1);
+            newPaths.append("title").text((d) => d.data.RowName);
+          },
+          (update) => {},
+          (exit) => {
+            exit.remove();
+          }
+        );
+    }
 
-      const newPaths = paths
-        .enter()
-        .append("path")
-        .attr("d", p.shape)
-        .on("click", pathclick)
-        .style("fill", (d) => "white")
-        .style("stroke", "#fff")
-        .style("stroke-width", 1);
-      newPaths.append("title").text((d) => d.data.RowName);
-
-      paths.exit().remove();
-
-      const texts = svg.selectAll("g").data(root.children, key);
-
-      const newTexts = texts
-        .enter()
-        .append("g")
-        .attr("transform", (d) => "translate(0, 0) rotate(0)")
-        .on("click", pathclick);
-
-      newTexts
-        .append("text")
-        .text((d) => d.data.RowName)
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "central");
-
-      texts.exit().remove();
-
+    function updateTexts(root) {
+      const texts = svg
+        .selectAll("g")
+        .data(root.children, key)
+        .join(
+          (enter) => {
+            const newTexts = enter
+              .append("g")
+              .attr("transform", (d) => "translate(0, 0) rotate(0)")
+              .on("click", pathclick);
+            newTexts
+              .append("text")
+              .text((d) => d.data.RowName)
+              .attr("text-anchor", "middle")
+              .attr("dominant-baseline", "central");
+          },
+          (update) => {},
+          (exit) => {
+            exit.remove();
+          }
+        );
       texts
-        .merge(newTexts)
         .selectAll("text")
         // this data() is necessary to update the child data elements that don't get recreated.
         // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update().
