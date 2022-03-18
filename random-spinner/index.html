@@ -21,12 +21,11 @@
 
     var formatNumber = d3.format(",d");
 
-    var angle = 0.0;
     var τ = 2 * Math.PI;
     var projections = {
       radial: {
         name: "radial",
-        x: (a) => a * τ + angle, // 0..1 -> 0..τ,
+        x: (a) => a * τ, // 0..1 -> 0..τ,
         y: d3
           .scalePow() // 0..1 -> 0..r
           .exponent(1.5)
@@ -39,10 +38,7 @@
           .outerRadius((d) => Math.max(0, projections.radial.y(d.y1))),
         translate: (d) =>
           pointRadial(projections.radial.x(d.x), projections.radial.y(d.y)),
-        rotate: (d) => {
-          let θ = projections.radial.x(d.x);
-          return (θ * 360) / τ + (θ % τ > Math.PI ? 90 : -90);
-        },
+        rotate: (d) => d * 360,
       },
     };
     var p = projections.radial;
@@ -54,7 +50,6 @@
       .domain([0, 1])
       .range([1.5 * radius, 0.1 * radius]);
 
-    var range100 = d3.scaleLinear().range([0, 100]);
     var root;
 
     var pointRadial = (θ, r) => [
@@ -67,7 +62,7 @@
       .domain([-radius, radius])
       .range([-100, 100]);
     var color = (d) => {
-      var p = pointRadial((d.x * τ + 10 * angle) % τ, ycolor(d.y));
+      var p = pointRadial((d.x * τ) % τ, ycolor(d.y));
       if (d.y == 0.0) p = [0, 0]; // root grey
       return d3.lab(
         70,
@@ -85,10 +80,11 @@
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
     function load(rows) {
+      // spread rows evenly across a height from y=0 to y=1
       heirarchy = d3.hierarchy({ name: "root", children: rows });
       heirarchy.count();
       root = d3.partition()(heirarchy);
-
+      // compute centers of each node
       for (const d of rows) {
         d.x = (d.x0 + d.x1) / 2;
         d.y = (d.y0 + d.y1) / 2;
@@ -113,61 +109,30 @@
 
     function update(root) {
       const t = svg.transition().duration(750);
-      updatePaths(root, t);
-      updateTexts(root, t);
-    }
 
-    function updatePaths(root, transition) {
-      const paths = svg
-        .selectAll("path")
-        .data(root.children, key)
-        .join(
-          (enter) => {
-            const newPaths = enter
-              .append("path")
-              .attr("d", p.shape)
-              .style("fill", (d) => "white")
-              .style("stroke", "#fff")
-              .style("stroke-width", 1);
-            newPaths.append("title").text((d) => d.data.RowName);
-            newPaths
-              .transition(transition)
-              .attr("transform", project)
-              .style("fill", color);
-            return newPaths;
-          },
-          (update) => update,
-          (exit) => exit.remove()
-        );
-    }
-
-    function updateTexts(root, transition) {
-      const texts = svg
+      svg
         .selectAll("g")
         .data(root.children, key)
-        .join(
-          (enter) => {
-            const newGroups = enter
-              .append("g")
-              .attr("transform", (d) => "translate(0, 0) rotate(0)");
-            newGroups.transition(transition).attr("transform", project);
-            const newTexts = newGroups
-              .append("text")
-              .text((d) => d.data.RowName)
-              .attr("text-anchor", "middle")
-              .attr("dominant-baseline", "central");
-            newTexts.transition(transition).attr("fill", "black");
-            return newGroups;
-          },
-          (update) => update,
-          (exit) => exit.remove()
-        );
-      texts
+        .join((enter) => {
+          const newGroups = enter
+            .append("g")
+            .attr("transform", (d) => "translate(0, 0) rotate(0)")
+            .each((d) => console.log("group created", d));
+          newGroups.transition(t).attr("transform", project);
+          const newTexts = newGroups
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
+            .attr("fill", "black");
+          const newPaths = newGroups
+            .append("path")
+            .attr("d", p.shape)
+            .style("stroke", "#fff")
+            .style("stroke-width", 1)
+            .style("fill", color);
+          return newGroups;
+        })
         .selectAll("text")
-        // this data() is necessary to update the child data elements that don't get recreated.
-        // see https://bost.ocks.org/mike/constancy/ , or try marking some nodes then running update().
-        // The panels change color (as they are parents) but the texts don't (as they are children of the g elements).
-        .data((d) => [d])
         .text((d) => d.data.RowName);
     }
 
