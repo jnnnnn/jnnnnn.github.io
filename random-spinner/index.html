@@ -7,7 +7,7 @@
 
   .spin {
     transform: translate(400px, 400px) rotate(0turn);
-    transition: transform 2s;
+    transition: transform 3s;
   }
 </style>
 
@@ -114,7 +114,7 @@
     }
 
     function spin() {
-      const turns = Math.random() * 10;
+      const turns = Math.random() * 30;
 
       d3.selectAll(".spin").style(
         "transform",
