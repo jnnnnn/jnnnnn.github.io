@@ -5,9 +5,9 @@
     stroke: #fff;
   }
 
-  /* https://stackoverflow.com/a/42613421/412529 wrap list to multiple columns */
-  div#list {
-    column-width: 150px;
+  .spin {
+    transform: translate(400px, 400px) rotate(0turn);
+    transition: transform 2s;
   }
 </style>
 
@@ -69,16 +69,13 @@
       );
     };
 
-    const spinnertransform = (degrees) =>
-      `translate(${width / 2} , ${height / 2}) rotate(${degrees})`;
-
     var svg = d3
       .select("body")
       .selectAll("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", spinnertransform(-90));
+      .attr("class", "spin");
 
     d3.selectAll("svg")
       .append("polygon")
@@ -117,12 +114,12 @@
     }
 
     function spin() {
-      finalDegrees = Math.random() * τ * 10 * 360;
-      d3.select("svg")
-        .selectChildren("g")
-        .transition()
-        .duration(2000)
-        .attr("transform", spinnertransform(finalDegrees));
+      const turns = Math.random() * 10;
+
+      d3.selectAll(".spin").style(
+        "transform",
+        `translate(${width / 2}px, ${height / 2}px) rotate(${turns}turn)`
+      );
     }
 
     function update(root) {
