@@ -69,21 +69,43 @@
       );
     };
 
+    const spinnertransform = (degrees) =>
+      `translate(${width / 2} , ${height / 2}) rotate(${degrees})`;
+
     var svg = d3
       .select("body")
       .selectAll("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+      .attr("transform", spinnertransform(-90));
 
-    function load(rows) {
+    d3.selectAll("svg")
+      .append("polygon")
+      .attr("id", "spinner")
+      .attr("points", [
+        [width / 2 + radius, height / 2],
+        [width, height / 2 - 20],
+        [width, height / 2 + 20],
+      ])
+      .style("fill", "green")
+      .style("stroke", "black")
+      .style("strokeWidth", "10px");
+
+    function load_text_data() {
+      var raw = document.getElementById("textdata").value;
+      if (!raw) return;
+      const rows = raw.split("\n");
+
       // spread rows evenly across a height from y=0 to y=1
-      heirarchy = d3.hierarchy({ name: "root", children: rows });
+      heirarchy = d3.hierarchy({
+        name: "Spin",
+        children: rows.map((r) => ({ name: r })),
+      });
       heirarchy.count();
       root = d3.partition()(heirarchy);
       // compute centers of each node
-      for (const d of root.children) {
+      for (const d of root.descendants()) {
         d.x = (d.x0 + d.x1) / 2;
         d.y = (d.y0 + d.y1) / 2;
       }
@@ -94,18 +116,20 @@
       update(root);
     }
 
-    function load_text_data() {
-      var raw = document.getElementById("textdata").value;
-      if (!raw) return;
-      const datarows = raw.split("\n");
-      load(datarows);
+    function spin() {
+      finalDegrees = Math.random() * τ * 10 * 360;
+      d3.select("svg")
+        .selectChildren("g")
+        .transition()
+        .duration(2000)
+        .attr("transform", spinnertransform(finalDegrees));
     }
 
     function update(root) {
       const t = svg.transition().duration(750);
       const groups = svg
-        .selectChildren() // top level <g>s only (excluding  text <g>s)
-        .data(root.children)
+        .selectChildren("g") // top level <g>s only (excluding  text <g>s)
+        .data(root.descendants())
         .join((enter) => {
           const newGroups = enter.append("g");
           const newPaths = newGroups
@@ -138,7 +162,10 @@
         .selectChildren("g")
         .selectChildren("text")
         .data((d) => d)
-        .text((d) => d.data);
+        .text((d) => d.data.name);
+
+      // clicking the root node (select chooses the first) will spin the wheel
+      svg.on("click", spin);
     }
 
     d3.select(self.frameElement).style("height", height + "px");
@@ -150,7 +177,13 @@
     placeholder="paste from spreadsheet here"
     onchange="load_text_data();"
     onkeyup="load_text_data();"
-  ></textarea>
+  >
+Pine
+Pear
+Plum
+Peach
+Pineapple</textarea
+  >
 
   <div id="list">
     <ul></ul>
