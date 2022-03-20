@@ -117,12 +117,10 @@
     function spin() {
       const turns = Math.random() + 12 * (forward ^= 1);
 
-      d3.selectAll(".spin")
-        .style("transition", "transform 3s")
-        .style(
-          "transform",
-          `translate(${width / 2}px, ${height / 2}px) rotate(${turns}turn)`
-        );
+      d3.selectAll(".spin").style(
+        "transform",
+        `translate(${width / 2}px, ${height / 2}px) rotate(${turns}turn)`
+      );
     }
 
     function update(root) {
