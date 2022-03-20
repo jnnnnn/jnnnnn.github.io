@@ -13,7 +13,7 @@
 
 <body onload="load_text_data();">
   <svg></svg>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="d3.v7.min.js"></script>
   <script>
     var width = 800,
       height = 800,
@@ -113,13 +113,16 @@
       update(root);
     }
 
+    let forward = 0;
     function spin() {
-      const turns = Math.random() * 30;
+      const turns = Math.random() + 12 * (forward ^= 1);
 
-      d3.selectAll(".spin").style(
-        "transform",
-        `translate(${width / 2}px, ${height / 2}px) rotate(${turns}turn)`
-      );
+      d3.selectAll(".spin")
+        .style("transition", "transform 3s")
+        .style(
+          "transform",
+          `translate(${width / 2}px, ${height / 2}px) rotate(${turns}turn)`
+        );
     }
 
     function update(root) {
