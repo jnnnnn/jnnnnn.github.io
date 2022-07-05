@@ -3,6 +3,7 @@
 ## CI/CD
 
 - How to [run gitversion in buildkite](./buildkite%20and%20gitversion.md)
+- Basics of [AWS Networking and VPCs](./aws-networking.md)
 
 ## Psychology
 
