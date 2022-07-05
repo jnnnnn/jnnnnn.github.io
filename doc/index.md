@@ -11,3 +11,7 @@
 ## Teamwork
 
 - [How to write code in a team](./pairing.md)
+
+## Application Security
+
+- [How does Oauth's PKCE flow work](../oauth-pkce.svg)
