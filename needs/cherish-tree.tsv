@@ -109,12 +109,12 @@ Index	Parent	Move	Origin
 108	14	Self-sufficient	John Gottman
 109	14	Stable	John Gottman
 110	14	Steady	John Gottman
-111	15	Emotional Stability	https://en.wikipedia.org/wiki/Personality
+111	14	Emotional Stability	https://en.wikipedia.org/wiki/Personality
 112	15	Appreciative	John Gottman
 113	15	Caring	John Gottman
-114	15	Compassionate	John Gottman
+114	16	Compassionate	John Gottman
 115	15	Devoted	John Gottman
-116	15	Empathetic	John Gottman
+116	16	Empathetic	John Gottman
 117	15	Gentle	John Gottman
 118	15	Insightful	John Gottman
 119	15	Kind	John Gottman
@@ -149,8 +149,8 @@ Index	Parent	Move	Origin
 148	18	Calm	John Gottman
 149	18	Considerate	John Gottman
 150	18	Friendly	John Gottman
-151	18	Generous	John Gottman
-152	18	Giving	John Gottman
+151	19	Generous	John Gottman
+152	17	Giving	John Gottman
 153	18	Humble	John Gottman
 154	18	Interesting	John Gottman
 155	18	Lovable	John Gottman
@@ -158,10 +158,10 @@ Index	Parent	Move	Origin
 157	18	Natural	John Gottman
 158	18	Pleasant	John Gottman
 159	18	Respectful	John Gottman
-160	18	Trustworthy	John Gottman
+160	17	Trustworthy	John Gottman
 161	18	Unique	John Gottman
 162	18	Unselfish	John Gottman
-163	18	Upbeat	John Gottman
+163	13	Upbeat	John Gottman
 164	18	Warm	John Gottman
 165	19	Agreeableness	https://en.wikipedia.org/wiki/Personality
 166	19	Manners	https://www.slideshare.net/cristymelloso/personality-definitions-and-its-components
