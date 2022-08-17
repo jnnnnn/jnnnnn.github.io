@@ -1,0 +1,27 @@
+name	type	importance
+writing code	technical	1
+testing	technical	1
+diagnosis & debugging	technical	1
+observability	technical	1
+software architecture	technical	1
+security	technical	1
+CI/CD	technical	1
+decision making	leadership	1
+driving alignment	leadership	1
+process thinking	leadership	1
+facilitation	leadership	1
+mentoring	leadership	1
+work breakdown	ways of working	1
+prioritisation	ways of working	1
+dependencies	ways of working	1
+dealing with ambiguity	ways of working	1
+reliability, delivery accountability	ways of working	1
+automation mindset	ways of working	1
+support engineering	ways of working	1
+delivering feedback	behavioural	1
+seeking and receiving feedback	behavioural	1
+effective communication	behavioural	1
+knowledge sharing	behavioural	1
+teamwork	behavioural	1
+relationship building	behavioural	1
+handling disagreement	behavioural	1
