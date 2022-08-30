@@ -46,7 +46,7 @@ const Cell =
                 type="text"
                 value=${cellToText(cell)}
                 onInput=${setCell(cellIndex)}
-                onClick=${CellClick({
+                onMouseDown=${CellClick({
                     board,
                     setBoard,
                     cellIndex,
