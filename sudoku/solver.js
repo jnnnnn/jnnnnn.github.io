@@ -65,9 +65,11 @@ const simpleSolveGrid = (board) => {
             const number = solvedCells.get(board[cellIndex]);
             if (!simpleSolveCell(board, cellIndex, number, 0)) {
                 log(0, cellIndex, number, "full simple failed");
+                return false;
             }
         }
     }
+    return true;
 };
 
 // eliminate this possibility from other cells in row/column/square
