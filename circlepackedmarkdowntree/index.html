@@ -22,18 +22,19 @@
             .attr("width", width)
             .attr("height", height);
 
-        // create dummy data -> just one element per circle
         var data = [
             {
                 code: "WAR",
                 effort: 4,
                 category: "Operations",
+                categoryId: 1,
                 name: "AWS Well-Architected Review",
             },
             {
                 code: "TM",
                 effort: 13,
                 category: "Security",
+                categoryId: 2,
                 name: "Threat Modelling",
             },
             {
@@ -46,12 +47,14 @@
                 code: "AD",
                 effort: 4,
                 category: "Maintainability",
+                categoryId: 3,
                 name: "Architecture Diagram",
             },
             {
                 code: "TR",
                 effort: 6,
                 category: "Maintainability",
+                categoryId: 3,
                 name: "Technical Reference",
             },
             { code: "Atlas", effort: 2, category: "Operations", name: "Atlas" },
@@ -59,12 +62,14 @@
                 code: "DD",
                 effort: 7,
                 category: "Operations",
+                categoryId: 1,
                 name: "Datadog dashboard",
             },
             {
                 code: "CCD",
                 effort: 4,
                 category: "Operations",
+                categoryId: 1,
                 name: "Cloudability cost dashboard",
             },
             { code: "Dome9", effort: 1, category: "Security", name: "Dome9" },
@@ -72,101 +77,120 @@
                 code: "SQ",
                 effort: 3,
                 category: "Maintainability",
+                categoryId: 3,
                 name: "SonarQube",
             },
             {
                 code: "Dpndb",
                 effort: 1,
                 category: "Security",
+                categoryId: 2,
                 name: "Dependabot",
             },
             {
                 code: "SHM",
                 effort: 2,
                 category: "Maintainability",
+                categoryId: 3,
                 name: "Software Health Metrics",
             },
             {
                 code: "Pen",
                 effort: 12,
                 category: "Security",
+                categoryId: 2,
                 name: "Penetration Test",
             },
             {
                 code: "BAC",
                 effort: 3,
                 category: "Security",
+                categoryId: 2,
                 name: "Buildkite access control",
             },
             {
                 code: "Perf",
                 effort: 9,
                 category: "Operations",
+                categoryId: 1,
                 name: "Performance Testing",
             },
             {
                 code: "AIT",
                 effort: 14,
                 category: "Maintainability",
+                categoryId: 3,
                 name: "Automated Integration Testing",
             },
             {
                 code: "CM",
                 effort: 4,
                 category: "Operations",
+                categoryId: 1,
                 name: "Cost modelling",
             },
             {
                 code: "Game",
                 effort: 19,
                 category: "Operations",
+                categoryId: 1,
                 name: "Game Day",
             },
             {
                 code: "GAT",
                 effort: 12,
                 category: "Security",
+                categoryId: 2,
                 name: "Security Guardrails / GAT",
             },
             {
                 code: "SqHM",
                 effort: 3,
                 category: "Operations",
+                categoryId: 1,
                 name: "Squad Health Metrics",
             },
             {
                 code: "ORS",
                 effort: 2,
                 category: "Security",
+                categoryId: 2,
                 name: "Github org repo settings",
             },
             {
                 code: "GG",
                 effort: 1,
                 category: "Security",
+                categoryId: 2,
                 name: "Gitguardian",
             },
             {
                 code: "SM",
                 effort: 1,
                 category: "Operations",
+                categoryId: 1,
                 name: "Support Model",
             },
             {
                 code: "SBOM",
                 effort: 1,
                 category: "Operations",
+                categoryId: 1,
                 name: "Software Bill Of Materials",
             },
             { code: "Xray", effort: 1, category: "Security", name: "Xray" },
             { code: "Ten", effort: 1, category: "Security", name: "Tenable" },
         ];
 
+        for (d of data) {
+            d.radius = 8 * Math.sqrt(d.effort) + 10;
+        }
+
         // A scale that gives a X target position for each group
         var x = d3
             .scaleOrdinal()
             .domain(["Security", "Operations", "Maintainability"])
-            .range([50, 200, 340]);
+            .range([width / 4, width / 2, (3 * width) / 4]);
 
         // A color scale
         var color = d3
@@ -175,31 +199,36 @@
             .range(["#F8766D", "#00BA38", "#619CFF"]);
 
         // Initialize the circle: all located at the center of the svg area
-        var node = svg
+        var gs = svg
             .append("g")
             .selectAll("circle")
             .data(data)
             .enter()
-            .append("circle")
-            .attr("r", (d) => 3 * Math.sqrt(d.effort) + 10)
-            .attr("cx", width / 2)
-            .attr("cy", height / 2)
-            .style("fill", (d) => color(d.category))
-            .style("fill-opacity", 0.8)
-            .attr("stroke", "black")
-            .style("stroke-width", 4)
-            .on(
-                "click",
-                (event, d) =>
-                    (document.getElementById("detail").innerHTML = d.name)
-            )
+            .append("g");
+
+        gs.attr("translate", `transform(${width / 2}, ${height / 2})`)
+            .on("click", clicked)
             .call(
                 d3
-                    .drag() // call specific function when circle is dragged
+                    .drag()
                     .on("start", dragstarted)
                     .on("drag", dragged)
                     .on("end", dragended)
             );
+
+        gs.append("circle")
+            .attr("r", (d) => d.radius)
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .style("fill", (d) => color(d.category))
+            .style("fill-opacity", 0.8)
+            .attr("stroke", "black")
+            .style("stroke-width", 4);
+
+        gs.append("text")
+            .attr("dx", -10)
+            .attr("dy", ".35em")
+            .text((d) => d.code);
 
         // Features of the forces applied to the nodes:
         var simulation = d3
@@ -228,21 +257,32 @@
             .force("charge", d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
             .force(
                 "collide",
-                d3.forceCollide().strength(0.1).radius(32).iterations(1)
+                d3.forceCollide().strength(0.1).radius(d => d.radius*1.2).iterations(1)
             ); // Force that avoids circle overlapping
 
         // Apply these forces to the nodes and update their positions.
         // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
-        simulation.nodes(data).on("tick", function (d) {
-            node.attr("cx", function (d) {
-                return d.x;
-            }).attr("cy", function (d) {
-                return d.y;
-            });
+        simulation.nodes(data).on("tick", (d) => {
+            gs.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
         });
 
+        function clicked(event, d) {
+            if (event.defaultPrevented) return; // dragged
+
+            d3.select(this)
+                .select("circle")
+                .transition()
+                .attr("fill", "black")
+                .attr("r", (d) => d.radius * 2)
+                .transition()
+                .attr("r", (d) => d.radius)
+                .attr("fill", d3.schemeCategory10[d.categoryId]);
+
+            updateInfoCard(d);
+        }
+
         function dragstarted() {
-          simulation.alphaTarget(0.03).restart();
+            simulation.alphaTarget(0.03).restart();
         }
 
         function dragged(event, d) {
@@ -253,7 +293,24 @@
         }
 
         function dragended() {
-          simulation.alphaTarget(0.03).restart();
+            simulation.alphaTarget(0.03).restart();
+        }
+
+        function updateInfoCard(d) {
+            document.getElementById("detail").innerHTML = `
+                <h1>${d.name}</h1>
+                <h2>What is the purpose?</h2>
+                <p class="note">What is this and why is it important?</p>
+                <h2>Does this apply to us?</h2>
+                <p class="note">How can a team determine that this tools is important/required for their product?  At what point(s) in the product's lifecycle should it be used and how often?  examples: in all CI/CD pipelines, for all cloud software, if your software is hosted on VMs, if you are using docker containers, before delivering new software to customer facing environments, when making significant software changes
+                </p>
+                <h2>What's the risk if we don't use it?</h2>
+                <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
+                <h2>How long will it take us?</h2>
+                <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
+                <p>Category: ${d.category}</p>
+                <p>Effort: ${d.effort}</p>
+            `;
         }
     </script>
 
