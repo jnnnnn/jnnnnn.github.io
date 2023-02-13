@@ -7,6 +7,29 @@
 </head>
 
 <body>
+    <div id="controls">
+        <form>
+            <group>
+                <input
+                    type="radio"
+                    id="r_effort"
+                    name="sizer"
+                    value="effort"
+                    onclick="sizeByEffort();"
+                />
+                Size by effort
+                <input
+                    type="radio"
+                    id="r_risk"
+                    name="sizer"
+                    value="risk"
+                    onclick="sizeByRisk();"
+                />
+                Size by risk
+            </group>
+        </form>
+    </div>
+
     <!-- inline-block -->
     <div id="circlechart" style="display: inline-block; width: 50%"></div>
 
@@ -257,13 +280,18 @@
             .force("charge", d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
             .force(
                 "collide",
-                d3.forceCollide().strength(0.1).radius(d => d.radius*1.2).iterations(1)
+                d3
+                    .forceCollide()
+                    .strength(0.1)
+                    .radius((d) => d.radius * 1.2)
+                    .iterations(1)
             ); // Force that avoids circle overlapping
 
         // Apply these forces to the nodes and update their positions.
         // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
         simulation.nodes(data).on("tick", (d) => {
             gs.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+            gs.select("circle").attr("r", (d) => d.radius);
         });
 
         function clicked(event, d) {
@@ -311,6 +339,20 @@
                 <p>Category: ${d.category}</p>
                 <p>Effort: ${d.effort}</p>
             `;
+        }
+
+        function sizeByEffort() {
+            for (d of data) {
+                d.radius = 8 * Math.sqrt(d.effort) + 10;
+            }
+            simulation.alphaTarget(0.03).restart();
+        }
+
+        function sizeByRisk() {
+            for (d of data) {
+                d.radius = 20;
+            }
+            simulation.alphaTarget(0.03).restart();
         }
     </script>
 
