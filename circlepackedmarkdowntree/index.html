@@ -2,141 +2,261 @@
 <meta charset="utf-8" />
 
 <head>
-  <script src="http://d3js.org/d3.v4.js"></script>
+    <script src="http://d3js.org/d3.v7.js"></script>
+    <style></style>
 </head>
 
 <body>
-  <div id="circlemarkdownchart"></div>
+    <!-- inline-block -->
+    <div id="circlechart" style="display: inline-block; width: 50%"></div>
 
-  <script>
-    // set the dimensions and margins of the graph
-    var width = 450;
-    var height = 450;
+    <script>
+        // set the dimensions and margins of the graph
+        var width = window.innerWidth / 2;
+        var height = window.innerHeight;
 
-    // append the svg object to the body of the page
-    var svg = d3
-      .select("#circlemarkdownchart")
-      .append("svg")
-      .attr("width", 450)
-      .attr("height", 450);
+        // append the svg object to the body of the page
+        var svg = d3
+            .select("#circlechart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
 
-    // create dummy data -> just one element per circle
-    var data = [
-      { name: "A", group: 1 },
-      { name: "B", group: 1 },
-      { name: "C", group: 1 },
-      { name: "D", group: 1 },
-      { name: "E", group: 1 },
-      { name: "F", group: 1 },
-      { name: "G", group: 2 },
-      { name: "H", group: 2 },
-      { name: "I", group: 2 },
-      { name: "J", group: 2 },
-      { name: "K", group: 2 },
-      { name: "L", group: 2 },
-      { name: "M", group: 3 },
-      { name: "N", group: 3 },
-      { name: "O", group: 3 }
-    ];
+        // create dummy data -> just one element per circle
+        var data = [
+            {
+                code: "WAR",
+                effort: 4,
+                category: "Operations",
+                name: "AWS Well-Architected Review",
+            },
+            {
+                code: "TM",
+                effort: 13,
+                category: "Security",
+                name: "Threat Modelling",
+            },
+            {
+                code: "CGR",
+                effort: 2,
+                category: "Operations",
+                name: "Cloud Governance Review",
+            },
+            {
+                code: "AD",
+                effort: 4,
+                category: "Maintainability",
+                name: "Architecture Diagram",
+            },
+            {
+                code: "TR",
+                effort: 6,
+                category: "Maintainability",
+                name: "Technical Reference",
+            },
+            { code: "Atlas", effort: 2, category: "Operations", name: "Atlas" },
+            {
+                code: "DD",
+                effort: 7,
+                category: "Operations",
+                name: "Datadog dashboard",
+            },
+            {
+                code: "CCD",
+                effort: 4,
+                category: "Operations",
+                name: "Cloudability cost dashboard",
+            },
+            { code: "Dome9", effort: 1, category: "Security", name: "Dome9" },
+            {
+                code: "SQ",
+                effort: 3,
+                category: "Maintainability",
+                name: "SonarQube",
+            },
+            {
+                code: "Dpndb",
+                effort: 1,
+                category: "Security",
+                name: "Dependabot",
+            },
+            {
+                code: "SHM",
+                effort: 2,
+                category: "Maintainability",
+                name: "Software Health Metrics",
+            },
+            {
+                code: "Pen",
+                effort: 12,
+                category: "Security",
+                name: "Penetration Test",
+            },
+            {
+                code: "BAC",
+                effort: 3,
+                category: "Security",
+                name: "Buildkite access control",
+            },
+            {
+                code: "Perf",
+                effort: 9,
+                category: "Operations",
+                name: "Performance Testing",
+            },
+            {
+                code: "AIT",
+                effort: 14,
+                category: "Maintainability",
+                name: "Automated Integration Testing",
+            },
+            {
+                code: "CM",
+                effort: 4,
+                category: "Operations",
+                name: "Cost modelling",
+            },
+            {
+                code: "Game",
+                effort: 19,
+                category: "Operations",
+                name: "Game Day",
+            },
+            {
+                code: "GAT",
+                effort: 12,
+                category: "Security",
+                name: "Security Guardrails / GAT",
+            },
+            {
+                code: "SqHM",
+                effort: 3,
+                category: "Operations",
+                name: "Squad Health Metrics",
+            },
+            {
+                code: "ORS",
+                effort: 2,
+                category: "Security",
+                name: "Github org repo settings",
+            },
+            {
+                code: "GG",
+                effort: 1,
+                category: "Security",
+                name: "Gitguardian",
+            },
+            {
+                code: "SM",
+                effort: 1,
+                category: "Operations",
+                name: "Support Model",
+            },
+            {
+                code: "SBOM",
+                effort: 1,
+                category: "Operations",
+                name: "Software Bill Of Materials",
+            },
+            { code: "Xray", effort: 1, category: "Security", name: "Xray" },
+            { code: "Ten", effort: 1, category: "Security", name: "Tenable" },
+        ];
 
-    // A scale that gives a X target position for each group
-    var x = d3
-      .scaleOrdinal()
-      .domain([1, 2, 3])
-      .range([50, 200, 340]);
+        // A scale that gives a X target position for each group
+        var x = d3
+            .scaleOrdinal()
+            .domain(["Security", "Operations", "Maintainability"])
+            .range([50, 200, 340]);
 
-    // A color scale
-    var color = d3
-      .scaleOrdinal()
-      .domain([1, 2, 3])
-      .range(["#F8766D", "#00BA38", "#619CFF"]);
+        // A color scale
+        var color = d3
+            .scaleOrdinal()
+            .domain(["Security", "Operations", "Maintainability"])
+            .range(["#F8766D", "#00BA38", "#619CFF"]);
 
-    // Initialize the circle: all located at the center of the svg area
-    var node = svg
-      .append("g")
-      .selectAll("circle")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("r", 29)
-      .attr("cx", width / 2)
-      .attr("cy", height / 2)
-      .style("fill", function(d) {
-        return color(d.group);
-      })
-      .style("fill-opacity", 0.8)
-      .attr("stroke", "black")
-      .style("stroke-width", 4)
-      .call(
-        d3
-          .drag() // call specific function when circle is dragged
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended)
-      );
+        // Initialize the circle: all located at the center of the svg area
+        var node = svg
+            .append("g")
+            .selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("r", (d) => 3 * Math.sqrt(d.effort) + 10)
+            .attr("cx", width / 2)
+            .attr("cy", height / 2)
+            .style("fill", (d) => color(d.category))
+            .style("fill-opacity", 0.8)
+            .attr("stroke", "black")
+            .style("stroke-width", 4)
+            .on(
+                "click",
+                (event, d) =>
+                    (document.getElementById("detail").innerHTML = d.name)
+            )
+            .call(
+                d3
+                    .drag() // call specific function when circle is dragged
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended)
+            );
 
-    // Features of the forces applied to the nodes:
-    var simulation = d3
-      .forceSimulation()
-      .force(
-        "x",
-        d3
-          .forceX()
-          .strength(0.5)
-          .x(function(d) {
-            return x(d.group);
-          })
-      )
-      .force(
-        "y",
-        d3
-          .forceY()
-          .strength(0.1)
-          .y(height / 2)
-      )
-      .force(
-        "center",
-        d3
-          .forceCenter()
-          .x(width / 2)
-          .y(height / 2)
-      ) // Attraction to the center of the svg area
-      .force("charge", d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
-      .force(
-        "collide",
-        d3
-          .forceCollide()
-          .strength(0.1)
-          .radius(32)
-          .iterations(1)
-      ); // Force that avoids circle overlapping
+        // Features of the forces applied to the nodes:
+        var simulation = d3
+            .forceSimulation()
+            .force(
+                "x",
+                d3
+                    .forceX()
+                    .strength(0.5)
+                    .x((d) => x(d.category))
+            )
+            .force(
+                "y",
+                d3
+                    .forceY()
+                    .strength(0.1)
+                    .y(height / 2)
+            )
+            .force(
+                "center",
+                d3
+                    .forceCenter()
+                    .x(width / 2)
+                    .y(height / 2)
+            ) // Attraction to the center of the svg area
+            .force("charge", d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
+            .force(
+                "collide",
+                d3.forceCollide().strength(0.1).radius(32).iterations(1)
+            ); // Force that avoids circle overlapping
 
-    // Apply these forces to the nodes and update their positions.
-    // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
-    simulation.nodes(data).on("tick", function(d) {
-      node
-        .attr("cx", function(d) {
-          return d.x;
-        })
-        .attr("cy", function(d) {
-          return d.y;
+        // Apply these forces to the nodes and update their positions.
+        // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+        simulation.nodes(data).on("tick", function (d) {
+            node.attr("cx", function (d) {
+                return d.x;
+            }).attr("cy", function (d) {
+                return d.y;
+            });
         });
-    });
 
-    // What happens when a circle is dragged?
-    function dragstarted(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.03).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-    function dragended(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.03);
-      d.fx = null;
-      d.fy = null;
-    }
-  </script>
+        function dragstarted() {
+          simulation.alphaTarget(0.03).restart();
+        }
+
+        function dragged(event, d) {
+            d3.select(this)
+                .raise()
+                .attr("cx", (d.x = event.x))
+                .attr("cy", (d.y = event.y));
+        }
+
+        function dragended() {
+          simulation.alphaTarget(0.03).restart();
+        }
+    </script>
+
+    <!-- the detail div occupies the right-hand half of the page -->
+    <div style="float: right; width: 50%" id="detail">Detail</div>
 </body>
