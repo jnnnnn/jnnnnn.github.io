@@ -3,7 +3,14 @@
 
 <head>
     <script src="http://d3js.org/d3.v7.js"></script>
-    <style></style>
+    <style>
+        /* the three links at the bottom of the detail card need to occupy the whole width */ 
+        .links {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    </style>
 </head>
 
 <body>
@@ -200,6 +207,7 @@
 
         function updateInfoCard(d) {
             document.getElementById("detail").innerHTML = `
+                <div class="card">
                 <h1>${d.name}</h1>
                 <h2>What is the purpose?</h2>
                 <p class="note">What is this and why is it important?</p>
@@ -210,8 +218,14 @@
                 <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
                 <h2>How long will it take us?</h2>
                 <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
+                <div class="links">
+                    <a href="">User Guide</a>
+                    <a href="">Get Help</a>
+                    <a href="">Provide Feedback</a>
+                </div>
                 <p>Category: ${d.category}</p>
                 <p>Effort: ${d.effort}</p>
+                </div>
             `;
         }
 
