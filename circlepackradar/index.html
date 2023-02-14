@@ -27,8 +27,9 @@
         var data = [];
 
         // set the dimensions and margins of the graph
-        var width = window.innerWidth / 2;
-        var height = window.innerHeight;
+        // include the dumb thing to make correct on mobiles
+        var width = window.innerWidth / 2 * window.devicePixelRatio;
+        var height = window.innerHeight * window.devicePixelRatio;
         var CENTER = Math.min(width, height) / 2;
 
         // d3 load data.csv
