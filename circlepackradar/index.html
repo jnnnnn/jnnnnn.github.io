@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+    <script src="http://d3js.org/d3.v7.js"></script>
+    <style>
+        /* the three links at the bottom of the detail card need to occupy the whole width */
+        .links {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- inline-block -->
+    <div id="circlechart" style="display: inline-block; width: 50%"></div>
+
+    <script>
+        const category_to_index = {
+            Security: 1,
+            Operations: 2,
+            Maintainability: 3,
+        };
+
+        var data = [];
+
+        // set the dimensions and margins of the graph
+        var width = window.innerWidth / 2;
+        var height = window.innerHeight;
+        var CENTER = Math.min(width, height) / 2;
+
+        // d3 load data.csv
+        d3.csv("data.csv", (d) => {
+            console.log("loading", d);
+            let cat = category_to_index[d.category] || 0;
+            let angle = (cat * 2 * Math.PI) / 3;
+            let radius = CENTER / d.risk * 3/4;
+            return {
+                name: d.name,
+                code: d.code,
+                category: d.category,
+                categoryId: cat,
+                effort: +d.effort,
+                risk: +d.risk,
+                radius: 8 * Math.sqrt(d.effort) + 20,
+                x: CENTER + radius * Math.cos(angle),
+                y: CENTER + radius * Math.sin(angle),
+            };
+        }).then(function (ds) {
+            data = ds;
+            draw(ds);
+        });
+
+        var simulation = d3.forceSimulation();
+
+        // append the svg object to the body of the page
+        var svg = d3
+            .select("#circlechart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // draw some circles
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", CENTER)
+            .attr("fill", "black")
+            .attr("opacity", 0.1);
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", CENTER * 2 / 3)
+            .attr("fill", "red")
+            .attr("opacity", 0.1);
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", CENTER / 3)
+            .attr("fill", "red")
+            .attr("opacity", 0.1);
+
+
+
+        // A color scale
+        var color = d3
+            .scaleOrdinal()
+            .domain(["Security", "Operations", "Maintainability"])
+            .range(["#F8766D", "#00BA38", "#619CFF"]);
+
+        // Initialize the circle: all located at the center of the svg area
+        var gs = svg.append("g");
+
+        function draw(data) {
+            gs = gs.selectAll("circle").data(data).enter().append("g");
+
+            gs.attr("translate", `transform(${width / 2}, ${height / 2})`)
+                .on("click", clicked)
+                .call(
+                    d3
+                        .drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended)
+                );
+
+            gs.append("circle")
+                .attr("r", (d) => d.radius)
+                .attr("cx", 0)
+                .attr("cy", 0)
+                .style("fill", (d) => color(d.category))
+                .style("fill-opacity", 0.8)
+                .attr("stroke", "black")
+                .style("stroke-width", 4);
+
+            gs.append("text")
+                .attr("dominant-baseline", "middle")
+                .attr("text-anchor", "middle")
+                .text((d) => d.code);
+
+            // Features of the forces applied to the nodes:
+            simulation
+                .force(
+                    "x",
+                    d3
+                        .forceX()
+                        .strength(0.5)
+                        .x((d) => d.x)
+                )
+                .force(
+                    "y",
+                    d3
+                        .forceY()
+                        .strength(0.5)
+                        .y((d) => d.y)
+                )
+                .force(
+                    "collide",
+                    d3
+                        .forceCollide()
+                        .strength(0.1)
+                        .radius((d) => d.radius * 1.2)
+                        .iterations(1)
+                )
+                .force("charge", d3.forceManyBody().strength(1)); // Nodes are attracted one each other of value is > 0
+
+            // Apply these forces to the nodes and update their positions.
+            // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+            simulation.nodes(data).on("tick", (d) => {
+                gs.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+            });
+        }
+
+        function clicked(event, d) {
+            if (event.defaultPrevented) return; // dragged
+
+            d3.select(this)
+                .select("circle")
+                .transition()
+                .attr("fill", "black")
+                .attr("r", (d) => d.radius * 2)
+                .transition()
+                .attr("r", (d) => d.radius)
+                .attr("fill", d3.schemeCategory10[d.categoryId]);
+
+            updateInfoCard(d);
+        }
+
+        function dragstarted() {
+            simulation.alphaTarget(0.03).restart();
+        }
+
+        function dragged(event, d) {
+            d3.select(this)
+                .raise()
+                .attr("cx", (d.x = event.x))
+                .attr("cy", (d.y = event.y));
+        }
+
+        function dragended() {
+            simulation.alphaTarget(0.03).restart();
+        }
+
+        function updateInfoCard(d) {
+            document.getElementById("detail").innerHTML = `
+                <div class="card">
+                <h1>${d.name}</h1>
+                <h2>What is the purpose?</h2>
+                <p class="note">What is this and why is it important?</p>
+                <h2>Does this apply to us?</h2>
+                <p class="note">How can a team determine that this tools is important/required for their product?  At what point(s) in the product's lifecycle should it be used and how often?  examples: in all CI/CD pipelines, for all cloud software, if your software is hosted on VMs, if you are using docker containers, before delivering new software to customer facing environments, when making significant software changes
+                </p>
+                <h2>What's the risk if we don't use it?</h2>
+                <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
+                <h2>How long will it take us?</h2>
+                <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
+                <div class="links">
+                    <a href="">User Guide</a>
+                    <a href="">Get Help</a>
+                    <a href="">Provide Feedback</a>
+                </div>
+                <p>Category: ${d.category}</p>
+                <p>Effort: ${d.effort}</p>
+                <p>Risk: ${d.risk}</p>
+                </div>
+            `;
+        }
+    </script>
+
+    <!-- the detail div occupies the right-hand half of the page -->
+    <div style="float: right; width: 50%" id="detail">
+        (Click a node for detail)
+    </div>
+</body>
