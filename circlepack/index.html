@@ -15,6 +15,7 @@
                     id="r_effort"
                     name="sizer"
                     value="effort"
+                    checked
                     onclick="sizeByEffort();"
                 />
                 Size by effort
@@ -52,7 +53,7 @@
                 categoryId: category_to_index[d.category] || 0,
                 effort: +d.effort,
                 risk: +d.risk,
-                radius: 8 * Math.sqrt(d.effort) + 10,
+                radius: 8 * Math.sqrt(d.effort) + 20,
             };
         }).then(function (ds) {
             data = ds;
@@ -115,8 +116,8 @@
                 .style("stroke-width", 4);
 
             gs.append("text")
-                .attr("dx", -10)
-                .attr("dy", ".35em")
+                .attr("dominant-baseline", "middle")
+                .attr("text-anchor", "middle")
                 .text((d) => d.code);
 
             // Features of the forces applied to the nodes:
@@ -216,7 +217,7 @@
 
         function sizeByEffort() {
             for (d of data) {
-                d.radius = 8 * Math.sqrt(d.effort) + 10;
+                d.radius = 8 * Math.sqrt(d.effort) + 20;
             }
             updateRadius();
             simulation.alphaTarget(0.03).restart();
@@ -224,7 +225,7 @@
 
         function sizeByRisk() {
             for (d of data) {
-                d.radius = d.risk * 10 + 10;
+                d.radius = d.risk * 10 + 20;
             }
             updateRadius();
             simulation.alphaTarget(0.03).restart();
