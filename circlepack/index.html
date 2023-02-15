@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <form>
+    <form onchange="restyle()">
         Size:
         <select id="size" name="size">
             <option value="None">None</option>
@@ -137,26 +137,6 @@
             .attr("width", width)
             .attr("height", height);
 
-        // draw some circles
-        svg.append("circle")
-            .attr("cx", CENTER)
-            .attr("cy", CENTER)
-            .attr("r", CENTER)
-            .attr("fill", "black")
-            .attr("opacity", 0.1);
-        svg.append("circle")
-            .attr("cx", CENTER)
-            .attr("cy", CENTER)
-            .attr("r", (CENTER * 2) / 3)
-            .attr("fill", "red")
-            .attr("opacity", 0.1);
-        svg.append("circle")
-            .attr("cx", CENTER)
-            .attr("cy", CENTER)
-            .attr("r", CENTER / 3)
-            .attr("fill", "red")
-            .attr("opacity", 0.1);
-
         let domains = {
             category: category_to_index.keys(),
             effort: [
@@ -190,12 +170,6 @@
             completeness: [0.1, 1],
         };
 
-        // A color scale
-        var color = d3
-            .scaleOrdinal()
-            .domain(["Security", "Operations", "Maintainability"])
-            .range(["#F8766D", "#00BA38", "#619CFF"]);
-
         // Initialize the circle: all located at the center of the svg area
         var gs = svg.append("g");
 
@@ -225,32 +199,6 @@
                 .attr("dominant-baseline", "middle")
                 .attr("text-anchor", "middle")
                 .text((d) => d.code);
-
-            // Features of the forces applied to the nodes:
-            simulation
-                .force(
-                    "x",
-                    d3
-                        .forceX()
-                        .strength(0.5)
-                        .x((d) => d.x)
-                )
-                .force(
-                    "y",
-                    d3
-                        .forceY()
-                        .strength(0.5)
-                        .y((d) => d.y)
-                )
-                .force(
-                    "collide",
-                    d3
-                        .forceCollide()
-                        .strength(0.1)
-                        .radius((d) => d.radius * 1.2)
-                        .iterations(1)
-                )
-                .force("charge", d3.forceManyBody().strength(1)); // Nodes are attracted one each other of value is > 0
 
             // Apply these forces to the nodes and update their positions.
             // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
@@ -286,6 +234,39 @@
         }
 
         function dragended() {
+            simulation.alphaTarget(0.03).restart();
+        }
+
+        function getScale(param) {
+            return (d) =>
+                d3
+                    .scaleLinear()
+                    .domain(domains[getSelection(param)])
+                    .range(ranges[param])(d[getSelection(param)]);
+        }
+
+        function restyle() {
+            gs.select("circle")
+                .transition()
+                .duration(1000)
+                .attr("r", getScale("size"))
+                .style("fill", getScale("color"))
+                .style("fill-opacity", 0.8)
+                .attr("stroke", "black")
+                .style("stroke-width", getScale("strokewidth"));
+
+            simulation
+                .force("x", d3.forceX().strength(0.5).x(getScale("posx")))
+                .force("y", d3.forceY().strength(0.5).y(getScale("posy")))
+                .force(
+                    "collide",
+                    d3
+                        .forceCollide()
+                        .strength(0.1)
+                        .radius(getScale("size"))
+                        .iterations(1)
+                )
+                .force("charge", d3.forceManyBody().strength(1)); // Nodes are attracted one each other of value is > 0
             simulation.alphaTarget(0.03).restart();
         }
 
