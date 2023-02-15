@@ -4,7 +4,7 @@
 <head>
     <script src="http://d3js.org/d3.v7.js"></script>
     <style>
-        /* the three links at the bottom of the detail card need to occupy the whole width */ 
+        /* the three links at the bottom of the detail card need to occupy the whole width */
         .links {
             display: flex;
             flex-direction: row;
@@ -14,30 +14,80 @@
 </head>
 
 <body>
-    <div id="controls">
-        <form>
-            <group>
-                <input
-                    type="radio"
-                    id="r_effort"
-                    name="sizer"
-                    value="effort"
-                    checked
-                    onclick="sizeByEffort();"
-                />
-                Size by effort
-                <input
-                    type="radio"
-                    id="r_risk"
-                    name="sizer"
-                    value="risk"
-                    onclick="sizeByRisk();"
-                />
-                Size by risk
-            </group>
-        </form>
-    </div>
-
+    <form>
+        Size:
+        <select id="size" name="size">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort" selected="selected">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+        Position (x):
+        <select id="posx" name="posx">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity" selected="selected">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+        Position (y):
+        <select id="posy" name="posy">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk" selected="selected">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+        Colour (hue):
+        <select id="colour" name="colour">
+            <option value="None">None</option>
+            <option value="category" selected="selected">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+        Colour (saturation):
+        <select id="saturation" name="saturation">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit" selected="selected">
+                Cost/Benefit
+            </option>
+            <option value="maturity">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+        Stroke (width):
+        <select id="strokewidth" name="strokewidth">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity">Maturity</option>
+            <option value="updated" selected="selected">Updated</option>
+        </select>
+        Stroke (completeness):
+        <select id="completeness" name="completeness">
+            <option value="None">None</option>
+            <option value="category">Category</option>
+            <option value="effort">Effort</option>
+            <option value="risk">Risk</option>
+            <option value="costbenefit">Cost/Benefit</option>
+            <option value="maturity" selected="selected">Maturity</option>
+            <option value="updated">Updated</option>
+        </select>
+    </form>
     <!-- inline-block -->
     <div id="circlechart" style="display: inline-block; width: 50%"></div>
 
@@ -50,17 +100,28 @@
 
         var data = [];
 
+        // set the dimensions and margins of the graph
+        // include the dumb thing to make correct on mobiles
+        var width = (window.innerWidth / 2) * window.devicePixelRatio;
+        var height = window.innerHeight * window.devicePixelRatio;
+        var CENTER = Math.min(width, height) / 2;
+
         // d3 load data.csv
         d3.csv("data.csv", (d) => {
             console.log("loading", d);
+            let cat = category_to_index[d.category] || 0;
+            let angle = (cat * 2 * Math.PI) / 3;
+            let radius = ((CENTER / d.risk) * 3) / 4;
             return {
                 name: d.name,
                 code: d.code,
                 category: d.category,
-                categoryId: category_to_index[d.category] || 0,
+                categoryId: cat,
                 effort: +d.effort,
                 risk: +d.risk,
                 radius: 8 * Math.sqrt(d.effort) + 20,
+                x: CENTER + radius * Math.cos(angle),
+                y: CENTER + radius * Math.sin(angle),
             };
         }).then(function (ds) {
             data = ds;
@@ -69,11 +130,6 @@
 
         var simulation = d3.forceSimulation();
 
-
-        // set the dimensions and margins of the graph
-        var width = window.innerWidth / 2;
-        var height = window.innerHeight;
-
         // append the svg object to the body of the page
         var svg = d3
             .select("#circlechart")
@@ -81,11 +137,58 @@
             .attr("width", width)
             .attr("height", height);
 
-        // A scale that gives a X target position for each group
-        var x = d3
-            .scaleOrdinal()
-            .domain(["Security", "Operations", "Maintainability"])
-            .range([width / 4, width / 2, (3 * width) / 4]);
+        // draw some circles
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", CENTER)
+            .attr("fill", "black")
+            .attr("opacity", 0.1);
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", (CENTER * 2) / 3)
+            .attr("fill", "red")
+            .attr("opacity", 0.1);
+        svg.append("circle")
+            .attr("cx", CENTER)
+            .attr("cy", CENTER)
+            .attr("r", CENTER / 3)
+            .attr("fill", "red")
+            .attr("opacity", 0.1);
+
+        let domains = {
+            category: category_to_index.keys(),
+            effort: [
+                Math.min(...data.map((d) => d.effort)),
+                Math.max(...data.map((d) => d.effort)),
+            ],
+            risk: [
+                Math.min(...data.map((d) => d.risk)),
+                Math.max(...data.map((d) => d.risk)),
+            ],
+            costbenefit: [
+                Math.min(...data.map((d) => d.costbenefit)),
+                Math.max(...data.map((d) => d.costbenefit)),
+            ],
+            maturity: [
+                Math.min(...data.map((d) => d.maturity)),
+                Math.max(...data.map((d) => d.maturity)),
+            ],
+            updated: [
+                Math.min(...data.map((d) => d.updated)),
+                Math.max(...data.map((d) => d.updated)),
+            ],
+        };
+        let ranges = {
+            size: [10, 50],
+            posx: [0.1, width * 0.9],
+            posy: [0.1, height * 0.9],
+            color: ["#888", "#F88"],
+            saturation: [0.1, 1],
+            strokewidth: [1, 5],
+            completeness: [0.1, 1],
+        };
 
         // A color scale
         var color = d3
@@ -94,14 +197,10 @@
             .range(["#F8766D", "#00BA38", "#619CFF"]);
 
         // Initialize the circle: all located at the center of the svg area
-        var gs = svg
-            .append("g")
+        var gs = svg.append("g");
 
         function draw(data) {
-                gs = gs.selectAll("circle")
-                .data(data)
-                .enter()
-                .append("g");
+            gs = gs.selectAll("circle").data(data).enter().append("g");
 
             gs.attr("translate", `transform(${width / 2}, ${height / 2})`)
                 .on("click", clicked)
@@ -134,45 +233,30 @@
                     d3
                         .forceX()
                         .strength(0.5)
-                        .x((d) => x(d.category))
+                        .x((d) => d.x)
                 )
                 .force(
                     "y",
                     d3
                         .forceY()
-                        .strength(0.1)
-                        .y(height / 2)
+                        .strength(0.5)
+                        .y((d) => d.y)
                 )
                 .force(
-                    "center",
+                    "collide",
                     d3
-                        .forceCenter()
-                        .x(width / 2)
-                        .y(height / 2)
-                ) // Attraction to the center of the svg area
+                        .forceCollide()
+                        .strength(0.1)
+                        .radius((d) => d.radius * 1.2)
+                        .iterations(1)
+                )
                 .force("charge", d3.forceManyBody().strength(1)); // Nodes are attracted one each other of value is > 0
-
-            updateRadius();
 
             // Apply these forces to the nodes and update their positions.
             // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
             simulation.nodes(data).on("tick", (d) => {
                 gs.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
             });
-        }
-
-        function updateRadius() {
-            gs.select("circle").attr("r", (d) => d.radius);
-
-            // Force that avoids circle overlapping
-            simulation.force(
-                "collide",
-                d3
-                    .forceCollide()
-                    .strength(0.1)
-                    .radius((d) => d.radius * 1.2)
-                    .iterations(1)
-            );
         }
 
         function clicked(event, d) {
@@ -225,24 +309,9 @@
                 </div>
                 <p>Category: ${d.category}</p>
                 <p>Effort: ${d.effort}</p>
+                <p>Risk: ${d.risk}</p>
                 </div>
             `;
-        }
-
-        function sizeByEffort() {
-            for (d of data) {
-                d.radius = 8 * Math.sqrt(d.effort) + 20;
-            }
-            updateRadius();
-            simulation.alphaTarget(0.03).restart();
-        }
-
-        function sizeByRisk() {
-            for (d of data) {
-                d.radius = d.risk * 10 + 20;
-            }
-            updateRadius();
-            simulation.alphaTarget(0.03).restart();
         }
     </script>
 
