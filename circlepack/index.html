@@ -185,7 +185,7 @@
             size: d3.interpolate(20, 50),
             posx: d3.interpolate(0.2 * width, width * 0.7),
             posy: d3.interpolate(0.8 * height, height * 0.3),
-            colour: d3.interpolate("red", "green", "blue"),
+            colour: d3.interpolateSinebow,
             saturation: d3.interpolate(0.1, 1),
             strokewidth: d3.interpolate(1, 5),
             completeness: d3.interpolate(0.1, 1),
