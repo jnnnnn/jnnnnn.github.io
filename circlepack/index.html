@@ -22,7 +22,7 @@
 
     <div id="circlechart" style="width: 50%; position: relative">
         <div style="position: absolute; top: 0; left: 0">
-            <form onchange="restyle()">
+            <form onchange="restyle()" onsubmit="return false;">
                 Size:
                 <select id="size" name="size">
                     <option value="none">None</option>
@@ -101,6 +101,7 @@
                     </option>
                     <option value="updated">Updated</option></select
                 ><br />
+                <button onclick="randomize();">Randomize</button>
             </form>
         </div>
     </div>
@@ -322,6 +323,24 @@
                     </div>
                 </div>
             `;
+        }
+
+        function randomize() {
+            const params = [
+                "size",
+                "posx",
+                "posy",
+                "colour",
+                "saturation",
+                "strokewidth",
+                "completeness",
+            ];
+            params.forEach((param) => {
+                const options = document.getElementById(param).options;
+                const index = Math.floor(Math.random() * options.length);
+                document.getElementById(param).selectedIndex = index;
+            });
+            restyle();
         }
     </script>
 </body>
