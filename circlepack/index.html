@@ -20,82 +20,90 @@
         <div id="hint" style="margin: 1em">(Hover over a node for a hint)</div>
     </div>
 
-    <form onchange="restyle()">
-        Size:
-        <select id="size" name="size">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort" selected="selected">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-        Position (x):
-        <select id="posx" name="posx">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity" selected="selected">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-        Position (y):
-        <select id="posy" name="posy">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk" selected="selected">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-        Colour (hue):
-        <select id="colour" name="colour">
-            <option value="none">None</option>
-            <option value="categoryId" selected="selected">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-        Colour (saturation):
-        <select id="saturation" name="saturation">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit" selected="selected">
-                Cost/Benefit
-            </option>
-            <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-        Stroke (width):
-        <select id="strokewidth" name="strokewidth">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity">Maturity</option>
-            <option value="updated" selected="selected">Updated</option></select
-        ><br />
-        Stroke (completeness):
-        <select id="completeness" name="completeness">
-            <option value="none">None</option>
-            <option value="categoryId">Category</option>
-            <option value="effort">Effort</option>
-            <option value="risk">Risk</option>
-            <option value="costbenefit">Cost/Benefit</option>
-            <option value="maturity" selected="selected">Maturity</option>
-            <option value="updated">Updated</option></select
-        ><br />
-    </form>
-    <!-- inline-block -->
-    <div id="circlechart" style="display: inline-block; width: 50%"></div>
+    <div id="circlechart" style="width: 50%; position: relative">
+        <div style="position: absolute; top: 0; left: 0">
+            <form onchange="restyle()">
+                Size:
+                <select id="size" name="size">
+                    <option value="none">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit" selected="selected">
+                        Cost/Benefit
+                    </option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated">Updated</option></select
+                ><br />
+                Position (x):
+                <select id="posx" name="posx">
+                    <option value="none">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort" selected="selected">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated">Updated</option></select
+                ><br />
+                Position (y):
+                <select id="posy" name="posy">
+                    <option value="none">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort">Effort</option>
+                    <option value="risk" selected="selected">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated">Updated</option></select
+                ><br />
+                Colour (hue):
+                <select id="colour" name="colour">
+                    <option value="none">None</option>
+                    <option value="categoryId" selected="selected">
+                        Category
+                    </option>
+                    <option value="effort">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated">Updated</option></select
+                ><br />
+                Colour (saturation):
+                <select id="saturation" name="saturation">
+                    <option value="none" selected="selected">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated">Updated</option></select
+                ><br />
+                Stroke (width):
+                <select id="strokewidth" name="strokewidth">
+                    <option value="none" selected="selected">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity">Maturity</option>
+                    <option value="updated" selected="selected">
+                        Updated
+                    </option></select
+                ><br />
+                Stroke (completeness):
+                <select id="completeness" name="completeness">
+                    <option value="none">None</option>
+                    <option value="categoryId">Category</option>
+                    <option value="effort">Effort</option>
+                    <option value="risk">Risk</option>
+                    <option value="costbenefit">Cost/Benefit</option>
+                    <option value="maturity" selected="selected">
+                        Maturity
+                    </option>
+                    <option value="updated">Updated</option></select
+                ><br />
+            </form>
+        </div>
+    </div>
 
     <script>
         const category_to_index = {
@@ -175,8 +183,8 @@
         }
         let ranges = {
             size: d3.interpolate(20, 50),
-            posx: d3.interpolate(0.2 * width, width * 0.7),
-            posy: d3.interpolate(0.7 * height, height * 0.2),
+            posx: d3.interpolate(0.7 * width, width * 0.2),
+            posy: d3.interpolate(0.3 * height, height * 0.8),
             colour: d3.interpolate("red", "green", "blue"),
             saturation: d3.interpolate(0.1, 1),
             strokewidth: d3.interpolate(1, 5),
@@ -283,7 +291,7 @@
                     "collide",
                     d3
                         .forceCollide()
-                        .strength(0.1)
+                        .strength(0.5)
                         .radius((d) => 10 + getScale("size")(d))
                         .iterations(1)
                 )
