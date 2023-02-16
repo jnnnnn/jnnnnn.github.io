@@ -10,6 +10,10 @@
             flex-direction: row;
             justify-content: space-around;
         }
+        form {
+            display: grid;
+            grid-template-columns: auto auto;
+        }
     </style>
 </head>
 
@@ -33,74 +37,20 @@
                         Cost/Benefit
                     </option>
                     <option value="maturity">Maturity</option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                    <option value="updated">Updated</option>
+                </select>
                 Position (x):
-                <select id="posx" name="posx">
-                    <option value="none">None</option>
-                    <option value="categoryId">Category</option>
-                    <option value="effort" selected="selected">Effort</option>
-                    <option value="risk">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity">Maturity</option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                <select id="posx" name="posx"></select>
                 Position (y):
-                <select id="posy" name="posy">
-                    <option value="none">None</option>
-                    <option value="categoryId">Category</option>
-                    <option value="effort">Effort</option>
-                    <option value="risk" selected="selected">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity">Maturity</option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                <select id="posy" name="posy"></select>
                 Colour (hue):
-                <select id="colour" name="colour">
-                    <option value="none">None</option>
-                    <option value="categoryId" selected="selected">
-                        Category
-                    </option>
-                    <option value="effort">Effort</option>
-                    <option value="risk">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity">Maturity</option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                <select id="colour" name="colour"></select>
                 Colour (saturation):
-                <select id="saturation" name="saturation">
-                    <option value="none" selected="selected">None</option>
-                    <option value="categoryId">Category</option>
-                    <option value="effort">Effort</option>
-                    <option value="risk">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity">Maturity</option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                <select id="saturation" name="saturation"></select>
                 Stroke (width):
-                <select id="strokewidth" name="strokewidth">
-                    <option value="none" selected="selected">None</option>
-                    <option value="categoryId">Category</option>
-                    <option value="effort">Effort</option>
-                    <option value="risk">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity">Maturity</option>
-                    <option value="updated" selected="selected">
-                        Updated
-                    </option></select
-                ><br />
-                Stroke (completeness):
-                <select id="completeness" name="completeness">
-                    <option value="none">None</option>
-                    <option value="categoryId">Category</option>
-                    <option value="effort">Effort</option>
-                    <option value="risk">Risk</option>
-                    <option value="costbenefit">Cost/Benefit</option>
-                    <option value="maturity" selected="selected">
-                        Maturity
-                    </option>
-                    <option value="updated">Updated</option></select
-                ><br />
+                <select id="strokewidth" name="strokewidth"></select>
+                Stroke (length):
+                <select id="strokelength" name="strokelength"></select>
                 <button onclick="randomize();">Randomize</button>
             </form>
         </div>
@@ -151,35 +101,25 @@
         }).then(function (ds) {
             data = ds;
             compute_domains();
+            prepare_options();
             draw(ds);
             restyle();
         });
 
         var domains = {};
         function compute_domains() {
+            let minmax = (field) => [
+                Math.min(...data.map((d) => d[field])),
+                Math.max(...data.map((d) => d[field])),
+            ];
             domains = {
                 none: [0, 1],
                 categoryId: [0, 3],
-                effort: [
-                    Math.min(...data.map((d) => d.effort)),
-                    Math.max(...data.map((d) => d.effort)),
-                ],
-                risk: [
-                    Math.min(...data.map((d) => d.risk)),
-                    Math.max(...data.map((d) => d.risk)),
-                ],
-                costbenefit: [
-                    Math.min(...data.map((d) => d.costbenefit)),
-                    Math.max(...data.map((d) => d.costbenefit)),
-                ],
-                maturity: [
-                    Math.min(...data.map((d) => d.maturity)),
-                    Math.max(...data.map((d) => d.maturity)),
-                ],
-                updated: [
-                    Math.min(...data.map((d) => d.updated)),
-                    Math.max(...data.map((d) => d.updated)),
-                ],
+                effort: minmax("effort"),
+                risk: minmax("risk"),
+                updated: minmax("updated"),
+                maturity: minmax("maturity"),
+                costbenefit: minmax("costbenefit"),
             };
         }
         let ranges = {
@@ -189,8 +129,21 @@
             colour: d3.interpolateSinebow,
             saturation: d3.interpolate(0.1, 1),
             strokewidth: d3.interpolate(1, 5),
-            completeness: d3.interpolate(0.1, 1),
+            strokelength: d3.interpolate(0.1, 1),
         };
+
+        // copy the options from the first select to the others
+        function prepare_options() {
+            let selects = document.querySelectorAll("select");
+            let first = selects[0];
+            for (let i = 1; i < selects.length; i++) {
+                let select = selects[i];
+                for (let j = 0; j < first.options.length; j++) {
+                    let option = first.options[j];
+                    select.options[j] = new Option(option.text, option.value);
+                }
+            }
+        }
 
         function draw(data) {
             gs = gs.selectAll("circle").data(data).enter().append("g");
@@ -263,15 +216,15 @@
         }
 
         function restyle() {
-            // completeness: scale from 0 to pi*size^2 based on the selected completeness param
+            // strokelength: scale from 0 to pi*size^2 based on the selected strokelength param
             const dashscale = (d) => {
                 const size = getScale("size")(d);
-                const domain = domains[getSelection("completeness")];
+                const domain = domains[getSelection("strokelength")];
                 const range = d3.interpolate(0, 2 * Math.PI * size);
                 const dashlen = d3
                     .scaleSequential()
                     .domain(domain)
-                    .interpolator(range)(d[getSelection("completeness")]);
+                    .interpolator(range)(d[getSelection("strokelength")]);
                 return `${dashlen}, 10000`;
             };
 
@@ -326,15 +279,7 @@
         }
 
         function randomize() {
-            const params = [
-                "size",
-                "posx",
-                "posy",
-                "colour",
-                "saturation",
-                "strokewidth",
-                "completeness",
-            ];
+            const params = Object.keys(ranges);
             params.forEach((param) => {
                 const options = document.getElementById(param).options;
                 const index = Math.floor(Math.random() * options.length);
