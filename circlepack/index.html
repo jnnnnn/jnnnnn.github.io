@@ -14,79 +14,85 @@
 </head>
 
 <body>
+    <!-- the detail div occupies the right-hand half of the page -->
+    <div style="float: right; width: 50%">
+        <div id="detail">(Click a node for detail)</div>
+        <div id="hint" style="margin: 1em">(Hover over a node for a hint)</div>
+    </div>
+
     <form onchange="restyle()">
         Size:
         <select id="size" name="size">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort" selected="selected">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
         Position (x):
         <select id="posx" name="posx">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity" selected="selected">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
         Position (y):
         <select id="posy" name="posy">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort">Effort</option>
             <option value="risk" selected="selected">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
         Colour (hue):
         <select id="colour" name="colour">
-            <option value="None">None</option>
-            <option value="category" selected="selected">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId" selected="selected">Category</option>
             <option value="effort">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
         Colour (saturation):
         <select id="saturation" name="saturation">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit" selected="selected">
                 Cost/Benefit
             </option>
             <option value="maturity">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
         Stroke (width):
         <select id="strokewidth" name="strokewidth">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity">Maturity</option>
-            <option value="updated" selected="selected">Updated</option>
-        </select>
+            <option value="updated" selected="selected">Updated</option></select
+        ><br />
         Stroke (completeness):
         <select id="completeness" name="completeness">
-            <option value="None">None</option>
-            <option value="category">Category</option>
+            <option value="none">None</option>
+            <option value="categoryId">Category</option>
             <option value="effort">Effort</option>
             <option value="risk">Risk</option>
             <option value="costbenefit">Cost/Benefit</option>
             <option value="maturity" selected="selected">Maturity</option>
-            <option value="updated">Updated</option>
-        </select>
+            <option value="updated">Updated</option></select
+        ><br />
     </form>
     <!-- inline-block -->
     <div id="circlechart" style="display: inline-block; width: 50%"></div>
@@ -104,29 +110,6 @@
         // include the dumb thing to make correct on mobiles
         var width = (window.innerWidth / 2) * window.devicePixelRatio;
         var height = window.innerHeight * window.devicePixelRatio;
-        var CENTER = Math.min(width, height) / 2;
-
-        // d3 load data.csv
-        d3.csv("data.csv", (d) => {
-            console.log("loading", d);
-            let cat = category_to_index[d.category] || 0;
-            let angle = (cat * 2 * Math.PI) / 3;
-            let radius = ((CENTER / d.risk) * 3) / 4;
-            return {
-                name: d.name,
-                code: d.code,
-                category: d.category,
-                categoryId: cat,
-                effort: +d.effort,
-                risk: +d.risk,
-                radius: 8 * Math.sqrt(d.effort) + 20,
-                x: CENTER + radius * Math.cos(angle),
-                y: CENTER + radius * Math.sin(angle),
-            };
-        }).then(function (ds) {
-            data = ds;
-            draw(ds);
-        });
 
         var simulation = d3.forceSimulation();
 
@@ -137,41 +120,68 @@
             .attr("width", width)
             .attr("height", height);
 
-        let domains = {
-            category: category_to_index.keys(),
-            effort: [
-                Math.min(...data.map((d) => d.effort)),
-                Math.max(...data.map((d) => d.effort)),
-            ],
-            risk: [
-                Math.min(...data.map((d) => d.risk)),
-                Math.max(...data.map((d) => d.risk)),
-            ],
-            costbenefit: [
-                Math.min(...data.map((d) => d.costbenefit)),
-                Math.max(...data.map((d) => d.costbenefit)),
-            ],
-            maturity: [
-                Math.min(...data.map((d) => d.maturity)),
-                Math.max(...data.map((d) => d.maturity)),
-            ],
-            updated: [
-                Math.min(...data.map((d) => d.updated)),
-                Math.max(...data.map((d) => d.updated)),
-            ],
-        };
-        let ranges = {
-            size: [10, 50],
-            posx: [0.1, width * 0.9],
-            posy: [0.1, height * 0.9],
-            color: ["#888", "#F88"],
-            saturation: [0.1, 1],
-            strokewidth: [1, 5],
-            completeness: [0.1, 1],
-        };
-
         // Initialize the circle: all located at the center of the svg area
         var gs = svg.append("g");
+
+        // d3 load data.csv
+        d3.csv("data.csv", (d) => {
+            let cat = category_to_index[d.category] || 0;
+            let angle = (cat * 2 * Math.PI) / 3;
+            return {
+                name: d.name,
+                code: d.code,
+                category: d.category,
+                categoryId: cat,
+                effort: +d.effort,
+                risk: +d.risk,
+                updated: Date.parse(d.updated),
+                maturity: +d.maturity,
+                costbenefit: +d.risk / +d.effort,
+                none: 0.5,
+            };
+        }).then(function (ds) {
+            data = ds;
+            compute_domains();
+            draw(ds);
+            restyle();
+        });
+
+        var domains = {};
+        function compute_domains() {
+            domains = {
+                none: [0, 1],
+                categoryId: [0, 3],
+                effort: [
+                    Math.min(...data.map((d) => d.effort)),
+                    Math.max(...data.map((d) => d.effort)),
+                ],
+                risk: [
+                    Math.min(...data.map((d) => d.risk)),
+                    Math.max(...data.map((d) => d.risk)),
+                ],
+                costbenefit: [
+                    Math.min(...data.map((d) => d.costbenefit)),
+                    Math.max(...data.map((d) => d.costbenefit)),
+                ],
+                maturity: [
+                    Math.min(...data.map((d) => d.maturity)),
+                    Math.max(...data.map((d) => d.maturity)),
+                ],
+                updated: [
+                    Math.min(...data.map((d) => d.updated)),
+                    Math.max(...data.map((d) => d.updated)),
+                ],
+            };
+        }
+        let ranges = {
+            size: d3.interpolate(20, 50),
+            posx: d3.interpolate(0.2 * width, width * 0.7),
+            posy: d3.interpolate(0.7 * height, height * 0.2),
+            colour: d3.interpolate("red", "green", "blue"),
+            saturation: d3.interpolate(0.1, 1),
+            strokewidth: d3.interpolate(1, 5),
+            completeness: d3.interpolate(0.1, 1),
+        };
 
         function draw(data) {
             gs = gs.selectAll("circle").data(data).enter().append("g");
@@ -184,16 +194,13 @@
                         .on("start", dragstarted)
                         .on("drag", dragged)
                         .on("end", dragended)
-                );
+                )
+                .on("mouseover", function (event, d) {
+                    const text = JSON.stringify(d, null, 2);
+                    d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
+                });
 
-            gs.append("circle")
-                .attr("r", (d) => d.radius)
-                .attr("cx", 0)
-                .attr("cy", 0)
-                .style("fill", (d) => color(d.category))
-                .style("fill-opacity", 0.8)
-                .attr("stroke", "black")
-                .style("stroke-width", 4);
+            gs.append("circle");
 
             gs.append("text")
                 .attr("dominant-baseline", "middle")
@@ -210,20 +217,15 @@
         function clicked(event, d) {
             if (event.defaultPrevented) return; // dragged
 
-            d3.select(this)
-                .select("circle")
-                .transition()
-                .attr("fill", "black")
-                .attr("r", (d) => d.radius * 2)
-                .transition()
-                .attr("r", (d) => d.radius)
-                .attr("fill", d3.schemeCategory10[d.categoryId]);
+            restyle();
+
+            d3.select(this).select("circle").transition().attr("r", 60);
 
             updateInfoCard(d);
         }
 
         function dragstarted() {
-            simulation.alphaTarget(0.03).restart();
+            simulation.alpha(0.1).restart();
         }
 
         function dragged(event, d) {
@@ -234,26 +236,45 @@
         }
 
         function dragended() {
-            simulation.alphaTarget(0.03).restart();
+            simulation.alpha(0.1).restart();
         }
 
         function getScale(param) {
-            return (d) =>
-                d3
-                    .scaleLinear()
-                    .domain(domains[getSelection(param)])
-                    .range(ranges[param])(d[getSelection(param)]);
+            const domain = domains[getSelection(param)]; // keys in d: effort, risk, etc
+            const range = ranges[param]; // selection possibilites: size, posx, etc
+            const scale = d3
+                .scaleSequential()
+                .domain(domain)
+                .interpolator(range);
+            return (d) => scale(d[getSelection(param)]);
+        }
+
+        function getSelection(param) {
+            return d3.select(`#${param}`).property("value");
         }
 
         function restyle() {
+            // completeness: scale from 0 to pi*size^2 based on the selected completeness param
+            const dashscale = (d) => {
+                const size = getScale("size")(d);
+                const domain = domains[getSelection("completeness")];
+                const range = d3.interpolate(0, 2 * Math.PI * size);
+                const dashlen = d3
+                    .scaleSequential()
+                    .domain(domain)
+                    .interpolator(range)(d[getSelection("completeness")]);
+                return `${dashlen}, 10000`;
+            };
+
             gs.select("circle")
                 .transition()
                 .duration(1000)
                 .attr("r", getScale("size"))
-                .style("fill", getScale("color"))
-                .style("fill-opacity", 0.8)
+                .style("fill", getScale("colour"))
+                .style("fill-opacity", getScale("saturation"))
                 .attr("stroke", "black")
-                .style("stroke-width", getScale("strokewidth"));
+                .attr("stroke-width", getScale("strokewidth"))
+                .attr("stroke-dasharray", dashscale);
 
             simulation
                 .force("x", d3.forceX().strength(0.5).x(getScale("posx")))
@@ -263,41 +284,36 @@
                     d3
                         .forceCollide()
                         .strength(0.1)
-                        .radius(getScale("size"))
+                        .radius((d) => 10 + getScale("size")(d))
                         .iterations(1)
                 )
-                .force("charge", d3.forceManyBody().strength(1)); // Nodes are attracted one each other of value is > 0
-            simulation.alphaTarget(0.03).restart();
+                //.force("charge", d3.forceManyBody().strength(1))
+                .alphaTarget(0)
+                .alphaDecay(0.02);
+
+            simulation.alpha(0.3).restart();
         }
 
         function updateInfoCard(d) {
             document.getElementById("detail").innerHTML = `
                 <div class="card">
-                <h1>${d.name}</h1>
-                <h2>What is the purpose?</h2>
-                <p class="note">What is this and why is it important?</p>
-                <h2>Does this apply to us?</h2>
-                <p class="note">How can a team determine that this tools is important/required for their product?  At what point(s) in the product's lifecycle should it be used and how often?  examples: in all CI/CD pipelines, for all cloud software, if your software is hosted on VMs, if you are using docker containers, before delivering new software to customer facing environments, when making significant software changes
-                </p>
-                <h2>What's the risk if we don't use it?</h2>
-                <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
-                <h2>How long will it take us?</h2>
-                <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
-                <div class="links">
-                    <a href="">User Guide</a>
-                    <a href="">Get Help</a>
-                    <a href="">Provide Feedback</a>
-                </div>
-                <p>Category: ${d.category}</p>
-                <p>Effort: ${d.effort}</p>
-                <p>Risk: ${d.risk}</p>
+                    <h1>${d.name}</h1>
+                    <h2>What is the purpose?</h2>
+                    <p class="note">What is this and why is it important?</p>
+                    <h2>Does this apply to us?</h2>
+                    <p class="note">How can a team determine that this tools is important/required for their product?  At what point(s) in the product's lifecycle should it be used and how often?  examples: in all CI/CD pipelines, for all cloud software, if your software is hosted on VMs, if you are using docker containers, before delivering new software to customer facing environments, when making significant software changes
+                    </p>
+                    <h2>What's the risk if we don't use it?</h2>
+                    <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
+                    <h2>How long will it take us?</h2>
+                    <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
+                    <div class="links">
+                        <a href="">User Guide</a>
+                        <a href="">Get Help</a>
+                        <a href="">Provide Feedback</a>
+                    </div>
                 </div>
             `;
         }
     </script>
-
-    <!-- the detail div occupies the right-hand half of the page -->
-    <div style="float: right; width: 50%" id="detail">
-        (Click a node for detail)
-    </div>
 </body>
