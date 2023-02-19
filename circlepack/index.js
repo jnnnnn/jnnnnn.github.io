@@ -265,3 +265,6 @@ function randomize() {
     });
     restyle();
 }
+
+d3.select("form").onchange = restyle;
+d3.select("#randomize").on("click", randomize);
