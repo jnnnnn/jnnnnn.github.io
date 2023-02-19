@@ -24,20 +24,25 @@
         <div id="hint" style="margin: 1em">(Hover over a node for a hint)</div>
     </div>
 
-    <div id="circlechart" style="width: 50%; position: relative">
+    <div id="polygonchart" style="width: 50%; position: relative">
         <div style="position: absolute; top: 0; left: 0">
             <form onchange="restyle()" onsubmit="return false;">
                 Size:
                 <select id="size" name="size">
                     <option value="none">None</option>
-                    <option value="categoryId">Category</option>
+                    <option value="category">Category</option>
+                    <option value="riskcategory">Risk Category</option>
                     <option value="effort">Effort</option>
+                    <option value="upskilleffort">Upskilling Effort</option>
+                    <option value="setupeffort">Setup Effort</option>
                     <option value="risk">Risk</option>
                     <option value="costbenefit" selected="selected">
                         Cost/Benefit
                     </option>
                     <option value="maturity">Maturity</option>
                     <option value="updated">Updated</option>
+                    <option value="created">Created</option>
+                    <option value="when">When</option>
                 </select>
                 Position (x):
                 <select id="posx" name="posx"></select>
@@ -51,16 +56,27 @@
                 <select id="strokewidth" name="strokewidth"></select>
                 Stroke (length):
                 <select id="strokelength" name="strokelength"></select>
+                Sides:
+                <select id="sides" name="sides"></select>
                 <button onclick="randomize();">Randomize</button>
             </form>
         </div>
     </div>
 
     <script>
-        const category_to_index = {
-            Security: 1,
-            Operations: 2,
-            Maintainability: 3,
+        const domains_config = {
+            category: { s: "ordinal" },
+            maturity: { s: "ordinal" },
+            riskcategory: { s: "ordinal" },
+            when: { s: "ordinal" },
+            none: { s: "linear" },
+            costbenefit: { s: "linear" },
+            effort: { s: "linear" },
+            upskilleffort: { s: "linear" },
+            setupeffort: { s: "linear" },
+            risk: { s: "linear" },
+            created: { s: "time" },
+            updated: { s: "time" },
         };
 
         var data = [];
@@ -74,28 +90,25 @@
 
         // append the svg object to the body of the page
         var svg = d3
-            .select("#circlechart")
+            .select("#polygonchart")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
 
-        // Initialize the circle: all located at the center of the svg area
+        // Initialize the polygon: all located at the center of the svg area
         var gs = svg.append("g");
 
         // d3 load data.csv
         d3.csv("data.csv", (d) => {
-            let cat = category_to_index[d.category] || 0;
-            let angle = (cat * 2 * Math.PI) / 3;
             return {
-                name: d.name,
-                code: d.code,
-                category: d.category,
-                categoryId: cat,
+                ...d,
                 effort: +d.effort,
+                upskilleffort: +d.upskilleffort,
+                setupeffort: +d.setupeffort,
                 risk: +d.risk,
-                updated: Date.parse(d.updated),
-                maturity: +d.maturity,
                 costbenefit: +d.risk / +d.effort,
+                created: Date.parse(d.created),
+                updated: Date.parse(d.updated),
                 none: 0.5,
             };
         }).then(function (ds) {
@@ -112,14 +125,21 @@
                 Math.min(...data.map((d) => d[field])),
                 Math.max(...data.map((d) => d[field])),
             ];
+            let sortedcategory = (field) =>
+                [...new Set(data.map((d) => d[field]))].sort();
             domains = {
                 none: [0, 1],
-                categoryId: [0, 3],
                 effort: minmax("effort"),
+                upskilleffort: minmax("upskilleffort"),
+                setupeffort: minmax("setupeffort"),
                 risk: minmax("risk"),
                 updated: minmax("updated"),
-                maturity: minmax("maturity"),
+                created: minmax("created"),
                 costbenefit: minmax("costbenefit"),
+                category: sortedcategory("category"),
+                maturity: sortedcategory("maturity"),
+                riskcategory: sortedcategory("riskcategory"),
+                when: sortedcategory("when"),
             };
         }
         let ranges = {
@@ -130,6 +150,7 @@
             saturation: d3.interpolate(0.1, 1),
             strokewidth: d3.interpolate(1, 5),
             strokelength: d3.interpolate(0.1, 1),
+            sides: d3.interpolate(3, 10),
         };
 
         // copy the options from the first select to the others
@@ -145,8 +166,16 @@
             }
         }
 
+        function polygon_points(radius, sides) {
+            const N = Math.ceil(sides);
+            return d3.range(N).map((i) => {
+                let angle = (i / N) * 2 * Math.PI + 3 * Math.PI / 2;
+                return [radius * Math.cos(angle), radius * Math.sin(angle)];
+            });
+        }
+
         function draw(data) {
-            gs = gs.selectAll("circle").data(data).enter().append("g");
+            gs = gs.selectAll("polygon").data(data).enter().append("g");
 
             gs.attr("translate", `transform(${width / 2}, ${height / 2})`)
                 .on("click", clicked)
@@ -162,7 +191,7 @@
                     d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
                 });
 
-            gs.append("circle");
+            gs.append("polygon");
 
             gs.append("text")
                 .attr("dominant-baseline", "middle")
@@ -180,8 +209,6 @@
             if (event.defaultPrevented) return; // dragged
 
             restyle();
-
-            d3.select(this).select("circle").transition().attr("r", 60);
 
             updateInfoCard(d);
         }
@@ -201,18 +228,29 @@
             simulation.alpha(0.1).restart();
         }
 
-        function getScale(param) {
-            const domain = domains[getSelection(param)]; // keys in d: effort, risk, etc
-            const range = ranges[param]; // selection possibilites: size, posx, etc
-            const scale = d3
-                .scaleSequential()
-                .domain(domain)
-                .interpolator(range);
-            return (d) => scale(d[getSelection(param)]);
+        function getScale(range) {
+            const selectedDomain = getSelection(range);
+            const domain_values = domains[selectedDomain]; // keys in d: effort, risk, etc
+            console.assert(domain_values, `domain ${selectedDomain} not found`);
+            const range_values = ranges[range]; // selection possibilites: size, posx, etc
+            if (domains_config[selectedDomain].s == "ordinal") {
+                const scale = d3
+                    .scaleOrdinal()
+                    .domain(domain_values)
+                    .range([range_values(0), range_values(1)]);
+                return (d) => scale(d[selectedDomain]);
+            } else {
+                const scale = d3
+                    .scaleSequential()
+                    .domain(domain_values)
+                    .interpolator(range_values);
+                return (d) => scale(d[selectedDomain]);
+            }
         }
 
-        function getSelection(param) {
-            return d3.select(`#${param}`).property("value");
+        // find the currently selected domain for a given range
+        function getSelection(range) {
+            return d3.select(`#${range}`).property("value");
         }
 
         function restyle() {
@@ -228,10 +266,15 @@
                 return `${dashlen}, 10000`;
             };
 
-            gs.select("circle")
+            gs.select("polygon")
+                .attr("points", (d) => {
+                    const sides = getScale("sides")(d);
+                    const radius = getScale("size")(d);
+                    const str = polygon_points(radius, sides).join(" ");
+                    return str;
+                })
                 .transition()
                 .duration(1000)
-                .attr("r", getScale("size"))
                 .style("fill", getScale("colour"))
                 .style("fill-opacity", getScale("saturation"))
                 .attr("stroke", "black")
