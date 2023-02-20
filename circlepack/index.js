@@ -189,12 +189,21 @@ function getSelection(range) {
     return d3.select(`#${range}`).property("value");
 }
 
+function distance(point0, point1) {
+    const dx = point0[0] - point1[0];
+    const dy = point0[1] - point1[1];
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 function restyle() {
     // strokelength: scale from 0 to pi*size^2 based on the selected strokelength param
     const dashscale = (d) => {
         const size = getScale("size")(d);
+        const sides = getScale("sides")(d);
+        const points = polygon_points(size, sides);
+        const circumference = sides * distance(points[0], points[1]);
         const domain = domains[getSelection("strokelength")];
-        const range = d3.interpolate(0, 2 * Math.PI * size);
+        const range = d3.interpolate(0, circumference);
         const dashlen = d3.scaleSequential().domain(domain).interpolator(range)(
             d[getSelection("strokelength")]
         );
@@ -266,5 +275,5 @@ function randomize() {
     restyle();
 }
 
-d3.select("form").onchange = restyle;
-d3.select("#randomize").on("click", randomize);
+d3.select("form").node().onchange = () => restyle();
+d3.select("#randomize").on("click", () => randomize());
