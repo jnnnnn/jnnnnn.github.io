@@ -11,7 +11,9 @@
         }
         form {
             display: grid;
-            grid-template-columns: auto auto;
+            grid-template-columns: auto auto auto auto auto auto;
+            justify-items: end;
+            grid-gap: 0.2em;
         }
     </style>
     <script type="module" src="index.js"></script>
@@ -47,18 +49,18 @@
                     <option value="when">When</option>
                     <option value="teamsize">Team Size</option>
                 </select>
-                Position (x):
-                <select id="posx" name="posx"></select>
-                Position (y):
-                <select id="posy" name="posy"></select>
                 Colour (hue):
                 <select id="colour" name="colour"></select>
-                Colour (saturation):
-                <select id="saturation" name="saturation"></select>
                 Stroke (width):
                 <select id="strokewidth" name="strokewidth"></select>
+                Position (x):
+                <select id="posx" name="posx"></select>
+                Colour (saturation):
+                <select id="saturation" name="saturation"></select>
                 Stroke (length):
                 <select id="strokelength" name="strokelength"></select>
+                Position (y):
+                <select id="posy" name="posy"></select>
                 Sides:
                 <select id="sides" name="sides"></select>
                 <button id="randomize">Randomize</button>
