@@ -1,4 +1,5 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
+import { axisBottom, axisLeft } from "https://cdn.skypack.dev/d3-axis@3";
 
 const domains_config = {
     category: { s: "ordinal" },
@@ -33,6 +34,10 @@ var svg = d3
 
 // Initialize the polygon: all located at the center of the svg area
 var gs = svg.append("g");
+
+svg.append("g").attr("id", "y-axis");
+
+svg.append("g").attr("id", "x-axis");
 
 // d3 load data.csv
 d3.csv("data.csv", (d) => {
@@ -83,7 +88,7 @@ let ranges = {
     posx: d3.interpolate(0.2 * width, width * 0.7),
     posy: d3.interpolate(0.8 * height, height * 0.3),
     // red at both ends doesn't make sense, skip the end
-    colour: (i) => d3.interpolateSinebow(i * 0.7), 
+    colour: (i) => d3.interpolateSinebow(i * 0.7),
     saturation: d3.interpolate(0.1, 1),
     strokewidth: d3.interpolate(1, 5),
     strokelength: d3.interpolate(0.1, 1),
@@ -166,7 +171,7 @@ function dragended() {
     simulation.alpha(0.1).restart();
 }
 
-function getScale(range_key, optional_domain_key) {
+function getRawScale(range_key, optional_domain_key) {
     const domain_key = optional_domain_key || getDomainKey(range_key);
     const domain_values = domains[domain_key]; // keys in d: effort, risk, etc
     console.assert(domain_values, `domain ${domain_key} not found`);
@@ -177,15 +182,20 @@ function getScale(range_key, optional_domain_key) {
         const scale = d3
             .scaleOrdinal()
             .domain(domain_values)
-            .range(d3.range(N).map((n) => interpolator(n / (N-1))));
-        return (d) => scale(d[domain_key]);
+            .range(d3.range(N).map((n) => interpolator(n / (N - 1))));
+        return scale;
     } else {
         const scale = d3
             .scaleSequential()
             .domain(domain_values)
             .interpolator(interpolator);
-        return (d) => scale(d[domain_key]);
+        return scale;
     }
+}
+
+function getScale(range_key, optional_domain_key) {
+    const domain_key = optional_domain_key || getDomainKey(range_key);
+    return (d) => getRawScale(range_key, domain_key)(d[domain_key]);
 }
 
 // find the key of the currently selected domain for a given range
@@ -224,6 +234,17 @@ function restyle() {
         .attr("stroke", "black")
         .attr("stroke-width", getScale("strokewidth"))
         .attr("stroke-dasharray", dashscale());
+
+    // render axes
+    d3.select("#x-axis")
+        .attr("transform", `translate(0, ${height - 40})`)
+        .transition()
+        .call(d3.axisTop(getRawScale("posx")));
+
+    d3.select("#y-axis")
+        .attr("transform", `translate(${40}, 0)`)
+        .transition()
+        .call(d3.axisRight(getRawScale("posy")));
 
     simulation
         .force("x", d3.forceX().strength(0.5).x(getScale("posx")))
