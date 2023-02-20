@@ -82,11 +82,13 @@ let ranges = {
     size: d3.interpolate(20, 50),
     posx: d3.interpolate(0.2 * width, width * 0.7),
     posy: d3.interpolate(0.8 * height, height * 0.3),
-    colour: i => d3.interpolateSinebow(i * 0.7), // red at both ends doesn't make sense, skip the end
+    // red at both ends doesn't make sense, skip the end
+    colour: (i) => d3.interpolateSinebow(i * 0.7), 
     saturation: d3.interpolate(0.1, 1),
     strokewidth: d3.interpolate(1, 5),
     strokelength: d3.interpolate(0.1, 1),
-    sides: d3.interpolate(3, 10),
+    sides: (f) => Math.round(d3.interpolate(3, 10)(f)),
+    identity: (i) => i,
 };
 
 // copy the options from the first select to the others
@@ -105,7 +107,7 @@ function prepare_options() {
 function polygon_points(radius, sides) {
     const N = Math.ceil(sides);
     return d3.range(N).map((i) => {
-        let angle = (i / N) * 2 * Math.PI + (3 * Math.PI) / 2;
+        let angle = (i / N) * 2 * Math.PI - Math.PI / 2;
         return [radius * Math.cos(angle), radius * Math.sin(angle)];
     });
 }
@@ -164,30 +166,31 @@ function dragended() {
     simulation.alpha(0.1).restart();
 }
 
-function getScale(range) {
-    const selectedDomain = getSelection(range);
-    const domain_values = domains[selectedDomain]; // keys in d: effort, risk, etc
-    console.assert(domain_values, `domain ${selectedDomain} not found`);
-    const interpolator = ranges[range]; // selection possibilites: size, posx, etc
-    if (domains_config[selectedDomain].s == "ordinal") {
+function getScale(range_key, optional_domain_key) {
+    const domain_key = optional_domain_key || getDomainKey(range_key);
+    const domain_values = domains[domain_key]; // keys in d: effort, risk, etc
+    console.assert(domain_values, `domain ${domain_key} not found`);
+    const interpolator = ranges[range_key]; // selection possibilites: size, posx, etc
+    console.assert(interpolator, `range ${range_key} not found`);
+    if (domains_config[domain_key].s == "ordinal") {
         const N = domain_values.length;
         const scale = d3
             .scaleOrdinal()
             .domain(domain_values)
-            .range(d3.range(N).map((n) => interpolator(n / N)));
-        return (d) => scale(d[selectedDomain]);
+            .range(d3.range(N).map((n) => interpolator(n / (N-1))));
+        return (d) => scale(d[domain_key]);
     } else {
         const scale = d3
             .scaleSequential()
             .domain(domain_values)
             .interpolator(interpolator);
-        return (d) => scale(d[selectedDomain]);
+        return (d) => scale(d[domain_key]);
     }
 }
 
-// find the currently selected domain for a given range
-function getSelection(range) {
-    return d3.select(`#${range}`).property("value");
+// find the key of the currently selected domain for a given range
+function getDomainKey(range_key) {
+    return d3.select(`#${range_key}`).property("value");
 }
 
 function distance(point0, point1) {
@@ -196,21 +199,17 @@ function distance(point0, point1) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-function restyle() {
-    // strokelength: scale from 0 to pi*size^2 based on the selected strokelength param
-    const dashscale = (d) => {
-        const size = getScale("size")(d);
-        const sides = getScale("sides")(d);
-        const points = polygon_points(size, sides);
-        const circumference = sides * distance(points[0], points[1]);
-        const domain = domains[getSelection("strokelength")];
-        const range = d3.interpolate(0, circumference);
-        const dashlen = d3.scaleSequential().domain(domain).interpolator(range)(
-            d[getSelection("strokelength")]
-        );
-        return `${dashlen}, 10000`;
-    };
+const dashscale = () => (d) => {
+    const size = getScale("size")(d);
+    const sides = getScale("sides")(d);
+    const points = polygon_points(size, sides);
+    const circumference = sides * distance(points[0], points[1]);
+    const dashlen =
+        getScale("identity", getDomainKey("strokelength"))(d) * circumference;
+    return `${dashlen}, 10000`;
+};
 
+function restyle() {
     gs.select("polygon")
         .attr("points", (d) => {
             const sides = getScale("sides")(d);
@@ -224,7 +223,7 @@ function restyle() {
         .style("fill-opacity", getScale("saturation"))
         .attr("stroke", "black")
         .attr("stroke-width", getScale("strokewidth"))
-        .attr("stroke-dasharray", dashscale);
+        .attr("stroke-dasharray", dashscale());
 
     simulation
         .force("x", d3.forceX().strength(0.5).x(getScale("posx")))
@@ -234,7 +233,7 @@ function restyle() {
             d3
                 .forceCollide()
                 .strength(0.5)
-                .radius((d) => 10 + getScale("size")(d))
+                .radius((d) => getScale("size")(d))
                 .iterations(1)
         )
         //.force("charge", d3.forceManyBody().strength(1))
@@ -267,12 +266,12 @@ function updateInfoCard(d) {
 }
 
 function randomize() {
-    const params = Object.keys(ranges);
-    params.forEach((param) => {
-        const options = document.getElementById(param).options;
-        const index = Math.floor(Math.random() * options.length);
-        document.getElementById(param).selectedIndex = index;
-    });
+    d3.selectAll("select")
+        .nodes()
+        .forEach((s) => {
+            const options = d3.select(s).selectAll("option");
+            s.selectedIndex = Math.floor(Math.random() * options.size());
+        });
     restyle();
 }
 
@@ -282,9 +281,11 @@ d3.select("#randomize").on("click", () => randomize());
 // for console debugging
 window.j = {
     domains,
-    d3, 
+    d3,
     data,
     domains_config,
     ranges,
     simulation,
+    polygon_points,
+    distance,
 };
