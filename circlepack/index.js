@@ -15,6 +15,7 @@ const domains_config = {
     risk: { s: d3.scaleSequential },
     created: { s: d3.scaleSequential, time: true },
     updated: { s: d3.scaleSequential, time: true },
+    teamsize: { s: d3.scaleSequential },
 };
 
 var data = [];
@@ -52,8 +53,9 @@ d3.csv("data.csv", (d) => {
         costbenefit: +d.risk / +d.effort,
         created: new Date(d.created),
         updated: new Date(d.updated),
+        teamsize: +d.teamsize,
         nonemin: 0,
-        nonemax: 1
+        nonemax: 1,
     };
 }).then(function (ds) {
     data = ds;
