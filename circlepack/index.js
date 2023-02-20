@@ -82,7 +82,7 @@ let ranges = {
     size: d3.interpolate(20, 50),
     posx: d3.interpolate(0.2 * width, width * 0.7),
     posy: d3.interpolate(0.8 * height, height * 0.3),
-    colour: d3.interpolateSinebow,
+    colour: i => d3.interpolateSinebow(i * 0.7), // red at both ends doesn't make sense, skip the end
     saturation: d3.interpolate(0.1, 1),
     strokewidth: d3.interpolate(1, 5),
     strokelength: d3.interpolate(0.1, 1),
@@ -168,18 +168,19 @@ function getScale(range) {
     const selectedDomain = getSelection(range);
     const domain_values = domains[selectedDomain]; // keys in d: effort, risk, etc
     console.assert(domain_values, `domain ${selectedDomain} not found`);
-    const range_values = ranges[range]; // selection possibilites: size, posx, etc
+    const interpolator = ranges[range]; // selection possibilites: size, posx, etc
     if (domains_config[selectedDomain].s == "ordinal") {
+        const N = domain_values.length;
         const scale = d3
             .scaleOrdinal()
             .domain(domain_values)
-            .range([range_values(0), range_values(1)]);
+            .range(d3.range(N).map((n) => interpolator(n / N)));
         return (d) => scale(d[selectedDomain]);
     } else {
         const scale = d3
             .scaleSequential()
             .domain(domain_values)
-            .interpolator(range_values);
+            .interpolator(interpolator);
         return (d) => scale(d[selectedDomain]);
     }
 }
@@ -277,3 +278,13 @@ function randomize() {
 
 d3.select("form").node().onchange = () => restyle();
 d3.select("#randomize").on("click", () => randomize());
+
+// for console debugging
+window.j = {
+    domains,
+    d3, 
+    data,
+    domains_config,
+    ranges,
+    simulation,
+};
