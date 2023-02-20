@@ -6,7 +6,8 @@ const domains_config = {
     maturity: { s: d3.scaleOrdinal },
     riskcategory: { s: d3.scaleOrdinal },
     when: { s: d3.scaleOrdinal },
-    none: { s: d3.scaleSequential },
+    nonemin: { s: d3.scaleSequential },
+    nonemax: { s: d3.scaleSequential },
     costbenefit: { s: d3.scaleSequential },
     effort: { s: d3.scaleSequential },
     upskilleffort: { s: d3.scaleSequential },
@@ -51,7 +52,8 @@ d3.csv("data.csv", (d) => {
         costbenefit: +d.risk / +d.effort,
         created: new Date(d.created),
         updated: new Date(d.updated),
-        none: 0.5,
+        nonemin: 0,
+        nonemax: 1
     };
 }).then(function (ds) {
     data = ds;
@@ -74,6 +76,8 @@ function compute_domains() {
                     : d3.extent(data, (d) => d[key]),
             ])
         ),
+        nonemin: [0, 1],
+        nonemax: [0, 1],
     };
 }
 let ranges = {
