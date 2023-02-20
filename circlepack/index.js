@@ -2,18 +2,18 @@ import * as d3 from "https://cdn.skypack.dev/d3@7";
 import { axisBottom, axisLeft } from "https://cdn.skypack.dev/d3-axis@3";
 
 const domains_config = {
-    category: { s: "ordinal" },
-    maturity: { s: "ordinal" },
-    riskcategory: { s: "ordinal" },
-    when: { s: "ordinal" },
-    none: { s: "linear" },
-    costbenefit: { s: "linear" },
-    effort: { s: "linear" },
-    upskilleffort: { s: "linear" },
-    setupeffort: { s: "linear" },
-    risk: { s: "linear" },
-    created: { s: "time" },
-    updated: { s: "time" },
+    category: { s: d3.scaleOrdinal },
+    maturity: { s: d3.scaleOrdinal },
+    riskcategory: { s: d3.scaleOrdinal },
+    when: { s: d3.scaleOrdinal },
+    none: { s: d3.scaleSequential },
+    costbenefit: { s: d3.scaleSequential },
+    effort: { s: d3.scaleSequential },
+    upskilleffort: { s: d3.scaleSequential },
+    setupeffort: { s: d3.scaleSequential },
+    risk: { s: d3.scaleSequential },
+    created: { s: d3.scaleSequential, time: true },
+    updated: { s: d3.scaleSequential, time: true },
 };
 
 var data = [];
@@ -35,9 +35,10 @@ var svg = d3
 // Initialize the polygon: all located at the center of the svg area
 var gs = svg.append("g");
 
-svg.append("g").attr("id", "y-axis");
-
-svg.append("g").attr("id", "x-axis");
+svg.append("g").attr("id", "y-axis").attr("transform", `translate(${40}, 0)`);
+svg.append("g")
+    .attr("id", "x-axis")
+    .attr("transform", `translate(0, ${height - 40})`);
 
 // d3 load data.csv
 d3.csv("data.csv", (d) => {
@@ -48,8 +49,8 @@ d3.csv("data.csv", (d) => {
         setupeffort: +d.setupeffort,
         risk: +d.risk,
         costbenefit: +d.risk / +d.effort,
-        created: Date.parse(d.created),
-        updated: Date.parse(d.updated),
+        created: new Date(d.created),
+        updated: new Date(d.updated),
         none: 0.5,
     };
 }).then(function (ds) {
@@ -62,25 +63,17 @@ d3.csv("data.csv", (d) => {
 
 var domains = {};
 function compute_domains() {
-    let minmax = (field) => [
-        Math.min(...data.map((d) => d[field])),
-        Math.max(...data.map((d) => d[field])),
-    ];
     let sortedcategory = (field) =>
         [...new Set(data.map((d) => d[field]))].sort();
     domains = {
-        none: [0, 1],
-        effort: minmax("effort"),
-        upskilleffort: minmax("upskilleffort"),
-        setupeffort: minmax("setupeffort"),
-        risk: minmax("risk"),
-        updated: minmax("updated"),
-        created: minmax("created"),
-        costbenefit: minmax("costbenefit"),
-        category: sortedcategory("category"),
-        maturity: sortedcategory("maturity"),
-        riskcategory: sortedcategory("riskcategory"),
-        when: sortedcategory("when"),
+        ...Object.fromEntries(
+            Object.entries(domains_config).map(([key, value]) => [
+                key,
+                value.s.name === "ordinal"
+                    ? sortedcategory(key)
+                    : d3.extent(data, (d) => d[key]),
+            ])
+        ),
     };
 }
 let ranges = {
@@ -177,20 +170,15 @@ function getRawScale(range_key, optional_domain_key) {
     console.assert(domain_values, `domain ${domain_key} not found`);
     const interpolator = ranges[range_key]; // selection possibilites: size, posx, etc
     console.assert(interpolator, `range ${range_key} not found`);
-    if (domains_config[domain_key].s == "ordinal") {
+    const scale = domains_config[domain_key].s();
+    scale.domain(domain_values);
+    if (domains_config[domain_key].s.name === "ordinal") {
         const N = domain_values.length;
-        const scale = d3
-            .scaleOrdinal()
-            .domain(domain_values)
-            .range(d3.range(N).map((n) => interpolator(n / (N - 1))));
-        return scale;
+        scale.range(d3.range(N).map((n) => interpolator(n / (N - 1))));
     } else {
-        const scale = d3
-            .scaleSequential()
-            .domain(domain_values)
-            .interpolator(interpolator);
-        return scale;
+        scale.interpolator(interpolator);
     }
+    return scale;
 }
 
 function getScale(range_key, optional_domain_key) {
@@ -235,16 +223,15 @@ function restyle() {
         .attr("stroke-width", getScale("strokewidth"))
         .attr("stroke-dasharray", dashscale());
 
-    // render axes
-    d3.select("#x-axis")
-        .attr("transform", `translate(0, ${height - 40})`)
-        .transition()
-        .call(d3.axisTop(getRawScale("posx")));
-
-    d3.select("#y-axis")
-        .attr("transform", `translate(${40}, 0)`)
-        .transition()
-        .call(d3.axisRight(getRawScale("posy")));
+    const makeAxis = (d3axis, nodeid, range_key) => {
+        const axis = d3axis(getRawScale(range_key));
+        if (domains_config[getDomainKey(range_key)].time) {
+            axis.tickFormat(d3.timeFormat("%Y-%m"));
+        }
+        d3.select(nodeid).transition().call(axis);
+    };
+    makeAxis(d3.axisTop, "#x-axis", "posx");
+    makeAxis(d3.axisRight, "#y-axis", "posy");
 
     simulation
         .force("x", d3.forceX().strength(0.5).x(getScale("posx")))
