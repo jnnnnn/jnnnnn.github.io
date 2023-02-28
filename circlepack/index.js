@@ -1,5 +1,4 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
-import { axisBottom, axisLeft } from "https://cdn.skypack.dev/d3-axis@3";
 
 const domains_config = {
     category: { s: d3.scaleOrdinal },
@@ -17,6 +16,8 @@ const domains_config = {
     updated: { s: d3.scaleSequential, time: true },
     teamsize: { s: d3.scaleSequential },
 };
+
+prepare_options();
 
 var data = [];
 
@@ -60,7 +61,6 @@ d3.csv("data.csv", (d) => {
 }).then(function (ds) {
     data = ds;
     compute_domains();
-    prepare_options();
     draw(ds);
     restyle();
 });

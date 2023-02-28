@@ -1,5 +1,5 @@
 code,name,category,risk,upskilleffort,setupeffort,maturity,effort,created,updated,riskcategory,when,teamsize
-AppSHQ,Application Security HQ,Security,1,2,0,1 - Adhoc,3,2023-02-18,2023-02-18,People,1 - Dev,10
+AppSHQ,Application Security HQ,Security,1,2,0,1 - Adhoc,3,2023-02-18,2023-02-18,Code,1 - Dev,10
 Atlas,Atlas,Operations,1,1,1,4 - Measured,3,2019-01-06,2019-01-06,Maintenance,1 - Dev,1
 AutIT,Automated Integration Testing,Maintainability,1,10,3,1 - Adhoc,14,2019-01-16,2019-01-16,Maintenance,1 - Dev,8
 BuiAC,Buildkite access control,Security Scanner,3,1,1,3 - Defined,3,2019-01-14,2019-01-14,Deploy,1 - Dev,1
