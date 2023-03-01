@@ -17,6 +17,17 @@ const domains_config = {
     teamsize: { s: d3.scaleSequential },
 };
 
+const default_ranges = {
+    size: "effort",
+    posx: "riskcategory",
+    posy: "when",
+    colour: "riskcategory",
+    saturation: "maturity",
+    strokewidth: "nonemin",
+    strokelength: "nonemax",
+    sides: "maturity",
+}
+
 prepare_options();
 
 var data = [];
@@ -105,6 +116,10 @@ function prepare_options() {
             let option = first.options[j];
             select.options[j] = new Option(option.text, option.value);
         }
+    }
+    // set defaults
+    for (let select of selects) {
+        select.value = default_ranges[select.id];
     }
 }
 
