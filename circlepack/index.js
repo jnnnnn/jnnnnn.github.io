@@ -26,7 +26,7 @@ const default_ranges = {
     strokewidth: "nonemin",
     strokelength: "nonemax",
     sides: "maturity",
-}
+};
 
 prepare_options();
 
@@ -131,6 +131,11 @@ function polygon_points(radius, sides) {
     });
 }
 
+const EXTRA_HINT_FIELDS = ["Effort", "Maturity", "When", "RiskCategory"];
+
+const title = (d) =>
+    d.name + "\n\n" + EXTRA_HINT_FIELDS.map((f) => `${f}: ${d[f.toLowerCase()]}`).join("\n");
+
 function draw(data) {
     gs = gs.selectAll("polygon").data(data).enter().append("g");
 
@@ -148,12 +153,14 @@ function draw(data) {
             d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
         });
 
-    gs.append("polygon");
+    gs.append("polygon").append("title").text(title);
 
     gs.append("text")
         .attr("dominant-baseline", "middle")
         .attr("text-anchor", "middle")
-        .text((d) => d.code);
+        .text((d) => d.code)
+        .append("title")
+        .text(title);
 
     // Apply these forces to the nodes and update their positions.
     // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
