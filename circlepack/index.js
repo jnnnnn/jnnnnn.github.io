@@ -6,6 +6,7 @@ const domains_config = {
     riskcategory: { s: d3.scaleOrdinal },
     when: { s: d3.scaleOrdinal },
     nonemin: { s: d3.scaleSequential },
+    nonemed: { s: d3.scaleSequential },
     nonemax: { s: d3.scaleSequential },
     costbenefit: { s: d3.scaleSequential },
     effort: { s: d3.scaleSequential },
@@ -18,14 +19,14 @@ const domains_config = {
 };
 
 const default_ranges = {
-    size: "effort",
+    size: "nonemed",
     posx: "riskcategory",
     posy: "when",
     colour: "riskcategory",
-    saturation: "maturity",
+    saturation: "when",
     strokewidth: "nonemin",
     strokelength: "nonemax",
-    sides: "maturity",
+    sides: "nonemax",
 };
 
 prepare_options();
@@ -34,25 +35,19 @@ var data = [];
 
 // set the dimensions and margins of the graph
 // include the dumb thing to make correct on mobiles
-var width = (window.innerWidth / 2) * window.devicePixelRatio;
+var width = window.innerWidth * window.devicePixelRatio;
 var height = window.innerHeight * window.devicePixelRatio;
 
 var simulation = d3.forceSimulation();
 
 // append the svg object to the body of the page
-var svg = d3
-    .select("#polygonchart")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+var svg = d3.select("#polygonchart").append("svg");
 
 // Initialize the polygon: all located at the center of the svg area
 var gs = svg.append("g");
 
 svg.append("g").attr("id", "y-axis").attr("transform", `translate(${40}, 0)`);
-svg.append("g")
-    .attr("id", "x-axis")
-    .attr("transform", `translate(0, ${height - 40})`);
+svg.append("g").attr("id", "x-axis");
 
 // d3 load data.csv
 d3.csv("data.csv", (d) => {
@@ -67,11 +62,13 @@ d3.csv("data.csv", (d) => {
         updated: new Date(d.updated),
         teamsize: +d.teamsize,
         nonemin: 0,
+        nonemed: 0.5,
         nonemax: 1,
     };
 }).then(function (ds) {
     data = ds;
     compute_domains();
+    resize();
     draw(ds);
     restyle();
 });
@@ -90,13 +87,17 @@ function compute_domains() {
             ])
         ),
         nonemin: [0, 1],
+        nonemed: [0, 1],
         nonemax: [0, 1],
     };
 }
+
+const EDGEPAD = 100 * window.devicePixelRatio;
+
 let ranges = {
     size: d3.interpolate(20, 50),
-    posx: d3.interpolate(0.2 * width, width * 0.7),
-    posy: d3.interpolate(0.8 * height, height * 0.3),
+    posx: d3.interpolate(EDGEPAD, width - EDGEPAD),
+    posy: d3.interpolate(height - EDGEPAD, EDGEPAD*2),
     // red at both ends doesn't make sense, skip the end
     colour: (i) => d3.interpolateSinebow(i * 0.7),
     saturation: d3.interpolate(0.1, 1),
@@ -105,6 +106,20 @@ let ranges = {
     sides: (f) => Math.round(d3.interpolate(3, 10)(f)),
     identity: (i) => i,
 };
+
+const resize = () => {
+    width = (window.innerWidth - 10) * window.devicePixelRatio;
+    height = (window.innerHeight - 10) * window.devicePixelRatio;
+
+    d3.select("svg").attr("width", width).attr("height", height);
+    d3.select("#x-axis").attr("transform", `translate(0, ${height - 40*window.devicePixelRatio})`);
+    ranges.posx = d3.interpolate(EDGEPAD*2, width - EDGEPAD);
+    ranges.posy = d3.interpolate(height - EDGEPAD, EDGEPAD*2);
+    restyle();
+};
+
+// attach to window resize event
+window.addEventListener("resize", resize);
 
 // copy the options from the first select to the others
 function prepare_options() {
@@ -134,7 +149,9 @@ function polygon_points(radius, sides) {
 const EXTRA_HINT_FIELDS = ["Effort", "Maturity", "When", "RiskCategory"];
 
 const title = (d) =>
-    d.name + "\n\n" + EXTRA_HINT_FIELDS.map((f) => `${f}: ${d[f.toLowerCase()]}`).join("\n");
+    d.name +
+    "\n\n" +
+    EXTRA_HINT_FIELDS.map((f) => `${f}: ${d[f.toLowerCase()]}`).join("\n");
 
 function draw(data) {
     gs = gs.selectAll("polygon").data(data).enter().append("g");
@@ -148,9 +165,10 @@ function draw(data) {
                 .on("drag", dragged)
                 .on("end", dragended)
         )
-        .on("mouseover", function (event, d) {
+        .on("mouseover", function (_event, d) {
             const text = JSON.stringify(d, null, 2);
-            d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
+            console.log(text);
+            //d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
         });
 
     gs.append("polygon").append("title").text(title);
