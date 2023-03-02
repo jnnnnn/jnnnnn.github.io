@@ -20,13 +20,13 @@ const domains_config = {
 
 const default_ranges = {
     size: "nonemed",
-    posx: "riskcategory",
-    posy: "when",
+    posx: "when",
+    posy: "riskcategory",
     colour: "riskcategory",
-    saturation: "when",
+    saturation: "nonemed",
     strokewidth: "nonemin",
-    strokelength: "nonemax",
-    sides: "nonemax",
+    strokelength: "nonemin",
+    sides: "when",
 };
 
 prepare_options();
@@ -96,8 +96,8 @@ const EDGEPAD = 100 * window.devicePixelRatio;
 
 let ranges = {
     size: d3.interpolate(20, 50),
-    posx: d3.interpolate(EDGEPAD, width - EDGEPAD),
-    posy: d3.interpolate(height - EDGEPAD, EDGEPAD*2),
+    posx: d3.interpolate(0, width),
+    posy: d3.interpolate(height, 0),
     // red at both ends doesn't make sense, skip the end
     colour: (i) => d3.interpolateSinebow(i * 0.7),
     saturation: d3.interpolate(0.1, 1),
@@ -113,8 +113,8 @@ const resize = () => {
 
     d3.select("svg").attr("width", width).attr("height", height);
     d3.select("#x-axis").attr("transform", `translate(0, ${height - 40*window.devicePixelRatio})`);
-    ranges.posx = d3.interpolate(EDGEPAD*2, width - EDGEPAD);
-    ranges.posy = d3.interpolate(height - EDGEPAD, EDGEPAD*2);
+    ranges.posx = d3.interpolate(EDGEPAD*1.5, width - EDGEPAD);
+    ranges.posy = d3.interpolate(height - EDGEPAD*1.5, EDGEPAD);
     restyle();
 };
 
