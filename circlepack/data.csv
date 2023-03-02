@@ -1,5 +1,5 @@
 code,name,category,riskcategory,risk,upskilleffort,setupeffort,recurringeffort,effort,maturity,created,updated,when,regular,externalteam,teamsize,oldwhen,cgovreview,orderdiscovered
-AppS,Application Scanning,Security Scanner,Code,1,3,5,,9,1 - Adhoc,2023-02-18,2023-02-18,6 - Delivery,,,20,2 - Notify,,35
+AppS,Application Scanning,Security Scanner,Code,1,3,5,,9,1 - Adhoc,2023-02-18,2023-02-18,6 - Pre-Delivery,,,20,2 - Notify,,35
 AppSHQ,Application Security HQ,Security,Code,1,2,0,,3,1 - Adhoc,2023-02-18,2023-02-18,7 - Delivery,,,10,1 - Dev,,39
 ArchD,Architecture Diagram,Maintainability,Maintenance,1,1,1,1,4,3 - Defined,2019-01-04,2019-01-04,4 - Local Dev,,,4,4 - Yearly,Yes,4
 Atlas,Atlas,Operations,Maintenance,1,1,1,,3,4 - Measured,2019-01-06,2019-01-06,7 - Delivery,,,1,1 - Dev,Yes,6
@@ -13,16 +13,16 @@ DatCD,Datadog Cost Dashboard,Operations,Cost,1,3,1,,5,1 - Adhoc,2023-02-18,2023-
 DatD,Datadog dashboard,Operations,Support,2,5,1,,7,3 - Defined,2019-01-07,2019-01-07,4 - Local Dev,,,5,1 - Dev,Yes,7
 DatPIA,Data Protection Impact Assessment,Operations,Infra,1,2,2,,5,1 - Adhoc,2023-02-18,2023-02-18,1 - Pre-Dev,,Legal,12,1 - Dev,,38
 DepB,Dependabot,Security Scanner,Code,2,2,2,,5,3 - Defined,2019-01-11,2019-01-11,5 - Development,,,5,2 - Notify,Yes,11
-Dome9,Dome9,Security Scanner,Infra,1,3,2,,6,3 - Defined,2019-01-09,2019-01-09,9 - Deployed,,,10,2 - Notify,Yes,9
+Dome9,Dome9,Security Scanner,Infra,1,3,2,,6,3 - Defined,2019-01-09,2019-01-09,9 - After Deploy,,,10,2 - Notify,Yes,9
 GameD,Game Day,Operations,Support,1,3,10,5,19,3 - Defined,2019-01-18,2019-01-18,6 - Pre-Delivery,,,7,1 - Dev,,18
 GAT,Security Guardrails / GAT,Security,Infra,2,10,1,,12,4 - Measured,2019-01-19,2019-01-19,4 - Local Dev,Regular,,7,4 - Yearly,,19
 GitG,Gitguardian,Security Scanner,Deploy,1,3,2,,6,3 - Defined,2019-01-22,2019-01-22,6 - Pre-Delivery,,,13,2 - Notify,,22
 GitSG,Github Security Guardrails,Security,Deploy,1,3,3,,7,1 - Adhoc,2023-02-18,2023-02-18,5 - Development,,,11,1 - Dev,,31
 OpeS,Iress Open Source Policy,Operations,Code,1,3,1,,5,1 - Adhoc,2023-03-01,2023-03-01,6 - Pre-Delivery,,,15,1 - Dev,,43
 OrgRS,Github org repo settings,Security,Deploy,1,3,3,,7,3 - Defined,2019-01-21,2019-01-21,6 - Pre-Delivery,,,10,1 - Dev,,21
-Pen,Penetration Test,Security,Code,3,1,10,,12,3 - Defined,2019-01-13,2019-01-13,9 - Deployed,,Infosec,8,4 - Yearly,Yes,13
+Pen,Penetration Test,Security,Code,3,1,10,,12,3 - Defined,2019-01-13,2019-01-13,9 - After Deploy,,Infosec,8,4 - Yearly,Yes,13
 Perf,Performance Testing,Operations,Maintenance,1,5,3,,9,1 - Adhoc,2019-01-15,2019-01-15,5 - Development,,,12,1 - Dev,Yes,15
-RunRC,Run readiness checklist,Operations,Infra,2,3,3,,7,1 - Adhoc,2023-02-18,2023-02-18,2 - Pre-Dev,Regular,SRE,4,1 - Dev,,28
+RunRC,Run readiness checklist,Operations,Infra,2,3,3,,7,1 - Adhoc,2023-02-18,2023-02-18,2 - Start dev,Regular,SRE,4,1 - Dev,,28
 SBOM,Software Bill Of Materials,Operations,Maintenance,1,2,1,,4,1 - Adhoc,2023-02-18,2019-01-24,7 - Delivery,,,20,1 - Dev,,24
 SecMA,SecOps Monitoring and Alerting,Security,Infra,1,5,5,,11,1 - Adhoc,2023-02-18,2023-02-18,8 - Deployed,,,15,1 - Dev,,32
 SecOGC,Security Operation Guardrails Checklist,Security,Infra,1,5,2,,8,1 - Adhoc,2023-02-18,2023-02-18,6 - Pre-Delivery,Regular,,16,4 - Yearly,,37
@@ -33,10 +33,10 @@ SonQ,SonarQube,Maintainability,Code,1,1,1,,3,4 - Measured,2019-01-10,2019-01-10,
 SquHM,Squad Health Metrics,Operations,Maintenance,1,1,1,,3,4 - Measured,2019-01-20,2019-01-20,6 - Pre-Delivery,Regular,,5,4 - Yearly,,20
 SupM,Support Model,Operations,Maintenance,1,5,1,,7,3 - Defined,2019-01-23,2019-01-23,7 - Delivery,,,10,1 - Dev,,23
 TecOR,Technology Operations Review,Operations,Maintenance,2,5,5,,11,1 - Adhoc,2023-02-18,2023-02-18,1 - Pre-Dev,Regular,SRE Infosec Platform,7,4 - Yearly,,33
-TORD,Technology Operations Review Dashboard,Operations,Maintenance,2,5,2,,3,1 - Adhoc,2023-03-01,2023-03-01,4 - Local Development,Regular,SRE Infosec Platform,15,1 - Dev,,42
 TecR,Technical Reference,Maintainability,Maintenance,1,3,2,,6,3 - Defined,2019-01-05,2019-01-05,6 - Pre-Delivery,,,12,1 - Dev,Yes,5
-Ten,Tenable,Security Scanner,Infra,1,3,5,,9,3 - Defined,2023-02-18,2019-01-26,9 - Deployed,,,9,2 - Notify,,26
+Ten,Tenable,Security Scanner,Infra,1,3,5,,9,3 - Defined,2023-02-18,2019-01-26,9 - After Deploy,,,9,2 - Notify,,26
 ThrM,Threat Modelling,Security,Code,3,10,2,,13,3 - Defined,2019-01-02,2019-01-02,1 - Pre-Dev,,,4,1 - Dev,Yes,2
-WelAR,AWS Well-Architected Review,Operations,Code,1,5,5,1,12,3 - Defined,2019-01-01,2019-01-01,2 - Pre-Dev,Regular,,8,4 - Yearly,Yes,1
+TORD,Technology Operations Review Dashboard,Operations,Maintenance,2,5,2,,3,1 - Adhoc,2023-03-01,2023-03-01,4 - Local Dev,Regular,SRE Infosec Platform,15,1 - Dev,,42
+WelAR,AWS Well-Architected Review,Operations,Code,1,5,5,1,12,3 - Defined,2019-01-01,2019-01-01,2 - Start dev,Regular,,8,4 - Yearly,Yes,1
 Xray,Xray,Security Scanner,Infra,1,3,3,,7,3 - Defined,2023-02-18,2019-01-25,7 - Delivery,,,8,2 - Notify,,25
 Zap,Zap,Security Scanner,Infra,1,3,3,,7,1 - Adhoc,2023-02-18,2023-02-18,7 - Delivery,,,14,2 - Notify,,30
