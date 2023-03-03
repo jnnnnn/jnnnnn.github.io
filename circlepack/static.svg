@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="960" height="955" viewBox="0 0 960 955"
+
+
+<svg width="1060" height="766" viewBox="0 0 1060 766"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
-
-
     <g>
-        <g translate="transform(480, 477.5)" transform="translate(191.46200021618847, 496.3189103193479)">
-            <polygon points="1.9135106236677395e-15,-31.25 27.06329386826371,15.624999999999995 -27.063293868263703,15.62500000000001" style="fill: rgb(255, 64, 64); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="162.37976320958222, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(580.8540578651817, 630.1268892361237)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Application Scanning
 
 Effort: 9
 Maturity: 1 - Adhoc
-When: 6 - Delivery
+When: 6 - Pre-Delivery
 RiskCategory: Code</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">AppS<title>Application Scanning
 
 Effort: 9
 Maturity: 1 - Adhoc
-When: 6 - Delivery
+When: 6 - Pre-Delivery
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(192.00011400608312, 392.61128170009874)">
-            <polygon points="1.2246467991473533e-15,-20 17.320508075688775,9.999999999999996 -17.32050807568877,10.000000000000007" style="fill: rgb(255, 64, 64); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="103.92304845413263, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(728.5714406777889, 616.0002017455453)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Application Security HQ
 
 Effort: 3
@@ -40,8 +40,8 @@ When: 7 - Delivery
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(575.9942919311728, 662.862703743247)">
-            <polygon points="1.3394574365674177e-15,-21.875 17.10256367898815,-13.638839415659795 21.326548078977392,4.8676454302943775 9.491206793196586,19.708693985365418 -9.491206793196582,19.708693985365418 -21.326548078977392,4.86764543029438 -17.102563678988155,-13.638839415659792" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="132.87689510475218, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(375.3975648323916, 237.6612879840599)">
+            <polygon points="2.1431318985078682e-15,-35 33.28697807033037,-10.815594803123158 20.57248383023656,28.31559480312316 -20.572483830236557,28.31559480312316 -33.28697807033038,-10.815594803123155" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Architecture Diagram
 
 Effort: 4
@@ -57,8 +57,8 @@ When: 4 - Local Dev
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(582.7226245274702, 359.213754965862)">
-            <polygon points="1.2246467991473533e-15,-20 11.755705045849464,-16.18033988749895 19.02113032590307,-6.180339887498948 19.02113032590307,6.180339887498948 11.755705045849464,16.18033988749895 1.2246467991473533e-15,20 -11.75570504584946,16.18033988749895 -19.02113032590307,6.18033988749895 -19.021130325903073,-6.1803398874989455 -11.755705045849465,-16.180339887498945" style="fill: rgb(9, 146, 227);" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.60679774997897, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(690.4749076839967, 206.67720726390914)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Atlas
 
 Effort: 3
@@ -74,8 +74,8 @@ When: 7 - Delivery
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(589.087760092636, 523.4922160039556)">
-            <polygon points="2.4875638107680612e-15,-40.625 35.182282028742826,20.312499999999993 -35.18228202874281,20.312500000000014" style="fill: rgb(9, 146, 227); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="211.0936921724569, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(457.68261890439686, 211.90997433915066)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Automated Integration Testing
 
 Effort: 14
@@ -91,8 +91,8 @@ When: 5 - Development
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(385.318888267162, 390.0335324176069)">
-            <polygon points="1.2246467991473533e-15,-20 15.636629649360597,-12.46979603717467 19.498558243636474,4.450418679126288 8.677674782351163,18.019377358048384 -8.677674782351161,18.019377358048384 -19.498558243636474,4.45041867912629 -15.636629649360598,-12.469796037174667" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="121.48744695291626, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(728.5715124558809, 409.60020521346223)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Buildkite access control
 
 Effort: 3
@@ -108,8 +108,8 @@ When: 7 - Delivery
 RiskCategory: Deploy</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(449.711903882521, 442.7488872409136)">
-            <polygon points="1.4542680739874819e-15,-23.75 18.56849770861571,-14.80788279414492 23.15453791431831,5.284872181462466 10.304738804042007,21.398010612682455 -10.304738804042003,21.398010612682455 -23.15453791431831,5.284872181462469 -18.56849770861571,-14.807882794144918" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="144.2663432565881, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(643.0251798963918, 314.6319469659385)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Checkov
 
 Effort: 5
@@ -125,8 +125,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(285.49010976931675, 364.09957808730843)">
-            <polygon points="1.3394574365674177e-15,-21.875 17.10256367898815,-13.638839415659795 21.326548078977392,4.8676454302943775 9.491206793196586,19.708693985365418 -9.491206793196582,19.708693985365418 -21.326548078977392,4.86764543029438 -17.102563678988155,-13.638839415659792" style="fill: rgb(209, 172, 2); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="132.87689510475218, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(850.5489840115688, 547.2172091436231)">
+            <polygon points="2.1431318985078682e-15,-35 22.49756633902888,-26.81155550916423 34.468271355427284,-6.077686218342563 30.310889132455355,17.499999999999993 11.970705016398409,32.88924172750679 -11.970705016398405,32.88924172750679 -30.310889132455348,17.50000000000001 -34.468271355427284,-6.077686218342551 -22.497566339028882,-26.811555509164226" style="fill: rgb(209, 172, 2); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Cloudability cost dashboard
 
 Effort: 4
@@ -142,8 +142,8 @@ When: 8 - Deployed
 RiskCategory: Cost</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(200.46896786224724, 579.6385384336821)">
-            <polygon points="1.2246467991473533e-15,-20 15.636629649360597,-12.46979603717467 19.498558243636474,4.450418679126288 8.677674782351163,18.019377358048384 -8.677674782351161,18.019377358048384 -19.498558243636474,4.45041867912629 -15.636629649360598,-12.469796037174667" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="121.48744695291626, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(514.1380667584788, 652.6627273750615)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Cloud Governance Review
 
 Effort: 3
@@ -159,8 +159,8 @@ When: 5 - Development
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(288.0001502751091, 657.8891352932378)">
-            <polygon points="1.3394574365674177e-15,-21.875 17.10256367898815,-13.638839415659795 21.326548078977392,4.8676454302943775 9.491206793196586,19.708693985365418 -9.491206793196582,19.708693985365418 -21.326548078977392,4.86764543029438 -17.102563678988155,-13.638839415659792" style="fill: rgb(209, 172, 2); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="132.87689510475218, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(381.42854751482093, 512.8001867809024)">
+            <polygon points="2.1431318985078682e-15,-35 33.28697807033037,-10.815594803123158 20.57248383023656,28.31559480312316 -20.572483830236557,28.31559480312316 -33.28697807033038,-10.815594803123155" style="fill: rgb(209, 172, 2); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Cost modelling
 
 Effort: 4
@@ -176,8 +176,8 @@ When: 4 - Local Dev
 RiskCategory: Cost</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(290.1295150479895, 318.73430386901686)">
-            <polygon points="1.4542680739874819e-15,-23.75 20.56810333988042,11.874999999999996 -20.568103339880413,11.875000000000007" style="fill: rgb(209, 172, 2); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.40862003928251, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(838.0223697481002, 478.3831997105732)">
+            <polygon points="2.1431318985078682e-15,-35 22.49756633902888,-26.81155550916423 34.468271355427284,-6.077686218342563 30.310889132455355,17.499999999999993 11.970705016398409,32.88924172750679 -11.970705016398405,32.88924172750679 -30.310889132455348,17.50000000000001 -34.468271355427284,-6.077686218342551 -22.497566339028882,-26.811555509164226" style="fill: rgb(209, 172, 2); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Datadog Cost Dashboard
 
 Effort: 5
@@ -193,8 +193,8 @@ When: 8 - Deployed
 RiskCategory: Cost</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(672.0002156572546, 657.8891173162025)">
-            <polygon points="1.6838893488276107e-15,-27.5 21.500365767870818,-17.145969551115172 26.81051758500015,6.119325683798646 11.93180282573285,24.776643867316526 -11.931802825732847,24.776643867316526 -26.81051758500015,6.119325683798649 -21.50036576787082,-17.14596955111517" style="fill: rgb(88, 42, 252); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="167.04523956025986, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(381.3458299869361, 99.01694928738247)">
+            <polygon points="2.1431318985078682e-15,-35 33.28697807033037,-10.815594803123158 20.57248383023656,28.31559480312316 -20.572483830236557,28.31559480312316 -33.28697807033038,-10.815594803123155" style="fill: rgb(88, 42, 252); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Datadog dashboard
 
 Effort: 7
@@ -210,8 +210,8 @@ When: 4 - Local Dev
 RiskCategory: Support</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(446.7736049263303, 755.7384234103147)">
-            <polygon points="1.4542680739874819e-15,-23.75 20.56810333988042,11.874999999999996 -20.568103339880413,11.875000000000007" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.40862003928251, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(129.31346903137884, 278.1897155041389)">
+            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Data Protection Impact Assessment
 
 Effort: 5
@@ -227,8 +227,8 @@ When: 1 - Pre-Dev
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(170.9621743904, 547.3507378893361)">
-            <polygon points="1.4542680739874819e-15,-23.75 18.56849770861571,-14.80788279414492 23.15453791431831,5.284872181462466 10.304738804042007,21.398010612682455 -10.304738804042003,21.398010612682455 -23.15453791431831,5.284872181462469 -18.56849770861571,-14.807882794144918" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="144.2663432565881, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(520.3886611497436, 582.9540504623844)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Dependabot
 
 Effort: 5
@@ -244,25 +244,25 @@ When: 5 - Development
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(446.6431319525812, 289.83468845619143)">
-            <polygon points="1.5690787114075463e-15,-25.625 20.034431738243264,-15.976926172630046 24.98252774965923,5.702098932630556 11.118270814887428,23.08732723999949 -11.118270814887426,23.08732723999949 -24.98252774965923,5.702098932630559 -20.034431738243267,-15.976926172630042" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="155.655791408424, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(933.3382464947526, 283.7525776286487)">
+            <polygon points="2.1431318985078682e-15,-35 20.57248383023656,-28.31559480312316 33.28697807033037,-10.815594803123158 33.28697807033037,10.815594803123158 20.57248383023656,28.31559480312316 2.1431318985078682e-15,35 -20.572483830236557,28.31559480312316 -33.28697807033037,10.815594803123163 -33.28697807033038,-10.815594803123155 -20.572483830236564,-28.315594803123158" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Dome9
 
 Effort: 6
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Infra</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">Dome9<title>Dome9
 
 Effort: 6
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(672.0002175569097, 445.6669271117565)">
-            <polygon points="3.061616997868383e-15,-50 39.09157412340149,-31.174490092936676 48.74639560909118,11.12604669781572 21.69418695587791,45.048443395120955 -21.694186955877903,45.048443395120955 -48.74639560909118,11.126046697815726 -39.09157412340149,-31.17449009293667" style="fill: rgb(88, 42, 252); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="303.7186173822907, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(612.8571055810537, 100.00002632207541)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(88, 42, 252); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Game Day
 
 Effort: 19
@@ -278,8 +278,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Support</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(480.00039660914194, 652.2928080332442)">
-            <polygon points="2.2579425359279324e-15,-36.875 21.674581178284946,-29.83250166757619 35.07020903838379,-11.395001667576185 35.07020903838379,11.395001667576185 21.674581178284946,29.83250166757619 2.2579425359279324e-15,36.875 -21.674581178284942,29.83250166757619 -35.07020903838379,11.395001667576189 -35.070209038383794,-11.395001667576182 -21.67458117828495,-29.83250166757618" style="fill: rgb(16, 237, 130);" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="227.90003335152366, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(381.5103588155459, 307.3741082596977)">
+            <polygon points="2.1431318985078682e-15,-35 33.28697807033037,-10.815594803123158 20.57248383023656,28.31559480312316 -20.572483830236557,28.31559480312316 -33.28697807033038,-10.815594803123155" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Security Guardrails / GAT
 
 Effort: 12
@@ -295,8 +295,8 @@ When: 4 - Local Dev
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(405.20869561659043, 464.0775063426459)">
-            <polygon points="1.5690787114075463e-15,-25.625 20.034431738243264,-15.976926172630046 24.98252774965923,5.702098932630556 11.118270814887428,23.08732723999949 -11.118270814887426,23.08732723999949 -24.98252774965923,5.702098932630559 -20.034431738243267,-15.976926172630042" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="155.655791408424, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(646.6527269822454, 418.6344365430619)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Gitguardian
 
 Effort: 6
@@ -312,8 +312,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Deploy</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(384.0001780833611, 551.777973943711)">
-            <polygon points="1.6838893488276107e-15,-27.5 23.815698604072065,13.749999999999995 -23.815698604072058,13.750000000000009" style="fill: rgb(104, 248, 31); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="142.89419162443238, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(497.14291315472866, 409.60011604217834)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Github Security Guardrails
 
 Effort: 7
@@ -329,8 +329,8 @@ When: 5 - Development
 RiskCategory: Deploy</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(192.08711613838682, 441.3285842764773)">
-            <polygon points="1.4542680739874819e-15,-23.75 20.56810333988042,11.874999999999996 -20.568103339880413,11.875000000000007" style="fill: rgb(255, 64, 64); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.40862003928251, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(644.8602118475296, 601.8735855014647)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Iress Open Source Policy
 
 Effort: 5
@@ -346,8 +346,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(362.9485959065103, 431.930922003699)">
-            <polygon points="1.6838893488276107e-15,-27.5 21.500365767870818,-17.145969551115172 26.81051758500015,6.119325683798646 11.93180282573285,24.776643867316526 -11.931802825732847,24.776643867316526 -26.81051758500015,6.119325683798649 -21.50036576787082,-17.14596955111517" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="167.04523956025986, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(579.0615966141278, 400.56578924739915)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(104, 248, 31); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Github org repo settings
 
 Effort: 7
@@ -363,25 +363,25 @@ When: 6 - Pre-Delivery
 RiskCategory: Deploy</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(192.0000649038612, 286.5001254748709)">
-            <polygon points="2.2579425359279324e-15,-36.875 28.830035916008597,-22.991186443540798 35.950466761704746,8.205459439639093 15.999462879959959,33.223227003901705 -15.999462879959953,33.223227003901705 -35.950466761704746,8.205459439639098 -28.830035916008605,-22.991186443540794" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="223.99248031943935, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(960.0000074857496, 616.0002119113678)">
+            <polygon points="2.1431318985078682e-15,-35 20.57248383023656,-28.31559480312316 33.28697807033037,-10.815594803123158 33.28697807033037,10.815594803123158 20.57248383023656,28.31559480312316 2.1431318985078682e-15,35 -20.572483830236557,28.31559480312316 -33.28697807033037,10.815594803123163 -33.28697807033038,-10.815594803123155 -20.572483830236564,-28.315594803123158" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Penetration Test
 
 Effort: 12
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Code</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">Pen<title>Penetration Test
 
 Effort: 12
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(544.9083768115277, 580.1479307982779)">
-            <polygon points="1.9135106236677395e-15,-31.25 27.06329386826371,15.624999999999995 -27.063293868263703,15.62500000000001" style="fill: rgb(9, 146, 227); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="162.37976320958222, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(524.4143398568953, 233.01085076355545)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Performance Testing
 
 Effort: 9
@@ -397,25 +397,25 @@ When: 5 - Development
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(479.93187741320344, 716.6582038136196)">
-            <polygon points="1.6838893488276107e-15,-27.5 23.815698604072065,13.749999999999995 -23.815698604072058,13.750000000000009" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="142.89419162443238, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(265.7143108171103, 306.40008942530994)">
+            <polygon points="2.1431318985078682e-15,-35 35,0 2.1431318985078682e-15,35 -35,4.2862637970157365e-15" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Run readiness checklist
 
 Effort: 7
 Maturity: 1 - Adhoc
-When: 2 - Pre-Dev
+When: 2 - Start dev
 RiskCategory: Infra</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">RunRC<title>Run readiness checklist
 
 Effort: 7
 Maturity: 1 - Adhoc
-When: 2 - Pre-Dev
+When: 2 - Start dev
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(550.6130598931563, 386.07656965793734)">
-            <polygon points="1.3394574365674177e-15,-21.875 18.944305707784597,10.937499999999996 -18.944305707784594,10.937500000000007" style="fill: rgb(9, 146, 227); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="113.66583424670759, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(746.0720811219585, 164.16770028323293)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Software Bill Of Materials
 
 Effort: 4
@@ -431,8 +431,8 @@ When: 7 - Delivery
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(482.0663919270895, 339.0347312238734)">
-            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="181.8653347947321, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(844.285741129108, 306.4000771268751)">
+            <polygon points="2.1431318985078682e-15,-35 22.49756633902888,-26.81155550916423 34.468271355427284,-6.077686218342563 30.310889132455355,17.499999999999993 11.970705016398409,32.88924172750679 -11.970705016398405,32.88924172750679 -30.310889132455348,17.50000000000001 -34.468271355427284,-6.077686218342551 -22.497566339028882,-26.811555509164226" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>SecOps Monitoring and Alerting
 
 Effort: 11
@@ -448,8 +448,8 @@ When: 8 - Deployed
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(501.4049776171791, 454.86783572431887)">
-            <polygon points="1.798699986247675e-15,-29.375 25.439496236167887,14.687499999999995 -25.43949623616788,14.68750000000001" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="152.63697741700727, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(574.2623305856096, 301.7540479612226)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Security Operation Guardrails Checklist
 
 Effort: 8
@@ -465,8 +465,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(499.2444282025817, 772.1400614486331)">
-            <polygon points="1.9135106236677395e-15,-31.25 27.06329386826371,15.624999999999995 -27.063293868263703,15.62500000000001" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="162.37976320958222, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(170.68658165481284, 334.6104782726764)">
+            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Security Review
 
 Effort: 9
@@ -482,8 +482,8 @@ When: 1 - Pre-Dev
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(479.0515188603729, 551.3719515755356)">
-            <polygon points="2.4875638107680612e-15,-40.625 35.182282028742826,20.312499999999993 -35.18228202874281,20.312500000000014" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="211.0936921724569, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(497.14278427857874, 306.4002629862487)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>SOC2
 
 Effort: 14
@@ -499,8 +499,8 @@ When: 5 - Development
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(597.7751816998198, 585.3580280981948)">
-            <polygon points="1.3394574365674177e-15,-21.875 12.85780239389785,-17.697246751951976 20.804361293956482,-6.759746751951974 20.804361293956482,6.759746751951974 12.85780239389785,17.697246751951976 1.3394574365674177e-15,21.875 -12.857802393897847,17.697246751951976 -20.804361293956482,6.759746751951977 -20.804361293956486,-6.759746751951972 -12.857802393897853,-17.697246751951972" style="fill: rgb(9, 146, 227);" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="135.1949350390395, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(509.33169660994423, 164.67923922602287)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Software Health Metrics
 
 Effort: 4
@@ -516,8 +516,8 @@ When: 5 - Development
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(214.3890579967895, 542.1461140833773)">
-            <polygon points="1.2246467991473533e-15,-20 11.755705045849464,-16.18033988749895 19.02113032590307,-6.180339887498948 19.02113032590307,6.180339887498948 11.755705045849464,16.18033988749895 1.2246467991473533e-15,20 -11.75570504584946,16.18033988749895 -19.02113032590307,6.18033988749895 -19.021130325903073,-6.1803398874989455 -11.755705045849465,-16.180339887498945" style="fill: rgb(255, 64, 64);" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.60679774997897, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(456.9018269727659, 612.3839187736085)">
+            <polygon points="2.1431318985078682e-15,-35 30.31088913245535,-17.5 30.310889132455355,17.499999999999993 2.1431318985078682e-15,35 -30.310889132455348,17.50000000000001 -30.31088913245535,-17.500000000000004" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>SonarQube
 
 Effort: 3
@@ -533,8 +533,8 @@ When: 5 - Development
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(553.2811913436315, 428.4614455376341)">
-            <polygon points="1.2246467991473533e-15,-20 11.755705045849464,-16.18033988749895 19.02113032590307,-6.180339887498948 19.02113032590307,6.180339887498948 11.755705045849464,16.18033988749895 1.2246467991473533e-15,20 -11.75570504584946,16.18033988749895 -19.02113032590307,6.18033988749895 -19.021130325903073,-6.1803398874989455 -11.755705045849465,-16.180339887498945" style="fill: rgb(9, 146, 227);" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="123.60679774997897, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(597.2464526241893, 171.87297409765566)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Squad Health Metrics
 
 Effort: 3
@@ -550,8 +550,8 @@ When: 6 - Pre-Delivery
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(596.2995416973314, 404.71883486617804)">
-            <polygon points="1.6838893488276107e-15,-27.5 21.500365767870818,-17.145969551115172 26.81051758500015,6.119325683798646 11.93180282573285,24.776643867316526 -11.931802825732847,24.776643867316526 -26.81051758500015,6.119325683798649 -21.50036576787082,-17.14596955111517" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="167.04523956025986, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(755.0977630115916, 233.5564407932648)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Support Model
 
 Effort: 7
@@ -567,8 +567,8 @@ When: 7 - Delivery
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(576.00032316386, 764.0003063377897)">
-            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(9, 146, 227); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="181.8653347947321, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(149.99996606804655, 203.20006046692)">
+            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Technology Operations Review
 
 Effort: 11
@@ -584,25 +584,8 @@ When: 1 - Pre-Dev
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(575.8350270732782, 621.007403996794)">
-            <polygon points="1.2246467991473533e-15,-20 17.320508075688775,9.999999999999996 -17.32050807568877,10.000000000000007" style="fill: rgb(9, 146, 227); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="103.92304845413263, 10000">
-                <title>Technology Operations Review Dashboard
-
-Effort: 3
-Maturity: 1 - Adhoc
-When: 4 - Local Development
-RiskCategory: Maintenance</title>
-            </polygon>
-            <text dominant-baseline="middle" text-anchor="middle">TORD<title>Technology Operations Review Dashboard
-
-Effort: 3
-Maturity: 1 - Adhoc
-When: 4 - Local Development
-RiskCategory: Maintenance</title>
-            </text>
-        </g>
-        <g translate="transform(480, 477.5)" transform="translate(588.6266121804722, 457.2777897329819)">
-            <polygon points="1.5690787114075463e-15,-25.625 20.034431738243264,-15.976926172630046 24.98252774965923,5.702098932630556 11.118270814887428,23.08732723999949 -11.118270814887426,23.08732723999949 -24.98252774965923,5.702098932630559 -20.034431738243267,-15.976926172630042" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="155.655791408424, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(626.6457784377261, 235.360883720513)">
+            <polygon points="2.1431318985078682e-15,-35 27.364101886381043,-21.822143065055673 34.122476926363824,7.788232688471004 15.185930869114536,31.53391037658467 -15.185930869114532,31.53391037658467 -34.122476926363824,7.788232688471008 -27.364101886381047,-21.82214306505567" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Technical Reference
 
 Effort: 6
@@ -618,25 +601,25 @@ When: 6 - Pre-Delivery
 RiskCategory: Maintenance</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(501.72942271313275, 275.7791099142604)">
-            <polygon points="1.9135106236677395e-15,-31.25 24.43223382712593,-19.48405630808542 30.46649725568199,6.953779186134825 13.558866847423692,28.155277121950597 -13.55886684742369,28.155277121950597 -30.46649725568199,6.953779186134828 -24.432233827125934,-19.484056308085417" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="189.82413586393164, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(986.661737202987, 329.04763539683995)">
+            <polygon points="2.1431318985078682e-15,-35 20.57248383023656,-28.31559480312316 33.28697807033037,-10.815594803123158 33.28697807033037,10.815594803123158 20.57248383023656,28.31559480312316 2.1431318985078682e-15,35 -20.572483830236557,28.31559480312316 -33.28697807033037,10.815594803123163 -33.28697807033038,-10.815594803123155 -20.572483830236564,-28.315594803123158" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Tenable
 
 Effort: 9
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Infra</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">Ten<title>Tenable
 
 Effort: 9
 Maturity: 3 - Defined
-When: 9 - Deployed
+When: 9 - After Deploy
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(191.9994618524728, 774.7203176037184)">
-            <polygon points="2.3727531733479967e-15,-38.75 30.295969945636156,-24.160229822025922 37.77845659704567,8.622686190807183 16.812994890805378,34.91254363121874 -16.812994890805374,34.91254363121874 -37.77845659704567,8.622686190807187 -30.29596994563616,-24.16022982202592" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="235.38192847127527, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(149.99998850848792, 616.0002245443919)">
+            <polygon points="2.1431318985078682e-15,-35 30.310889132455355,17.499999999999993 -30.310889132455348,17.50000000000001" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Threat Modelling
 
 Effort: 13
@@ -652,25 +635,42 @@ When: 1 - Pre-Dev
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(192.00079076693592, 699.1067505079719)">
-            <polygon points="2.2579425359279324e-15,-36.875 28.830035916008597,-22.991186443540798 35.950466761704746,8.205459439639093 15.999462879959959,33.223227003901705 -15.999462879959953,33.223227003901705 -35.950466761704746,8.205459439639098 -28.830035916008605,-22.991186443540794" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="223.99248031943935, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(387.46063996178475, 168.7478174229219)">
+            <polygon points="2.1431318985078682e-15,-35 33.28697807033037,-10.815594803123158 20.57248383023656,28.31559480312316 -20.572483830236557,28.31559480312316 -33.28697807033038,-10.815594803123155" style="fill: rgb(9, 146, 227); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
+                <title>Technology Operations Review Dashboard
+
+Effort: 3
+Maturity: 1 - Adhoc
+When: 4 - Local Dev
+RiskCategory: Maintenance</title>
+            </polygon>
+            <text dominant-baseline="middle" text-anchor="middle">TORD<title>Technology Operations Review Dashboard
+
+Effort: 3
+Maturity: 1 - Adhoc
+When: 4 - Local Dev
+RiskCategory: Maintenance</title>
+            </text>
+        </g>
+        <g translate="transform(955, 472.5)" transform="translate(265.7142758329688, 616.0002416068188)">
+            <polygon points="2.1431318985078682e-15,-35 35,0 2.1431318985078682e-15,35 -35,4.2862637970157365e-15" style="fill: rgb(255, 64, 64); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>AWS Well-Architected Review
 
 Effort: 12
 Maturity: 3 - Defined
-When: 2 - Pre-Dev
+When: 2 - Start dev
 RiskCategory: Code</title>
             </polygon>
             <text dominant-baseline="middle" text-anchor="middle">WelAR<title>AWS Well-Architected Review
 
 Effort: 12
 Maturity: 3 - Defined
-When: 2 - Pre-Dev
+When: 2 - Start dev
 RiskCategory: Code</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(448.1553007368718, 391.5340570935426)">
-            <polygon points="1.6838893488276107e-15,-27.5 21.500365767870818,-17.145969551115172 26.81051758500015,6.119325683798646 11.93180282573285,24.776643867316526 -11.931802825732847,24.776643867316526 -26.81051758500015,6.119325683798649 -21.50036576787082,-17.14596955111517" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="167.04523956025986, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(705.3112892900447, 282.7568339973885)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Xray
 
 Effort: 7
@@ -686,8 +686,8 @@ When: 7 - Delivery
 RiskCategory: Infra</title>
             </text>
         </g>
-        <g translate="transform(480, 477.5)" transform="translate(502.7427528367382, 398.0147580683054)">
-            <polygon points="1.6838893488276107e-15,-27.5 23.815698604072065,13.749999999999995 -23.815698604072058,13.750000000000009" style="fill: rgb(16, 237, 130); fill-opacity: 0.1;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="142.89419162443238, 10000">
+        <g translate="transform(955, 472.5)" transform="translate(756.1497528283131, 330.82258661732715)">
+            <polygon points="2.1431318985078682e-15,-35 24.748737341529164,-24.748737341529164 35,0 24.748737341529164,24.748737341529164 2.1431318985078682e-15,35 -24.74873734152916,24.748737341529164 -35,4.2862637970157365e-15 -24.748737341529168,-24.74873734152916" style="fill: rgb(16, 237, 130); fill-opacity: 0.55;" stroke="rgb(0, 0, 0)" stroke-width="1" stroke-dasharray="0, 10000">
                 <title>Zap
 
 Effort: 7
@@ -705,73 +705,65 @@ RiskCategory: Infra</title>
         </g>
     </g>
     <g id="y-axis" transform="translate(40, 0)" fill="none" font-size="10" font-family="sans-serif" text-anchor="start">
-        <path class="domain" stroke="currentColor" d="M6,764.5H0.5V287H6"></path>
-        <g class="tick" opacity="1" transform="translate(0,764.5)">
+        <path class="domain" stroke="currentColor" d="M6,616.5H0.5V100.5H6"></path>
+        <g class="tick" opacity="1" transform="translate(0, 616.5)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">1 - Pre-Dev</text>
+            <text fill="currentColor" x="9" dy="0.32em">Code</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(0,711.4444444444445)">
+        <g class="tick" opacity="1" transform="translate(0, 513.2999877929688)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">2 - Pre-Dev</text>
+            <text fill="currentColor" x="9" dy="0.32em">Cost</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(0,658.3888888888889)">
+        <g class="tick" opacity="1" transform="translate(0, 410.1000061035156)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">4 - Local Dev</text>
+            <text fill="currentColor" x="9" dy="0.32em">Deploy</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(0,605.3333333333334)">
+        <g class="tick" opacity="1" transform="translate(0, 306.8999938964844)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">4 - Local Development</text>
+            <text fill="currentColor" x="9" dy="0.32em">Infra</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(0,552.2777777777778)">
+        <g class="tick" opacity="1" transform="translate(0, 203.6999969482422)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">5 - Development</text>
+            <text fill="currentColor" x="9" dy="0.32em">Maintenance</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(0,499.22222222222223)">
+        <g class="tick" opacity="1" transform="translate(0,100.5)">
             <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">6 - Delivery</text>
-        </g>
-        <g class="tick" opacity="1" transform="translate(0,446.1666666666667)">
-            <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">6 - Pre-Delivery</text>
-        </g>
-        <g class="tick" opacity="1" transform="translate(0,393.1111111111111)">
-            <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">7 - Delivery</text>
-        </g>
-        <g class="tick" opacity="1" transform="translate(0,340.0555555555556)">
-            <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">8 - Deployed</text>
-        </g>
-        <g class="tick" opacity="1" transform="translate(0,287)">
-            <line stroke="currentColor" x2="6"></line>
-            <text fill="currentColor" x="9" dy="0.32em">9 - Deployed</text>
+            <text fill="currentColor" x="9" dy="0.32em">Support</text>
         </g>
     </g>
-    <g id="x-axis" transform="translate(0, 915)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
-        <path class="domain" stroke="currentColor" d="M192.5,-6V0.5H672.5V-6"></path>
-        <g class="tick" opacity="1" transform="translate(192.5,0)">
+    <g id="x-axis" transform="translate(0, 726)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
+        <path class="domain" stroke="currentColor" d="M150.5,-6V0.5H960.5V-6"></path>
+        <g class="tick" opacity="1" transform="translate(150.5,0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Code</text>
+            <text fill="currentColor" y="-9" dy="0em">1 - Pre-Dev</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(288.5,0)">
+        <g class="tick" opacity="1" transform="translate(266.21429443359375, 0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Cost</text>
+            <text fill="currentColor" y="-9" dy="0em">2 - Start dev</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(384.5,0)">
+        <g class="tick" opacity="1" transform="translate(381.9285583496094, 0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Deploy</text>
+            <text fill="currentColor" y="-9" dy="0em">4 - Local Dev</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(480.5,0)">
+        <g class="tick" opacity="1" transform="translate(497.6428527832031, 0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Infra</text>
+            <text fill="currentColor" y="-9" dy="0em">5 - Development</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(576.5,0)">
+        <g class="tick" opacity="1" transform="translate(613.3571166992188, 0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Maintenance</text>
+            <text fill="currentColor" y="-9" dy="0em">6 - Pre-Delivery</text>
         </g>
-        <g class="tick" opacity="1" transform="translate(672.5,0)">
+        <g class="tick" opacity="1" transform="translate(729.0714111328125, 0)">
             <line stroke="currentColor" y2="-6"></line>
-            <text fill="currentColor" y="-9" dy="0em">Support</text>
+            <text fill="currentColor" y="-9" dy="0em">7 - Delivery</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(844.7857055664062, 0)">
+            <line stroke="currentColor" y2="-6"></line>
+            <text fill="currentColor" y="-9" dy="0em">8 - Deployed</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(960.5, 0)">
+            <line stroke="currentColor" y2="-6"></line>
+            <text fill="currentColor" y="-9" dy="0em">9 - After Deploy</text>
         </g>
     </g>
 </svg>

@@ -49,30 +49,6 @@ var gs = svg.append("g");
 svg.append("g").attr("id", "y-axis").attr("transform", `translate(${40}, 0)`);
 svg.append("g").attr("id", "x-axis");
 
-// d3 load data.csv
-d3.csv("data.csv", (d) => {
-    return {
-        ...d,
-        effort: +d.effort,
-        upskilleffort: +d.upskilleffort,
-        setupeffort: +d.setupeffort,
-        risk: +d.risk,
-        costbenefit: +d.risk / +d.effort,
-        created: new Date(d.created),
-        updated: new Date(d.updated),
-        teamsize: +d.teamsize,
-        nonemin: 0,
-        nonemed: 0.5,
-        nonemax: 1,
-    };
-}).then(function (ds) {
-    data = ds;
-    compute_domains();
-    resize();
-    draw(ds);
-    restyle();
-});
-
 var domains = {};
 function compute_domains() {
     let sortedcategory = (field) =>
@@ -112,9 +88,12 @@ const resize = () => {
     height = (window.innerHeight - 10) * window.devicePixelRatio;
 
     d3.select("svg").attr("width", width).attr("height", height);
-    d3.select("#x-axis").attr("transform", `translate(0, ${height - 40*window.devicePixelRatio})`);
-    ranges.posx = d3.interpolate(EDGEPAD*1.5, width - EDGEPAD);
-    ranges.posy = d3.interpolate(height - EDGEPAD*1.5, EDGEPAD);
+    d3.select("#x-axis").attr(
+        "transform",
+        `translate(0, ${height - 40 * window.devicePixelRatio})`
+    );
+    ranges.posx = d3.interpolate(EDGEPAD * 1.5, width - EDGEPAD);
+    ranges.posy = d3.interpolate(height - EDGEPAD * 1.5, EDGEPAD);
     restyle();
 };
 
@@ -331,6 +310,37 @@ function randomize() {
 
 d3.select("form").node().onchange = () => restyle();
 d3.select("#randomize").on("click", () => randomize());
+
+// load data
+const map_csv_row = (d) => ({
+    ...d,
+    effort: +d.effort,
+    upskilleffort: +d.upskilleffort,
+    setupeffort: +d.setupeffort,
+    risk: +d.risk,
+    costbenefit: +d.risk / +d.effort,
+    created: new Date(d.created),
+    updated: new Date(d.updated),
+    teamsize: +d.teamsize,
+    nonemin: 0,
+    nonemed: 0.5,
+    nonemax: 1,
+});
+
+const LIVE_DATA_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdXoFkd-G9FpVUwPJdn2i3UiVAGkXs9eDqfL7wRtoEZCt4158ZoW189eRmCZob_fLFnO3bnOfn3zrW/pub?gid=0&single=true&output=csv";
+// d3 load data.csv
+try {
+    data = await d3.csv(LIVE_DATA_URL, map_csv_row);
+} catch (e) {
+    console.log("Failed to load live data, falling back to local data");
+    data = await d3.csv("data.csv", map_csv_row);
+}
+
+compute_domains();
+resize();
+draw(data);
+restyle();
 
 // for console debugging
 window.j = {
