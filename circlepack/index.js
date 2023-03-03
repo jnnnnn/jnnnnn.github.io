@@ -328,7 +328,7 @@ const map_csv_row = (d) => ({
 });
 
 const LIVE_DATA_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdXoFkd-G9FpVUwPJdn2i3UiVAGkXs9eDqfL7wRtoEZCt4158ZoW189eRmCZob_fLFnO3bnOfn3zrW/pub?gid=0&single=true&output=csv";
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdXoFkd-G9FpVUwPJdn2i3UiVAGkXs9eDqfL7wRtoEZCt4158ZoW189eRmCZob_fLFnO3bnOfn3zrW/pub?gid=0&single=true&output=csv&headers=0";
 // d3 load data.csv
 try {
     data = await d3.csv(LIVE_DATA_URL, map_csv_row);
