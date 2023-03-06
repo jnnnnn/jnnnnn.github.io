@@ -1,32 +1,32 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 const domains_config = {
-    category: { s: d3.scaleOrdinal },
-    maturity: { s: d3.scaleOrdinal },
-    riskcategory: { s: d3.scaleOrdinal },
-    when: { s: d3.scaleOrdinal },
+    Category: { s: d3.scaleOrdinal },
+    Maturity: { s: d3.scaleOrdinal },
+    "Risk Category": { s: d3.scaleOrdinal },
+    When: { s: d3.scaleOrdinal },
     nonemin: { s: d3.scaleSequential },
     nonemed: { s: d3.scaleSequential },
     nonemax: { s: d3.scaleSequential },
-    costbenefit: { s: d3.scaleSequential },
-    effort: { s: d3.scaleSequential },
-    upskilleffort: { s: d3.scaleSequential },
-    setupeffort: { s: d3.scaleSequential },
-    risk: { s: d3.scaleSequential },
-    created: { s: d3.scaleSequential, time: true },
-    updated: { s: d3.scaleSequential, time: true },
-    teamsize: { s: d3.scaleSequential },
+    "Cost/Benefit": { s: d3.scaleSequential },
+    Effort: { s: d3.scaleSequential },
+    "Upskill Effort": { s: d3.scaleSequential },
+    "Setup Effort": { s: d3.scaleSequential },
+    Risk: { s: d3.scaleSequential },
+    Created: { s: d3.scaleSequential, time: true },
+    Updated: { s: d3.scaleSequential, time: true },
+    "Team Size": { s: d3.scaleSequential },
 };
 
 const default_ranges = {
     size: "nonemed",
-    posx: "when",
-    posy: "riskcategory",
-    colour: "riskcategory",
+    posx: "When",
+    posy: "Risk Category",
+    colour: "Risk Category",
     saturation: "nonemed",
     strokewidth: "nonemin",
     strokelength: "nonemin",
-    sides: "when",
+    sides: "When",
 };
 
 prepare_options();
@@ -41,15 +41,15 @@ var height = window.innerHeight * window.devicePixelRatio;
 var simulation = d3.forceSimulation();
 
 // append the svg object to the body of the page
-var svg = d3.select("#polygonchart").append("svg");
+let svg = d3.select("#polygonchart").append("svg");
 
 // Initialize the polygon: all located at the center of the svg area
-var gs = svg.append("g");
+let gs = svg.append("g");
 
 svg.append("g").attr("id", "y-axis").attr("transform", `translate(${40}, 0)`);
 svg.append("g").attr("id", "x-axis");
 
-var domains = {};
+let domains = {};
 function compute_domains() {
     let sortedcategory = (field) =>
         [...new Set(data.map((d) => d[field]))].sort();
@@ -125,12 +125,10 @@ function polygon_points(radius, sides) {
     });
 }
 
-const EXTRA_HINT_FIELDS = ["Effort", "Maturity", "When", "RiskCategory"];
+const EXTRA_HINT_FIELDS = ["Effort", "Maturity", "When", "Risk Category"];
 
 const title = (d) =>
-    d.name +
-    "\n\n" +
-    EXTRA_HINT_FIELDS.map((f) => `${f}: ${d[f.toLowerCase()]}`).join("\n");
+    d.Name + "\n\n" + EXTRA_HINT_FIELDS.map((f) => `${f}: ${d[f]}`).join("\n");
 
 function draw(data) {
     gs = gs.selectAll("polygon").data(data).enter().append("g");
@@ -146,7 +144,7 @@ function draw(data) {
         )
         .on("mouseover", function (_event, d) {
             const text = JSON.stringify(d, null, 2);
-            console.log(text);
+            //console.log(text);
             //d3.select("#hint").node().innerHTML = `<pre>${text}</pre>`;
         });
 
@@ -155,13 +153,13 @@ function draw(data) {
     gs.append("text")
         .attr("dominant-baseline", "middle")
         .attr("text-anchor", "middle")
-        .text((d) => d.code)
+        .text((d) => d.Code)
         .append("title")
         .text(title);
 
     // Apply these forces to the nodes and update their positions.
     // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
-    simulation.nodes(data).on("tick", (d) => {
+    simulation.nodes(data).on("tick", () => {
         gs.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
     });
 }
@@ -234,14 +232,14 @@ const dashscale = () => (d) => {
 
 function restyle() {
     gs.select("polygon")
+        .transition()
+        .duration(1000)
         .attr("points", (d) => {
             const sides = getScale("sides")(d);
             const radius = getScale("size")(d);
             const str = polygon_points(radius, sides).join(" ");
             return str;
         })
-        .transition()
-        .duration(1000)
         .style("fill", getScale("colour"))
         .style("fill-opacity", getScale("saturation"))
         .attr("stroke", "black")
@@ -314,33 +312,33 @@ d3.select("#randomize").on("click", () => randomize());
 // load data
 const map_csv_row = (d) => ({
     ...d,
-    effort: +d.effort,
-    upskilleffort: +d.upskilleffort,
-    setupeffort: +d.setupeffort,
-    risk: +d.risk,
-    costbenefit: +d.risk / +d.effort,
-    created: new Date(d.created),
-    updated: new Date(d.updated),
-    teamsize: +d.teamsize,
+    Effort: +d["Effort"],
+    "Upskill Effort": +d["Upskill Effort"],
+    "Setup Effort": +d["Setup Effort"],
+    Risk: +d["Risk"],
+    Created: new Date(d["Created"]),
+    Updated: new Date(d["Updated"]),
+    TeamSize: +d["Team Size"],
+    "Cost/Benefit": +d["Cost/Benefit"],
     nonemin: 0,
     nonemed: 0.5,
     nonemax: 1,
 });
 
-const LIVE_DATA_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdXoFkd-G9FpVUwPJdn2i3UiVAGkXs9eDqfL7wRtoEZCt4158ZoW189eRmCZob_fLFnO3bnOfn3zrW/pub?gid=0&single=true&output=csv&headers=0";
-// d3 load data.csv
+// try this next https://stackoverflow.com/questions/74464800/download-google-sheet-as-csv-from-url-using-javascript
+// https://docs.google.com/spreadsheets/d/1PCaXLQFyUbgdJLoVp0LbQ6g4We6SuCAyhJHf694Ocp4/gviz/tq?tqx=out:csv&sheet=Sheet1
 try {
+    // couldn't figure out CORS with the IRESS sheet (can't share publically, requires IRESS credentials). Error was
+    // Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://docs.google.com/spreadsheets/d/1PCaXLQFyUbgdJLoVp0LbQ6g4We6SuCAyhJHf694Ocp4/gviz/tq?tqx=out:csv&sheet=Sheet1. (Reason: expected ‘true’ in CORS header ‘Access-Control-Allow-Credentials’).
+    // or (credentials: "omit"): HTTP 401.
+    // Fixed by using a public sheet from my personal account.
+    const LIVE_DATA_URL =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6CsJDV3HRTgoRzKxQeNvF7bB3hoC-zFU5mhHazv5iBpVIOi6oqdwCok4DVeGR1ft4rdihlxGK4wSE/pub?gid=0&single=true&output=csv";
     data = await d3.csv(LIVE_DATA_URL, map_csv_row);
 } catch (e) {
-    console.log("Failed to load live data, falling back to local data");
+    console.log("Failed to load live data, falling back to local data", e);
     data = await d3.csv("data.csv", map_csv_row);
 }
-
-compute_domains();
-resize();
-draw(data);
-restyle();
 
 // for console debugging
 window.j = {
@@ -353,3 +351,8 @@ window.j = {
     polygon_points,
     distance,
 };
+
+compute_domains();
+resize();
+draw(data);
+restyle();
