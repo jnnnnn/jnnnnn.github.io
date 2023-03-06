@@ -318,7 +318,7 @@ const map_csv_row = (d) => ({
     Risk: +d["Risk"],
     Created: new Date(d["Created"]),
     Updated: new Date(d["Updated"]),
-    TeamSize: +d["Team Size"],
+    "Team Size": +d["Team Size"],
     "Cost/Benefit": +d["Cost/Benefit"],
     nonemin: 0,
     nonemed: 0.5,
