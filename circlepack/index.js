@@ -32,6 +32,7 @@ const default_ranges = {
 prepare_options();
 
 var data = [];
+let sidebarVisible = false;
 
 // set the dimensions and margins of the graph
 var width = window.innerWidth;
@@ -83,14 +84,14 @@ let ranges = {
 };
 
 const resize = () => {
-    width = (window.innerWidth - 10) * window.devicePixelRatio;
-    height = (window.innerHeight - 10) * window.devicePixelRatio;
+    width = window.innerWidth - 10;
+    if (sidebarVisible) {
+        width /= 2;
+    }
+    height = window.innerHeight - 10;
 
     d3.select("svg").attr("width", width).attr("height", height);
-    d3.select("#x-axis").attr(
-        "transform",
-        `translate(0, ${height - 40 * window.devicePixelRatio})`
-    );
+    d3.select("#x-axis").attr("transform", `translate(0, ${height - 40})`);
     ranges.posx = d3.interpolate(EDGEPAD * 1.5, width - EDGEPAD);
     ranges.posy = d3.interpolate(height - EDGEPAD * 1.5, EDGEPAD);
     restyle();
@@ -274,9 +275,11 @@ function restyle() {
 }
 
 function updateInfoCard(d) {
+    sidebarVisible = true;
+    resize();
     document.getElementById("detail").innerHTML = `
         <div class="card">
-            <h1>${d.name}</h1>
+            <h1>${d.Name}</h1>
             <h2>What is the purpose?</h2>
             <p class="note">What is this and why is it important?</p>
             <h2>Does this apply to us?</h2>
@@ -293,6 +296,13 @@ function updateInfoCard(d) {
             </div>
         </div>
     `;
+    document.getElementById("detail").onclick = () => hideInfoCard();
+}
+
+function hideInfoCard() {
+    document.getElementById("detail").innerHTML = "";
+    sidebarVisible = false;
+    resize();
 }
 
 function randomize() {
