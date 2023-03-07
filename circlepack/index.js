@@ -34,9 +34,8 @@ prepare_options();
 var data = [];
 
 // set the dimensions and margins of the graph
-// include the dumb thing to make correct on mobiles
-var width = window.innerWidth * window.devicePixelRatio;
-var height = window.innerHeight * window.devicePixelRatio;
+var width = window.innerWidth;
+var height = window.innerHeight;
 
 var simulation = d3.forceSimulation();
 
