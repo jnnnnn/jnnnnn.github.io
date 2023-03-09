@@ -150,12 +150,27 @@ function draw(data) {
 
     gs.append("polygon").append("title").text(title);
 
-    gs.append("text")
+    const textnodes = gs
+        .append("text")
         .attr("dominant-baseline", "middle")
         .attr("text-anchor", "middle")
-        .text((d) => d.Code)
-        .append("title")
-        .text(title);
+        .attr(
+            "transform",
+            (d) => `translate(0, ${-10 - 10 * d.NameLines.length})`
+        )
+        .text("");
+
+    // split d.Name into lines and append a tspan for each line
+    textnodes
+        .selectAll("tspan")
+        .data((d) => d.NameLines)
+        .enter()
+        .append("tspan")
+        .attr("x", 0)
+        .attr("dy", "20")
+        .text((d) => d);
+
+    textnodes.append("title").text(title);
 
     // Apply these forces to the nodes and update their positions.
     // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
@@ -274,28 +289,16 @@ function restyle() {
     simulation.alpha(0.3).restart();
 }
 
-function updateInfoCard(d) {
+async function updateInfoCard(d) {
     sidebarVisible = true;
     resize();
-    document.getElementById("detail").innerHTML = `
-        <div class="card">
-            <h1>${d.Name}</h1>
-            <h2>What is the purpose?</h2>
-            <p class="note">What is this and why is it important?</p>
-            <h2>Does this apply to us?</h2>
-            <p class="note">How can a team determine that this tools is important/required for their product?  At what point(s) in the product's lifecycle should it be used and how often?  examples: in all CI/CD pipelines, for all cloud software, if your software is hosted on VMs, if you are using docker containers, before delivering new software to customer facing environments, when making significant software changes
-            </p>
-            <h2>What's the risk if we don't use it?</h2>
-            <p class="note">Consider the risk and who is impacted.  The team, our customers, Iress?</p>
-            <h2>How long will it take us?</h2>
-            <p class="note">Consider setup / first time use, including any knowledge aquisition, as well as ongoing or regular use.</p>
-            <div class="links">
-                <a href="">User Guide</a>
-                <a href="">Get Help</a>
-                <a href="">Provide Feedback</a>
-            </div>
-        </div>
-    `;
+    const contents = await fetch(`summaries/${d.Name}.html`);
+    if (contents.ok) {
+        document.getElementById("detail").innerHTML = await contents.text();
+    } else {
+        console.log(`no summary found for ${d.Name}`);
+        document.getElementById("detail").innerHTML = `<h1>${d.Name}</h1>`;
+    }
     document.getElementById("detail").onclick = () => hideInfoCard();
 }
 
@@ -332,6 +335,7 @@ const map_csv_row = (d) => ({
     nonemin: 0,
     nonemed: 0.5,
     nonemax: 1,
+    NameLines: d["Name"].split(" "),
 });
 
 // try this next https://stackoverflow.com/questions/74464800/download-google-sheet-as-csv-from-url-using-javascript
