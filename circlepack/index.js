@@ -19,14 +19,14 @@ const domains_config = {
 };
 
 const default_ranges = {
-    size: "nonemed",
-    posx: "When",
-    posy: "Risk Category",
-    colour: "Risk Category",
-    saturation: "nonemed",
+    size: "Maturity",
+    posx: "Team Size",
+    posy: "Effort",
+    colour: "Team Size",
+    saturation: "Risk",
     strokewidth: "nonemin",
     strokelength: "nonemin",
-    sides: "When",
+    sides: "Maturity",
 };
 
 prepare_options();
