@@ -11,6 +11,8 @@ Building a coaching habit will help:
 -   you and your team reconnect to the work that not only has impact but has
     meaning as well
 
+### Key questions
+
 1. What’s on Your Mind?. neither too open and broad nor too narrow and confining
 2. And What Else?. more options can lead to better decisions; you rein yourself in; and you buy yourself time
 3. What’s the real challenge here for you?. Stop the noise and encourage introspection and realizations.
@@ -18,6 +20,8 @@ Building a coaching habit will help:
 5. How can I help? Stop taking responsibility, and let them develop their own problem-solving skills.
 6. If You’re Saying Yes to This, What Are You Saying No To?.
 7. What Was Most Useful for You?. Embed the learning.
+
+### Quotes I liked
 
 > Coaching for development is about turning the focus from the issue to the
 > person dealing with the issue, the person who’s managing the fire. This
@@ -41,10 +45,10 @@ Building a coaching habit will help:
 >     detail. You want more detail because you want to fix the problem. And suddenly
 >     you’re back in the vicious circles of overdependence and overwhelm.
 
-> T is for tribe. Be on their side, and make sure they know it.
-> E is for expectation. Clear futures are safe.
-> R is for rank. Seniority is safety.
-> A is for autonomy. Real choices result in rewards and therefore safety.
+> - T is for tribe. Be on their side, and make sure they know it.
+> - E is for expectation. Clear futures are safe.
+> - R is for rank. Seniority is safety.
+> - A is for autonomy. Real choices result in rewards and therefore safety.
 
 > How to Say No When You Can’t Say No: Say yes more slowly:
 >
