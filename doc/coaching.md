@@ -83,3 +83,27 @@ Ask questions for insight (1-5), impact (6-10), Reflect, Open and active listeni
 18. Split-tracks -- Separate and prioritize key points in complex conversations to stay focused and address issues effectively.
 19. Pause and summarize -- Summarize key messages and agree on next steps in conversations to avoid confusion and ensure clarity.
 20. Reflect and embed -- Reflect on what you've learned and the impact it has had on your team. Review your progress and the skills you've developed.
+
+## Good Mentor
+
+https://vadimkravcenko.com/shorts/good-mentor/ a good guide for anyone looking
+to mentor:
+
+- Establishing the Foundation
+  - Step 1: Build Trust
+  - Step 2: Set Boundaries and Expectations.
+  - Step 3: Establish Goals and a Plan.
+- The Art of Guidance
+  - Step 1: Encourage Self-Reliance
+  - Step 2: Provide Constructive Feedback
+  - Step 3: Encourage Transparency
+  - Step 4: Promote Continuous Learning
+  - Step 5: Ask the Right Questions
+  - Step 6: Sharing Personal Stories
+- The Feedback Loop
+  - Measure yourself by objectives
+  - Do Regular Check-ins
+  - Look for tangible improvements
+  - Seek feedback from others
+  - Be open to criticism
+  - Adjusting Style Based on Context
