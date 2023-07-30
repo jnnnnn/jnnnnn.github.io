@@ -1,70 +1,110 @@
 <!DOCTYPE html>
 <meta charset="utf-8" />
 <head>
-  <title>jnnnnn</title>
+    <title>jnnnnn</title>
+    <style>
+        .section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+    </style>
 </head>
 <body>
-  <p>Welcome.</p>
-  <a href="https://github.com/jnnnnn/jnnnnn.github.io/tree/master/doc/index.md">Writings</a>
-  <p>
-    Category color generator:
-    <a href="category-colors-2L-inplace.html">2 levels</a> or
-    <a href="category-colors-constrained.html">with an arbitrary constraint</a>
-  </p>
-  <p>
-    Bachata moves: <a href="moveexplorer.html">mobile version</a> -
-    <a href="treediagram2.html">tree</a> -
-    <a href="stateexplorer.html?f=bachata_moves.txt">markov graph</a> -
-    <a href="dance-variation-bachata.html">variation</a
-    ><a href="dance-variation-salsa.html">s</a>
-  </p>
-  <p>
-    State transition diagram explorer:
-    <a href="stateexplorer.html?f=salsa_moves.txt">salsa</a>
-    -
-    <a href="stateexplorer.html?f=bachata_moves.txt">bachata</a> (<a
-      href="stateexplorer.html?f=bachata_moves_fun.txt"
-      >fun</a
-    >) -
-    <a href="eliteroute/stateexplorer.html?f=best-loop-data.tsv"
-      >ED trade routes</a
-    >
-  </p>
-  <p>
-    All your base are belong to you:
-    <a href="base-converter.html">base converter</a>
-  </p>
-  <p>
-    Decision Maker: <a href="8ball.html">Decide</a> -
-    <a href="8ball.html?type=yes">AlwaysYes</a> -
-    <a href="8ball.html?type=no">AlwaysNo</a>
-  </p>
-  <p><a href="random-spinner/">Spinning wheel</a> chooses randomly between several options</p>
-  <p>
-    Lit Dang Netflix Concentration Helper: (<a
-      href="https://youtu.be/k5QqXoVuOv8"
-      >video</a
-    >)
-  </p>
-  <p>FIX viewer: <a href="fixviewer/FixTranslate2.html">FixTranslate2</a></p>
-  <p>
-    Needs tool: <a href="needs/index.html">Needs tool</a> -
-    <a href="needs/sunburst.html?data=feelings-tree3.tsv">Feelings sunburst</a>
-    <a href="needs/blank.html?f=cherish.tsv">Cherish sliders</a>
-    <a href="needs/sunburst.html?data=cherish-tree.tsv">Cherish wheel</a>
-  </p>
-    <p><a href="oauth-pkce.svg">OAuth and PKCE</a> explanation chart</p>
-  <p>
-    GTFS visualiser: <a href="melnet/">melnet</a> (<a
-      href="https://youtu.be/swFEUJqtmvU"
-      >video</a
-    >)
-  </p>
-  <p>
-    Chart maker: <a href="quickgraph/">QuickGraph</a> -
-    <a href="quickgraph/readme.md">documentation</a>
-  </p>
-  <p>Tax Fraction: <a href="taxfrac/">TaxFrac</a></p>
-  <p><a href="sudoku/">Sudoku</a> solver in Preact</p>
-  <p><a href="oauth-pkce.svg">OAuth and PKCE</a> explanation chart</p>
+    <div class="section">
+        <p>Welcome.</p>
+        <p>
+            <a
+                href="https://github.com/jnnnnn/jnnnnn.github.io/tree/master/doc/index.md"
+                >Writings</a
+            >
+        </p>
+    </div>
+    <div class="section">
+        <h1>Psychology</h1>
+        <p><a href="needs/index.html">Needs tool</a></p>
+        <p>
+            <a href="needs/sunburst.html?data=feelings-tree3.tsv"
+                >Feelings sunburst</a
+            >
+        </p>
+        <p>
+            <a href="needs/blank.html?f=cherish.tsv">Cherish sliders</a>
+        </p>
+        <p>
+            <a href="needs/sunburst.html?data=cherish-tree.tsv"
+                >Cherish wheel</a
+            >
+        </p>
+    </div>
+    <div class="section">
+        <h1>Software toys</h1>
+        <p>
+            Chart maker: <a href="quickgraph/">QuickGraph</a> -
+            <a href="quickgraph/readme.md">documentation</a>
+        </p>
+        <p>Tax Fraction: <a href="taxfrac/">TaxFrac</a></p>
+        <p><a href="sudoku/">Sudoku</a> solver in Preact</p>
+        <p><a href="oauth-pkce.svg">OAuth and PKCE</a> explanation chart</p>
+        <p>
+            Lit Dang Netflix Concentration Helper: (<a
+                href="https://youtu.be/k5QqXoVuOv8"
+                >video</a
+            >)
+        </p>
+        <p>
+            All your base are belong to you:
+            <a href="base-converter.html">base converter</a>
+        </p>
+    </div>
+    <div class="section">
+        <h1>Visualisations</h1>
+        <p>
+            Bachata moves: <a href="moveexplorer.html">mobile version</a> -
+            <a href="treediagram2.html">tree</a> -
+            <a href="stateexplorer.html?f=bachata_moves.txt">markov graph</a> -
+            <a href="dance-variation-bachata.html">variation</a
+            ><a href="dance-variation-salsa.html">s</a>
+        </p>
+        <p>
+            State transition diagram explorer:
+            <a href="stateexplorer.html?f=salsa_moves.txt">salsa</a>
+            -
+            <a href="stateexplorer.html?f=bachata_moves.txt">bachata</a> (<a
+                href="stateexplorer.html?f=bachata_moves_fun.txt"
+                >fun</a
+            >) -
+            <a href="eliteroute/stateexplorer.html?f=best-loop-data.tsv"
+                >ED trade routes</a
+            >
+        </p>
+        <p>
+            Category color generator:
+            <a href="category-colors-2L-inplace.html">2 levels</a> or
+            <a href="category-colors-constrained.html"
+                >with an arbitrary constraint</a
+            >
+        </p>
+        <p>
+            GTFS visualiser: <a href="melnet/">melnet</a> (<a
+                href="https://youtu.be/swFEUJqtmvU"
+                >video</a
+            >)
+        </p>
+        <p>
+            Decision Maker: <a href="8ball.html">Decide</a> -
+            <a href="8ball.html?type=yes">AlwaysYes</a> -
+            <a href="8ball.html?type=no">AlwaysNo</a>
+        </p>
+        <p>
+            <a href="random-spinner/">Spinning wheel</a> chooses randomly
+            between several options
+        </p>
+    </div>
+    <div class="section">
+        <h1>Financial Markets</h1>
+
+        <p>
+            FIX viewer: <a href="fixviewer/FixTranslate2.html">FixTranslate2</a>
+        </p>
+    </div>
 </body>
