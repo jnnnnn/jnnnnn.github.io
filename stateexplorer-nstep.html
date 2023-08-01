@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- 
+stateexplorer.html: an HTML page that allows exploring state transition diagrams.
+
+The diagrams are loaded from Tab-Separated-Value files containing at least three columns: Start, Move, and End.
+Start is the starting state of a transition. 
+Move is some text describing the transition. 
+End is the final state of the transition.
+You can also have a Description column giving some extra information about the transition, that will appear as hovertext and in the move history.
+
+License: Released as Public Domain.
+Original Author: Jonathan Newnham
+-->
+<style>
+
+.nodepos {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+  fill-opacity: 0;
+  stroke-width: 3;
+}
+
+.axis {
+  stroke: #999;
+  stroke-opacity: .5;
+  fill-opacity: 0;
+  stroke-width: 1;
+}
+
+.transitionnode {
+  text-anchor: middle;
+  font-size: 11pt;
+  font-family: Calibri, Sans, sans-serif;
+}
+
+.transitionnodeselected {
+  fill: #00B;
+  font-size: 18pt;
+}
+
+.posnode {
+  font-size: 14pt;
+  font-weight: bold;
+  font-family: Times New Roman, Times, Calibri, Sans, sans-serif;
+  font-variant: normal;
+  text-anchor: middle;
+}
+
+.shortkey {
+  font-weight: bold;
+}
+
+p.setting {
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}
+
+div#explanation h3 {
+  display:inline;
+}
+div#explanation .historystate {
+  display:inline;
+  color: #888;
+}
+div#explanation .historyarrow,
+div#explanation p {
+  display:inline;
+  padding: .5em;
+}
+
+.posnodeselected {
+  font-size: 18pt;
+}
+
+</style>
+<body>
+<h1 style="display:inline">State transition explorer</h1>
+<p style="display:inline; pad-left:0.5em"><a href="stateexplorer-instructions.html">Instructions: Click things!</a></p>
+<div id="data" style="display:inline">
+  <textarea id="textdata" style="height:1.5em; width:20em; overflow-x:hidden; opacity:0.5;" placeholder="paste from spreadsheet here" onchange="load_text_data();" onkeyup="load_text_data();"></textarea>
+</div>
+<div id="controls" style="float:right">
+  <form id="fc" onsubmit="on_filter_transitions(); return false;" style="display:inline">
+    <p class="setting" title="Show transitions out of the currently selected state">
+      <input id="forwardlinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">F</span>orward links
+    </p>
+    <p class="setting" title="Show transitions leading into the currently selected state">
+      <input id="backlinks" type="checkbox" onchange="on_filter_transitions();"/><span class="shortkey">B</span>ack links
+    </p>
+    <p class="setting" title="Show transitions looping to/from the currently selected state">
+      <input id="selflinks" type="checkbox" checked onchange="on_filter_transitions();"/><span class="shortkey">S</span>elf links
+    </p>
+    <br />
+    <input type="button" value="Reload" onclick="init_states();" title="Reload the data file if it has changed."/>
+    <p class="setting" title="Hide transitions not connected to the current state. Forward and Back must be checked to show unrelated transitions.">
+      <input id="hideunrelatedtrans" type="checkbox" checked onchange="on_filter_transitions();"/>Hide <span class="shortkey">u</span>nrelated
+    </p>    
+    <p class="setting" title="Only show transitions that match this regular expression">
+      <input id="filter" type="search" placeholder="regex (filter)"/>
+    </p>
+    <br />
+    History: 
+    <span class="shortkey" onclick="for (i = 0; i < 100; i++) { history_next(); }">N</span>
+    <span class="shortkey" onclick="history_next();">→</span>
+    and
+    <span class="shortkey">P</span>
+    <span class="shortkey">←</span>
+    ;
+    <span class="shortkey">R</span>andom.    
+    <p class="setting" title="Only show 5 items in the history (deleting older ones)">
+      <input id="trimhistory" type="checkbox"/><span class="shortkey">T</span>rim
+    </p>
+    <p class="setting" title="Omit descriptions from the history.">
+      <input id="shorthistory" type="checkbox" onchange="move_history=[];"/>Brief
+    </p>
+  </form>
+</div>
+<div id="errors"></div>
+<div id="graphdiv" style="width:1100; margin:auto">
+  <svg id="graph"></svg>
+</div>
+<div id="explanation" style="min-height: 500px"></div>
+<script src="d3.v3.min.js"></script>
+<script>
+
+// jargon:
+//   * sd : state: a resting state
+//   * td : transition: a way of transitioning between states
+//   * link: a physics object of the force graph. A spring between a state and a transition.
+
+// http://bl.ocks.org/mbostock/5649592 stroke dash interpolation
+// http://bl.ocks.org/mbostock/3310323 line interpolation
+// http://bl.ocks.org/gka/5145845 circular graph of links
+// http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json explore a dag
+
+var width = 1200 || d3.select("body")[0][0].scrollWidth || 1100,
+    height = 800 || d3.select("body")[0][0].scrollHeight || 700;
+
+var color = d3.scale.category20();
+
+var gravity = 0.02;
+
+var startdelay = 0;
+
+var force = d3.layout.force()
+    .charge(-150)
+    .linkDistance(70)
+    .linkStrength(0.5)
+    // .gravity(0.5) // set later on
+    .size([width, height]);
+
+// this is used for the central node
+function strong_gravity(alpha) {
+  return function(d) {
+    d.x += (width/2 - d.x) * (0.1 + .1/(.1 + alpha));
+    d.y += (height/2 - d.y) * 0.1;
+  }
+}
+
+// a function that pushes pre-transitions to the left and post-transitions to the right.
+function separate_gravity(alpha) {
+  return function(d) {
+    if (d == state_data_selected) 
+      return; // otherwise jiggle
+
+    d.x += d.selected_next * alpha * 3;  // bool coerced to 0 or 1
+    d.x -= d.selected_prev * alpha * 3;  // bool coerced to 0 or 1
+
+    if (d.target_height) 
+      d.y += (d.target_height - d.y) * .1 * alpha;
+  };
+}
+
+
+var svg = d3.select("svg#graph")
+    .attr("width", width)
+    .attr("height", height);
+
+var layerP = svg.append("g").attr("id", "layerP"); // for link paths (background)
+var layer0 = svg.append("g").attr("id", "layer0"); // other background stuff (link text)
+var layer2 = svg.append("g").attr("id", "layer2"); // for everything else (nodes)
+
+var state_data; // states (graph nodes)
+var state_data_selected; // the currently-selected state
+var transition_data; // transitions between states (provide a path between nodes)
+var move_history = [];
+var move_history_current; // undo/redo pointer
+var move_history_next_id = 0;
+
+var filterback = document.getElementById("backlinks");
+var filterforward = document.getElementById("forwardlinks");
+
+function get_link_color(d) {
+  if (d.selected_next && d.selected_prev) return "#000";
+  if (d.selected_next) return "#040";
+  if (d.selected_prev) return "#800";
+  return "#444"; 
+}
+
+function add_history(new_move_td) {
+  // need a new data object to prevent accidental data join collisions in history list
+  // (otherwise if the same move is in the list more than once, joins will be out of order)
+  var hd = {
+    "key": move_history_next_id++,
+    "td": new_move_td
+  };
+  var shortHistory = document.getElementById("shorthistory").checked;
+  if (document.getElementById("trimhistory").checked) 
+    move_history = move_history.slice(0, 5);
+  move_history.unshift(hd);
+  move_history_current = hd;
+
+  var history_elements = d3.selectAll("div#explanation").selectAll("div")
+      .data(shortHistory?move_history.slice().reverse():move_history, function(hd) { return hd.key; });
+
+  var new_history = history_elements
+    .enter()
+    .insert("div");
+  if (shortHistory)
+    new_history.style("display", "inline");
+  if (shortHistory)
+    new_history.append("h3")
+      .classed("historystate", true)
+      .classed("historyarrow", true)
+      .text("→");
+  new_history.append("h3")
+      .classed("historymove", true)
+      .text(function(hd) { return hd.td.name; })
+      .attr("title", function(hd) { return hd.td.description; });
+  new_history.append("h3")
+      .classed("historystate", true)
+      .classed("historyarrow", true)
+      .text("→");
+  new_history.append("h3")
+      .classed("historystate", true)
+      .style("color", color(hd.td.end))
+      .text(function(hd) { return hd.td.end; });
+  if (!shortHistory) {
+    new_history.append("p")
+      .classed("historyextra", true)
+      .text(function(hd) { return hd.td.description + " ("+hd.td.ind+")"; });
+  }
+  new_history.on("click", function(hd) {
+    select_transition(hd.td);
+    move_history_current = hd;
+  });
+
+  history_elements
+    .exit()
+ // .transition()
+ //   .duration(300)
+ //   .style("opacity", 0)
+      .remove();
+}
+
+function history_next() {
+  // if we're at the top of the stack, choose at random
+  if (move_history.indexOf(move_history_current) < 1) {
+    var possible_transitions = svg.selectAll("g.linknext")[0]; // all "next" transition groups
+    var random_index = Math.floor(Math.random() * possible_transitions.length);
+    var random_transition_data = possible_transitions[random_index].__data__;      
+    select_transition(random_transition_data);
+    add_history(random_transition_data);  
+  } else {
+    // otherwise step forward
+    var current_index = move_history.indexOf(move_history_current);
+    var next_index = current_index - 1;
+    move_history_current = move_history[next_index];
+    select_transition(move_history_current.td);
+  }  
+}
+
+function history_prev() {
+  var current_index = move_history.indexOf(move_history_current);
+
+  // if we're at the bottom of the stack, choose at random
+  if (current_index === -1 || current_index === move_history.length-1) {
+    var possible_transitions = svg.selectAll("g.linkprev")[0]; // all "prev" transitions groups
+    var random_index = Math.floor(Math.random() * possible_transitions.length);
+    var random_td = possible_transitions[random_index].__data__;
+    select_state(random_td.physics_start.source);
+  } else {
+    // otherwise step backward
+    var current_index = move_history.indexOf(move_history_current);
+    var prev_index = current_index + 1;
+    move_history_current = move_history[prev_index];
+    select_transition(move_history_current.td);
+  }
+}
+
+// focus on the given transition (and associated end state)
+// take data because element might not exist until after state is selected
+function select_transition(new_td) {  
+  var new_state_element = d3
+      .selectAll(".posnode")
+      .filter(function(sd) { return sd == new_td.physics_end.target; })
+      .node();
+  
+  select_state(new_state_element.__data__);
+  
+  var new_transition_element = layer0.selectAll(".transitionnode")
+    .classed("transitionnodeselected", function(td) { return td == new_td; });
+}
+
+function layout_transitions(tds)
+{
+  var default_spacing = 50; // vertical distance between transitions, unless too many and squeezing happens
+  var spacing = Math.min(default_spacing, (height *.9) / tds.length); // only use 80% of available height
+  var first_node_height = height/2 - spacing*(tds.length-1)/2;
+  tds.forEach(function(td, i) { td.target_height = first_node_height + spacing * i; });
+}
+
+// Move a new State node to the centre of the graph, and add links in and out of it.
+function select_state(sdsel) {
+  if (!sdsel)
+  {
+    var random_index = Math.floor(Math.random() * state_data.length);
+    sdsel = state_data[random_index];
+  }
+
+  var new_state_element = d3
+    .selectAll(".posnode")
+    .filter(function(sd) { return sd == sdsel; })
+    .node();
+
+  state_data_selected = sdsel;
+
+  // remove any other selection
+  svg.selectAll(".posnodeselected").classed("posnodeselected", false);
+
+  // select the clicked node
+  var current_pos_node = d3.select(new_state_element);
+  current_pos_node.classed("posnodeselected", true);
+
+  // update data indicating selected state and transition
+  transition_data.forEach(function(td) {
+    td.selected_next = td.physics_start.source == sdsel;
+    td.selected_prev = td.physics_end  .target == sdsel;
+  });
+
+  var transition_data_visible = get_visible_transition_data();
+
+  // set which states are next and/or previous, for physics
+  state_data.forEach(function(sd) {
+    sd.selected_next = false;
+    sd.selected_prev = false;
+  });
+  transition_data_visible.forEach(function(td) {
+    if (td.selected_prev) { td.physics_start.source.selected_prev = true; }
+    if (td.selected_next) { td.physics_end  .target.selected_next = true; }
+    delete td.target_height; // free unselected transitions from height-layout constraint
+  });
+  
+  // allocate a vertical position to all the transitions (for physics)
+  // self links
+  layout_transitions(transition_data_visible
+    .filter(function(td) { return td.selected_next && td.selected_prev; })
+    .sort(function(td1, td2) { return td1.key.strcmp(td2.key); }));
+  // backward links
+  layout_transitions(transition_data_visible
+    .filter(function(td) { return !td.selected_next && td.selected_prev; })
+    .sort(function(td1, td2) { return td1.key.strcmp(td2.key); }));
+  // forward links
+  layout_transitions(transition_data_visible
+    .filter(function(td) { return td.selected_next && !td.selected_prev; })
+    .sort(function(td1, td2) { return td1.end.strcmp(td2.end); }));
+
+  draw_transitions(transition_data_visible);
+
+  // slow down any existing physics so the initial transitions are easier to spot
+  force.alpha(0.01);
+  // don't start physics straight away so we can see which move gets selected
+  setTimeout(start_physics, startdelay);
+}
+
+function draw_transitions(transition_data_visible) {
+  // create/update the visible transition elements
+  var transition_nodes = layer0.selectAll("g.linkgroup")
+      .data(transition_data_visible, function(td) { return td.key; })      
+      .classed("linknext", function(td) { return td.selected_next; })
+      .classed("linkprev", function(td) { return td.selected_prev; });
+
+  transition_nodes
+    .exit()
+    .remove(); // can't fade out because removing later might stuff up other transitions
+  
+  transition_nodes
+    .selectAll(".link")
+    .transition()
+      .duration(750)
+      .style("stroke", get_link_color); 
+
+  // enter selection
+  var new_transitions = transition_nodes
+    .enter().append("g") // supposedly merges update selection
+      .classed("linkgroup", true)      
+      .classed("linknext", function(td) { return td.selected_next; })
+      .classed("linkprev", function(td) { return td.selected_prev; })
+      .on("click", transition_node_click);
+
+  var paths = layerP.selectAll("path")
+      .data(transition_data_visible, function(td) { return td.key; });
+
+  paths.exit().remove();
+  paths.enter().append("path")
+      .attr("class", "link")
+      .style("stroke-width", function(td) { return td.count; })
+      .style("opacity", 0)
+
+  new_transitions.append('g')
+      .attr("class", "linktext")
+    .append("text")
+      .attr("dx", 0)
+      .attr("dy", ".35em")
+      .attr("class", "transitionnode")            
+      .style("opacity", 0) // will fade in
+      .attr("title", function(td) { return td.description })
+      .text(function(td) { return td.name; });
+  
+  var fade = svg.transition()
+      .delay(startdelay)
+      .duration(300);
+  fade.selectAll("path.link")
+      .style("opacity", .3)
+      .style("stroke", get_link_color);
+  fade.selectAll("g.linkgroup text")
+      .style("opacity", 1)
+      .style("fill", get_link_color);
+}
+
+function on_filter_transitions() {
+  if (d3.event)
+    d3.event.stopPropagation();
+
+  select_state(state_data_selected); // filters transitions
+}
+
+// apply filtering to the list of all transitions to choose which ones should be visible.
+function get_visible_transition_data() {
+  var selflinks = document.getElementById("selflinks").checked;
+  var hideunrelatedtrans = document.getElementById("hideunrelatedtrans").checked;
+  var backlinks = document.getElementById("backlinks").checked;
+  var forwardlinks = document.getElementById("forwardlinks").checked;
+
+  var re_filter = new RegExp(document.getElementById("filter").value, "i"); // i for case-insensitive
+
+  return transition_data.filter( function(td) {
+          return (selflinks || !(td.start === td.end)) 
+              && !(hideunrelatedtrans && !(td.selected_prev || td.selected_next))
+              && (backlinks || td.selected_next)
+              && (forwardlinks || td.selected_prev)
+              && (re_filter.test(td.key));
+      });
+}
+
+function start_physics() {  
+  var transition_data_visible = get_visible_transition_data();
+  var transition_link_data = []; // links from state to transition and transition to state. for physics simulation.
+  transition_data_visible.forEach(function(td) {
+    transition_link_data.push(td.physics_start);
+    if (!td.nochange) // don't need two identical links for physics
+      transition_link_data.push(td.physics_end);
+  });
+
+  var all_nodes = state_data.concat(transition_data_visible);
+
+  force
+    .nodes(all_nodes)
+    .gravity(gravity * (1 + 0.03 * all_nodes.length))
+    .links(transition_link_data)
+    .start();
+
+  var state_node = svg.selectAll("g.posnode");
+  var state_node_selected = svg.selectAll("g.posnodeselected");
+  var link_lines = svg.selectAll("path.link");
+  var link_nodes_text = svg.selectAll("g.linktext");
+  var link_nodes = svg.selectAll("g.linkgroup");
+
+  force.on("tick", function(e) {
+    // a little bit of custom physics
+    link_nodes.each(separate_gravity(15 * e.alpha));
+    state_node.each(separate_gravity(15 * e.alpha));
+    state_node_selected.each(strong_gravity(e.alpha));
+    // move the paths
+    link_lines.attr("d", function(td) {
+      var start_node      = td.physics_start.source;
+      var transition_node = td.physics_start.target;
+      var end_node        = td.physics_end.target;
+      var points = [
+          [start_node.x, start_node.y],
+          [transition_node.x - 2.3*td.name.length, transition_node.y],
+          [transition_node.x                     , transition_node.y],
+          [transition_node.x + 2.3*td.name.length, transition_node.y],          
+          [end_node.x, end_node.y],
+      ];      
+      return d3.svg.line()
+          .interpolate("monotone")
+          (points);
+    });
+    // move the text and circles
+    state_node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    // move the link text
+    link_nodes_text.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  });
+}
+
+function load_text_data() {
+  var raw = document.getElementById("textdata").value;
+  if (!raw)
+    return;
+  var csv_rows = d3.tsv.parse(raw);
+  load_rows(csv_rows);
+  document.getElementById("textdata").value = "";
+}
+
+// combine multiple duplicate rows, keeping count.
+function build_transitions_from_rows(state_data, csv_rows) {  
+  // while we're building the array of transitions, there might be some duplicates. 
+  // Use a map to keep count then return in an array after.
+  var build_transitions = {}; 
+
+  // map state name -> full data entry
+  var state_map = {};  
+  state_data.forEach(function(sd) { 
+    state_map[sd.name] = sd; 
+  });
+  
+  csv_rows.forEach(function(row) {
+    var key = row.Start + "->" + row.Move + "->" + row.End;
+    if (!build_transitions[key])
+    {
+      var td = { // td
+        "key": key,
+        "start": row.Start,
+        "name": row.Move,
+        "end": row.End,        
+        "description": row.Description,
+        "count": 1,
+        "nochange": row.Start === row.End,
+        "ind": row.Index
+      };
+
+      // for physics simulation (start and end link are independent)
+      td.physics_start = {
+        source: state_map[row.Start],
+        target: td // yep, circular reference
+      };
+      td.physics_end = {
+        source: td, // yep, circular reference
+        target: state_map[row.End]
+      };
+
+      if (state_map[row.Start] === undefined || state_map[row.End] === undefined)
+          throw "Undefined state lol";
+
+      state_map[row.Start].size += 1;
+      state_map[row.End].size += 1;
+
+      // finished construction, save it for returning (or counting)
+      build_transitions[key] = td;
+    } else {
+      // this row is a duplicate; increase count instead.
+      build_transitions[key].count += 1;
+    }
+  });
+
+  var transition_data = [];
+  for (var transition in build_transitions)
+    transition_data.push(build_transitions[transition]);
+  return transition_data;
+}
+
+function init_states() {  
+  force.stop();
+
+  layerP.selectAll('*').remove();
+  layer0.selectAll('*').remove();
+  layer2.selectAll('*').remove();
+
+  var matches = /f=([^&#=]*)/.exec(window.location.search);
+  if (!matches || matches[1] === "")
+    document.getElementById("errors").innerHTML="Error: state-transition-data-file name not specified. Use an '?f=' parameter in the url.";
+  var datafile = matches[1];
+
+  d3.tsv(datafile, function(error, csv_rows) {
+
+    if (error)
+      document.getElementById("errors").innerHTML = "Couldn't load " + datafile + ": " + error.statusText;
+    else
+      load_rows(csv_rows);
+  });
+}
+
+function load_rows(csv_rows) {
+  document.getElementById("errors").innerHTML = "";
+  var start_states = d3.set(csv_rows.map(function(row){ return row.Start; })).values();
+  var end_states = d3.set(csv_rows.map(function(row){ return row.End; })).values();
+  var states = d3.set(start_states.concat(end_states)).values();
+  state_data = states.map(function(state, index){ 
+    return { // sd
+      name: state, 
+      x:width / 2, 
+      y:22 + 22*index, 
+      size: 0
+    }; 
+  }); 
+  
+  // colours from http://jnnnnn.github.io/category-colors-2L-inplace.html
+  color = d3.scale.ordinal()
+      .domain(states)
+      .range(["#30c514", "#9321ff", "#d31911", "#0d7396", "#fb83c5", "#c2a962", "#3162db", "#3cc091", "#8e5e60", "#fc9010", "#46770e", "#ae2fba", "#fc8c71", "#cc1e58", "#98a7f4", "#9eafab", "#8c5697", "#aab31e", "#607049", "#9a5c17", "#33bcc2", "#69bf51", "#2f56ff", "#ca9fb8", "#cb0783", "#dc8df4", "#296bb9", "#d4a424", "#3cb6f3", "#756c12", "#157a48", "#b94335", "#af466c", "#da9d88", "#656b75", "#137775", "#f28ea1", "#93b486", "#8c41dc", "#83653e", "#96adcf", "#b34a07", "#e39c56", "#93b760", "#8254b9", "#ae408d", "#fd77f5", "#74be19", "#9e583f", "#696597", "#b9aa87", "#d01b37", "#ae0edc", "#d696d0", "#19c46b", "#f8914a", "#42c341", "#bcac46", "#a35356", "#50716a", "#4864c4", "#1fbbda", "#6eb9aa", "#5b7230", "#8c5a81", "#be3b4c", "#7c50d0", "#7fb3c3", "#027c2f", "#736a54", "#63afff", "#be9de8", "#9f44ae", "#69bd79", "#a9b06e", "#fd7ddd", "#bca79f", "#8fb932", "#725eae"]);
+
+  transition_data = build_transitions_from_rows(state_data, csv_rows); 
+
+  layer0.selectAll(".axis").data([
+        [[0, height/2],[width, height/2]],
+        [[width/2, 0],[width/2, height]],
+    ])
+    .enter().append("path")
+      .attr("d", function(d) { return d3.svg.line().interpolate("monotone")(d); })
+      .classed("axis", true);
+
+  var state_node = layer2.selectAll(".posnode")
+      .data(state_data)
+    .enter().append("g")
+      .classed("posnode", true)
+      .attr("transform", function(d, i) { return "translate(" + d.x + "," + d.y + ")"; })
+      .on("click", posnodeclick)      
+      .call(force.drag);
+
+  state_node.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", function(sd, i) { return 7 + Math.sqrt(sd.size); })
+      .style("fill", function(sd, i) { return color(sd.name); })
+      .style("opacity", 0.5)
+      ;
+
+  state_node.append("text")
+      .attr("dy", "4pt")
+      .attr("class", "posnode")        
+      .text(function(sd) { return sd.name; })
+      .style("fill", "black")
+      ;
+
+  select_state(); // select a state at random to start things off  
+}
+
+function posnodeclick (sd)
+{ 
+  if (d3.event.defaultPrevented)
+    return; // don't "click" if dragged.
+  move_history_current = undefined;
+  select_state(sd);
+}
+
+function transition_node_click(td)
+{
+  if (d3.event.defaultPrevented)
+    return; // don't "click" if dragged.  
+
+  move_history_current = undefined;
+  select_transition(td);
+  add_history(td);
+}
+
+function togglecheckbox(id)
+{
+  document.getElementById(id).checked = !document.getElementById(id).checked;
+  select_state(state_data_selected);
+  if (d3.event)
+    d3.event.stopPropagation();
+}
+
+function onkeypress()
+{
+  // http://stackoverflow.com/questions/15261447/how-do-i-capture-keystroke-events-in-d3-force-layout
+  // finding keyCodes: http://jsfiddle.net/qAHC2/292/
+  switch(d3.event.keyCode) {        
+    case 39: // right arrow
+    case 78: // n
+      history_next();
+      break;
+    case 37: // left arrow
+    case 80: // p
+      history_prev();
+      break;
+    case 85: // u
+      togglecheckbox("hideunrelatedtrans");
+      break;
+    case 83: // s
+      togglecheckbox("selflinks");
+      break;
+    case 66: // b
+      togglecheckbox("backlinks");
+      break;
+    case 70: // f
+      togglecheckbox("forwardlinks");
+      break;
+    case 82: // r
+      select_state(); // choose a random state
+      break;
+    case 84: // t
+      togglecheckbox("trimhistory");
+      break;
+    // case 37: // left
+    // case 38: // up
+    // case 40: // down
+    case 220: // backslash
+    case 191: // forward slash
+      document.getElementById("filter").focus();
+    default:
+      console.log(d3.event.keyCode);
+      break;
+  };
+  d3.event.stopPropagation();
+}
+
+d3.select("body")
+    .on("keydown", onkeypress);
+
+d3.select("input#filter")
+    .on("keyup", function(keyevent) {
+      on_filter_transitions();
+      d3.event.stopPropagation();
+    });
+
+d3.select("input#filter")
+    .on("keydown", function(keyevent) {
+      d3.event.stopPropagation();
+    });
+
+
+String.prototype.strcmp = function(s) {
+    if (this < s) return -1;
+    if (this > s) return 1;
+    return 0;
+}
+
+init_states();
+
+</script>
