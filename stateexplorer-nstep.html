@@ -73,6 +73,11 @@ Original Author: Jonathan Newnham
         display: inline;
         padding: 0.5em;
     }
+    div#allstates {
+      display: grid;
+      /* each column is 5em wide */
+      grid-template-columns: repeat(auto-fill, 10em);
+    }
 
     .posnodeselected {
         font-size: 18pt;
@@ -158,6 +163,20 @@ Original Author: Jonathan Newnham
                 <input id="filter" type="search" placeholder="regex (filter)" />
             </p>
             <br />
+            <!-- a numeric entry for setting DEPTH_LIMIT -->
+            <p
+                class="setting"
+                title="Show transitions up to this many steps away from the selected state"
+            >
+                <input
+                    id="depthlimit"
+                    type="number"
+                    min="1"
+                    max="10"
+                    value="2"
+                    onchange="DEPTH_LIMIT = this.value; on_filter_transitions();"
+                /><span class="shortkey">D</span>epth limit
+            <br />
             History:
             <span
                 class="shortkey"
@@ -186,6 +205,7 @@ Original Author: Jonathan Newnham
                 />Brief
             </p>
         </form>
+        <div id="allstates"></div>
     </div>
     <div id="errors"></div>
     <div id="graphdiv" style="width: 1100; margin: auto">
@@ -217,9 +237,9 @@ let DEPTH_LIMIT = 2;
 
 var force = d3.layout
     .force()
-    .charge(-150)
+    .charge(-3)
     .linkDistance(70)
-    .linkStrength(0.5)
+    .linkStrength(0.1)
     // .gravity(0.5) // set later on
     .size([width, height]);
 
@@ -412,6 +432,7 @@ function select_state(sdsel) {
         // move old node to a random position so we can click it
         let s = state_data_selected;
         while (
+            // stay away from the middle
             Math.abs(s.x - width / 2) < width / 5 &&
             Math.abs(s.y - height / 2) < height / 5
         ) {
@@ -446,7 +467,7 @@ function select_state(sdsel) {
     var transition_data_visible = get_visible_transition_data();
 
     // allocate a vertical position to all the transitions (for physics)
-    for (let depth = -DEPTH_LIMIT; depth <= DEPTH_LIMIT; depth++) {
+    for (let depth = -DEPTH_LIMIT*2; depth <= DEPTH_LIMIT*2; depth++) {
         let transitions_at_depth = transition_data_visible
             .filter((td) => td.depth === depth)
             .sort((td1, td2) => td1.key.strcmp(td2.key));
@@ -490,8 +511,8 @@ function compute_visible_states(sdsel) {
     sdsel.depth = 0;
 
     // Step 3: Iterate through the states, setting the depth of the next state to the current depth + 1.
-    let forward_links = sdsel.forward_links;
-    let backward_links = sdsel.backward_links;
+    let forward_links = document.getElementById("forwardlinks").checked ? sdsel.forward_links : [];
+    let backward_links = document.getElementById("backlinks").checked ? sdsel.backward_links : [];
     let depth = 0;
     while (
         forward_links.length + backward_links.length > 0 &&
@@ -501,7 +522,7 @@ function compute_visible_states(sdsel) {
         let forward_links_next = [];
         for (let sd of forward_links) {
             if (sd.depth === false) {
-                sd.depth = depth + 1;
+                sd.depth = 2*(depth + 1);
                 forward_links_next = forward_links_next.concat(
                     sd.forward_links
                 );
@@ -511,7 +532,7 @@ function compute_visible_states(sdsel) {
         let backward_links_next = [];
         for (let sd of backward_links) {
             if (sd.depth === false) {
-                sd.depth = -depth - 1;
+                sd.depth = -2*(depth + 1);
                 backward_links_next = backward_links_next.concat(
                     sd.backward_links
                 );
@@ -529,7 +550,7 @@ function draw_visible_states() {
     state_nodes.style("opacity", (sd) => {
         // if the second character is '-', make it less visible
         const f = sd.name[1] === "-" ? 0.8 : 1;
-        return f * (sd.depth !== false ? 1 : 0.3);
+        return f * (sd.depth !== false ? 1 : 0.1);
     });
 }
 
@@ -604,6 +625,14 @@ function on_filter_transitions() {
     select_state(state_data_selected); // filters transitions
 }
 
+// -2 -> -1, 4 -> 3, 0 -> 0, 1 -> 0
+function one_step_towards_center(n) {
+    if (n < 0) return n + 1;
+    if (n > 0) return n - 1;
+    return 0;
+}
+
+
 // apply filtering to the list of all transitions to choose which ones should be visible.
 function get_visible_transition_data() {
     var selflinks = document.getElementById("selflinks").checked;
@@ -618,14 +647,9 @@ function get_visible_transition_data() {
     transition_data.forEach((td) => {
         let s = td.physics_start.source.depth;
         let t = td.physics_end.target.depth;
-        if (s !== false && t !== false) td.depth = s + t;
+        if (s !== false && t !== false) td.depth = one_step_towards_center(s + t);
         else td.depth = false;
     });
-
-    // log all depths as a console group
-    console.groupCollapsed("Transition depths");
-    transition_data.forEach((td) => console.log(td.key + ": " + td.depth));
-    console.groupEnd();
 
     return transition_data.filter(function (td) {
         return (
@@ -711,10 +735,11 @@ function build_transitions_from_rows(state_data, csv_rows) {
     var state_map = {};
     state_data.forEach(function (sd) {
         state_map[sd.name] = sd;
+        sd.key = sd.name; // for sorting later
     });
 
     csv_rows.forEach(function (row) {
-        var key = row.Start + "->" + row.Move + "->" + row.End;
+        var key = row.Start + "->" + row.End + "(" + row.Move + ")";
         if (!build_transitions[key]) {
             var td = {
                 // td
@@ -846,6 +871,17 @@ function load_rows(csv_rows) {
         })
         .on("click", posnodeclick)
         .call(force.drag);
+
+    document.getElementById("allstates").innerHTML = "";
+    d3.select("div#allstates")
+        .selectAll("div")
+        .data(state_data)
+        .enter()
+        .append("div")
+        .attr("class", "allstate")
+        .style("color", sd => color(sd.name))
+        .text(sd => sd.name)
+        .on("click", sd => select_state(sd));
 
     state_node
         .append("circle")
