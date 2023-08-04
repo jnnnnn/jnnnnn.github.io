@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <!-- 
-stateexplorer.html: an HTML page that allows exploring state transition diagrams.
+stateexplorer-nstep.html: an HTML page that allows exploring state transition diagrams, showing N steps before and after the selected state.
 
 The diagrams are loaded from Tab-Separated-Value files containing at least three columns: Start, Move, and End.
 Start is the starting state of a transition. 
@@ -148,6 +148,8 @@ var color = d3.scale.category20();
 var gravity = 0.02;
 
 var startdelay = 0;
+
+let DEPTH_LIMIT = 2;
 
 var force = d3.layout.force()
     .charge(-150)
@@ -339,25 +341,17 @@ function select_state(sdsel) {
   var current_pos_node = d3.select(new_state_element);
   current_pos_node.classed("posnodeselected", true);
 
+
+  compute_visible_states(sdsel);
+
   // update data indicating selected state and transition
   transition_data.forEach(function(td) {
-    td.selected_next = td.physics_start.source == sdsel;
-    td.selected_prev = td.physics_end  .target == sdsel;
+    td.selected_next = td.physics_start.source.selected_next != false;
+    td.selected_prev = td.physics_end  .target.selected_prev != false;
   });
 
   var transition_data_visible = get_visible_transition_data();
 
-  // set which states are next and/or previous, for physics
-  state_data.forEach(function(sd) {
-    sd.selected_next = false;
-    sd.selected_prev = false;
-  });
-  transition_data_visible.forEach(function(td) {
-    if (td.selected_prev) { td.physics_start.source.selected_prev = true; }
-    if (td.selected_next) { td.physics_end  .target.selected_next = true; }
-    delete td.target_height; // free unselected transitions from height-layout constraint
-  });
-  
   // allocate a vertical position to all the transitions (for physics)
   // self links
   layout_transitions(transition_data_visible
@@ -378,6 +372,61 @@ function select_state(sdsel) {
   force.alpha(0.01);
   // don't start physics straight away so we can see which move gets selected
   setTimeout(start_physics, startdelay);
+}
+
+// Algorithm Summary:
+// breadth-first the state graph, setting depth as we go, starting from the selected state
+// selected_next records the depth of the end of the first encountered transition -- i.e. minimum distance to the right
+// selected_prev records the (negative) depth of the start of the first encountered transition -- i.e. minimum distance to the left
+function compute_visible_states(sdsel) {
+  // reset all nodes to invisible
+  state_data.forEach(sd => { 
+    sd.visible = false; 
+    sd.forward_links = []; 
+    sd.backward_links = []; 
+    sd.selected_next = false;
+    sd.selected_prev = false;
+  });
+
+  // Step 1: Each transition links to a start state and an end state. Build a list of links for each state.
+  for (let td of transition_data) {
+    td.physics_start.source.forward_links.push(td.physics_end.target);
+    td.physics_end.target.backward_links.push(td.physics_start.source);
+    delete td.target_height;
+  }
+
+  // Step 2: Start with the selected state. Set its forward (selected_next) and backward (selected_prev) depth to 0.
+  sdsel.selected_next = 0;
+  sdsel.selected_prev = 0;
+
+  // Step 3: Iterate through the states, setting the depth of the next state to the current depth + 1.
+  let forward_links = [];
+  let backward_links = [];
+  let depth = 0;
+  while ((forward_links.length + backward_links.length) > 0 && depth <= DEPTH_LIMIT) {
+    // Step 3a: For the next iteration, we need to know which states were visited in the previous one.
+    let forward_links_next = [];
+    for (let sd of forward_links) {
+      if (sd.selected_next === false) {
+        sd.selected_next = depth + 1;
+        sd.visible = true;
+        forward_links_next = forward_links_next.concat(sd.forward_links);
+      }
+    }
+    forward_links = forward_links_next;
+    let backward_links_next = [];
+    for (let sd of backward_links) {
+      if (sd.selected_prev === false) {
+        sd.selected_prev = depth - 1;
+        sd.visible = true;
+        backward_links_next = backward_links_next.concat(sd.backward_links);
+      }
+    }
+    backward_links = backward_links_next;
+
+    // Step 3c: Increment the depth.
+    depth++;
+  }
 }
 
 function draw_transitions(transition_data_visible) {
