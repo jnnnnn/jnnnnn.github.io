@@ -1,0 +1,855 @@
+Index	Start	End	Move	Parent	Tags	Origin	Date	Video Description
+1	Ferrite Dust	GoldFromEmeril	1	root				
+2	Oxygen	GoldFromEmeril	1	root				
+3	Emeril	GoldFromEmeril	1	root				
+4	GoldFromEmeril	Gold	10	root				
+5	Salvaged Data	Nanite Cluster	15.00	root				
+6	Living Pearl	Gold	100.00	root				
+7	Hypnotic Eye	Living Slime	50.00	root				
+8	Hadal Core	Nanite Cluster	50.00	root				
+9	Crystal Sulphide	Sodium Nitrate	50.00	root				
+10	Larval Core	Nanite Cluster	50.00	root				
+11	Cyto-Phosphate	Condensed Carbon	1.00	root				
+12	Hexite	Gold	1.00	root				
+13	Frost Crystal	Glass	0.03	root				
+14	Gold	Pyrite	1.00	root				
+15	Platinum	Nanite Cluster	0.03	root				
+16	Pugneum	Nanite Cluster	0.04	root				
+17	Mordite	Faecium	0.33	root				
+18	Oxygen	Carbon	1.00	root				
+19	Di-hydrogen	Di-hydrogen Jelly	0.03	root				
+20	Di-hydrogen Jelly	Di-hydrogen	40.00	root				
+21	Cobalt	Ionised Cobalt	0.50	root				
+22	Ionised Cobalt	Cobalt	2.00	root				
+23	Condensed Carbon	Carbon	2.00	root				
+24	Carbon	Condensed Carbon	0.50	root				
+25	Sodium	Sodium Nitrate	0.50	root				
+26	Sodium Nitrate	Sodium	2.00	root				
+27	Ferrite Dust	Pure Ferrite	1.00	root				
+28	Pure Ferrite	Magnetised Ferrite	0.50	root				
+29	Magnetised Ferrite	Pure Ferrite	2.00	root				
+30	Cadmium	Chromatic Metal	1.00	root				
+31	Indium	Chromatic Metal	2.00	root				
+32	Emeril	Chromatic Metal	1.50	root				
+33	Copper	Chromatic Metal	0.50	root				
+34	Activated Cadmium	Chromatic Metal	2.00	root				
+35	Activated Indium	Chromatic Metal	4.00	root				
+36	Activated Emeril	Chromatic Metal	3.00	root				
+37	Activated Copper	Chromatic Metal	1.00	root				
+38	Paraffinium	Ferrite Dust	1.00	root				
+39	Pyrite	Ferrite Dust	1.00	root				
+40	Ammonia	Ferrite Dust	1.00	root				
+41	Uranium	Ferrite Dust	1.00	root				
+42	Dioxite	Ferrite Dust	1.00	root				
+43	Phosphorus	Ferrite Dust	1.00	root				
+44	Salt	Chlorine	0.50	root				
+45	Chlorine	Salt	2.00	root				
+46	Sulphurine	Radon	0.33	root				
+47	Radon	Nitrogen	0.33	root				
+48	Nitrogen	Sulphurine	0.33	root				
+49	Residual Goop	Viscous Fluids	1.00	root				
+50	Runaway Mould	Nanite Cluster	0.20	root				
+51	Rusted Metal	Ferrite Dust	2.00	root				
+52	Living Slime	Runaway Mould	1.00	root				
+53	Viscous Fluids	Living Slime	1.00	root				
+54	Tritium	Di-hydrogen	0.20	root				
+55	Fungal Mould	Carbon	2.00	root				
+56	Gamma Root	Carbon	2.00	root				
+57	Cactus Flesh	Carbon	2.00	root				
+58	Solanium	Carbon	2.00	root				
+59	Star Bulb	Carbon	2.00	root				
+60	Marrow Bulb	Sodium	1.00	root				
+61	Kelp Sac	Oxygen	1.00	root				
+62	Faecium	Mordite	0.67	root				
+63	Aronium	Silver	250.00	root				
+64	Dirty Bronze	Silver	250.00	root				
+65	Herox	Silver	250.00	root				
+66	Lemmium	Gold	125.00	root				
+67	Magno-Gold	Gold	125.00	root				
+68	Grantine	Gold	125.00	root				
+69	Geodesite	Platinum	250.00	root				
+70	Iridesite	Platinum	250.00	root				
+100	Cyto-Phosphate	M-1	50	root	double,1			
+101	Salt	M-1	50	root	double,2			
+102	M-1	Glass	1	root	double,result			
+103	Faecium	M-2	1	root	double,1			
+104	Hexite	M-2	1	root	double,2			
+105	M-2	Nanite Cluster	1	root	double,result			
+106	Faecium	M-3	1	root	double,1			
+107	Residual Goop	M-3	1	root	double,2			
+108	M-3	Gold	1	root	double,result			
+109	Gold	M-4	1	root	double,1			
+110	Silver	M-4	1	root	double,2			
+111	M-4	Platinum	1	root	double,result			
+112	Uranium	M-5	1	root	double,1			
+113	Di-hydrogen	M-5	1	root	double,2			
+114	M-5	Condensed Carbon	2	root	double,result			
+115	Sulphurine	M-6	1	root	double,1			
+116	Di-hydrogen	M-6	1	root	double,2			
+117	M-6	Solanium	1	root	double,result			
+118	Radon	M-7	1	root	double,1			
+119	Di-hydrogen	M-7	1	root	double,2			
+120	M-7	Uranium	1	root	double,result			
+121	Nitrogen	M-8	1	root	double,1			
+122	Di-hydrogen	M-8	1	root	double,2			
+123	M-8	Ammonia	1	root	double,result			
+124	Di-hydrogen	M-9	1	root	double,1			
+125	Oxygen	M-9	1	root	double,2			
+126	M-9	Salt	1	root	double,result			
+127	Di-hydrogen	M-10	1	root	double,1			
+128	Carbon	M-10	1	root	double,2			
+129	M-10	Faecium	1	root	double,result			
+130	Di-hydrogen	M-11	1	root	double,1			
+131	Condensed Carbon	M-11	1	root	double,2			
+132	M-11	Mordite	1	root	double,result			
+133	Ferrite Dust	M-12	1	root	double,1			
+134	Carbon	M-12	1	root	double,2			
+135	M-12	Magnetised Ferrite	1	root	double,result			
+136	Ferrite Dust	M-13	1	root	double,1			
+137	Condensed Carbon	M-13	1	root	double,2			
+138	M-13	Magnetised Ferrite	2	root	double,result			
+139	Pure Ferrite	M-14	1	root	double,1			
+140	Carbon	M-14	1	root	double,2			
+141	M-14	Magnetised Ferrite	2	root	double,result			
+142	Pure Ferrite	M-15	1	root	double,1			
+143	Condensed Carbon	M-15	1	root	double,2			
+144	M-15	Magnetised Ferrite	3	root	double,result			
+145	Di-hydrogen	M-16	1	root	double,1			
+146	Tritium	M-16	1	root	double,2			
+147	M-16	Deuterium	1	root	double,result			
+148	Pure Ferrite	M-17	1	root	double,1			
+149	Oxygen	M-17	1	root	double,2			
+150	M-17	Rusted Metal	2	root	double,result			
+151	Ferrite Dust	M-18	1	root	double,1			
+152	Oxygen	M-18	1	root	double,2			
+153	M-18	Rusted Metal	1	root	double,result			
+154	Carbon	M-19	2	root	double,1			
+155	Oxygen	M-19	2	root	double,2			
+156	M-19	Condensed Carbon	5	root	double,result			
+157	Condensed Carbon	M-20	1	root	double,1			
+158	Oxygen	M-20	2	root	double,2			
+159	M-20	Condensed Carbon	6	root	double,result			
+160	Sodium	M-21	1	root	double,1			
+161	Oxygen	M-21	1	root	double,2			
+162	M-21	Sodium Nitrate	1	root	double,result			
+163	Sodium Nitrate	M-22	1	root	double,1			
+164	Oxygen	M-22	1	root	double,2			
+165	M-22	Sodium Nitrate	2	root	double,result			
+166	Carbon	M-23	1	root	double,1			
+167	Sodium	M-23	1	root	double,2			
+168	M-23	Sodium Nitrate	1	root	double,result			
+169	Condensed Carbon	M-24	1	root	double,1			
+170	Sodium	M-24	1	root	double,2			
+171	M-24	Sodium Nitrate	2	root	double,result			
+172	Carbon	M-25	1	root	double,1			
+173	Sodium Nitrate	M-25	1	root	double,2			
+174	M-25	Dioxite	1	root	double,result			
+175	Condensed Carbon	M-26	1	root	double,1			
+176	Sodium Nitrate	M-26	1	root	double,2			
+177	M-26	Dioxite	2	root	double,result			
+178	Carbon	M-27	1	root	double,1			
+179	Pugneum	M-27	1	root	double,2			
+180	M-27	Mordite	1	root	double,result			
+181	Condensed Carbon	M-28	1	root	double,1			
+182	Pugneum	M-28	1	root	double,2			
+183	M-28	Mordite	2	root	double,result			
+184	Sodium	M-29	1	root	double,1			
+185	Pugneum	M-29	1	root	double,2			
+186	M-29	Sodium Nitrate	1	root	double,result			
+187	Sodium Nitrate	M-30	1	root	double,1			
+188	Pugneum	M-30	1	root	double,2			
+189	M-30	Sodium Nitrate	3	root	double,result			
+190	Carbon	M-31	2	root	double,1			
+191	Mordite	M-31	1	root	double,2			
+192	M-31	Faecium	3	root	double,result			
+193	Condensed Carbon	M-32	1	root	double,1			
+194	Mordite	M-32	1	root	double,2			
+195	M-32	Faecium	4	root	double,result			
+196	Sodium	M-33	2	root	double,1			
+197	Mordite	M-33	1	root	double,2			
+198	M-33	Marrow Bulb	3	root	double,result			
+199	Sodium Nitrate	M-34	1	root	double,1			
+200	Mordite	M-34	1	root	double,2			
+201	M-34	Marrow Bulb	4	root	double,result			
+202	Ferrite Dust	M-35	2	root	double,1			
+203	Pugneum	M-35	1	root	double,2			
+204	M-35	Pure Ferrite	3	root	double,result			
+205	Pure Ferrite	M-36	2	root	double,1			
+206	Pugneum	M-36	1	root	double,2			
+207	M-36	Magnetised Ferrite	3	root	double,result			
+208	Magnetised Ferrite	M-37	3	root	double,1			
+209	Pugneum	M-37	1	root	double,2			
+210	M-37	Magnetised Ferrite	4	root	double,result			
+211	Cadmium	M-38	1	root	double,1			
+212	Chromatic Metal	M-38	1	root	double,2			
+213	M-38	Cadmium	2	root	double,result			
+214	Indium	M-39	1	root	double,1			
+215	Chromatic Metal	M-39	1	root	double,2			
+216	M-39	Indium	2	root	double,result			
+217	Emeril	M-40	1	root	double,1			
+218	Chromatic Metal	M-40	1	root	double,2			
+219	M-40	Emeril	2	root	double,result			
+220	Copper	M-41	1	root	double,1			
+221	Chromatic Metal	M-41	1	root	double,2			
+222	M-41	Copper	2	root	double,result			
+223	Paraffinium	M-42	1	root	double,1			
+224	Star Bulb	M-42	1	root	double,2			
+225	M-42	Star Bulb	2	root	double,result			
+226	Pyrite	M-43	1	root	double,1			
+227	Cactus Flesh	M-43	1	root	double,2			
+228	M-43	Cactus Flesh	2	root	double,result			
+229	Ammonia	M-44	1	root	double,1			
+230	Fungal Mould	M-44	1	root	double,2			
+231	M-44	Fungal Mould	2	root	double,result			
+232	Uranium	M-45	1	root	double,1			
+233	Gamma Root	M-45	1	root	double,2			
+234	M-45	Gamma Root	2	root	double,result			
+235	Dioxite	M-46	1	root	double,1			
+236	Frost Crystal	M-46	1	root	double,2			
+237	M-46	Frost Crystal	2	root	double,result			
+238	Phosphorus	M-47	1	root	double,1			
+239	Solanium	M-47	1	root	double,2			
+240	M-47	Solanium	2	root	double,result			
+241	Salt	M-48	2	root	double,1			
+242	Oxygen	M-48	2	root	double,2			
+243	M-48	Chlorine	5	root	double,result			
+244	Chlorine	M-49	1	root	double,1			
+245	Oxygen	M-49	2	root	double,2			
+246	M-49	Chlorine	6	root	double,result			
+247	Cobalt	M-50	2	root	double,1			
+248	Oxygen	M-50	2	root	double,2			
+249	M-50	Ionised Cobalt	5	root	double,result			
+250	Ionised Cobalt	M-51	1	root	double,1			
+251	Oxygen	M-51	2	root	double,2			
+252	M-51	Ionised Cobalt	6	root	double,result			
+253	Mordite	M-52	1	root	double,1			
+254	Pugneum	M-52	1	root	double,2			
+255	M-52	Gold	1	root	double,result			
+256	Silver	M-53	1	root	double,1			
+257	Oxygen	M-53	1	root	double,2			
+258	M-53	Paraffinium	2	root	double,result			
+259	Gold	M-54	1	root	double,1			
+260	Oxygen	M-54	1	root	double,2			
+261	M-54	Pyrite	2	root	double,result			
+262	Platinum	M-55	1	root	double,1			
+263	Oxygen	M-55	1	root	double,2			
+264	M-55	Magnetised Ferrite	10	root	double,result			
+265	Sulphurine	M-56	1	root	double,1			
+266	Oxygen	M-56	1	root	double,2			
+267	M-56	Radon	1	root	double,result			
+268	Radon	M-57	1	root	double,1			
+269	Oxygen	M-57	1	root	double,2			
+270	M-57	Nitrogen	1	root	double,result			
+271	Nitrogen	M-58	1	root	double,1			
+272	Oxygen	M-58	1	root	double,2			
+273	M-58	Sulphurine	1	root	double,result			
+274	Sulphurine	M-59	1	root	double,1			
+275	Chromatic Metal	M-59	1	root	double,2			
+276	M-59	Radon	1	root	double,result			
+277	Radon	M-60	1	root	double,1			
+278	Chromatic Metal	M-60	1	root	double,2			
+279	M-60	Nitrogen	1	root	double,result			
+280	Nitrogen	M-61	1	root	double,1			
+281	Chromatic Metal	M-61	1	root	double,2			
+282	M-61	Sulphurine	1	root	double,result			
+283	Nitrogen	M-62	1	root	double,1			
+284	Sodium	M-62	1	root	double,2			
+285	M-62	Sodium Nitrate	1	root	double,result			
+286	Nitrogen	M-63	1	root	double,1			
+287	Sodium Nitrate	M-63	1	root	double,2			
+288	M-63	Sodium Nitrate	2	root	double,result			
+289	Marrow Bulb	M-64	1	root	double,1			
+290	Oxygen	M-64	1	root	double,2			
+291	M-64	Ionised Cobalt	2	root	double,result			
+292	Kelp Sac	M-65	1	root	double,1			
+293	Oxygen	M-65	1	root	double,2			
+294	M-65	Chlorine	2	root	double,result			
+295	Faecium	M-66	1	root	double,1			
+296	Oxygen	M-66	1	root	double,2			
+297	M-66	Faecium	3	root	double,result			
+298	Marrow Bulb	M-67	1	root	double,1			
+299	Pugneum	M-67	1	root	double,2			
+300	M-67	Ionised Cobalt	2	root	double,result			
+301	Kelp Sac	M-68	1	root	double,1			
+302	Pugneum	M-68	1	root	double,2			
+303	M-68	Chlorine	2	root	double,result			
+304	Marrow Bulb	M-69	1	root	double,1			
+305	Carbon	M-69	1	root	double,2			
+306	M-69	Sodium	2	root	double,result			
+307	Kelp Sac	M-70	1	root	double,1			
+308	Carbon	M-70	1	root	double,2			
+309	M-70	Oxygen	2	root	double,result			
+310	Faecium	M-71	1	root	double,1			
+311	Carbon	M-71	2	root	double,2			
+312	M-71	Condensed Carbon	2	root	double,result			
+313	Marrow Bulb	M-72	1	root	double,1			
+314	Sodium	M-72	1	root	double,2			
+315	M-72	Sodium Nitrate	2	root	double,result			
+316	Kelp Sac	M-73	1	root	double,1			
+317	Sodium	M-73	1	root	double,2			
+318	M-73	Sodium Nitrate	2	root	double,result			
+319	Faecium	M-74	1	root	double,1			
+320	Sodium	M-74	1	root	double,2			
+321	M-74	Sodium Nitrate	2	root	double,result			
+322	Marrow Bulb	M-75	1	root	double,1			
+323	Condensed Carbon	M-75	1	root	double,2			
+324	M-75	Sodium	2	root	double,result			
+325	Kelp Sac	M-76	1	root	double,1			
+326	Condensed Carbon	M-76	1	root	double,2			
+327	M-76	Oxygen	2	root	double,result			
+328	Faecium	M-77	1	root	double,1			
+329	Condensed Carbon	M-77	1	root	double,2			
+330	M-77	Condensed Carbon	3	root	double,result			
+331	Marrow Bulb	M-78	1	root	double,1			
+332	Sodium Nitrate	M-78	1	root	double,2			
+333	M-78	Sodium Nitrate	2	root	double,result			
+334	Kelp Sac	M-79	1	root	double,1			
+335	Sodium Nitrate	M-79	1	root	double,2			
+336	M-79	Sodium Nitrate	2	root	double,result			
+337	Faecium	M-80	1	root	double,1			
+338	Sodium Nitrate	M-80	1	root	double,2			
+339	M-80	Sodium Nitrate	2	root	double,result			
+340	Marrow Bulb	M-81	1	root	double,1			
+341	Cobalt	M-81	1	root	double,2			
+342	M-81	Ionised Cobalt	2	root	double,result			
+343	Kelp Sac	M-82	1	root	double,1			
+344	Salt	M-82	1	root	double,2			
+345	M-82	Chlorine	2	root	double,result			
+346	Marrow Bulb	M-83	1	root	double,1			
+347	Ionised Cobalt	M-83	1	root	double,2			
+348	M-83	Ionised Cobalt	2	root	double,result			
+349	Kelp Sac	M-84	1	root	double,1			
+350	Chlorine	M-84	1	root	double,2			
+351	M-84	Chlorine	2	root	double,result			
+352	Faecium	M-85	1	root	double,1			
+353	Pugneum	M-85	1	root	double,2			
+354	M-85	Gold	2	root	double,result			
+355	Faecium	M-86	1	root	double,1			
+356	Mordite	M-86	1	root	double,2			
+357	M-86	Condensed Carbon	2	root	double,result			
+358	Indium	M-87	1	root	double,1			
+359	Ferrite Dust	M-87	1	root	double,2			
+360	M-87	Magnetised Ferrite	4	root	double,result			
+361	Cadmium	M-88	1	root	double,1			
+362	Ferrite Dust	M-88	1	root	double,2			
+363	M-88	Magnetised Ferrite	2	root	double,result			
+364	Emeril	M-89	1	root	double,1			
+365	Ferrite Dust	M-89	1	root	double,2			
+366	M-89	Magnetised Ferrite	3	root	double,result			
+367	Copper	M-90	1	root	double,1			
+368	Ferrite Dust	M-90	1	root	double,2			
+369	M-90	Magnetised Ferrite	1	root	double,result			
+370	Cadmium	M-91	1	root	double,1			
+371	Pure Ferrite	M-91	1	root	double,2			
+372	M-91	Chromatic Metal	2	root	double,result			
+373	Emeril	M-92	1	root	double,1			
+374	Pure Ferrite	M-92	1	root	double,2			
+375	M-92	Chromatic Metal	3	root	double,result			
+376	Copper	M-93	1	root	double,1			
+377	Pure Ferrite	M-93	1	root	double,2			
+378	M-93	Chromatic Metal	1	root	double,result			
+379	Indium	M-94	1	root	double,1			
+380	Pure Ferrite	M-94	1	root	double,2			
+381	M-94	Chromatic Metal	4	root	double,result			
+382	Activated Cadmium	M-95	1	root	double,1			
+383	Ferrite Dust	M-95	1	root	double,2			
+384	M-95	Magnetised Ferrite	4	root	double,result			
+385	Activated Indium	M-96	1	root	double,1			
+386	Ferrite Dust	M-96	1	root	double,2			
+387	M-96	Magnetised Ferrite	8	root	double,result			
+388	Activated Emeril	M-97	1	root	double,1			
+389	Ferrite Dust	M-97	1	root	double,2			
+390	M-97	Magnetised Ferrite	6	root	double,result			
+391	Activated Copper	M-98	1	root	double,1			
+392	Ferrite Dust	M-98	1	root	double,2			
+393	M-98	Magnetised Ferrite	2	root	double,result			
+394	Activated Cadmium	M-99	1	root	double,1			
+395	Pure Ferrite	M-99	1	root	double,2			
+396	M-99	Chromatic Metal	4	root	double,result			
+397	Activated Indium	M-100	1	root	double,1			
+398	Pure Ferrite	M-100	1	root	double,2			
+399	M-100	Chromatic Metal	8	root	double,result			
+400	Activated Emeril	M-101	1	root	double,1			
+401	Pure Ferrite	M-101	1	root	double,2			
+402	M-101	Chromatic Metal	6	root	double,result			
+403	Activated Copper	M-102	1	root	double,1			
+404	Pure Ferrite	M-102	1	root	double,2			
+405	M-102	Chromatic Metal	2	root	double,result			
+406	Paraffinium	M-103	2	root	double,1			
+407	Oxygen	M-103	1	root	double,2			
+408	M-103	Star Bulb	1	root	double,result			
+409	Pyrite	M-104	2	root	double,1			
+410	Oxygen	M-104	1	root	double,2			
+411	M-104	Cactus Flesh	1	root	double,result			
+412	Ammonia	M-105	2	root	double,1			
+413	Oxygen	M-105	1	root	double,2			
+414	M-105	Fungal Mould	1	root	double,result			
+415	Uranium	M-106	2	root	double,1			
+416	Oxygen	M-106	1	root	double,2			
+417	M-106	Gamma Root	1	root	double,result			
+418	Dioxite	M-107	2	root	double,1			
+419	Oxygen	M-107	1	root	double,2			
+420	M-107	Frost Crystal	1	root	double,result			
+421	Phosphorus	M-108	2	root	double,1			
+422	Oxygen	M-108	1	root	double,2			
+423	M-108	Solanium	1	root	double,result			
+424	Paraffinium	M-109	2	root	double,1			
+425	Ferrite Dust	M-109	1	root	double,2			
+426	M-109	Ammonia	1	root	double,result			
+427	Pyrite	M-110	2	root	double,1			
+428	Ferrite Dust	M-110	1	root	double,2			
+429	M-110	Paraffinium	1	root	double,result			
+430	Ammonia	M-111	2	root	double,1			
+431	Ferrite Dust	M-111	1	root	double,2			
+432	M-111	Dioxite	1	root	double,result			
+433	Uranium	M-112	2	root	double,1			
+434	Ferrite Dust	M-112	1	root	double,2			
+435	M-112	Pyrite	1	root	double,result			
+436	Dioxite	M-113	2	root	double,1			
+437	Ferrite Dust	M-113	1	root	double,2			
+438	M-113	Phosphorus	1	root	double,result			
+439	Phosphorus	M-114	2	root	double,1			
+440	Ferrite Dust	M-114	1	root	double,2			
+441	M-114	Uranium	1	root	double,result			
+442	Paraffinium	M-115	2	root	double,1			
+443	Pure Ferrite	M-115	1	root	double,2			
+444	M-115	Ammonia	1	root	double,result			
+445	Pyrite	M-116	2	root	double,1			
+446	Pure Ferrite	M-116	1	root	double,2			
+447	M-116	Paraffinium	1	root	double,result			
+448	Ammonia	M-117	2	root	double,1			
+449	Pure Ferrite	M-117	1	root	double,2			
+450	M-117	Dioxite	1	root	double,result			
+451	Uranium	M-118	2	root	double,1			
+452	Pure Ferrite	M-118	1	root	double,2			
+453	M-118	Pyrite	1	root	double,result			
+454	Dioxite	M-119	2	root	double,1			
+455	Pure Ferrite	M-119	1	root	double,2			
+456	M-119	Phosphorus	1	root	double,result			
+457	Phosphorus	M-120	2	root	double,1			
+458	Pure Ferrite	M-120	1	root	double,2			
+459	M-120	Uranium	1	root	double,result			
+460	Fungal Mould	M-121	2	root	double,1			
+461	Salt	M-121	1	root	double,2			
+462	M-121	Ammonia	1	root	double,result			
+463	Frost Crystal	M-122	2	root	double,1			
+464	Salt	M-122	1	root	double,2			
+465	M-122	Dioxite	1	root	double,result			
+466	Gamma Root	M-123	2	root	double,1			
+467	Salt	M-123	1	root	double,2			
+468	M-123	Uranium	1	root	double,result			
+469	Cactus Flesh	M-124	2	root	double,1			
+470	Salt	M-124	1	root	double,2			
+471	M-124	Pyrite	1	root	double,result			
+472	Solanium	M-125	2	root	double,1			
+473	Salt	M-125	1	root	double,2			
+474	M-125	Phosphorus	1	root	double,result			
+475	Star Bulb	M-126	2	root	double,1			
+476	Salt	M-126	1	root	double,2			
+477	M-126	Paraffinium	1	root	double,result			
+478	Sulphurine	M-127	1	root	double,1			
+479	Ferrite Dust	M-127	1	root	double,2			
+480	M-127	Paraffinium	1	root	double,result			
+481	Ferrite Dust	M-128	1	root	double,1			
+482	Radon	M-128	1	root	double,2			
+483	M-128	Uranium	1	root	double,result			
+484	Nitrogen	M-129	1	root	double,1			
+485	Ferrite Dust	M-129	1	root	double,2			
+486	M-129	Sodium Nitrate	1	root	double,result			
+487	Sulphurine	M-130	1	root	double,1			
+488	Pure Ferrite	M-130	1	root	double,2			
+489	M-130	Paraffinium	2	root	double,result			
+490	Radon	M-131	1	root	double,1			
+491	Pure Ferrite	M-131	1	root	double,2			
+492	M-131	Uranium	2	root	double,result			
+493	Nitrogen	M-132	1	root	double,1			
+494	Pure Ferrite	M-132	1	root	double,2			
+495	M-132	Sodium Nitrate	2	root	double,result			
+496	Sulphurine	M-133	1	root	double,1			
+497	Magnetised Ferrite	M-133	1	root	double,2			
+498	M-133	Paraffinium	3	root	double,result			
+499	Radon	M-134	1	root	double,1			
+500	Magnetised Ferrite	M-134	1	root	double,2			
+501	M-134	Uranium	3	root	double,result			
+502	Nitrogen	M-135	1	root	double,1			
+503	Magnetised Ferrite	M-135	1	root	double,2			
+504	M-135	Sodium Nitrate	3	root	double,result			
+505	Ammonia	M-136	1	root	double,1			
+506	Nitrogen	M-136	1	root	double,2			
+507	M-136	Fungal Mould	1	root	double,result			
+508	Dioxite	M-137	1	root	double,1			
+509	Radon	M-137	1	root	double,2			
+510	M-137	Frost Crystal	1	root	double,result			
+511	Uranium	M-138	1	root	double,1			
+512	Radon	M-138	1	root	double,2			
+513	M-138	Gamma Root	1	root	double,result			
+514	Pyrite	M-139	1	root	double,1			
+515	Sulphurine	M-139	1	root	double,2			
+516	M-139	Cactus Flesh	1	root	double,result			
+517	Phosphorus	M-140	1	root	double,1			
+518	Sulphurine	M-140	1	root	double,2			
+519	M-140	Solanium	1	root	double,result			
+520	Paraffinium	M-141	1	root	double,1			
+521	Nitrogen	M-141	1	root	double,2			
+522	M-141	Star Bulb	1	root	double,result			
+523	Cobalt	M-142	1	root	double,1			
+524	Nitrogen	M-142	1	root	double,2			
+525	M-142	Marrow Bulb	1	root	double,result			
+526	Salt	M-143	1	root	double,1			
+527	Nitrogen	M-143	1	root	double,2			
+528	M-143	Kelp Sac	1	root	double,result			
+529	Sulphurine	M-144	1	root	double,1			
+530	Nitrogen	M-144	1	root	double,2			
+531	M-144	Faecium	1	root	double,result			
+532	Silver	L-1	15	root	triple,1			
+533	Gold	L-1	15	root	triple,2			
+534	Platinum	L-1	25	root	triple,3			
+535	L-1	Nanite Cluster	1	root	triple,result			
+536	Ferrite Dust	L-2	1	root	triple,1			
+537	Pure Ferrite	L-2	1	root	triple,2			
+538	Silver	L-2	1	root	triple,3			
+539	L-2	Magnetised Ferrite	5	root	triple,result			
+540	Ferrite Dust	L-3	1	root	triple,1			
+541	Pure Ferrite	L-3	1	root	triple,2			
+542	Gold	L-3	1	root	triple,3			
+543	L-3	Magnetised Ferrite	8	root	triple,result			
+544	Ferrite Dust	L-4	1	root	triple,1			
+545	Pure Ferrite	L-4	1	root	triple,2			
+546	Platinum	L-4	1	root	triple,3			
+547	L-4	Magnetised Ferrite	12	root	triple,result			
+548	Fungal Mould	L-5	1	root	triple,1			
+549	Kelp Sac	L-5	1	root	triple,2			
+550	Condensed Carbon	L-5	1	root	triple,3			
+551	L-5	Oxygen	10	root	triple,result			
+552	Frost Crystal	L-6	1	root	triple,1			
+553	Kelp Sac	L-6	1	root	triple,2			
+554	Condensed Carbon	L-6	1	root	triple,3			
+555	L-6	Oxygen	10	root	triple,result			
+556	Cactus Flesh	L-7	1	root	triple,1			
+557	Kelp Sac	L-7	1	root	triple,2			
+558	Condensed Carbon	L-7	1	root	triple,3			
+559	L-7	Oxygen	10	root	triple,result			
+560	Solanium	L-8	1	root	triple,1			
+561	Kelp Sac	L-8	1	root	triple,2			
+562	Condensed Carbon	L-8	1	root	triple,3			
+563	L-8	Oxygen	10	root	triple,result			
+564	Gamma Root	L-9	1	root	triple,1			
+565	Kelp Sac	L-9	1	root	triple,2			
+566	Condensed Carbon	L-9	1	root	triple,3			
+567	L-9	Oxygen	10	root	triple,result			
+568	Star Bulb	L-10	1	root	triple,1			
+569	Kelp Sac	L-10	1	root	triple,2			
+570	Condensed Carbon	L-10	1	root	triple,3			
+571	L-10	Oxygen	10	root	triple,result			
+572	Silver	L-11	1	root	triple,1			
+573	Gold	L-11	1	root	triple,2			
+574	Copper	L-11	1	root	triple,3			
+575	L-11	Chromatic Metal	5	root	triple,result			
+576	Silver	L-12	1	root	triple,1			
+577	Gold	L-12	1	root	triple,2			
+578	Cadmium	L-12	1	root	triple,3			
+579	L-12	Chromatic Metal	10	root	triple,result			
+580	Silver	L-13	1	root	triple,1			
+581	Gold	L-13	1	root	triple,2			
+582	Emeril	L-13	1	root	triple,3			
+583	L-13	Chromatic Metal	20	root	triple,result			
+584	Silver	L-14	1	root	triple,1			
+585	Gold	L-14	1	root	triple,2			
+586	Indium	L-14	1	root	triple,3			
+587	L-14	Chromatic Metal	30	root	triple,result			
+588	Ferrite Dust	L-15	1	root	triple,1			
+589	Oxygen	L-15	1	root	triple,2			
+590	Emeril	L-15	1	root	triple,3			
+591	L-15	Gold	10	root	triple,result			
+592	Ferrite Dust	L-16	1	root	triple,1			
+593	Oxygen	L-16	1	root	triple,2			
+594	Chromatic Metal	L-16	250	root	triple,3			
+595	L-16	Platinum	10	root	triple,result			
+596	Condensed Carbon	L-17	25	root	triple,1			
+597	Sodium	L-17	10	root	triple,2			
+598	Chromatic Metal	L-17	250	root	triple,3			
+599	L-17	Warp Cell	1	root	triple,result			
+600	Carbon	L-18	50	root	triple,1			
+601	Sodium Nitrate	L-18	5	root	triple,2			
+602	Chromatic Metal	L-18	250	root	triple,3			
+603	L-18	Warp Cell	1	root	triple,result			
+604	Condensed Carbon	L-19	25	root	triple,1			
+605	Sodium Nitrate	L-19	5	root	triple,2			
+606	Chromatic Metal	L-19	250	root	triple,3			
+607	L-19	Warp Cell	1	root	triple,result			
+608	Oxygen	L-20	10	root	triple,1			
+609	Ferrite Dust	L-20	20	root	triple,2			
+610	Carbon	L-20	20	root	triple,3			
+611	L-20	Unstable Plasma	1	root	triple,result			
+612	Oxygen	L-21	10	root	triple,1			
+613	Ferrite Dust	L-21	20	root	triple,2			
+614	Condensed Carbon	L-21	10	root	triple,3			
+615	L-21	Unstable Plasma	1	root	triple,result			
+616	Oxygen	L-22	10	root	triple,1			
+617	Pure Ferrite	L-22	20	root	triple,2			
+618	Carbon	L-22	20	root	triple,3			
+619	L-22	Unstable Plasma	1	root	triple,result			
+620	Oxygen	L-23	10	root	triple,1			
+621	Condensed Carbon	L-23	10	root	triple,2			
+622	Pure Ferrite	L-23	20	root	triple,3			
+623	L-23	Unstable Plasma	1	root	triple,result			
+624	Oxygen	L-24	10	root	triple,1			
+625	Condensed Carbon	L-24	10	root	triple,2			
+626	Di-hydrogen	L-24	10	root	triple,3			
+627	L-24	Life Support Gel	1	root	triple,result			
+628	Di-hydrogen	L-25	10	root	triple,1			
+629	Ferrite Dust	L-25	20	root	triple,2			
+630	Sodium Nitrate	L-25	5	root	triple,3			
+631	L-25	Starship Launch Fuel	1	root	triple,result			
+632	Di-hydrogen	L-26	10	root	triple,1			
+633	Pure Ferrite	L-26	20	root	triple,2			
+634	Sodium	L-26	10	root	triple,3			
+635	L-26	Starship Launch Fuel	1	root	triple,result			
+636	Di-hydrogen	L-27	10	root	triple,1			
+637	Magnetised Ferrite	L-27	10	root	triple,2			
+638	Sodium Nitrate	L-27	5	root	triple,3			
+639	L-27	Starship Launch Fuel	1	root	triple,result			
+640	Ferrite Dust	L-28	10	root	triple,1			
+641	Silver	L-28	10	root	triple,2			
+642	Sodium	L-28	10	root	triple,3			
+643	L-28	Ion Battery	1	root	triple,result			
+644	Paraffinium	L-29	30	root	triple,1			
+645	Cobalt	L-29	60	root	triple,2			
+646	Tritium	L-29	20	root	triple,3			
+647	L-29	Aronium	1	root	triple,result			
+648	Paraffinium	L-30	30	root	triple,1			
+649	Ionised Cobalt	L-30	30	root	triple,2			
+650	Tritium	L-30	20	root	triple,3			
+651	L-30	Aronium	1	root	triple,result			
+652	Paraffinium	L-31	30	root	triple,1			
+653	Cobalt	L-31	60	root	triple,2			
+654	Silver	L-31	20	root	triple,3			
+655	L-31	Aronium	1	root	triple,result			
+656	Paraffinium	L-32	30	root	triple,1			
+657	Ionised Cobalt	L-32	30	root	triple,2			
+658	Silver	L-32	20	root	triple,3			
+659	L-32	Aronium	1	root	triple,result			
+660	Paraffinium	L-33	30	root	triple,1			
+661	Cobalt	L-33	60	root	triple,2			
+662	Gold	L-33	10	root	triple,3			
+663	L-33	Aronium	1	root	triple,result			
+664	Paraffinium	L-34	30	root	triple,1			
+665	Ionised Cobalt	L-34	30	root	triple,2			
+666	Gold	L-34	10	root	triple,3			
+667	L-34	Aronium	1	root	triple,result			
+668	Paraffinium	L-35	30	root	triple,1			
+669	Cobalt	L-35	60	root	triple,2			
+670	Platinum	L-35	5	root	triple,3			
+671	L-35	Aronium	1	root	triple,result			
+672	Paraffinium	L-36	30	root	triple,1			
+673	Ionised Cobalt	L-36	30	root	triple,2			
+674	Platinum	L-36	5	root	triple,3			
+675	L-36	Aronium	1	root	triple,result			
+676	Pyrite	L-37	30	root	triple,1			
+677	Ferrite Dust	L-37	120	root	triple,2			
+678	Tritium	L-37	20	root	triple,3			
+679	L-37	Dirty Bronze	1	root	triple,result			
+680	Pyrite	L-38	30	root	triple,1			
+681	Pure Ferrite	L-38	60	root	triple,2			
+682	Tritium	L-38	20	root	triple,3			
+683	L-38	Dirty Bronze	1	root	triple,result			
+684	Pyrite	L-39	30	root	triple,1			
+685	Ferrite Dust	L-39	120	root	triple,2			
+686	Silver	L-39	20	root	triple,3			
+687	L-39	Dirty Bronze	1	root	triple,result			
+688	Pyrite	L-40	30	root	triple,1			
+689	Pure Ferrite	L-40	60	root	triple,2			
+690	Silver	L-40	20	root	triple,3			
+691	L-40	Dirty Bronze	1	root	triple,result			
+692	Pyrite	L-41	30	root	triple,1			
+693	Ferrite Dust	L-41	120	root	triple,2			
+694	Gold	L-41	10	root	triple,3			
+695	L-41	Dirty Bronze	1	root	triple,result			
+696	Pyrite	L-42	30	root	triple,1			
+697	Pure Ferrite	L-42	60	root	triple,2			
+698	Gold	L-42	10	root	triple,3			
+699	L-42	Dirty Bronze	1	root	triple,result			
+700	Pyrite	L-43	30	root	triple,1			
+701	Ferrite Dust	L-43	120	root	triple,2			
+702	Platinum	L-43	5	root	triple,3			
+703	L-43	Dirty Bronze	1	root	triple,result			
+704	Pyrite	L-44	30	root	triple,1			
+705	Pure Ferrite	L-44	60	root	triple,2			
+706	Platinum	L-44	5	root	triple,3			
+707	L-44	Dirty Bronze	1	root	triple,result			
+708	Ammonia	L-45	30	root	triple,1			
+709	Cobalt	L-45	60	root	triple,2			
+710	Tritium	L-45	20	root	triple,3			
+711	L-45	Herox	1	root	triple,result			
+712	Ammonia	L-46	30	root	triple,1			
+713	Ionised Cobalt	L-46	30	root	triple,2			
+714	Tritium	L-46	20	root	triple,3			
+715	L-46	Herox	1	root	triple,result			
+716	Ammonia	L-47	30	root	triple,1			
+717	Cobalt	L-47	60	root	triple,2			
+718	Silver	L-47	20	root	triple,3			
+719	L-47	Herox	1	root	triple,result			
+720	Ammonia	L-48	30	root	triple,1			
+721	Ionised Cobalt	L-48	30	root	triple,2			
+722	Silver	L-48	20	root	triple,3			
+723	L-48	Herox	1	root	triple,result			
+724	Ammonia	L-49	30	root	triple,1			
+725	Cobalt	L-49	60	root	triple,2			
+726	Gold	L-49	10	root	triple,3			
+727	L-49	Herox	1	root	triple,result			
+728	Ammonia	L-50	30	root	triple,1			
+729	Ionised Cobalt	L-50	30	root	triple,2			
+730	Gold	L-50	10	root	triple,3			
+731	L-50	Herox	1	root	triple,result			
+732	Ammonia	L-51	30	root	triple,1			
+733	Cobalt	L-51	60	root	triple,2			
+734	Platinum	L-51	5	root	triple,3			
+735	L-51	Herox	1	root	triple,result			
+736	Ammonia	L-52	30	root	triple,1			
+737	Ionised Cobalt	L-52	30	root	triple,2			
+738	Platinum	L-52	5	root	triple,3			
+739	L-52	Herox	1	root	triple,result			
+740	Uranium	L-53	30	root	triple,1			
+741	Ferrite Dust	L-53	120	root	triple,2			
+742	Tritium	L-53	20	root	triple,3			
+743	L-53	Lemmium	1	root	triple,result			
+744	Uranium	L-54	30	root	triple,1			
+745	Pure Ferrite	L-54	60	root	triple,2			
+746	Tritium	L-54	20	root	triple,3			
+747	L-54	Lemmium	1	root	triple,result			
+748	Uranium	L-55	30	root	triple,1			
+749	Ferrite Dust	L-55	120	root	triple,2			
+750	Silver	L-55	20	root	triple,3			
+751	L-55	Lemmium	1	root	triple,result			
+752	Uranium	L-56	30	root	triple,1			
+753	Pure Ferrite	L-56	60	root	triple,2			
+754	Silver	L-56	20	root	triple,3			
+755	L-56	Lemmium	1	root	triple,result			
+756	Uranium	L-57	30	root	triple,1			
+757	Ferrite Dust	L-57	120	root	triple,2			
+758	Gold	L-57	10	root	triple,3			
+759	L-57	Lemmium	1	root	triple,result			
+760	Uranium	L-58	30	root	triple,1			
+761	Pure Ferrite	L-58	60	root	triple,2			
+762	Gold	L-58	10	root	triple,3			
+763	L-58	Lemmium	1	root	triple,result			
+764	Uranium	L-59	30	root	triple,1			
+765	Ferrite Dust	L-59	120	root	triple,2			
+766	Platinum	L-59	5	root	triple,3			
+767	L-59	Lemmium	1	root	triple,result			
+768	Uranium	L-60	30	root	triple,1			
+769	Pure Ferrite	L-60	60	root	triple,2			
+770	Platinum	L-60	5	root	triple,3			
+771	L-60	Lemmium	1	root	triple,result			
+772	Phosphorus	L-61	30	root	triple,1			
+773	Cobalt	L-61	60	root	triple,2			
+774	Tritium	L-61	20	root	triple,3			
+775	L-61	Magno-Gold	1	root	triple,result			
+776	Phosphorus	L-62	30	root	triple,1			
+777	Ionised Cobalt	L-62	30	root	triple,2			
+778	Tritium	L-62	20	root	triple,3			
+779	L-62	Magno-Gold	1	root	triple,result			
+780	Phosphorus	L-63	30	root	triple,1			
+781	Cobalt	L-63	60	root	triple,2			
+782	Silver	L-63	20	root	triple,3			
+783	L-63	Magno-Gold	1	root	triple,result			
+784	Phosphorus	L-64	30	root	triple,1			
+785	Ionised Cobalt	L-64	30	root	triple,2			
+786	Silver	L-64	20	root	triple,3			
+787	L-64	Magno-Gold	1	root	triple,result			
+788	Phosphorus	L-65	30	root	triple,1			
+789	Cobalt	L-65	60	root	triple,2			
+790	Gold	L-65	10	root	triple,3			
+791	L-65	Magno-Gold	1	root	triple,result			
+792	Phosphorus	L-66	30	root	triple,1			
+793	Ionised Cobalt	L-66	30	root	triple,2			
+794	Gold	L-66	10	root	triple,3			
+795	L-66	Magno-Gold	1	root	triple,result			
+796	Phosphorus	L-67	30	root	triple,1			
+797	Cobalt	L-67	60	root	triple,2			
+798	Platinum	L-67	5	root	triple,3			
+799	L-67	Magno-Gold	1	root	triple,result			
+800	Phosphorus	L-68	30	root	triple,1			
+801	Ionised Cobalt	L-68	30	root	triple,2			
+802	Platinum	L-68	5	root	triple,3			
+803	L-68	Magno-Gold	1	root	triple,result			
+804	Dioxite	L-69	30	root	triple,1			
+805	Cobalt	L-69	60	root	triple,2			
+806	Tritium	L-69	20	root	triple,3			
+807	L-69	Grantine	1	root	triple,result			
+808	Dioxite	L-70	30	root	triple,1			
+809	Ionised Cobalt	L-70	30	root	triple,2			
+810	Tritium	L-70	20	root	triple,3			
+811	L-70	Grantine	1	root	triple,result			
+812	Dioxite	L-71	30	root	triple,1			
+813	Cobalt	L-71	60	root	triple,2			
+814	Silver	L-71	20	root	triple,3			t
+815	L-71	Grantine	1	root	triple,result			
+816	Dioxite	L-72	30	root	triple,1			
+817	Ionised Cobalt	L-72	30	root	triple,2			
+818	Silver	L-72	20	root	triple,3			
+819	L-72	Grantine	1	root	triple,result			
+820	Dioxite	L-73	30	root	triple,1			
+821	Cobalt	L-73	60	root	triple,2			
+822	Gold	L-73	10	root	triple,3			
+823	L-73	Grantine	1	root	triple,result			
+824	Dioxite	L-74	30	root	triple,1			
+825	Ionised Cobalt	L-74	30	root	triple,2			
+826	Gold	L-74	10	root	triple,3			
+827	L-74	Grantine	1	root	triple,result			
+828	Dioxite	L-75	30	root	triple,1			
+829	Cobalt	L-75	60	root	triple,2			
+830	Platinum	L-75	5	root	triple,3			
+831	L-75	Grantine	1	root	triple,result			
+832	Dioxite	L-76	30	root	triple,1			
+833	Ionised Cobalt	L-76	30	root	triple,2			
+834	Platinum	L-76	5	root	triple,3			
+835	L-76	Grantine	1	root	triple,result			
+836	Sulphurine	L-77	100	root	triple,1			
+837	Carbon	L-77	20	root	triple,2			
+838	Salt	L-77	10	root	triple,3			
+839	L-77	Thermic Condensate	1	root	triple,result			
+840	Radon	L-78	100	root	triple,1			
+841	Carbon	L-78	20	root	triple,2			
+842	Salt	L-78	10	root	triple,3			
+843	L-78	Enriched Carbon	1	root	triple,result			
+844	Nitrogen	L-79	100	root	triple,1			
+845	Carbon	L-79	20	root	triple,2			
+846	Salt	L-79	10	root	triple,3			
+847	L-79	Nitrogen Salt	1	root	triple,result			
+848	Sulphurine	L-80	100	root	triple,1			
+849	Condensed Carbon	L-80	10	root	triple,2			
+850	Salt	L-80	10	root	triple,3			
+851	L-80	Thermic Condensate	1	root	triple,result			
+852	Radon	L-81	100	root	triple,1			
+853	Condensed Carbon	L-81	10	root	triple,2			
+854	Salt	L-81	10	root	triple,3			
+855	L-81	Enriched Carbon	1	root	triple,result			
+856	Nitrogen	L-82	100	root	triple,1			
+857	Condensed Carbon	L-82	10	root	triple,2			
+858	Salt	L-82	10	root	triple,3			
+859	L-82	Nitrogen Salt	1	root	triple,result			
+860	Sulphurine	L-83	100	root	triple,1			
+861	Carbon	L-83	20	root	triple,2			
+862	Chlorine	L-83	5	root	triple,3			
+863	L-83	Thermic Condensate	1	root	triple,result			
+864	Radon	L-84	100	root	triple,1			
+865	Carbon	L-84	20	root	triple,2			
+866	Chlorine	L-84	5	root	triple,3			
+867	L-84	Enriched Carbon	1	root	triple,result			
+868	Nitrogen	L-85	100	root	triple,1			
+869	Carbon	L-85	20	root	triple,2			
+870	Chlorine	L-85	5	root	triple,3			
+871	L-85	Nitrogen Salt	1	root	triple,result			
+872	Sulphurine	L-86	100	root	triple,1			
+873	Condensed Carbon	L-86	10	root	triple,2			
+874	Chlorine	L-86	5	root	triple,3			
+875	L-86	Thermic Condensate	1	root	triple,result			
+876	Radon	L-87	100	root	triple,1			
+877	Condensed Carbon	L-87	10	root	triple,2			
+878	Chlorine	L-87	5	root	triple,3			
+879	L-87	Enriched Carbon	1	root	triple,result			
+880	Nitrogen	L-88	100	root	triple,1			
+881	Condensed Carbon	L-88	10	root	triple,2			
+882	Chlorine	L-88	5	root	triple,3			
+883	L-88	Nitrogen Salt	1	root	triple,result			
