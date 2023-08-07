@@ -143,7 +143,9 @@ export const draw = (state) => () => {
 
   ctx.save();
 
-  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, width, height);
+
   ctx.translate(transform.x, transform.y);
   ctx.scale(transform.k, transform.k);
 
