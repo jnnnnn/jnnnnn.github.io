@@ -1,7 +1,4 @@
-# stream data from microphone / speakers, through whisper transcriber, to text output
-
-MODEL_SIZE = "large-v3"  # this is the Whisper model to use. For the fastest one, use "tiny". For moderate speed, "medium". "large-v3" is accurate but slower.
-
+# stream data from microphone, through whisper transcriber, to text output
 
 # https://github.com/snakers4/silero-vad/blob/master/examples/pyaudio-streaming/pyaudio-streaming-examples.ipynb
 
@@ -11,6 +8,8 @@ try:
     import os
     import time
     from datetime import datetime, timedelta
+    import argparse
+
     import numpy as np
     import torch
 
@@ -31,13 +30,25 @@ except ImportError:
 
 print("Completed imports")
 
+AVAILABLE_MODELS = ["tiny", "base", "small", "medium", "large-v3"]
+
+parser = argparse.ArgumentParser(description='Transcribe audio from microphone and speakers to output and file.')
+parser.add_argument('--outfile', default=os.path.expanduser("~/transcripts/transcript.txt"))
+parser.add_argument('--model', default="large-v3", choices=AVAILABLE_MODELS, help="Whisper model to use. Tiny is 39MB, Base is 74MB, Small is 244MB, Medium is 769MB, Large is 1550MB. Larger models are more accurate but use more memory and compute time")
+parser.add_argument('--partials', default="tiny", help="use a fast an inaccurate model to show partial transcriptions continuously")
+parser.add_argument('--only-while-app', default="Zoom Meeting", help="only transcribe when this app is active, or None/blank/False to transcribe all the time")
+args = parser.parse_args()
+
+MODEL_SIZE = args.model
 
 # Above this confidence, we assume that speech is present
 VAD_THRESHOLD = 0.4
 
-# transcribe repeatedly, overwriting until silence is detected
-PARTIALS = False
+# transcribe continuously, overwriting until silence is detected and we use the
+# main model on the full utterance for the log
+PARTIALS = args.partials
 
+ONLY_WHILE_APP = args.only_while_app
 
 # dataclass for input or output stream
 class Stream:
@@ -57,13 +68,14 @@ class Stream:
     prev_audio = np.zeros((0), dtype=np.float32)
 
 
-outfile = os.path.expanduser("~/transcripts/transcript.txt")
+outfile = args.outfile
 
 if not os.path.exists(os.path.dirname(outfile)):
     os.makedirs(os.path.dirname(outfile))
 with open(outfile, "a") as f:
     print(f"\n\nStarting new transcript at {datetime.now()}", file=f)
 
+print(f"\nSaving transcript to {outfile}\n\n")
 
 def init_stream(input=False):
     stream = Stream()
@@ -148,8 +160,14 @@ print("Loading VAD model...")
 ) = torch.hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad")
 print(f"Loading whisper model '{MODEL_SIZE}'...")
 transcribe_model = WhisperModel(MODEL_SIZE, compute_type="int8")
-# transcribe_model = WhisperModel("tiny", compute_type="int8")
 print("Loaded whisper model")
+
+if PARTIALS:
+    print("Loading fast whisper model...")
+    if PARTIALS == MODEL_SIZE:
+        fast_model = transcribe_model
+    else:
+        fast_model = WhisperModel(PARTIALS, compute_type="int8")
 
 
 def validate(model, inputs: torch.Tensor):
@@ -167,6 +185,33 @@ def int2float(sound):
     return sound
 
 
+last_zoom_check = datetime.now()
+zoom_active = None
+
+
+def check_zoom_active():
+    if not ONLY_WHILE_APP:
+        return True
+    global last_zoom_check, zoom_active
+    if datetime.now() - last_zoom_check < timedelta(seconds=10):
+        return zoom_active
+    import win32gui
+
+    windows = set()
+
+    def winEnumHandler(hwnd, ctx):
+        if win32gui.IsWindowVisible(hwnd):
+            windows.add(win32gui.GetWindowText(hwnd))
+
+    win32gui.EnumWindows(winEnumHandler, None)
+    last_zoom_check = datetime.now()
+    new_zoom_active = ONLY_WHILE_APP in windows
+    if new_zoom_active != zoom_active:
+        print(f"\n{ONLY_WHILE_APP} is now {'active' if new_zoom_active else 'inactive'}")
+    zoom_active = new_zoom_active
+    return zoom_active
+
+
 last_time = datetime.now()
 
 while input_stream.stream.is_active() or output_stream.stream.is_active():
@@ -174,6 +219,9 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
         samples = stream.available_data
         stream.available_data = np.zeros((0), dtype=np.float32)
         read_data = False
+        if not check_zoom_active():
+            continue
+
         if len(samples):
             stream.confidence = vad_model(torch.from_numpy(samples), 16000).item()
             # when confidence starts to be above the threshold,
@@ -210,10 +258,12 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
             and len(stream.voice_data) > 0
         ):
             # print(" " * 60, end="\r")  # clear line
-            print(
-                f"transcribing {stream.prefix} {len(stream.voice_data) / stream.SAMPLE_RATE} seconds" + " " * 30,
-                end="\r",
-            )
+            if not PARTIALS:
+                print(
+                    f"transcribing {stream.prefix} {len(stream.voice_data) / stream.SAMPLE_RATE} seconds"
+                    + " " * 30,
+                    end="\r",
+                )
             transcribe_data = stream.voice_data
             stream.voice_data = np.zeros((0), dtype=np.int16)
             segments, info = transcribe_model.transcribe(
@@ -221,8 +271,9 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
             )
             # walk the generator so we don't clear line "transcribing" too soon
             result = " ".join(s.text.strip() for s in segments)
-            print(" " * 60, end="\r")  # clear line
-            print(f"{stream.prefix}: {result}")
+            print(" " * 78, end="\r")  # clear line
+            clocktime = datetime.now().strftime("%H:%M")
+            print(f"{clocktime}  {stream.prefix}: {result}")
             # save to ~/transcripts/transcript-speakers.txt
             # if it's been more than a couple of minutes, put some newlines
             if datetime.now() - last_time > timedelta(minutes=2):
@@ -232,23 +283,24 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
             if last_time.minute != datetime.now().minute:
                 last_time = datetime.now()
                 with open(outfile, "a") as f:
-                    print(f"The time is now {last_time}", file=f)
+                    print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
             with open(outfile, "a") as f:
                 f.write(f"{stream.prefix}: {result}\n")
-        elif not idle or len(stream.voice_data) == 0 or not PARTIALS:
+        elif PARTIALS:
+            if len(stream.voice_data) > 0:
+                start = datetime.now()
+                last_five_seconds = stream.voice_data[-stream.SAMPLE_RATE * 5 :]
+                segments, info = fast_model.transcribe(
+                    last_five_seconds, beam_size=1, language="en"
+                )
+                result = " ".join(s.text.strip() for s in segments)
+                print(" " * 60, end="\r")
+                proctime = datetime.now() - start
+                print(f"p: {result[-70:]} ({proctime.total_seconds():.2f}s)", end="\r")
+        else:
             print(
                 f"input: {len(input_stream.voice_data) / input_stream.SAMPLE_RATE:.0f}s / {input_stream.confidence:.1f}; "
                 + f"output: {len(output_stream.voice_data) / output_stream.SAMPLE_RATE:.0f}s / {output_stream.confidence:.1f}; "
                 + ("idle" if idle else ""),
                 end="\r",
             )
-        else:  # idle and voice_data is not empty
-            # print partial transcription?!
-            start = datetime.now()
-            segments, info = transcribe_model.transcribe(
-                stream.voice_data, beam_size=6, language="en"
-            )
-            result = " ".join(s.text.strip() for s in segments)
-            print(" " * 60, end="\r")
-            proctime = datetime.now() - start
-            print(f"p: {result} ({proctime.total_seconds():.2f}s)", end="\r")
