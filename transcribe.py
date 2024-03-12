@@ -10,8 +10,9 @@ try:
     from datetime import datetime, timedelta
     import argparse
 
-    import numpy as np
-    import torch
+    # interactivity -- keyboard input and output
+    import keyboard
+    import pyautogui
 
     # pyaudiowpatch allows recording from loopbacks/outputs
     import pyaudiowpatch as pyaudio
@@ -19,11 +20,14 @@ try:
 
     # this was for checking waveforms while debugging how bytes are converted to floats
     # import pylab
+
+    import numpy as np
+    import torch
     from faster_whisper import WhisperModel
 except ImportError:
     print(
         """Import error. Please run the following command:
-            pip install faster-whisper numpy torch pyaudiowpatch pydub --upgrade
+            pip install faster-whisper numpy torch pyaudiowpatch librosa keyboard --upgrade
         """
     )
     sys.exit(-1)
@@ -32,11 +36,17 @@ print("Completed imports")
 
 AVAILABLE_MODELS = ["tiny", "base", "small", "medium", "large-v3"]
 
+substitutions = {
+}
+
+yearmonth = datetime.now().strftime("%Y-%m")
+
 parser = argparse.ArgumentParser(description='Transcribe audio from microphone and speakers to output and file.')
-parser.add_argument('--outfile', default=os.path.expanduser("~/transcripts/transcript.txt"))
+parser.add_argument('--outfile', default=os.path.expanduser(f"~/transcripts/transcript-{yearmonth}.txt"))
 parser.add_argument('--model', default="large-v3", choices=AVAILABLE_MODELS, help="Whisper model to use. Tiny is 39MB, Base is 74MB, Small is 244MB, Medium is 769MB, Large is 1550MB. Larger models are more accurate but use more memory and compute time")
 parser.add_argument('--partials', default="tiny", help="use a fast an inaccurate model to show partial transcriptions continuously")
 parser.add_argument('--only-while-app', default="Zoom Meeting", help="only transcribe when this app is active, or None/blank/False to transcribe all the time")
+parser.add_argument('--keyboardout', default=False, help="Type what is said into the keyboard")
 args = parser.parse_args()
 
 MODEL_SIZE = args.model
@@ -48,7 +58,11 @@ VAD_THRESHOLD = 0.4
 # main model on the full utterance for the log
 PARTIALS = args.partials
 
-ONLY_WHILE_APP = args.only_while_app
+ONLY_WHILE_APP_TITLE = args.only_while_app
+ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLE)
+
+# if True, type what is said into the keyboard
+KEYBOARDOUT = args.keyboardout
 
 # dataclass for input or output stream
 class Stream:
@@ -73,7 +87,7 @@ outfile = args.outfile
 if not os.path.exists(os.path.dirname(outfile)):
     os.makedirs(os.path.dirname(outfile))
 with open(outfile, "a") as f:
-    print(f"\n\nStarting new transcript at {datetime.now()}", file=f)
+    print(f"\n\n\n\n\n\nStarting new transcript at {datetime.now()}", file=f)
 
 print(f"\nSaving transcript to {outfile}\n\n")
 
@@ -81,12 +95,7 @@ def init_stream(input=False):
     stream = Stream()
     stream.prefix = "i" if input else "o"
 
-    print("Printing audio devices:")
     pa = pyaudio.PyAudio()
-    for i in range(pa.get_device_count()):
-        info = pa.get_device_info_by_index(i)
-        print(f"{info['index']}: {info['name']} ")
-
     wasapi_info = pa.get_host_api_info_by_type(pyaudio.paWASAPI)
 
     # Get default WASAPI speakers
@@ -195,31 +204,55 @@ def check_zoom_active():
     global last_zoom_check, zoom_active
     if datetime.now() - last_zoom_check < timedelta(seconds=10):
         return zoom_active
-    import win32gui
-
-    windows = set()
-
-    def winEnumHandler(hwnd, ctx):
-        if win32gui.IsWindowVisible(hwnd):
-            windows.add(win32gui.GetWindowText(hwnd))
-
-    win32gui.EnumWindows(winEnumHandler, None)
+    
     last_zoom_check = datetime.now()
-    new_zoom_active = ONLY_WHILE_APP in windows
+    new_zoom_active = ONLY_WHILE_APP_TITLE in list_windows()
     if new_zoom_active != zoom_active:
-        print(f"\n{ONLY_WHILE_APP} is now {'active' if new_zoom_active else 'inactive'}")
+        print(f"\n{ONLY_WHILE_APP_TITLE} is now {'active' if new_zoom_active else 'inactive'}")
     zoom_active = new_zoom_active
     return zoom_active
 
 
 last_time = datetime.now()
 
+def list_windows():
+    import win32gui
+    windows = set()
+    def winEnumHandler(hwnd, ctx):
+        if win32gui.IsWindowVisible(hwnd):
+            windows.add(win32gui.GetWindowText(hwnd))
+    win32gui.EnumWindows(winEnumHandler, None)
+    return sorted(windows)
+
+def on_key_event(event):
+    global KEYBOARDOUT, ONLY_WHILE_APP
+    if event.event_type == keyboard.KEY_DOWN and keyboard.is_pressed('ctrl'):
+        if keyboard.is_pressed('t'):
+            KEYBOARDOUT = not KEYBOARDOUT
+            print(f"typing: {KEYBOARDOUT}")
+        if keyboard.is_pressed('z'):
+            ONLY_WHILE_APP = not ONLY_WHILE_APP
+            print(f"only while app: {ONLY_WHILE_APP_TITLE if ONLY_WHILE_APP else 'always on'}")
+        if keyboard.is_pressed('c'):
+            os.system('cls' if os.name == 'nt' else 'clear')
+        # list app windows
+        if keyboard.is_pressed('l'):
+            print(list_windows())
+        # list audio devices
+        if keyboard.is_pressed('a'):
+            pa = pyaudio.PyAudio()
+            for i in range(pa.get_device_count()):
+                info = pa.get_device_info_by_index(i)
+                print(f"{info['index']}: {info['name']} ")
+            
+keyboard.on_press(on_key_event)
+
 while input_stream.stream.is_active() or output_stream.stream.is_active():
     for stream in [input_stream, output_stream]:
         samples = stream.available_data
         stream.available_data = np.zeros((0), dtype=np.float32)
         read_data = False
-        if not check_zoom_active():
+        if not (KEYBOARDOUT or check_zoom_active()):
             continue
 
         if len(samples):
@@ -271,6 +304,8 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
             )
             # walk the generator so we don't clear line "transcribing" too soon
             result = " ".join(s.text.strip() for s in segments)
+            for k, v in substitutions.items():
+                result = result.replace(k, v)
             print(" " * 78, end="\r")  # clear line
             clocktime = datetime.now().strftime("%H:%M")
             print(f"{clocktime}  {stream.prefix}: {result}")
@@ -278,7 +313,7 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
             # if it's been more than a couple of minutes, put some newlines
             if datetime.now() - last_time > timedelta(minutes=2):
                 with open(outfile, "a") as f:
-                    print("\n\n", file=f)
+                    print("\n"*5, file=f)
             # if the minute has changed, log a line saying the current time.
             if last_time.minute != datetime.now().minute:
                 last_time = datetime.now()
@@ -286,6 +321,8 @@ while input_stream.stream.is_active() or output_stream.stream.is_active():
                     print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
             with open(outfile, "a") as f:
                 f.write(f"{stream.prefix}: {result}\n")
+            if KEYBOARDOUT:
+                pyautogui.write(result + " ", interval=0.01)
         elif PARTIALS:
             if len(stream.voice_data) > 0:
                 start = datetime.now()
