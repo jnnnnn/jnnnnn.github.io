@@ -11,8 +11,8 @@ try:
     import argparse
 
     # interactivity -- keyboard input and output
-    import keyboard
     import pyautogui
+    import msvcrt
 
     # pyaudiowpatch allows recording from loopbacks/outputs
     import pyaudiowpatch as pyaudio
@@ -45,7 +45,7 @@ parser = argparse.ArgumentParser(description='Transcribe audio from microphone a
 parser.add_argument('--outfile', default=os.path.expanduser(f"~/transcripts/transcript-{yearmonth}.txt"))
 parser.add_argument('--model', default="large-v3", choices=AVAILABLE_MODELS, help="Whisper model to use. Tiny is 39MB, Base is 74MB, Small is 244MB, Medium is 769MB, Large is 1550MB. Larger models are more accurate but use more memory and compute time")
 parser.add_argument('--partials', default="tiny", help="use a fast an inaccurate model to show partial transcriptions continuously")
-parser.add_argument('--only-while-app', default="Zoom Meeting", help="only transcribe when this app is active, or None/blank/False to transcribe all the time")
+parser.add_argument('--only-while-app', nargs="*", default=["Zoom Meeting", "VideoFrameWnd"], help="only transcribe when this app is active, or None/blank/False to transcribe all the time")
 parser.add_argument('--keyboardout', default=False, help="Type what is said into the keyboard")
 args = parser.parse_args()
 
@@ -58,8 +58,8 @@ VAD_THRESHOLD = 0.4
 # main model on the full utterance for the log
 PARTIALS = args.partials
 
-ONLY_WHILE_APP_TITLE = args.only_while_app
-ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLE)
+ONLY_WHILE_APP_TITLES = set(args.only_while_app)
+ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLES)
 
 # if True, type what is said into the keyboard
 KEYBOARDOUT = args.keyboardout
@@ -206,9 +206,9 @@ def check_zoom_active():
         return zoom_active
     
     last_zoom_check = datetime.now()
-    new_zoom_active = ONLY_WHILE_APP_TITLE in list_windows()
+    new_zoom_active = bool(ONLY_WHILE_APP_TITLES.intersection(list_windows()))
     if new_zoom_active != zoom_active:
-        print(f"\n{ONLY_WHILE_APP_TITLE} is now {'active' if new_zoom_active else 'inactive'}")
+        print(f"\n{ONLY_WHILE_APP_TITLES} is now {'active' if new_zoom_active else 'inactive'}")
     zoom_active = new_zoom_active
     return zoom_active
 
@@ -224,34 +224,36 @@ def list_windows():
     win32gui.EnumWindows(winEnumHandler, None)
     return sorted(windows)
 
-def on_key_event(event):
+def on_key_event(key):
     global KEYBOARDOUT, ONLY_WHILE_APP
-    if event.event_type == keyboard.KEY_DOWN and keyboard.is_pressed('ctrl'):
-        if keyboard.is_pressed('t'):
-            KEYBOARDOUT = not KEYBOARDOUT
-            print(f"typing: {KEYBOARDOUT}")
-        if keyboard.is_pressed('z'):
-            ONLY_WHILE_APP = not ONLY_WHILE_APP
-            print(f"only while app: {ONLY_WHILE_APP_TITLE if ONLY_WHILE_APP else 'always on'}")
-        if keyboard.is_pressed('c'):
-            os.system('cls' if os.name == 'nt' else 'clear')
-        # list app windows
-        if keyboard.is_pressed('l'):
-            print(list_windows())
-        # list audio devices
-        if keyboard.is_pressed('a'):
-            pa = pyaudio.PyAudio()
-            for i in range(pa.get_device_count()):
-                info = pa.get_device_info_by_index(i)
-                print(f"{info['index']}: {info['name']} ")
-            
-keyboard.on_press(on_key_event)
+    if key == 'T':
+        KEYBOARDOUT = not KEYBOARDOUT
+        print(f"typing: {KEYBOARDOUT}")
+    if key == 'Z':
+        ONLY_WHILE_APP = not ONLY_WHILE_APP
+        print(f"only while app: {ONLY_WHILE_APP_TITLES if ONLY_WHILE_APP else 'always on'}")
+    if key == 'C':
+        os.system('cls' if os.name == 'nt' else 'clear')
+    # list app windows
+    if key == 'L':
+        print(list_windows())
+    # list audio devices
+    if key == 'A':
+        pa = pyaudio.PyAudio()
+        for i in range(pa.get_device_count()):
+            info = pa.get_device_info_by_index(i)
+            print(f"{info['index']}: {info['name']} ")
 
 while input_stream.stream.is_active() or output_stream.stream.is_active():
+    if msvcrt.kbhit():
+        key = msvcrt.getch().decode("utf-8")
+        on_key_event(key)
+
     for stream in [input_stream, output_stream]:
         samples = stream.available_data
         stream.available_data = np.zeros((0), dtype=np.float32)
         read_data = False
+        
         if not (KEYBOARDOUT or check_zoom_active()):
             continue
 
