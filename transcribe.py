@@ -41,12 +41,32 @@ substitutions = {
 
 yearmonth = datetime.now().strftime("%Y-%m")
 
-parser = argparse.ArgumentParser(description='Transcribe audio from microphone and speakers to output and file.')
-parser.add_argument('--outfile', default=os.path.expanduser(f"~/transcripts/transcript-{yearmonth}.txt"))
-parser.add_argument('--model', default="large-v3", choices=AVAILABLE_MODELS, help="Whisper model to use. Tiny is 39MB, Base is 74MB, Small is 244MB, Medium is 769MB, Large is 1550MB. Larger models are more accurate but use more memory and compute time")
-parser.add_argument('--partials', default="tiny", help="use a fast an inaccurate model to show partial transcriptions continuously")
-parser.add_argument('--only-while-app', nargs="*", default=["Zoom Meeting", "VideoFrameWnd"], help="only transcribe when this app is active, or None/blank/False to transcribe all the time")
-parser.add_argument('--keyboardout', default=False, help="Type what is said into the keyboard")
+parser = argparse.ArgumentParser(
+    description="Transcribe audio from microphone and speakers to output and file."
+)
+parser.add_argument(
+    "--outfile", default=os.path.expanduser(f"~/transcripts/transcript-{yearmonth}.txt")
+)
+parser.add_argument(
+    "--model",
+    default="tiny",
+    choices=AVAILABLE_MODELS,
+    help="Whisper model to use. Tiny is 39MB, Base is 74MB, Small is 244MB, Medium is 769MB, Large is 1550MB. Larger models are more accurate but use more memory and compute time",
+)
+parser.add_argument(
+    "--partials",
+    default="tiny",
+    help="use a fast an inaccurate model to show partial transcriptions continuously",
+)
+parser.add_argument(
+    "--only-while-app",
+    nargs="*",
+    default=["Zoom Meeting", "VideoFrameWnd"],
+    help="only transcribe when this app is active, or None/blank/False to transcribe all the time",
+)
+parser.add_argument(
+    "--keyboardout", default=False, help="Type what is said into the keyboard"
+)
 args = parser.parse_args()
 
 MODEL_SIZE = args.model
@@ -63,6 +83,7 @@ ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLES)
 
 # if True, type what is said into the keyboard
 KEYBOARDOUT = args.keyboardout
+
 
 # dataclass for input or output stream
 class Stream:
@@ -91,11 +112,12 @@ with open(outfile, "a") as f:
 
 print(f"\nSaving transcript to {outfile}\n\n")
 
+pa = pyaudio.PyAudio()
+
 def init_stream(input=False):
     stream = Stream()
     stream.prefix = "i" if input else "o"
 
-    pa = pyaudio.PyAudio()
     wasapi_info = pa.get_host_api_info_by_type(pyaudio.paWASAPI)
 
     # Get default WASAPI speakers
@@ -112,15 +134,19 @@ def init_stream(input=False):
                 break
         else:
             print(
-                "Default loopback output device not found.\n\nRun `python -m pyaudiowpatch` to check available devices.\nExiting...\n"
+                "Default loopback output device not found.\n\nRun `python -m pyaudiowpatch` to check available devices."
             )
+            input("Press any key to exit...")
             exit()
 
     if input:
-        print("Transcribing from default mic")
+        default_mic = pa.get_device_info_by_index(wasapi_info["defaultInputDevice"])
+        print(
+            f"Transcribing from default mic: ({default_mic['index']}){default_mic['name']}"
+        )
     else:
         print(
-            f"Recording from: ({default_speakers['index']}){default_speakers['name']}: {default_speakers}"
+            f"Recording from: ({default_speakers['index']}){default_speakers['name']}"
         )
 
     # 1 second chunks, smaller means sentences keep getting split up
@@ -134,6 +160,10 @@ def init_stream(input=False):
     def callback(input_data, frame_count, time_info, flags):
         # print(f"callback: {type(input_data)} - {frame_count} frames, {len(input_data)} samples, {flags}, {input_data[:20]}")
         # resample to what Whisper expects: 16khz mono f32
+        if flags & ~pyaudio.paNoError:
+            print(f"Error in callback: {flags}, {flags:08b}")
+            stream.stream.close()
+            return None, pyaudio.paAbort
         floats = librosa.util.buf_to_float(input_data, n_bytes=2, dtype=np.float32)
         if INPUT_CHANNELS > 1:
             floats = np.reshape(floats, (INPUT_CHANNELS, -1), order="F")
@@ -142,6 +172,7 @@ def init_stream(input=False):
             floats, orig_sr=INPUT_SAMPLE_RATE, target_sr=stream.SAMPLE_RATE
         )
         stream.available_data = np.append(stream.available_data, input_data)
+
         return input_data, pyaudio.paContinue
 
     stream.stream = pa.open(
@@ -157,8 +188,7 @@ def init_stream(input=False):
     return stream
 
 
-input_stream = init_stream(input=True)
-output_stream = init_stream(input=False)
+KEYBOARDOUT_start = datetime.now()
 
 torch.set_num_threads(1)
 
@@ -204,142 +234,187 @@ def check_zoom_active():
     global last_zoom_check, zoom_active
     if datetime.now() - last_zoom_check < timedelta(seconds=10):
         return zoom_active
-    
+
     last_zoom_check = datetime.now()
     new_zoom_active = bool(ONLY_WHILE_APP_TITLES.intersection(list_windows()))
     if new_zoom_active != zoom_active:
-        print(f"\n{ONLY_WHILE_APP_TITLES} is now {'active' if new_zoom_active else 'inactive'}")
+        print(
+            f"\n{ONLY_WHILE_APP_TITLES} is now {'active' if new_zoom_active else 'inactive'}"
+        )
     zoom_active = new_zoom_active
     return zoom_active
 
 
 last_time = datetime.now()
 
+
 def list_windows():
     import win32gui
+
     windows = set()
+
     def winEnumHandler(hwnd, ctx):
         if win32gui.IsWindowVisible(hwnd):
             windows.add(win32gui.GetWindowText(hwnd))
+
     win32gui.EnumWindows(winEnumHandler, None)
     return sorted(windows)
 
+
 def on_key_event(key):
-    global KEYBOARDOUT, ONLY_WHILE_APP
-    if key == 'T':
+    global KEYBOARDOUT, ONLY_WHILE_APP, KEYBOARDOUT_start
+    if key == "T":
         KEYBOARDOUT = not KEYBOARDOUT
+        KEYBOARDOUT_start = datetime.now()
         print(f"typing: {KEYBOARDOUT}")
-    if key == 'Z':
+    if key == "Z":
         ONLY_WHILE_APP = not ONLY_WHILE_APP
-        print(f"only while app: {ONLY_WHILE_APP_TITLES if ONLY_WHILE_APP else 'always on'}")
-    if key == 'C':
-        os.system('cls' if os.name == 'nt' else 'clear')
+        print(
+            f"only while app: {ONLY_WHILE_APP_TITLES if ONLY_WHILE_APP else 'always on'}"
+        )
+    if key == "C":
+        os.system("cls" if os.name == "nt" else "clear")
     # list app windows
-    if key == 'L':
+    if key == "L":
         print(list_windows())
     # list audio devices
-    if key == 'A':
+    if key == "A":
         pa = pyaudio.PyAudio()
         for i in range(pa.get_device_count()):
             info = pa.get_device_info_by_index(i)
             print(f"{info['index']}: {info['name']} ")
+    if key == "R":
+        print("Reloading streams")
+        input_stream.stream.close()
+        output_stream.stream.close()
 
-while input_stream.stream.is_active() or output_stream.stream.is_active():
-    if msvcrt.kbhit():
-        key = msvcrt.getch().decode("utf-8")
-        on_key_event(key)
 
-    for stream in [input_stream, output_stream]:
-        samples = stream.available_data
-        stream.available_data = np.zeros((0), dtype=np.float32)
-        read_data = False
-        
-        if not (KEYBOARDOUT or check_zoom_active()):
-            continue
+def mainloop():
+    global KEYBOARDOUT, KEYBOARDOUT_start, last_time
+    while input_stream.stream.is_active() or output_stream.stream.is_active():
+        if msvcrt.kbhit():
+            key = msvcrt.getch().decode("utf-8")
+            on_key_event(key)
 
-        if len(samples):
-            stream.confidence = vad_model(torch.from_numpy(samples), 16000).item()
-            # when confidence starts to be above the threshold,
-            # we want to keep the chunk before (incase there was part of a word in it),
+        for stream in [input_stream, output_stream]:
+            samples = stream.available_data
+            stream.available_data = np.zeros((0), dtype=np.float32)
+
+            # Don't leave it in typing mode for more than five minutes because I forget
             if (
-                stream.confidence > VAD_THRESHOLD
-                and stream.prev_confidence < VAD_THRESHOLD
+                KEYBOARDOUT
+                and KEYBOARDOUT_start
+                and datetime.now() - KEYBOARDOUT_start > timedelta(minutes=3)
             ):
-                # keep the previous audio after all
-                stream.voice_data = np.append(stream.voice_data, stream.prev_audio)
-            # and the chunk after it drops (just to be sure we don't cut off a word)
-            if (
-                stream.confidence > VAD_THRESHOLD
-                or stream.prev_confidence > VAD_THRESHOLD
-            ):
-                stream.voice_data = np.append(stream.voice_data, samples)
-                stream.prev_audio = np.zeros((0), dtype=np.float32)
+                KEYBOARDOUT = None
+                print("typing: False (3 minute timeout reached)")
+
+            if not (KEYBOARDOUT or check_zoom_active()):
+                continue
+
+            if len(samples):
+                stream.confidence = vad_model(torch.from_numpy(samples), 16000).item()
+                # when confidence starts to be above the threshold,
+                # we want to keep the chunk before (incase there was part of a word in it),
+                if (
+                    stream.confidence > VAD_THRESHOLD
+                    and stream.prev_confidence < VAD_THRESHOLD
+                ):
+                    # keep the previous audio after all
+                    stream.voice_data = np.append(stream.voice_data, stream.prev_audio)
+                # and the chunk after it drops (just to be sure we don't cut off a word)
+                if (
+                    stream.confidence > VAD_THRESHOLD
+                    or stream.prev_confidence > VAD_THRESHOLD
+                ):
+                    stream.voice_data = np.append(stream.voice_data, samples)
+                    stream.prev_audio = np.zeros((0), dtype=np.float32)
+                else:
+                    # we only want to keep previous audio if we haven't already
+                    # added it to voice_data, to make sure we don't add it twice
+                    stream.prev_audio = samples
+
+                stream.prev_confidence = stream.confidence
+                idle = False
             else:
-                # we only want to keep previous audio if we haven't already
-                # added it to voice_data, to make sure we don't add it twice
-                stream.prev_audio = samples
+                # if we didn't read any data, sleep for a bit to avoid busy-waiting
+                idle = True
+                time.sleep(0.1)
 
-            stream.prev_confidence = stream.confidence
-            idle = False
-        else:
-            # if we didn't read any data, sleep for a bit to avoid busy-waiting
-            idle = True
-            time.sleep(0.1)
-
-        # transcribe once confidence that someone is still speaking drops below 0.5
-        if (
-            stream.confidence < VAD_THRESHOLD
-            and stream.prev_confidence < VAD_THRESHOLD
-            and len(stream.voice_data) > 0
-        ):
-            # print(" " * 60, end="\r")  # clear line
-            if not PARTIALS:
+            # transcribe once confidence that someone is still speaking drops below 0.5
+            if (
+                stream.confidence < VAD_THRESHOLD
+                and stream.prev_confidence < VAD_THRESHOLD
+                and len(stream.voice_data) > 0
+            ):
+                # print(" " * 60, end="\r")  # clear line
+                if not PARTIALS:
+                    print(
+                        f"transcribing {stream.prefix} {len(stream.voice_data) / stream.SAMPLE_RATE} seconds"
+                        + " " * 30,
+                        end="\r",
+                    )
+                transcribe_data = stream.voice_data
+                stream.voice_data = np.zeros((0), dtype=np.int16)
+                segments, info = transcribe_model.transcribe(
+                    transcribe_data, beam_size=6, language="en"
+                )
+                # walk the generator so we don't clear line "transcribing" too soon
+                result = " ".join(s.text.strip() for s in segments)
+                for k, v in substitutions.items():
+                    result = result.replace(k, v)
+                print(" " * 78, end="\r")  # clear line
+                clocktime = datetime.now().strftime("%H:%M")
+                print(f"{clocktime}  {stream.prefix}: {result}")
+                # save to ~/transcripts/transcript-speakers.txt
+                # if it's been more than a couple of minutes, put some newlines
+                if datetime.now() - last_time > timedelta(minutes=2):
+                    with open(outfile, "a") as f:
+                        print("\n" * 5, file=f)
+                # if the minute has changed, log a line saying the current time.
+                if last_time.minute != datetime.now().minute:
+                    last_time = datetime.now()
+                    with open(outfile, "a") as f:
+                        print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
+                with open(outfile, "a") as f:
+                    f.write(f"{stream.prefix}: {result}\n")
+                if KEYBOARDOUT and stream.prefix == "i":
+                    pyautogui.write(result + " ", interval=0.01)
+                    KEYBOARDOUT_start = datetime.now()
+            elif PARTIALS:
+                if len(stream.voice_data) > 0:
+                    start = datetime.now()
+                    last_five_seconds = stream.voice_data[-stream.SAMPLE_RATE * 5 :]
+                    segments, info = fast_model.transcribe(
+                        last_five_seconds, beam_size=1, language="en"
+                    )
+                    result = " ".join(s.text.strip() for s in segments)
+                    print(" " * 60, end="\r")
+                    proctime = datetime.now() - start
+                    print(
+                        f"p: {result[-70:]} ({proctime.total_seconds():.2f}s)", end="\r"
+                    )
+            else:
                 print(
-                    f"transcribing {stream.prefix} {len(stream.voice_data) / stream.SAMPLE_RATE} seconds"
-                    + " " * 30,
+                    f"input: {len(input_stream.voice_data) / input_stream.SAMPLE_RATE:.0f}s / {input_stream.confidence:.1f}; "
+                    + f"output: {len(output_stream.voice_data) / output_stream.SAMPLE_RATE:.0f}s / {output_stream.confidence:.1f}; "
+                    + ("idle" if idle else ""),
                     end="\r",
                 )
-            transcribe_data = stream.voice_data
-            stream.voice_data = np.zeros((0), dtype=np.int16)
-            segments, info = transcribe_model.transcribe(
-                transcribe_data, beam_size=6, language="en"
-            )
-            # walk the generator so we don't clear line "transcribing" too soon
-            result = " ".join(s.text.strip() for s in segments)
-            for k, v in substitutions.items():
-                result = result.replace(k, v)
-            print(" " * 78, end="\r")  # clear line
-            clocktime = datetime.now().strftime("%H:%M")
-            print(f"{clocktime}  {stream.prefix}: {result}")
-            # save to ~/transcripts/transcript-speakers.txt
-            # if it's been more than a couple of minutes, put some newlines
-            if datetime.now() - last_time > timedelta(minutes=2):
-                with open(outfile, "a") as f:
-                    print("\n"*5, file=f)
-            # if the minute has changed, log a line saying the current time.
-            if last_time.minute != datetime.now().minute:
-                last_time = datetime.now()
-                with open(outfile, "a") as f:
-                    print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
-            with open(outfile, "a") as f:
-                f.write(f"{stream.prefix}: {result}\n")
-            if KEYBOARDOUT:
-                pyautogui.write(result + " ", interval=0.01)
-        elif PARTIALS:
-            if len(stream.voice_data) > 0:
-                start = datetime.now()
-                last_five_seconds = stream.voice_data[-stream.SAMPLE_RATE * 5 :]
-                segments, info = fast_model.transcribe(
-                    last_five_seconds, beam_size=1, language="en"
-                )
-                result = " ".join(s.text.strip() for s in segments)
-                print(" " * 60, end="\r")
-                proctime = datetime.now() - start
-                print(f"p: {result[-70:]} ({proctime.total_seconds():.2f}s)", end="\r")
-        else:
-            print(
-                f"input: {len(input_stream.voice_data) / input_stream.SAMPLE_RATE:.0f}s / {input_stream.confidence:.1f}; "
-                + f"output: {len(output_stream.voice_data) / output_stream.SAMPLE_RATE:.0f}s / {output_stream.confidence:.1f}; "
-                + ("idle" if idle else ""),
-                end="\r",
-            )
+
+
+wait_time = 1
+while True:
+    try:
+        input_stream = init_stream(input=True)
+        output_stream = init_stream(input=False)
+        mainloop()
+    except Exception as e:
+        print(f"Error: {e}")
+
+        print("Reinitializing pyaudio to reset default devices...")
+        pa.terminate()
+        pa = pyaudio.PyAudio()
+
+        wait_time = wait_time * 2  # exponential backoff
+        time.sleep(wait_time)
