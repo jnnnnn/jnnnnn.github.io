@@ -27,7 +27,7 @@ try:
 except ImportError:
     print(
         """Import error. Please run the following command:
-            pip install faster-whisper numpy torch pyaudiowpatch librosa keyboard --upgrade
+            pip install faster-whisper torchaudio pyautogui pyaudiowpatch librosa --upgrade
         """
     )
     sys.exit(-1)
