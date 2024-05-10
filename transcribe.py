@@ -40,8 +40,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 AVAILABLE_MODELS = ["tiny", "base", "small", "medium", "large-v3"]
 
-substitutions = {
-}
+substitutions = {}
 
 yearmonth = datetime.now().strftime("%Y-%m")
 
@@ -118,6 +117,7 @@ print(f"\nSaving transcript to {outfile}\n\n")
 
 pa = pyaudio.PyAudio()
 
+
 def init_stream(input=False):
     stream = Stream()
     stream.prefix = "i" if input else "o"
@@ -178,7 +178,7 @@ def init_stream(input=False):
         stream.available_data = np.append(stream.available_data, input_data)
 
         return input_data, pyaudio.paContinue
-    
+
     stream.voice_detection = []
 
     stream.stream = pa.open(
@@ -267,13 +267,19 @@ def list_windows():
     return sorted(windows)
 
 
+def transcribe_window_focus():
+    import win32gui
+
+    return "transcribe" in win32gui.GetWindowText(win32gui.GetForegroundWindow())
+
+
 def on_key_event(key):
     global KEYBOARDOUT, ONLY_WHILE_APP, KEYBOARDOUT_start
-    if key == "T":
+    if key == "t":
         KEYBOARDOUT = not KEYBOARDOUT
         KEYBOARDOUT_start = datetime.now()
         print(f"typing: {KEYBOARDOUT}")
-    if key == "Z":
+    if key == "z":
         ONLY_WHILE_APP = not ONLY_WHILE_APP
         print(
             f"only while app: {ONLY_WHILE_APP_TITLES if ONLY_WHILE_APP else 'always on'}"
@@ -281,15 +287,15 @@ def on_key_event(key):
     if key == "C":
         os.system("cls" if os.name == "nt" else "clear")
     # list app windows
-    if key == "L":
+    if key == "l":
         print(list_windows())
     # list audio devices
-    if key == "A":
+    if key == "a":
         pa = pyaudio.PyAudio()
         for i in range(pa.get_device_count()):
             info = pa.get_device_info_by_index(i)
             print(f"{info['index']}: {info['name']} ")
-    if key == "R":
+    if key == "r":
         print("Reloading streams")
         input_stream.stream.close()
         output_stream.stream.close()
@@ -304,9 +310,7 @@ def transcribe_partial(stream):
     result = " ".join(s.text.strip() for s in segments)
     print(" " * 60, end="\r")
     proctime = datetime.now() - start
-    print(
-        f"p: {result[-70:]} ({proctime.total_seconds():.2f}s)", end="\r"
-    )
+    print(f"p: {result[-70:]} ({proctime.total_seconds():.2f}s)", end="\r")
 
 
 def transcribe(stream, break_point):
@@ -320,10 +324,13 @@ def transcribe(stream, break_point):
     if max(confidences) < VAD_THRESHOLD:
         return
 
-    global KEYBOARDOUT, KEYBOARDOUT_start, last_time
-    segments, info = transcribe_model.transcribe(
-        speech, beam_size=6, language="en"
+    print(
+        f"transcribing {len(speech) / stream.SAMPLE_RATE:.0f}s of audio" + " " * 50,
+        end="\r",
     )
+
+    global KEYBOARDOUT, KEYBOARDOUT_start, last_time
+    segments, info = transcribe_model.transcribe(speech, beam_size=6, language="en")
     # walk the generator so we don't clear line "transcribing" too soon
     result = " ".join(s.text.strip() for s in segments)
     for k, v in substitutions.items():
@@ -343,14 +350,15 @@ def transcribe(stream, break_point):
             print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
     with open(outfile, "a") as f:
         f.write(f"{stream.prefix}: {result}\n")
-    if KEYBOARDOUT and stream.prefix == "i":
+    if KEYBOARDOUT and stream.prefix == "i" and not transcribe_window_focus():
         pyautogui.write(result + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
 
+
 def find_break(voice_detection):
-    '''Find a sensible index to break the audio stream at, based on voice detection confidence:
-       We want sequences where the audio is at least three seconds (three values), and the last two values are below threshold.
-       If the given array is more than 15 seconds, break it at the lowest confidence point to avoid very long lines of transcription.'''
+    """Find a sensible index to break the audio stream at, based on voice detection confidence:
+    We want sequences where the audio is at least three seconds (three values), and the last two values are below threshold.
+    If the given array is more than 15 seconds, break it at the lowest confidence point to avoid very long lines of transcription."""
     MIN = 3
     if len(voice_detection) <= MIN:
         return None
@@ -358,21 +366,55 @@ def find_break(voice_detection):
         min_value = min(voice_detection[MIN:])
         return MIN + voice_detection[MIN:].index(min_value)
     for i in range(MIN, len(voice_detection)):
-        if voice_detection[i] < VAD_THRESHOLD and voice_detection[i - 1] < VAD_THRESHOLD:
+        if (
+            voice_detection[i] < VAD_THRESHOLD
+            and voice_detection[i - 1] < VAD_THRESHOLD
+        ):
             return i
-    else: 
+    else:
         return None
 
+
 def detect_speech(stream):
-    '''Update stream.voice_detection with any new stream.available_data'''
+    """Update stream.voice_detection with any new stream.available_data"""
     chunks = len(stream.available_data) // stream.SAMPLE_RATE
     detected = len(stream.voice_detection)
+    # if there's more than a minute of saved data, print a warning
+    if chunks - detected > 60:
+        print(
+            f"WARNING: detecting speech for {chunks - detected} seconds of audio data\n"
+        )
+
     for i in range(detected, chunks):
         start = i * stream.SAMPLE_RATE
         end = start + stream.SAMPLE_RATE
         samples = stream.available_data[start:end]
-        stream.voice_detection.append(vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item())
+        stream.voice_detection.append(
+            vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item()
+        )
 
+
+def truncate(stream):
+    """Remove any leading non-speech from stream.available_data because
+    it's probably not worth transcribing.
+    """
+    if not stream.voice_detection:
+        return
+
+    for i, confidence in enumerate(stream.voice_detection):
+        if confidence > VAD_THRESHOLD:
+            # keep one second of audio before the detected speech, in case we cut off the start of a word
+            i = max(0, i - 1)
+            stream.available_data = stream.available_data[i * stream.SAMPLE_RATE :]
+            stream.voice_detection = stream.voice_detection[i:]
+            break
+
+    # if there's more than 10 minutes of audio, only keep the last nine minutes
+    TRUNCATE_SECONDS = 9 * 60
+    TRUNCATE_TRIGGER = 10 * 60
+    if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
+        stream.available_data = stream.available_data[-TRUNCATE_SECONDS * stream.SAMPLE_RATE :]
+        stream.voice_detection = stream.voice_detection[-TRUNCATE_SECONDS:]
 
 def check_active():
     global KEYBOARDOUT, KEYBOARDOUT_start
@@ -401,13 +443,19 @@ def mainloop():
 
         for stream in [input_stream, output_stream]:
             detect_speech(stream)
+            truncate(stream)
             break_point = find_break(stream.voice_detection)
             if break_point:
                 transcribe(stream, break_point)
-            elif PARTIALS and stream.voice_detection and stream.voice_detection[-1] > VAD_THRESHOLD:
+            elif (
+                PARTIALS
+                and stream.voice_detection
+                and stream.voice_detection[-1] > VAD_THRESHOLD
+            ):
                 transcribe_partial(stream)
             else:
-                time.sleep(0.2)
+                time.sleep(0.05)
+
 
 wait_time = 1
 while True:
