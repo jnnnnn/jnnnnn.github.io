@@ -168,14 +168,16 @@ def init_stream(input=False):
             print(f"Error in callback: {flags}, {flags:08b}")
             stream.stream.close()
             return None, pyaudio.paAbort
-        floats = librosa.util.buf_to_float(input_data, n_bytes=2, dtype=np.float32)
-        if INPUT_CHANNELS > 1:
-            floats = np.reshape(floats, (INPUT_CHANNELS, -1), order="F")
-            floats = librosa.to_mono(floats)
-        input_data = librosa.resample(
-            floats, orig_sr=INPUT_SAMPLE_RATE, target_sr=stream.SAMPLE_RATE
-        )
-        stream.available_data = np.append(stream.available_data, input_data)
+
+        if check_active():
+            floats = librosa.util.buf_to_float(input_data, n_bytes=2, dtype=np.float32)
+            if INPUT_CHANNELS > 1:
+                floats = np.reshape(floats, (INPUT_CHANNELS, -1), order="F")
+                floats = librosa.to_mono(floats)
+            input_data = librosa.resample(
+                floats, orig_sr=INPUT_SAMPLE_RATE, target_sr=stream.SAMPLE_RATE
+            )
+            stream.available_data = np.append(stream.available_data, input_data)
 
         return input_data, pyaudio.paContinue
 
@@ -360,11 +362,12 @@ def find_break(voice_detection):
     We want sequences where the audio is at least three seconds (three values), and the last two values are below threshold.
     If the given array is more than 15 seconds, break it at the lowest confidence point to avoid very long lines of transcription."""
     MIN = 3
+    MAX = 16
     if len(voice_detection) <= MIN:
         return None
-    if len(voice_detection) > 15:
-        min_value = min(voice_detection[MIN:])
-        return MIN + voice_detection[MIN:].index(min_value)
+    if len(voice_detection) >= MAX:
+        min_value = min(voice_detection[MIN:MAX])
+        return MIN + voice_detection[MIN:MAX].index(min_value)
     for i in range(MIN, len(voice_detection)):
         if (
             voice_detection[i] < VAD_THRESHOLD
