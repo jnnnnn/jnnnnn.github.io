@@ -1,4 +1,7 @@
-# stream data from microphone, through whisper transcriber, to text output
+substitutions = {
+}
+
+# stream data from microphone and speakers, through whisper transcriber, to text output
 
 # https://github.com/snakers4/silero-vad/blob/master/examples/pyaudio-streaming/pyaudio-streaming-examples.ipynb
 
@@ -6,6 +9,7 @@ try:
     print("Importing dependencies...")
     import sys
     import os
+    import subprocess
     import time
     from datetime import datetime, timedelta
     import argparse
@@ -17,17 +21,16 @@ try:
     # pyaudiowpatch allows recording from loopbacks/outputs
     import pyaudiowpatch as pyaudio
     import librosa
-
-    # this was for checking waveforms while debugging how bytes are converted to floats
-    # import pylab
+    import soundfile
 
     import numpy as np
     import torch
     from faster_whisper import WhisperModel
-except ImportError:
+except ImportError as e:
     print(
-        """Import error. Please run the following command:
-            pip install faster-whisper torchaudio pyautogui pyaudiowpatch librosa --upgrade
+        f"""Import error {e}. 
+        Please run the following command:
+            pip install faster-whisper torchaudio pyautogui pyaudiowpatch librosa pysoundfile --upgrade
         """
     )
     sys.exit(-1)
@@ -39,8 +42,6 @@ print("Completed imports")
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 AVAILABLE_MODELS = ["tiny", "base", "small", "medium", "large-v3"]
-
-substitutions = {}
 
 yearmonth = datetime.now().strftime("%Y-%m")
 
@@ -70,6 +71,11 @@ parser.add_argument(
 parser.add_argument(
     "--keyboardout", default=False, help="Type what is said into the keyboard"
 )
+parser.add_argument(
+    "--clip-folder",
+    default=os.path.expanduser(f"~/transcripts/clips-{yearmonth}"),
+    help="Folder to save clips to",
+)
 args = parser.parse_args()
 
 MODEL_SIZE = args.model
@@ -87,23 +93,26 @@ ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLES)
 # if True, type what is said into the keyboard
 KEYBOARDOUT = args.keyboardout
 
+CLIPSPATH = args.clip_folder
+SAVE_NEXT_CLIP = False
+
 
 # dataclass for input or output stream
 class Stream:
     # this is in the format whisper expects, 16khz mono
     available_data = np.zeros((0), dtype=np.float32)
+    SAMPLE_RATE = 16000
+
+    # this is the original data, at the original sample rate but mono
+    original_data = np.zeros((0), dtype=np.float32)
+    original_sample_rate = 0
+
     outfile = ""
     stream = None
-    prefix = ""
+    prefix = ""  # "i" for input, "o" for output, printed at the start of each line
 
-    # this data has made it through VAD, may not be complete yet
-    voice_data = np.zeros((0), dtype=np.float32)
-    # Silero-Voice-Activity-Detector's reported "Confidence" that speech is present
-    confidence = 0.0
-
-    # keep in case voice activity starts
-    prev_confidence = confidence
-    prev_audio = np.zeros((0), dtype=np.float32)
+    last_time = datetime.now()
+    idles = 0.0
 
 
 outfile = args.outfile
@@ -157,8 +166,8 @@ def init_stream(input=False):
     CHUNK_SECONDS = 0.2
     INPUT_CHANNELS = int(default_speakers["maxInputChannels"])
     INPUT_SAMPLE_RATE = int(default_speakers["defaultSampleRate"])
+    stream.original_sample_rate = INPUT_SAMPLE_RATE
     INPUT_CHUNK = int(INPUT_SAMPLE_RATE * CHUNK_SECONDS)
-    stream.SAMPLE_RATE = 16000
     # CHUNK = int(SAMPLE_RATE * CHUNK_SECONDS)
 
     def callback(input_data, frame_count, time_info, flags):
@@ -174,10 +183,12 @@ def init_stream(input=False):
             if INPUT_CHANNELS > 1:
                 floats = np.reshape(floats, (INPUT_CHANNELS, -1), order="F")
                 floats = librosa.to_mono(floats)
+            stream.original_data = np.append(stream.original_data, floats)
             input_data = librosa.resample(
                 floats, orig_sr=INPUT_SAMPLE_RATE, target_sr=stream.SAMPLE_RATE
             )
             stream.available_data = np.append(stream.available_data, input_data)
+            stream.last_time = datetime.now()
 
         return input_data, pyaudio.paContinue
 
@@ -288,6 +299,11 @@ def on_key_event(key):
         )
     if key == "C":
         os.system("cls" if os.name == "nt" else "clear")
+    if key == "s":
+        global SAVE_NEXT_CLIP
+        SAVE_NEXT_CLIP = not SAVE_NEXT_CLIP
+        print(f"Saving next clip: {SAVE_NEXT_CLIP}")
+
     # list app windows
     if key == "l":
         print(list_windows())
@@ -318,9 +334,9 @@ def transcribe_partial(stream):
 def transcribe(stream, break_point):
     # remove the speech up to the break point from the available data
     speech = stream.available_data[: break_point * stream.SAMPLE_RATE]
+    original = stream.original_data[: break_point * stream.original_sample_rate]
     confidences = stream.voice_detection[:break_point]
-    stream.available_data = stream.available_data[break_point * stream.SAMPLE_RATE :]
-    stream.voice_detection = stream.voice_detection[break_point:]
+    drop_seconds(stream, break_point)
 
     # don't transcribe chunks that aren't speech, it's a little noisy sometimes
     if max(confidences) < VAD_THRESHOLD:
@@ -339,7 +355,8 @@ def transcribe(stream, break_point):
         result = result.replace(k, v)
     print(" " * 78, end="\r")  # clear line
     clocktime = datetime.now().strftime("%H:%M")
-    print(f"{clocktime}  {stream.prefix}: {result}")
+    for line in result.split("\n"):
+        print(f"{clocktime}  {stream.prefix}: {line}")
     # save to ~/transcripts/transcript-speakers.txt
     # if it's been more than a couple of minutes, put some newlines
     if datetime.now() - last_time > timedelta(minutes=2):
@@ -351,35 +368,78 @@ def transcribe(stream, break_point):
         with open(outfile, "a") as f:
             print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
     with open(outfile, "a") as f:
-        f.write(f"{stream.prefix}: {result}\n")
+        for line in result.split("\n"):
+            f.write(f"{stream.prefix}: {result}\n")
+    if SAVE_NEXT_CLIP:
+        saveclip(original, stream.original_sample_rate, result)
     if KEYBOARDOUT and stream.prefix == "i" and not transcribe_window_focus():
         pyautogui.write(result + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
 
 
-def find_break(voice_detection):
+def saveclip(samples, sample_rate, transcript):
+    """Write out a clip of audio as an ogg file, and use the transcription as the filename"""
+    if not os.path.exists(CLIPSPATH):
+        os.makedirs(CLIPSPATH)
+
+    # pick the five longest words to use in the filename
+    result = "".join(c for c in transcript.lower() if c.isalnum() or c.isspace())
+    words = sorted(set(result.split()), key=len, reverse=True)[:5]
+    # only take 50 chars because soundfile will crash if windows rejects filename too long
+    result = "-".join(w for w in result.split() if w in words)[:50]
+    if not result or not len(samples):
+        return
+    filename = os.path.join(CLIPSPATH, result + ".wav")
+    duration = len(samples) / sample_rate
+    print(f"Saving {duration}s clip to {filename} at {sample_rate/1000}kHz")
+    soundfile.write(filename, samples, sample_rate)
+    # pysoundfile's ogg support crashes after a 2-3 writes, so write as wav and convert with ffmpeg
+    # capture output to hide ffmpeg's progress. use .opus extension so that metadata works.
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            filename,
+            "-c:a",
+            "libvorbis",
+            "-q:a",
+            "4",
+            "-metadata",
+            f"Title={transcript}",
+            filename.replace(".wav", ".ogg"),
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    os.remove(filename)
+
+
+def find_break(stream):
     """Find a sensible index to break the audio stream at, based on voice detection confidence:
     We want sequences where the audio is at least three seconds (three values), and the last two values are below threshold.
     If the given array is more than 15 seconds, break it at the lowest confidence point to avoid very long lines of transcription."""
     MIN = 3
     MAX = 16
-    if len(voice_detection) <= MIN:
+    probs = stream.voice_detection
+    if len(probs) <= MIN:
         return None
-    if len(voice_detection) >= MAX:
-        min_value = min(voice_detection[MIN:MAX])
-        return MIN + voice_detection[MIN:MAX].index(min_value)
-    for i in range(MIN, len(voice_detection)):
-        if (
-            voice_detection[i] < VAD_THRESHOLD
-            and voice_detection[i - 1] < VAD_THRESHOLD
-        ):
+    if len(probs) >= MAX:
+        min_value = min(probs[MIN:MAX])
+        return MIN + probs[MIN:MAX].index(min_value)
+    for i in range(MIN, len(probs)):
+        if probs[i] < VAD_THRESHOLD and probs[i - 1] < VAD_THRESHOLD:
             return i
+    # if the stream has had no new data for a bit, transcribe what we've got
+    delayed = stream.idles > 1.1
+    if len(probs) > MIN and delayed:
+        return len(probs) - 1
     else:
         return None
 
 
 def detect_speech(stream):
-    """Update stream.voice_detection with any new stream.available_data"""
+    """Update stream.voice_detection with any new stream.available_data."""
     chunks = len(stream.available_data) // stream.SAMPLE_RATE
     detected = len(stream.voice_detection)
     # if there's more than a minute of saved data, print a warning
@@ -396,6 +456,18 @@ def detect_speech(stream):
             vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item()
         )
 
+    new_data = chunks - detected > 0
+    if new_data:
+        stream.idles = 0
+    return new_data
+
+
+def drop_seconds(stream, seconds):
+    """Remove the given number of seconds from the start of the stream"""
+    stream.available_data = stream.available_data[seconds * stream.SAMPLE_RATE :]
+    stream.original_data = stream.original_data[seconds * stream.original_sample_rate :]
+    stream.voice_detection = stream.voice_detection[seconds:]
+
 
 def truncate(stream):
     """Remove any leading non-speech from stream.available_data because
@@ -408,16 +480,19 @@ def truncate(stream):
         if confidence > VAD_THRESHOLD:
             # keep one second of audio before the detected speech, in case we cut off the start of a word
             i = max(0, i - 1)
-            stream.available_data = stream.available_data[i * stream.SAMPLE_RATE :]
-            stream.voice_detection = stream.voice_detection[i:]
+            drop_seconds(stream, i)
             break
 
     # if there's more than 10 minutes of audio, only keep the last nine minutes
     TRUNCATE_SECONDS = 9 * 60
     TRUNCATE_TRIGGER = 10 * 60
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
-        stream.available_data = stream.available_data[-TRUNCATE_SECONDS * stream.SAMPLE_RATE :]
-        stream.voice_detection = stream.voice_detection[-TRUNCATE_SECONDS:]
+        drop_seconds(stream, TRUNCATE_SECONDS)
+
+    # if there hasn't been any new data for a few seconds, clear the buffer
+    if stream.idles > 2:
+        drop_seconds(stream, len(stream.voice_detection))
+
 
 def check_active():
     global KEYBOARDOUT, KEYBOARDOUT_start
@@ -435,7 +510,8 @@ def check_active():
 
 def mainloop():
     global KEYBOARDOUT, KEYBOARDOUT_start, last_time
-    while input_stream.stream.is_active() or output_stream.stream.is_active():
+    streams = [input_stream, output_stream]
+    while any(s.stream.is_active() for s in streams):
         if msvcrt.kbhit():
             key = msvcrt.getch().decode("utf-8")
             on_key_event(key)
@@ -444,20 +520,27 @@ def mainloop():
             time.sleep(1)
             continue
 
-        for stream in [input_stream, output_stream]:
-            detect_speech(stream)
+        new_data = []
+
+        for stream in streams:
+            new_data.append(detect_speech(stream))
             truncate(stream)
-            break_point = find_break(stream.voice_detection)
+            break_point = find_break(stream)
             if break_point:
                 transcribe(stream, break_point)
+                stream.idles = 0
             elif (
                 PARTIALS
                 and stream.voice_detection
                 and stream.voice_detection[-1] > VAD_THRESHOLD
+                and new_data[-1]
             ):
                 transcribe_partial(stream)
-            else:
-                time.sleep(0.05)
+                stream.idles = 0
+        if not any(new_data):
+            time.sleep(0.05)
+            for s in streams:
+                s.idles += 0.05
 
 
 wait_time = 1
