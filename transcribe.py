@@ -1,4 +1,6 @@
 substitutions = {
+    "Krista": "Crysta",
+    "Christa": "Crysta",
     # "([.?!]) ": "\\1\n",
 }
 
@@ -69,9 +71,9 @@ AVAILABLE_MODELS = [
     "tiny",  # fine even on cpu. used for preview transcripts. makes lots of mistakes
     "base",
     "small",  # starting to require an accelerator (GTX1060 or better)
-    "distil-small",  # the distil models are compressed to be almost as accurate but ~5x more efficient
+    "distil-small.en",  # the distil models are compressed to be almost as accurate but ~5x more efficient
     "medium",
-    "distil-medium",
+    "distil-medium.en",
     "large-v3",  # recommend 8GB GPU RAM, GTX1080 or better. very few mistakes; 90% of sentences don't require correction.
     "distil-large-v3",  # almost as good as large, 6x faster
 ]
@@ -92,7 +94,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--partials",
-    default="tiny",
+    default="distil-small.en",
     help="use a fast an inaccurate model to show partial transcriptions continuously",
 )
 parser.add_argument(
@@ -121,6 +123,7 @@ MODEL_SIZE = args.model
 
 # Above this confidence, we assume that speech is present
 VAD_THRESHOLD = 0.4
+VAD_RATE = 10  # 100ms chunks
 
 # transcribe continuously, overwriting until silence is detected and we use the
 # main model on the full utterance for the log
@@ -156,6 +159,8 @@ class Stream:
     idles = 0.0
 
     partial_len = 0
+
+    voice_activity = []
 
 
 outfile = args.outfile
@@ -234,8 +239,6 @@ def init_stream(input=False):
             stream.last_time = datetime.now()
 
         return input_data, pyaudio.paContinue
-
-    stream.voice_detection = []
 
     stream.stream = pa.open(
         format=pyaudio.paInt16,  # taking in raw f32 was too hard, something about little-endian
@@ -373,8 +376,8 @@ def transcribe_partial(stream):
     if (
         not (
             PARTIALS
-            and stream.voice_detection
-            and stream.voice_detection[-1] > VAD_THRESHOLD
+            and stream.voice_activity
+            and max(stream.voice_activity[-10:]) > VAD_THRESHOLD
         )
         or len(stream.available_data) == stream.partial_len
     ):
@@ -398,13 +401,13 @@ def transcribe(stream, break_point):
     if not transcribe_model:
         load_model()
     # remove the speech up to the break point from the available data
-    samplecount = int(break_point * stream.SAMPLE_RATE)
+    samplecount = int(break_point / VAD_RATE * stream.SAMPLE_RATE)
     speech = stream.available_data[:samplecount]
     original = stream.original_data[
         : samplecount * stream.original_sample_rate // stream.SAMPLE_RATE
     ]
-    confidences = stream.voice_detection[: int(break_point)]
-    drop_seconds(stream, break_point)
+    confidences = stream.voice_activity[:break_point]
+    trim_start(stream, break_point)
 
     # don't transcribe chunks that aren't speech, it's a little noisy sometimes
     if max(confidences) < VAD_THRESHOLD:
@@ -504,59 +507,80 @@ def find_break(stream):
     If the given array is more than 15 seconds, break it at the lowest confidence (quietest) point
     to avoid very long lines of transcription.
     """
-    probs = stream.voice_detection
+    probs = stream.voice_activity
 
-    MIN = 3
-    MAX = MAX_CLIP_LENGTH
+    MIN = 3 * VAD_RATE
+    MAX = MAX_CLIP_LENGTH * VAD_RATE
     if len(probs) >= MAX:
         min_value = min(probs[MIN:MAX])
         result = MIN + probs[MIN:MAX].index(min_value)
-        logging.debug(f"Found break at {result}s ({min_value:.1f} VAC) because over max length")
+        logging.debug(
+            f"Found break at {result/VAD_RATE:.1f}s ({min_value:.1f} VAC) because over max length"
+        )
         return result
     if len(probs) > 0 and stream.idles > 1.1:
         logging.debug("Found break at end because stream idle")
-        return len(probs) + 1000  # consume all available data
+        return len(probs) + 100  # consume all available data
     if len(probs) <= MIN:
         return None
-    for i in range(MIN, len(probs)):
-        if probs[i] < VAD_THRESHOLD and probs[i - 1] < VAD_THRESHOLD:
-            logging.debug(f"Found break at non-speech {i}s ({probs[i]:.1f} VAC) of {len(probs)}s available")
-            return i
+
+    index, average = index_lowest_average(probs)
+    if average < VAD_THRESHOLD:
+        logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
+        return index
+
+
+def index_lowest_average(probs, window=10):
+    """Find the index of the lowest average confidence
+    for a window of values in the given list of probabilities.
+    """
+    if len(probs) < window:
+        return 0
+    averages = [sum(probs[i : i + window]) / window for i in range(len(probs) - window)]
+    min_value = min(averages)
+    result = averages.index(min_value) + window // 2
+    return result, averages[result]
 
 
 def find_break_partial(stream):
     """If the clip is more than 30 seconds, run a partial transcribe and then report all the segments except the last one."""
-    if len(stream.voice_detection) > MAX_CLIP_LENGTH:
+    if len(stream.voice_activity) > MAX_CLIP_LENGTH * VAD_RATE:
         segments, _info = fast_model.transcribe(
             stream.available_data, beam_size=1, language="en", word_timestamps=False
         )
         segments = list(segments)
         if len(segments) < 2:
-            logging.debug(f"Found break to be end because only {len(segments)} segments")
-            return len(stream.available_data / stream.SAMPLE_RATE)
+            logging.debug(
+                f"Found break (partial) to be end because only {len(segments)} segments"
+            )
+            return len(stream.available_data) * VAD_RATE / stream.SAMPLE_RATE
         else:
-            logging.debug(f"Found break at {segments[-2].end} of {segments[-1].end}s")
-            return segments[-2].end
+            logging.debug(
+                f"Found break (partial) at {segments[-2].end:.2f} of {segments[-1].end}s"
+            )
+            return segments[-2].end * VAD_RATE
     else:
         return find_break(stream)
 
 
 def detect_speech(stream):
-    """Update stream.voice_detection with any new stream.available_data."""
-    chunks = len(stream.available_data) // stream.SAMPLE_RATE
-    detected = len(stream.voice_detection)
+    """Update stream.voice_activity with any new stream.available_data."""
+    CHUNK_SIZE = stream.SAMPLE_RATE // VAD_RATE
+    chunks = len(stream.available_data) // CHUNK_SIZE
+    detected = len(stream.voice_activity)
     # if there's more than a minute of saved data, print a warning
-    if chunks - detected > 60:
+    seconds_to_detect = (chunks - detected) // VAD_RATE
+    if seconds_to_detect > 60:
         logging.warning(
-            f"WARNING: detecting speech for {chunks - detected} seconds of audio data\n"
+            f"WARNING: detecting speech for {seconds_to_detect} seconds of audio data\n"
         )
 
     for i in range(detected, chunks):
-        start = i * stream.SAMPLE_RATE
-        end = start + stream.SAMPLE_RATE
+        start = i * CHUNK_SIZE
+        end = start + CHUNK_SIZE
         samples = stream.available_data[start:end]
-        stream.voice_detection.append(
-            vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item()
+        stream.voice_activity.append(
+            vad_model(torch.from_numpy(samples), CHUNK_SIZE).item()
         )
 
     new_data = chunks - detected > 0
@@ -565,40 +589,43 @@ def detect_speech(stream):
     return new_data
 
 
-def drop_seconds(stream, seconds):
+def trim_start(stream, vadchunks):
     """Remove the given number of seconds from the start of the stream"""
-    if seconds <= 0: 
+    if vadchunks <= 0:
         return
-    
-    logging.debug(f"dropping {seconds}s of audio")
-    samples = int(seconds * stream.SAMPLE_RATE)
+
+    logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
+    samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
     stream.available_data = stream.available_data[samples:]
     stream.original_data = stream.original_data[
         samples * stream.original_sample_rate // stream.SAMPLE_RATE :
     ]
-    stream.voice_detection = []  # recompute as fractional second may cause alignment issues
+    stream.voice_activity = stream.voice_activity[vadchunks:]
 
 
-def truncate(stream):
+def removeLeadingNonSpeech(stream):
     """Remove any leading non-speech from stream.available_data because
     it's probably not worth transcribing.
     """
-    for i, confidence in enumerate(stream.voice_detection):
+    # keep 0.3s of audio before the detected speech, in case we cut off the start of a word
+    KEEP_CHUNKS = int(0.3 * VAD_RATE)
+    for i, confidence in enumerate(stream.voice_activity):
         if confidence > VAD_THRESHOLD and not SAVE_NEXT_CLIP:
-            # keep one second of audio before the detected speech, in case we cut off the start of a word
-            i = max(0, i - 1)
-            drop_seconds(stream, i)
+            i = max(0, i - KEEP_CHUNKS)
+            if i > 0:
+                logging.debug(f"truncating {i/VAD_RATE:.1f}s of audio")
+                trim_start(stream, i)
             break
 
     # if there's more than 10 minutes of audio, only keep the last nine minutes
     TRUNCATE_SECONDS = 9 * 60
     TRUNCATE_TRIGGER = 10 * 60
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
-        drop_seconds(stream, TRUNCATE_SECONDS)
+        trim_start(stream, TRUNCATE_SECONDS * VAD_RATE)
 
     # if there hasn't been any new data for a few seconds, clear the buffer
     if stream.idles > 2:
-        drop_seconds(stream, len(stream.voice_detection))
+        trim_start(stream, len(stream.voice_activity))
 
 
 def check_active():
@@ -642,7 +669,7 @@ def mainloop():
 
         for stream in streams:
             new_data.append(detect_speech(stream))
-            truncate(stream)
+            removeLeadingNonSpeech(stream)
             break_point = find_break_partial(stream)
             if break_point:
                 transcribe(stream, break_point)
