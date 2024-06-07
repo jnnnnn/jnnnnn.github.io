@@ -135,11 +135,11 @@ class Stream:
     prefix = ""  # "i" for input, "o" for output, printed at the start of each line
 
     last_time = datetime.now()
-    idles = 0.0
 
     partial_len = 0
 
-    voice_activity = []
+    vad = None
+    vad_offset = 0
 
 
 outfile = args.outfile
@@ -228,8 +228,16 @@ def init_stream(input=False):
     )
 
     # each stream needs its own vad model because it is stateful.
-    stream.vad_model, _ = torch.hub.load(
+    vad_model, (_, _, _, VadIterator, _) = torch.hub.load(
         repo_or_dir="snakers4/silero-vad", model="silero_vad"
+    )
+    # https://github.com/snakers4/silero-vad/blob/master/utils_vad.py
+    stream.vad = VadIterator(
+        vad_model,
+        threshold=0.5,
+        sampling_rate=16000,
+        min_silence_duration_ms=100,
+        speech_pad_ms=30,
     )
 
     return stream
@@ -345,14 +353,7 @@ def on_key_event(key):
 
 
 def transcribe_partial(stream):
-    if (
-        not (
-            PARTIALS
-            and stream.voice_activity
-            and max(stream.voice_activity[-10:]) > VAD_THRESHOLD
-        )
-        or len(stream.available_data) == stream.partial_len
-    ):
+    if not (PARTIALS and stream.partial_activity):
         return False
 
     start = datetime.now()
@@ -364,26 +365,20 @@ def transcribe_partial(stream):
     proctime = datetime.now() - start
     print(BLANK + f"p ({proctime.total_seconds():.2f}s): {result[-70:]}", end="\r")
     stream.partial_len = len(stream.available_data)
-    stream.idles = 0
+    stream.partial_activity = False
     return True
 
 
-def transcribe(stream, break_point):
+def transcribe(stream, end_offset):
     global transcribe_model
     if not transcribe_model:
         load_model()
     # remove the speech up to the break point from the available data
-    samplecount = int(break_point / VAD_RATE * stream.SAMPLE_RATE)
-    speech = stream.available_data[:samplecount]
-    confidences = stream.voice_activity[:break_point]
+    speech = stream.available_data[:end_offset]
     logging.debug(
         f"Truncate because transcribe {len(speech) / stream.SAMPLE_RATE:.1f}s of audio"
     )
-    trim_start(stream, break_point)
-
-    # don't transcribe chunks that aren't speech, it's a little noisy sometimes
-    if max(confidences) < VAD_THRESHOLD:
-        return
+    trim_start(stream, end_offset)
 
     print(
         BLANK + f"transcribing {len(speech) / stream.SAMPLE_RATE:.0f}s of audio",
@@ -421,18 +416,15 @@ def transcribe(stream, break_point):
         pyautogui.write(result + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
 
-    stream.idles = 0
 
-
-def trim_start(stream, vadchunks):
+def trim_start(stream, end_offset):
     """Remove the given number of seconds from the start of the stream"""
-    if vadchunks <= 0:
+    if end_offset <= 0:
         return
 
-    # logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
-    samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
-    stream.available_data = stream.available_data[samples:]
-    stream.voice_activity = stream.voice_activity[vadchunks:]
+    stream.available_data = stream.available_data[end_offset:]
+    stream.vad.current_sample = max(0, stream.vad.current_sample - end_offset)
+    stream.vad.temp_end = max(0, stream.vad.temp_end - end_offset)
 
 
 def removeLeadingNonSpeech(stream):
@@ -455,11 +447,6 @@ def removeLeadingNonSpeech(stream):
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
         logging.debug("truncating 9 minutes of audio")
         trim_start(stream, TRUNCATE_SECONDS * VAD_RATE)
-
-    # if there hasn't been any new data for a few seconds, clear the buffer
-    if stream.idles > 2:
-        logging.debug("truncate because idle")
-        trim_start(stream, len(stream.voice_activity))
 
 
 def check_active():
@@ -487,6 +474,18 @@ def check_active():
     return active
 
 
+def detect_speech(stream):
+    "Is there new speech to process? Return the sample offset at the end if so."
+    if len(stream.available_data) <= stream.vad_offset:
+        return
+
+    vad_result = stream.vad(stream.available_data[stream.vad_offset :])
+    stream.partial_activity = stream.vad.triggered
+
+    if vad_result:
+        return vad_result["end"]
+
+
 def mainloop():
     global KEYBOARDOUT, KEYBOARDOUT_start, last_time
     streams = [input_stream, output_stream]
@@ -502,17 +501,14 @@ def mainloop():
         new_data = []
 
         for stream in streams:
-            new_data.append(detect_speech(stream))
-            removeLeadingNonSpeech(stream)
-            break_point = find_break_partial(stream)
-            if break_point:
-                transcribe(stream, break_point)
-            else:
-                transcribe_partial(stream)
-        if not any(new_data):
-            for s in streams:
-                s.idles += 0.05
-            time.sleep(0.05)
+            end_offset = detect_speech(stream)
+            new_data.append()
+
+            if end_offset:
+                transcribe(stream, end_offset)
+            elif not transcribe_partial(stream):
+                removeLeadingNonSpeech(stream)
+                time.sleep(0.05)
 
 
 wait_time = 1
