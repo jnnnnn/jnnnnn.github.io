@@ -427,61 +427,50 @@ def transcribe(stream, break_point):
 
 def find_break(stream):
     """
-    Find a sensible index to break the audio stream at, based on voice detection confidence:
-    We want sequences where the audio is at least three seconds (three values), and
-    the last two values are below threshold.
-
-    If the given array is more than 15 seconds, break it at the lowest confidence (quietest) point
-    to avoid very long lines of transcription.
+    Find a sensible index to break the audio stream at, based on voice detection confidence.
     """
     probs = stream.voice_activity
 
-    MIN = 3 * VAD_RATE
-    MAX = MAX_CLIP_LENGTH * VAD_RATE
+    MIN = 3 * VAD_RATE # at least 3 seconds
+    MAX = MAX_CLIP_LENGTH * VAD_RATE # waffle! break at low point
+    WINDOW = int(0.3 * VAD_RATE)
     if len(probs) >= MAX:
-        min_value = min(probs[MIN:MAX])
-        result = MIN + probs[MIN:MAX].index(min_value)
-        logging.debug(
-            f"Found break at {result/VAD_RATE:.1f}s ({min_value:.1f} VAC) because over max length"
-        )
-        return result
+        index, average = index_lowest_average(probs, start=MIN, window=WINDOW)
+        logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC) because over max length")
+        return index
     if len(probs) > 0 and stream.idles > 1.1:
         logging.debug("Found break at end because stream idle")
         return len(probs) + 100  # consume all available data
-    if len(probs) <= MIN:
+    if not MIN < len(probs) - WINDOW:
         return None
 
-    index, average = index_lowest_average(probs)
-    if average < VAD_THRESHOLD and index > MIN and max(probs[:index]) > VAD_THRESHOLD:
+    index, average = index_lowest_average(probs, start=MIN, window=WINDOW)
+    if average < VAD_THRESHOLD and max(probs[:index]) > VAD_THRESHOLD:
         logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
         return index
 
 
-def index_lowest_average(probs, window=10):
+def index_lowest_average(probs, start=0, window=10):
     """Find the index of the lowest average confidence
     for a window of values in the given list of probabilities.
     """
-    if len(probs) < window:
-        return 0
-    averages = [sum(probs[i : i + window]) / window for i in range(len(probs) - window)]
+    assert start < len(probs) - window
+    averages = [sum(probs[i : i + window]) / window for i in range(start, len(probs) - window)]
     smallestAverage = min(averages)
-    windowCenter = averages.index(smallestAverage) + window // 2
-    return windowCenter, smallestAverage
+    windowStart = start + averages.index(smallestAverage)
+    lowPointInWindow = min(probs[windowStart : windowStart + window])
+    lowIndex = windowStart + probs[windowStart : windowStart + window].index(lowPointInWindow)
+    return lowIndex, smallestAverage
 
 
 def find_break_partial(stream):
-    """If the clip is more than 30 seconds, run a partial transcribe and then report all the segments except the last one."""
-    if len(stream.voice_activity) > MAX_CLIP_LENGTH * VAD_RATE:
+    """If the clip is more than 30 seconds, run a fast transcribe and then do a full transcription all the segments except the last one."""
+    if False and len(stream.voice_activity) > MAX_CLIP_LENGTH * VAD_RATE:
         segments, _info = fast_model.transcribe(
             stream.available_data, beam_size=1, language="en", word_timestamps=False
         )
         segments = list(segments)
-        if len(segments) < 2:
-            logging.debug(
-                f"Found break (partial) to be end because only {len(segments)} segments"
-            )
-            return int(len(stream.available_data) * VAD_RATE / stream.SAMPLE_RATE)
-        else:
+        if len(segments) > 1:
             logging.debug(
                 f"Found break (partial) at {segments[-2].end:.2f} of {segments[-1].end}s"
             )
@@ -602,21 +591,9 @@ def mainloop():
             else:
                 transcribe_partial(stream)
         if not any(new_data):
-            print_vad_stats(streams)
             for s in streams:
                 s.idles += 0.05
             time.sleep(0.05)
-
-
-def print_vad_stats(streams):
-    "print mean and max of voice activity, as a console-graph"
-    print(
-        BLANK
-        + " - ".join(
-            "".join([f"{v*10:.0f}" for v in s.voice_activity]) for s in streams
-        ),
-        end="\r",
-    )
 
 
 wait_time = 1
