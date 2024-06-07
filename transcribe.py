@@ -142,6 +142,7 @@ class Stream:
     prefix = ""  # "i" for input, "o" for output, printed at the start of each line
 
     last_time = datetime.now()
+    idles = 0.0
 
     partial_len = 0
 
@@ -527,9 +528,6 @@ def trim_start(stream, vadchunks):
     logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
     samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
     stream.available_data = stream.available_data[samples:]
-    stream.original_data = stream.original_data[
-        samples * stream.original_sample_rate // stream.SAMPLE_RATE :
-    ]
     stream.voice_activity = stream.voice_activity[vadchunks:]
 
 
@@ -540,7 +538,7 @@ def removeLeadingNonSpeech(stream):
     # keep 0.3s of audio before the detected speech, in case we cut off the start of a word
     KEEP_CHUNKS = int(0.3 * VAD_RATE)
     for i, confidence in enumerate(stream.voice_activity):
-        if confidence > VAD_THRESHOLD and not SAVE_NEXT_CLIP:
+        if confidence > VAD_THRESHOLD:
             i = max(0, i - KEEP_CHUNKS)
             if i > 0:
                 logging.debug(f"truncating {i/VAD_RATE:.1f}s of audio")
