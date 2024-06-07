@@ -384,11 +384,7 @@ def transcribe(stream, break_point):
     # remove the speech up to the break point from the available data
     samplecount = int(break_point / VAD_RATE * stream.SAMPLE_RATE)
     speech = stream.available_data[:samplecount]
-    confidences = stream.voice_activity[:break_point]
     trim_start(stream, break_point, "transcribing")
-    # don't transcribe chunks that aren't speech, it's a little noisy sometimes
-    if max(confidences) < VAD_THRESHOLD:
-        return
 
     print(
         BLANK + f"transcribing {len(speech) / stream.SAMPLE_RATE:.0f}s of audio",
@@ -456,7 +452,7 @@ def find_break(stream):
         return None
 
     index, average = index_lowest_average(probs)
-    if average < VAD_THRESHOLD and index > MIN:
+    if average < VAD_THRESHOLD and index > MIN and max(probs[:index]) > VAD_THRESHOLD:
         logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
         return index
 
@@ -535,20 +531,23 @@ def removeLeadingNonSpeech(stream):
     """Remove any leading non-speech from stream.available_data because
     it's probably not worth transcribing.
     """
-    # keep 0.3s of audio before the detected speech, in case we cut off the start of a word
-    KEEP_CHUNKS = int(0.3 * VAD_RATE)
-    for i, confidence in enumerate(stream.voice_activity):
-        if confidence > VAD_THRESHOLD:
-            i = max(0, i - KEEP_CHUNKS)
-            if i > 0:
-                trim_start(stream, i, "leading non-speech")
-            break
 
     # if there's more than 10 minutes of audio, only keep the last nine minutes
     TRUNCATE_SECONDS = 9 * 60
     TRUNCATE_TRIGGER = 10 * 60
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
         trim_start(stream, TRUNCATE_SECONDS * VAD_RATE, "too much audio")
+
+    # keep 0.2s of audio before the detected speech, so we don't cut off words
+    # note: if there is no speech in the buffer, this will not trim anything
+    #  - as soon as speech triggers, we'll trim the buffer back to this point
+    KEEP_CHUNKS = int(0.2 * VAD_RATE)
+    DUMP_SILENCE = 10 * VAD_RATE
+    for i, confidence in enumerate(stream.voice_activity):
+        if confidence > VAD_THRESHOLD or i > DUMP_SILENCE:
+            i -= KEEP_CHUNKS
+            trim_start(stream, i, "leading non-speech")
+            break
 
     # if there hasn't been any new data for a few seconds, clear the buffer
     if stream.idles > 2:
@@ -603,9 +602,21 @@ def mainloop():
             else:
                 transcribe_partial(stream)
         if not any(new_data):
+            print_vad_stats(streams)
             for s in streams:
                 s.idles += 0.05
             time.sleep(0.05)
+
+
+def print_vad_stats(streams):
+    "print mean and max of voice activity, as a console-graph"
+    print(
+        BLANK
+        + " - ".join(
+            "".join([f"{v*10:.0f}" for v in s.voice_activity]) for s in streams
+        ),
+        end="\r",
+    )
 
 
 wait_time = 1
