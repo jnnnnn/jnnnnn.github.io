@@ -385,7 +385,7 @@ def transcribe(stream, break_point):
     samplecount = int(break_point / VAD_RATE * stream.SAMPLE_RATE)
     speech = stream.available_data[:samplecount]
     confidences = stream.voice_activity[:break_point]
-    trim_start(stream, break_point)
+    trim_start(stream, break_point, "transcribing")
     # don't transcribe chunks that aren't speech, it's a little noisy sometimes
     if max(confidences) < VAD_THRESHOLD:
         return
@@ -520,12 +520,12 @@ def detect_speech(stream):
     return new_data
 
 
-def trim_start(stream, vadchunks):
+def trim_start(stream, vadchunks, because):
     """Remove the given number of seconds from the start of the stream"""
     if vadchunks <= 0:
         return
 
-    logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
+    logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio because {because}")
     samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
     stream.available_data = stream.available_data[samples:]
     stream.voice_activity = stream.voice_activity[vadchunks:]
@@ -541,19 +541,18 @@ def removeLeadingNonSpeech(stream):
         if confidence > VAD_THRESHOLD:
             i = max(0, i - KEEP_CHUNKS)
             if i > 0:
-                logging.debug(f"truncating {i/VAD_RATE:.1f}s of audio")
-                trim_start(stream, i)
+                trim_start(stream, i, "leading non-speech")
             break
 
     # if there's more than 10 minutes of audio, only keep the last nine minutes
     TRUNCATE_SECONDS = 9 * 60
     TRUNCATE_TRIGGER = 10 * 60
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
-        trim_start(stream, TRUNCATE_SECONDS * VAD_RATE)
+        trim_start(stream, TRUNCATE_SECONDS * VAD_RATE, "too much audio")
 
     # if there hasn't been any new data for a few seconds, clear the buffer
     if stream.idles > 2:
-        trim_start(stream, len(stream.voice_activity))
+        trim_start(stream, len(stream.voice_activity), "idle")
 
 
 def check_active():
