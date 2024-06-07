@@ -92,7 +92,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--partials",
-    default="distil-small.en",
+    default="tiny.en",
     help="use a fast an inaccurate model to show partial transcriptions continuously",
 )
 parser.add_argument(
@@ -387,7 +387,7 @@ def transcribe(stream, break_point):
     trim_start(stream, break_point, "transcribing")
 
     print(
-        BLANK + f"transcribing {len(speech) / stream.SAMPLE_RATE:.0f}s of audio",
+        BLANK + f"transcribing {len(speech) / stream.SAMPLE_RATE:.1f}s of audio",
         end="\r",
     )
 
@@ -431,12 +431,14 @@ def find_break(stream):
     """
     probs = stream.voice_activity
 
-    MIN = 3 * VAD_RATE # at least 3 seconds
-    MAX = MAX_CLIP_LENGTH * VAD_RATE # waffle! break at low point
+    MIN = 3 * VAD_RATE  # at least 3 seconds
+    MAX = MAX_CLIP_LENGTH * VAD_RATE  # waffle! break at low point
     WINDOW = int(0.3 * VAD_RATE)
     if len(probs) >= MAX:
         index, average = index_lowest_average(probs, start=MIN, window=WINDOW)
-        logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC) because over max length")
+        logging.debug(
+            f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC) because over max length"
+        )
         return index
     if len(probs) > 0 and stream.idles > 1.1:
         logging.debug("Found break at end because stream idle")
@@ -455,11 +457,15 @@ def index_lowest_average(probs, start=0, window=10):
     for a window of values in the given list of probabilities.
     """
     assert start < len(probs) - window
-    averages = [sum(probs[i : i + window]) / window for i in range(start, len(probs) - window)]
+    averages = [
+        sum(probs[i : i + window]) / window for i in range(start, len(probs) - window)
+    ]
     smallestAverage = min(averages)
     windowStart = start + averages.index(smallestAverage)
     lowPointInWindow = min(probs[windowStart : windowStart + window])
-    lowIndex = windowStart + probs[windowStart : windowStart + window].index(lowPointInWindow)
+    lowIndex = windowStart + probs[windowStart : windowStart + window].index(
+        lowPointInWindow
+    )
     return lowIndex, smallestAverage
 
 
@@ -591,9 +597,24 @@ def mainloop():
             else:
                 transcribe_partial(stream)
         if not any(new_data):
+            if all(
+                all(va < VAD_THRESHOLD for va in s.voice_activity[-10 * VAD_RATE :])
+                for s in streams
+            ):
+                print_vad_stats(streams)
             for s in streams:
                 s.idles += 0.05
             time.sleep(0.05)
+
+
+def print_vad_stats(streams):
+    print(
+        BLANK + "VAD: "
+        + " - ".join(
+            "".join(f"{10 * p:.0f}" for p in s.voice_activity[::3]) for s in streams
+        ),
+        end="\r",
+    )
 
 
 wait_time = 1
