@@ -527,7 +527,7 @@ def find_break(stream):
         return None
 
     index, average = index_lowest_average(probs)
-    if average < VAD_THRESHOLD:
+    if average < VAD_THRESHOLD and index > MIN:
         logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
         return index
 
