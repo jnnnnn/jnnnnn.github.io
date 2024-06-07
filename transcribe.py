@@ -30,6 +30,8 @@ try:
 
     import numpy as np
 
+    import matplotlib.pyplot as plt
+
     print("Torch..", end=" ", flush=True)
     import torch
 
@@ -160,6 +162,8 @@ class Stream:
 
     partial_len = 0
 
+    figure = None
+
     voice_activity = []
 
 
@@ -250,18 +254,21 @@ def init_stream(input=False):
         frames_per_buffer=INPUT_CHUNK,
     )
 
+    # each stream needs its own vad model because it is stateful.
+    stream.vad_model, _ = torch.hub.load(
+        repo_or_dir="snakers4/silero-vad", model="silero_vad"
+    )
+
+    if not input:
+        stream.figure = plt.figure()
+        stream.figure.show()
+
     return stream
 
 
 KEYBOARDOUT_start = datetime.now()
 
 torch.set_num_threads(1)
-
-logging.info("Loading Voice Activity Detection model...")
-(
-    vad_model,
-    _,
-) = torch.hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad")
 
 transcribe_model = None
 
@@ -407,6 +414,9 @@ def transcribe(stream, break_point):
         : samplecount * stream.original_sample_rate // stream.SAMPLE_RATE
     ]
     confidences = stream.voice_activity[:break_point]
+    logging.debug(
+        f"Truncate because transcribe {len(speech) / stream.SAMPLE_RATE:.1f}s of audio"
+    )
     trim_start(stream, break_point)
 
     # don't transcribe chunks that aren't speech, it's a little noisy sometimes
@@ -537,9 +547,9 @@ def index_lowest_average(probs, window=10):
     if len(probs) < window:
         return 0
     averages = [sum(probs[i : i + window]) / window for i in range(len(probs) - window)]
-    min_value = min(averages)
-    result = averages.index(min_value) + window // 2
-    return result, averages[result]
+    smallestAverage = min(averages)
+    windowCenter = averages.index(smallestAverage) + window // 2
+    return windowCenter, smallestAverage
 
 
 def find_break_partial(stream):
@@ -553,12 +563,12 @@ def find_break_partial(stream):
             logging.debug(
                 f"Found break (partial) to be end because only {len(segments)} segments"
             )
-            return len(stream.available_data) * VAD_RATE / stream.SAMPLE_RATE
+            return int(len(stream.available_data) * VAD_RATE / stream.SAMPLE_RATE)
         else:
             logging.debug(
                 f"Found break (partial) at {segments[-2].end:.2f} of {segments[-1].end}s"
             )
-            return segments[-2].end * VAD_RATE
+            return int(segments[-2].end * VAD_RATE)
     else:
         return find_break(stream)
 
@@ -580,12 +590,20 @@ def detect_speech(stream):
         end = start + CHUNK_SIZE
         samples = stream.available_data[start:end]
         stream.voice_activity.append(
-            vad_model(torch.from_numpy(samples), CHUNK_SIZE).item()
+            stream.vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item()
         )
 
     new_data = chunks - detected > 0
     if new_data:
         stream.idles = 0
+
+    if stream.figure:
+        plt.figure(stream.figure)
+        plt.clf()
+        plt.plot(stream.voice_activity)
+        plt.draw()
+        plt.pause(0.01)
+
     return new_data
 
 
@@ -594,7 +612,7 @@ def trim_start(stream, vadchunks):
     if vadchunks <= 0:
         return
 
-    logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
+    # logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
     samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
     stream.available_data = stream.available_data[samples:]
     stream.original_data = stream.original_data[
@@ -613,7 +631,7 @@ def removeLeadingNonSpeech(stream):
         if confidence > VAD_THRESHOLD and not SAVE_NEXT_CLIP:
             i = max(0, i - KEEP_CHUNKS)
             if i > 0:
-                logging.debug(f"truncating {i/VAD_RATE:.1f}s of audio")
+                logging.debug(f"truncating because silent {i/VAD_RATE:.1f}s of audio")
                 trim_start(stream, i)
             break
 
@@ -621,10 +639,12 @@ def removeLeadingNonSpeech(stream):
     TRUNCATE_SECONDS = 9 * 60
     TRUNCATE_TRIGGER = 10 * 60
     if len(stream.available_data) > TRUNCATE_TRIGGER * stream.SAMPLE_RATE:
+        logging.debug("truncating 9 minutes of audio")
         trim_start(stream, TRUNCATE_SECONDS * VAD_RATE)
 
     # if there hasn't been any new data for a few seconds, clear the buffer
     if stream.idles > 2:
+        logging.debug("truncate because idle")
         trim_start(stream, len(stream.voice_activity))
 
 
