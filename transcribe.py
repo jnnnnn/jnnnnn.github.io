@@ -1,5 +1,5 @@
 substitutions = {
-    "([.?!]) ": "\\1\n",
+    # "([.?!]) ": "\\1\n",
 }
 
 # stream data from microphone and speakers, through whisper transcriber, to text output
@@ -69,8 +69,11 @@ AVAILABLE_MODELS = [
     "tiny",  # fine even on cpu. used for preview transcripts. makes lots of mistakes
     "base",
     "small",  # starting to require an accelerator (GTX1060 or better)
+    "distil-small",  # the distil models are compressed to be almost as accurate but ~5x more efficient
     "medium",
+    "distil-medium",
     "large-v3",  # recommend 8GB GPU RAM, GTX1080 or better. very few mistakes; 90% of sentences don't require correction.
+    "distil-large-v3",  # almost as good as large, 6x faster
 ]
 
 yearmonth = datetime.now().strftime("%Y-%m")
@@ -367,7 +370,6 @@ def on_key_event(key):
 
 
 def transcribe_partial(stream):
-    """"""
     if (
         not (
             PARTIALS
@@ -380,13 +382,14 @@ def transcribe_partial(stream):
 
     start = datetime.now()
     last_five_seconds = stream.available_data[-stream.SAMPLE_RATE * 5 :]
-    segments, info = fast_model.transcribe(
+    segments, _info = fast_model.transcribe(
         last_five_seconds, beam_size=1, language="en", word_timestamps=False
     )
     result = " ".join(s.text.strip() for s in segments)
     proctime = datetime.now() - start
     print(BLANK + f"p ({proctime.total_seconds():.2f}s): {result[-70:]}", end="\r")
     stream.partial_len = len(stream.available_data)
+    stream.idles = 0
     return True
 
 
@@ -395,9 +398,12 @@ def transcribe(stream, break_point):
     if not transcribe_model:
         load_model()
     # remove the speech up to the break point from the available data
-    speech = stream.available_data[: break_point * stream.SAMPLE_RATE]
-    original = stream.original_data[: break_point * stream.original_sample_rate]
-    confidences = stream.voice_detection[:break_point]
+    samplecount = int(break_point * stream.SAMPLE_RATE)
+    speech = stream.available_data[:samplecount]
+    original = stream.original_data[
+        : samplecount * stream.original_sample_rate // stream.SAMPLE_RATE
+    ]
+    confidences = stream.voice_detection[: int(break_point)]
     drop_seconds(stream, break_point)
 
     # don't transcribe chunks that aren't speech, it's a little noisy sometimes
@@ -415,7 +421,7 @@ def transcribe(stream, break_point):
     )
     # walk the generator so we don't clear line "transcribing" too soon
     segments = list(segments)
-    result = " ".join(s.text.strip() for s in segments)
+    result = "\n".join(s.text.strip() for s in segments)
     for s in segments:
         logging.debug(f"segment: '{s}'")
     for pattern, replacement in substitutions.items():
@@ -439,8 +445,10 @@ def transcribe(stream, break_point):
     if SAVE_NEXT_CLIP:
         saveclip(original, stream.original_sample_rate, result)
     if KEYBOARDOUT and stream.prefix == "i" and not transcribe_window_focus():
-        pyautogui.write(result.replace("\n", " ") + " ", interval=0.01)
+        pyautogui.write(result + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
+
+    stream.idles = 0
 
 
 def saveclip(samples, sample_rate, transcript):
@@ -502,14 +510,35 @@ def find_break(stream):
     MAX = MAX_CLIP_LENGTH
     if len(probs) >= MAX:
         min_value = min(probs[MIN:MAX])
-        return MIN + probs[MIN:MAX].index(min_value)
+        result = MIN + probs[MIN:MAX].index(min_value)
+        logging.debug(f"Found break at {result}s ({min_value:.1f} VAC) because over max length")
+        return result
     if len(probs) > 0 and stream.idles > 1.1:
+        logging.debug("Found break at end because stream idle")
         return len(probs) + 1000  # consume all available data
     if len(probs) <= MIN:
         return None
     for i in range(MIN, len(probs)):
         if probs[i] < VAD_THRESHOLD and probs[i - 1] < VAD_THRESHOLD:
+            logging.debug(f"Found break at non-speech {i}s ({probs[i]:.1f} VAC) of {len(probs)}s available")
             return i
+
+
+def find_break_partial(stream):
+    """If the clip is more than 30 seconds, run a partial transcribe and then report all the segments except the last one."""
+    if len(stream.voice_detection) > MAX_CLIP_LENGTH:
+        segments, _info = fast_model.transcribe(
+            stream.available_data, beam_size=1, language="en", word_timestamps=False
+        )
+        segments = list(segments)
+        if len(segments) < 2:
+            logging.debug(f"Found break to be end because only {len(segments)} segments")
+            return len(stream.available_data / stream.SAMPLE_RATE)
+        else:
+            logging.debug(f"Found break at {segments[-2].end} of {segments[-1].end}s")
+            return segments[-2].end
+    else:
+        return find_break(stream)
 
 
 def detect_speech(stream):
@@ -538,12 +567,16 @@ def detect_speech(stream):
 
 def drop_seconds(stream, seconds):
     """Remove the given number of seconds from the start of the stream"""
-    resampled = int(seconds * stream.SAMPLE_RATE)
-    stream.available_data = stream.available_data[resampled:]
+    if seconds <= 0: 
+        return
+    
+    logging.debug(f"dropping {seconds}s of audio")
+    samples = int(seconds * stream.SAMPLE_RATE)
+    stream.available_data = stream.available_data[samples:]
     stream.original_data = stream.original_data[
-        resampled * stream.original_sample_rate // stream.SAMPLE_RATE :
+        samples * stream.original_sample_rate // stream.SAMPLE_RATE :
     ]
-    stream.voice_detection = []  # recompute all so that it aligns with the new data
+    stream.voice_detection = []  # recompute as fractional second may cause alignment issues
 
 
 def truncate(stream):
@@ -610,12 +643,11 @@ def mainloop():
         for stream in streams:
             new_data.append(detect_speech(stream))
             truncate(stream)
-            break_point = find_break(stream)
+            break_point = find_break_partial(stream)
             if break_point:
                 transcribe(stream, break_point)
-                stream.idles = 0
-            elif transcribe_partial(stream):
-                stream.idles = 0
+            else:
+                transcribe_partial(stream)
         if not any(new_data):
             for s in streams:
                 s.idles += 0.05
