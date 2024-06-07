@@ -12,7 +12,6 @@ try:
     print("Importing dependencies...", end=" ", flush=True)
     import sys
     import os
-    import subprocess
     import time
     from datetime import datetime, timedelta
     import argparse
@@ -26,7 +25,6 @@ try:
     # pyaudiowpatch allows recording from loopbacks/outputs
     import pyaudiowpatch as pyaudio
     import librosa
-    import soundfile
 
     import numpy as np
 
@@ -106,16 +104,6 @@ parser.add_argument(
 parser.add_argument(
     "--keyboardout", default=False, help="Type what is said into the keyboard"
 )
-parser.add_argument(
-    "--clip-folder",
-    default=os.path.expanduser(f"~/transcripts/clips-{yearmonth}"),
-    help="Folder to save clips to",
-)
-parser.add_argument(
-    "--max-clip-length",
-    default=16,
-    help="Maximum length of a clip to transcribe, in seconds",
-)
 
 args = parser.parse_args()
 
@@ -135,21 +123,12 @@ ONLY_WHILE_APP = bool(ONLY_WHILE_APP_TITLES)
 # if True, type what is said into the keyboard
 KEYBOARDOUT = args.keyboardout
 
-CLIPSPATH = args.clip_folder
-SAVE_NEXT_CLIP = False
-
-MAX_CLIP_LENGTH = args.max_clip_length
-
 
 # dataclass for input or output stream
 class Stream:
     # this is in the format whisper expects, 16khz mono
     available_data = np.zeros((0), dtype=np.float32)
     SAMPLE_RATE = 16000
-
-    # this is the original data, at the original sample rate but mono
-    original_data = np.zeros((0), dtype=np.float32)
-    original_sample_rate = 0
 
     outfile = ""
     stream = None
@@ -214,7 +193,6 @@ def init_stream(input=False):
     CHUNK_SECONDS = 0.2
     INPUT_CHANNELS = int(default_speakers["maxInputChannels"])
     INPUT_SAMPLE_RATE = int(default_speakers["defaultSampleRate"])
-    stream.original_sample_rate = INPUT_SAMPLE_RATE
     INPUT_CHUNK = int(INPUT_SAMPLE_RATE * CHUNK_SECONDS)
     # CHUNK = int(SAMPLE_RATE * CHUNK_SECONDS)
 
@@ -231,7 +209,6 @@ def init_stream(input=False):
             if INPUT_CHANNELS > 1:
                 floats = np.reshape(floats, (INPUT_CHANNELS, -1), order="F")
                 floats = librosa.to_mono(floats)
-            stream.original_data = np.append(stream.original_data, floats)
             input_data = librosa.resample(
                 floats, orig_sr=INPUT_SAMPLE_RATE, target_sr=stream.SAMPLE_RATE
             )
@@ -348,10 +325,6 @@ def on_key_event(key):
         )
     if key == "C":
         os.system("cls" if os.name == "nt" else "clear")
-    if key == "s":
-        global SAVE_NEXT_CLIP
-        SAVE_NEXT_CLIP = not SAVE_NEXT_CLIP
-        logging.info(f"Saving next clip: {SAVE_NEXT_CLIP}")
 
     # list app windows
     if key == "l":
@@ -402,9 +375,6 @@ def transcribe(stream, break_point):
     # remove the speech up to the break point from the available data
     samplecount = int(break_point / VAD_RATE * stream.SAMPLE_RATE)
     speech = stream.available_data[:samplecount]
-    original = stream.original_data[
-        : samplecount * stream.original_sample_rate // stream.SAMPLE_RATE
-    ]
     confidences = stream.voice_activity[:break_point]
     logging.debug(
         f"Truncate because transcribe {len(speech) / stream.SAMPLE_RATE:.1f}s of audio"
@@ -447,149 +417,11 @@ def transcribe(stream, break_point):
     with open(outfile, "a") as f:
         for line in result.split("\n"):
             f.write(f"{stream.prefix}: {line}\n")
-    if SAVE_NEXT_CLIP:
-        saveclip(original, stream.original_sample_rate, result)
     if KEYBOARDOUT and stream.prefix == "i" and not transcribe_window_focus():
         pyautogui.write(result + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
 
     stream.idles = 0
-
-
-def saveclip(samples, sample_rate, transcript):
-    """Write out a clip of audio as an ogg file, and use the transcription as the filename"""
-    if not os.path.exists(CLIPSPATH):
-        os.makedirs(CLIPSPATH)
-
-    # pick the five longest words to use in the filename
-    result = "".join(c for c in transcript.lower() if c.isalnum() or c.isspace())
-    words = sorted(set(result.split()), key=len, reverse=True)[:5]
-    # only take 50 chars because soundfile will crash if windows rejects filename too long
-    result = "-".join(w for w in result.split() if w in words)[:50]
-    if not result or not len(samples):
-        return
-    filename = os.path.join(CLIPSPATH, result + ".wav")
-    duration = len(samples) / sample_rate
-    logging.info(f"Saving {duration}s clip to {filename} at {sample_rate/1000}kHz")
-    soundfile.write(filename, samples, sample_rate)
-    # pysoundfile's ogg support crashes after a 2-3 writes (something to do with dll version mismatch),
-    # so write as wav and convert with ffmpeg
-    subprocess.run(
-        [
-            "ffmpeg",
-            "-y",
-            "-loglevel",
-            "warning",
-            "-hide_banner",
-            "-nostats",
-            "-i",
-            filename,
-            "-ac",
-            "1",
-            "-filter:a",
-            "speechnorm=e=12.5:r=0.0001:l=1",
-            "-c:a",
-            "libvorbis",
-            "-q:a",
-            "4",
-            "-metadata",
-            f"Title={transcript}",
-            filename.replace(".wav", ".ogg"),
-        ],
-    )
-    os.remove(filename)
-
-
-def find_break(stream):
-    """
-    Find a sensible index to break the audio stream at, based on voice detection confidence:
-    We want sequences where the audio is at least three seconds (three values), and
-    the last two values are below threshold.
-
-    If the given array is more than 15 seconds, break it at the lowest confidence (quietest) point
-    to avoid very long lines of transcription.
-    """
-    probs = stream.voice_activity
-
-    MIN = 3 * VAD_RATE
-    MAX = MAX_CLIP_LENGTH * VAD_RATE
-    if len(probs) >= MAX:
-        min_value = min(probs[MIN:MAX])
-        result = MIN + probs[MIN:MAX].index(min_value)
-        logging.debug(
-            f"Found break at {result/VAD_RATE:.1f}s ({min_value:.1f} VAC) because over max length"
-        )
-        return result
-    if len(probs) > 0 and stream.idles > 1.1:
-        logging.debug("Found break at end because stream idle")
-        return len(probs) + 100  # consume all available data
-    if len(probs) <= MIN:
-        return None
-
-    index, average = index_lowest_average(probs)
-    if average < VAD_THRESHOLD and index > MIN:
-        logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
-        return index
-
-
-def index_lowest_average(probs, window=10):
-    """Find the index of the lowest average confidence
-    for a window of values in the given list of probabilities.
-    """
-    if len(probs) < window:
-        return 0
-    averages = [sum(probs[i : i + window]) / window for i in range(len(probs) - window)]
-    smallestAverage = min(averages)
-    windowCenter = averages.index(smallestAverage) + window // 2
-    return windowCenter, smallestAverage
-
-
-def find_break_partial(stream):
-    """If the clip is more than 30 seconds, run a partial transcribe and then report all the segments except the last one."""
-    if len(stream.voice_activity) > MAX_CLIP_LENGTH * VAD_RATE:
-        segments, _info = fast_model.transcribe(
-            stream.available_data, beam_size=1, language="en", word_timestamps=False
-        )
-        segments = list(segments)
-        if len(segments) < 2:
-            logging.debug(
-                f"Found break (partial) to be end because only {len(segments)} segments"
-            )
-            return int(len(stream.available_data) * VAD_RATE / stream.SAMPLE_RATE)
-        else:
-            logging.debug(
-                f"Found break (partial) at {segments[-2].end:.2f} of {segments[-1].end}s"
-            )
-            return int(segments[-2].end * VAD_RATE)
-    else:
-        return find_break(stream)
-
-
-def detect_speech(stream):
-    """Update stream.voice_activity with any new stream.available_data."""
-    CHUNK_SIZE = stream.SAMPLE_RATE // VAD_RATE
-    chunks = len(stream.available_data) // CHUNK_SIZE
-    detected = len(stream.voice_activity)
-    # if there's more than a minute of saved data, print a warning
-    seconds_to_detect = (chunks - detected) // VAD_RATE
-    if seconds_to_detect > 60:
-        logging.warning(
-            f"WARNING: detecting speech for {seconds_to_detect} seconds of audio data\n"
-        )
-
-    for i in range(detected, chunks):
-        start = i * CHUNK_SIZE
-        end = start + CHUNK_SIZE
-        samples = stream.available_data[start:end]
-        stream.voice_activity.append(
-            stream.vad_model(torch.from_numpy(samples), stream.SAMPLE_RATE).item()
-        )
-
-    new_data = chunks - detected > 0
-    if new_data:
-        stream.idles = 0
-
-    return new_data
 
 
 def trim_start(stream, vadchunks):
@@ -600,9 +432,6 @@ def trim_start(stream, vadchunks):
     # logging.debug(f"dropping {vadchunks / VAD_RATE:.1f}s of audio")
     samples = int(vadchunks / VAD_RATE * stream.SAMPLE_RATE)
     stream.available_data = stream.available_data[samples:]
-    stream.original_data = stream.original_data[
-        samples * stream.original_sample_rate // stream.SAMPLE_RATE :
-    ]
     stream.voice_activity = stream.voice_activity[vadchunks:]
 
 
@@ -613,7 +442,7 @@ def removeLeadingNonSpeech(stream):
     # keep 0.3s of audio before the detected speech, in case we cut off the start of a word
     KEEP_CHUNKS = int(0.3 * VAD_RATE)
     for i, confidence in enumerate(stream.voice_activity):
-        if confidence > VAD_THRESHOLD and not SAVE_NEXT_CLIP:
+        if confidence > VAD_THRESHOLD:
             i = max(0, i - KEEP_CHUNKS)
             if i > 0:
                 logging.debug(f"truncating because silent {i/VAD_RATE:.1f}s of audio")
@@ -644,7 +473,7 @@ def check_active():
         KEYBOARDOUT = None
         logging.info("typing: False (3 minute timeout reached)")
 
-    active = KEYBOARDOUT or SAVE_NEXT_CLIP or check_zoom_active()
+    active = KEYBOARDOUT or check_zoom_active()
 
     global transcribe_model
     # free up gpu memory while we're idling
