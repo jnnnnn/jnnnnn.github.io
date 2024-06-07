@@ -30,8 +30,6 @@ try:
 
     import numpy as np
 
-    import matplotlib.pyplot as plt
-
     print("Torch..", end=" ", flush=True)
     import torch
 
@@ -162,8 +160,6 @@ class Stream:
 
     partial_len = 0
 
-    figure = None
-
     voice_activity = []
 
 
@@ -258,10 +254,6 @@ def init_stream(input=False):
     stream.vad_model, _ = torch.hub.load(
         repo_or_dir="snakers4/silero-vad", model="silero_vad"
     )
-
-    if not input:
-        stream.figure = plt.figure()
-        stream.figure.show()
 
     return stream
 
@@ -596,13 +588,6 @@ def detect_speech(stream):
     new_data = chunks - detected > 0
     if new_data:
         stream.idles = 0
-
-    if stream.figure:
-        plt.figure(stream.figure)
-        plt.clf()
-        plt.plot(stream.voice_activity)
-        plt.draw()
-        plt.pause(0.01)
 
     return new_data
 
