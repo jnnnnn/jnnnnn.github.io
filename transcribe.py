@@ -1,7 +1,10 @@
+import math
+
+
 substitutions = {
-    "Krista": "Crysta",
-    "Christa": "Crysta",
     # "([.?!]) ": "\\1\n",
+    "^ *Thank you.$": "",  # Whisper emits this when parsing noise for some reason
+    r"\s*\n[\n\s]+": "\n",
 }
 
 # stream data from microphone and speakers, through whisper transcriber, to text output
@@ -115,8 +118,9 @@ args = parser.parse_args()
 MODEL_SIZE = args.model
 
 # Above this confidence, we assume that speech is present
-VAD_THRESHOLD = 0.4
+VAD_THRESHOLD = 0.5
 VAD_RATE = 10  # 100ms chunks
+VAD_WINDOW = 2.0  # 1 second window so that hesitant speech is still joined instead of cut into five-word paragraphs
 
 # transcribe continuously, overwriting until silence is detected and we use the
 # main model on the full utterance for the log
@@ -321,8 +325,11 @@ def transcribe_window_focus():
     return "transcribe" in win32gui.GetWindowText(win32gui.GetForegroundWindow())
 
 
+BUMP_TARGET = "WINDOW"
+
+
 def on_key_event(key):
-    global KEYBOARDOUT, ONLY_WHILE_APP, KEYBOARDOUT_start
+    global KEYBOARDOUT, ONLY_WHILE_APP, KEYBOARDOUT_start, BUMP_TARGET
     if key == "t":
         KEYBOARDOUT = not KEYBOARDOUT
         KEYBOARDOUT_start = datetime.now()
@@ -351,6 +358,38 @@ def on_key_event(key):
         logging.info("Reloading streams")
         input_stream.stream.close()
         output_stream.stream.close()
+    if key == "+" or key == "-":
+        bump(key)
+    if key == "w":
+        BUMP_TARGET = "WINDOW"
+    if key == "e":
+        BUMP_TARGET = "THRESHOLD"
+    if key == "h":
+        logging.info(
+            """Commands that work while running:
+            t: toggle keyboard output
+            z: toggle active app detection
+            C: clear screen
+            h: help
+            l: list windows
+            o: list loggers
+            a: list audio devices
+            r: reload streams
+            +: increase / decrease
+            w: adjust window
+            e: adjust threshold
+            """
+        )
+
+
+def bump(key):
+    global VAD_WINDOW, VAD_THRESHOLD
+    if BUMP_TARGET == "WINDOW":
+        VAD_WINDOW += 0.1 if key == "+" else -0.1
+        logging.info(f"VAD_WINDOW: {VAD_WINDOW:.1f}")
+    if BUMP_TARGET == "THRESHOLD":
+        VAD_THRESHOLD += 0.1 if key == "+" else -0.1
+        logging.info(f"VAD_THRESHOLD: {VAD_THRESHOLD:.1f}")
 
 
 def transcribe_partial(stream):
@@ -376,6 +415,7 @@ def transcribe_partial(stream):
     stream.idles = 0
     return True
 
+LAST_OUTPUT_STREAM = None
 
 def transcribe(stream, break_point):
     global transcribe_model
@@ -391,53 +431,64 @@ def transcribe(stream, break_point):
         end="\r",
     )
 
-    global KEYBOARDOUT, KEYBOARDOUT_start, last_time
-    segments, info = transcribe_model.transcribe(
-        speech, beam_size=6, language="en", word_timestamps=False
+    start = datetime.now()
+    global KEYBOARDOUT, KEYBOARDOUT_start, last_time, LAST_OUTPUT_STREAM
+    segments, _info = transcribe_model.transcribe(
+        speech,
+        beam_size=6,
+        language="en",
+        word_timestamps=False,
+        task="translate"
     )
-    # walk the generator so we don't clear line "transcribing" too soon
-    segments = list(segments)
-    result = "\n".join(s.text.strip() for s in segments)
+    strings = []
     for s in segments:
         logging.debug(f"segment: '{s}'")
+        strings.append(s.text.strip())
+    duration = datetime.now() - start
+    result = "\n".join(strings)
     for pattern, replacement in substitutions.items():
         result = re.sub(pattern, replacement, result)
-    clocktime = datetime.now().strftime("%H:%M")
-    for line in result.split("\n"):
-        print(BLANK + f"{clocktime}  {stream.prefix}: {line}")
+    speed = len(speech) / stream.SAMPLE_RATE / duration.total_seconds()
+    logging.debug(f"transcribed {len(speech) / stream.SAMPLE_RATE:.1f}s in {duration.total_seconds():.1f}s ({speed:.1f}x)")
+    if not result.strip():
+        return  # don't emit blanks
+    print(BLANK, end = "\r")
+    print(result, end="\n\n")
     # save to ~/transcripts/transcript-speakers.txt
     # if it's been more than a couple of minutes, put some newlines
     if datetime.now() - last_time > timedelta(minutes=2):
         with open(outfile, "a") as f:
             print("\n" * 5, file=f)
-    # if the minute has changed, log a line saying the current time.
-    if last_time.minute != datetime.now().minute:
+    # if the minute or stream has changed, log a line saying the current time.
+    if last_time.minute != datetime.now().minute or stream.prefix != LAST_OUTPUT_STREAM:
         last_time = datetime.now()
         with open(outfile, "a") as f:
-            print(f"t: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
+            print(f"{stream.prefix}: {last_time.strftime('%Y-%m-%d %H:%M')}", file=f)
     with open(outfile, "a") as f:
-        for line in result.split("\n"):
-            f.write(f"{stream.prefix}: {line}\n")
-    if KEYBOARDOUT and stream.prefix == "i" and not transcribe_window_focus():
-        pyautogui.write(result + " ", interval=0.01)
+        f.write(result + "\n\n")
+    if KEYBOARDOUT and not transcribe_window_focus():
+        pyautogui.write(result.replace("\n", " ") + " ", interval=0.01)
         KEYBOARDOUT_start = datetime.now()
 
+    LAST_OUTPUT_STREAM = stream.prefix
     stream.idles = 0
 
 
 def find_break(stream):
     """
-    Find a sensible index to break the audio stream at, based on voice detection confidence.
+    Find a sensible voice activity chunk to break the audio stream at, based on voice detection confidence.
     """
     probs = stream.voice_activity
 
     MIN = 3 * VAD_RATE  # at least 3 seconds
-    MAX = MAX_CLIP_LENGTH * VAD_RATE  # waffle! break at low point
-    WINDOW = int(0.3 * VAD_RATE)
+    MAX = (
+        MAX_CLIP_LENGTH * VAD_RATE
+    )  # waffle! break at low point++++++++--++++_+_++++--+-+-+-+-+-+++_+_+_+_+
+    WINDOW = int(VAD_WINDOW * VAD_RATE)
     if len(probs) >= MAX:
         index, average = index_lowest_average(probs, start=MIN, window=WINDOW)
         logging.debug(
-            f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC) because over max length"
+            f"Found break at {index/VAD_RATE:.1f}s because over max length for VAD chunks {chunkedmaxstring(probs[:index])})"
         )
         return index
     if len(probs) > 0 and stream.idles > 1.1:
@@ -447,8 +498,10 @@ def find_break(stream):
         return None
 
     index, average = index_lowest_average(probs, start=MIN, window=WINDOW)
-    if average < VAD_THRESHOLD and max(probs[:index]) > VAD_THRESHOLD:
-        logging.debug(f"Found break at {index/VAD_RATE:.1f}s ({average:.1f} VAC)")
+    if average < VAD_THRESHOLD and sum(probs[:index]) / index > VAD_THRESHOLD:
+        logging.debug(
+            f"Found break at {index/VAD_RATE:.1f}s for VAD chunks {chunkedmaxstring(probs[:index])})"
+        )
         return index
 
 
@@ -467,22 +520,6 @@ def index_lowest_average(probs, start=0, window=10):
         lowPointInWindow
     )
     return lowIndex, smallestAverage
-
-
-def find_break_partial(stream):
-    """If the clip is more than 30 seconds, run a fast transcribe and then do a full transcription all the segments except the last one."""
-    if False and len(stream.voice_activity) > MAX_CLIP_LENGTH * VAD_RATE:
-        segments, _info = fast_model.transcribe(
-            stream.available_data, beam_size=1, language="en", word_timestamps=False
-        )
-        segments = list(segments)
-        if len(segments) > 1:
-            logging.debug(
-                f"Found break (partial) at {segments[-2].end:.2f} of {segments[-1].end}s"
-            )
-            return int(segments[-2].end * VAD_RATE)
-    else:
-        return find_break(stream)
 
 
 def detect_speech(stream):
@@ -562,15 +599,6 @@ def check_active():
 
     active = KEYBOARDOUT or check_zoom_active()
 
-    global transcribe_model
-    # free up gpu memory while we're idling
-    try:
-        if not active and transcribe_model:
-            del transcribe_model
-            transcribe_model = None
-    except NameError:
-        transcribe_model = None
-
     return active
 
 
@@ -591,7 +619,7 @@ def mainloop():
         for stream in streams:
             new_data.append(detect_speech(stream))
             removeLeadingNonSpeech(stream)
-            break_point = find_break_partial(stream)
+            break_point = find_break(stream)
             if break_point:
                 transcribe(stream, break_point)
             else:
@@ -607,11 +635,21 @@ def mainloop():
             time.sleep(0.05)
 
 
+def chunkedmaxstring(ps):
+    # outputs something like "000019998100" representing voice activity
+    DISPLAY_RATE = int(VAD_RATE / 3)
+    return "".join(
+        f"{math.floor(10 * max(ps[i : i + DISPLAY_RATE])) :.0f}"
+        for i in range(0, len(ps), DISPLAY_RATE)
+    )
+
+
 def print_vad_stats(streams):
     print(
-        BLANK + "VAD: "
+        BLANK
+        + "VAD: "
         + " - ".join(
-            "".join(f"{10 * p:.0f}" for p in s.voice_activity[::3]) for s in streams
+            f"{s.prefix}: {chunkedmaxstring(s.voice_activity)}" for s in streams
         ),
         end="\r",
     )
