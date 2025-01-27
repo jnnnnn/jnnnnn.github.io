@@ -30,7 +30,7 @@ export const keydown = (state) => (key) => {
     case "s":
       if (d3.event.ctrlKey) {
         event.preventDefault();
-        save(state);
+        savename(state);
       } else select(state)(source, target);
       break;
     case "L":
@@ -182,13 +182,21 @@ const searchSelect = (state) => {
 };
 
 const showHelp = () => {
-  window.location =
-    "https://github.com/jnnnnn/jnnnnn.github.io/tree/master/quickgraph";
+  window.open("https://github.com/jnnnnn/jnnnnn.github.io/tree/master/quickgraph", '_blank').focus();
 };
 
 const deleteAll = (state) => {
   mutate(state)({ nodes: [], edges: [] });
   resetSimulation(state)();
+};
+
+const savename = (state) => { 
+  promptText({
+    placeholder: "filename",
+    confirm: (text) => {
+      save(state, text);
+    },
+  });
 };
 
 export const resetZoom = (state) => {

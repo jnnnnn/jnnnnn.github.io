@@ -155,3 +155,14 @@ Trying to get tex-linebreak compiled as an es6 module. ugh.
 Link to correct docs.
 
 Pretty usable for what I want it for.
+
+## 2025-01-28
+
+want a index of several graphs stored in local storage and an interface to switch between them.
+
+press `o` to open a list of graphs, prompting for a name for the current one if it is not already named.
+
+yuk, complex. easier to just specify a filename. that way last-edited-time is easier. localstorage also prone to getting cleared.
+
+if actual files, can sync with dropbox etc. more easily.
+

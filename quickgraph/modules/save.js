@@ -1,9 +1,9 @@
-export const save = (state) => {
+export const save = (state, name) => {
   const object = exportState(state);
   const blob = new Blob([JSON.stringify(object)], {
     type: "application/json",
   });
-  saveFile(blob, "bookchart.json");
+  saveFile(blob, name + ".json");
 };
 
 const saveFile = (blob, name) => {
