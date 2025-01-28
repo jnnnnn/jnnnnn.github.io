@@ -31,11 +31,31 @@ const drawText = (state) => (obj, fontSize) => {
   ctx.font = fontSize + "px Arial";
   ctx.textAlign = "center";
 
-  if (!obj.lines) obj.lines = obj.text.split("\n");
+  if (!obj.lines) obj.lines = splitlines(obj.text);
+  const offset = -0.75 + obj.lines.length * 0.5;
   obj.lines.forEach((line, index) => {
-    ctx.fillText(line, obj.x, obj.y + index * fontSize);
+    ctx.fillText(line, obj.x, obj.y + (index-offset) * fontSize);
   });
 };
+
+const splitlines = (text) => {
+  text = text.replace(/(\r\n|\n|\r)/gm, " ");
+  const linecount = Math.sqrt(text.length / 7);
+  const linelength = 7 * linecount;
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    if (line.length + word.length < linelength || !line) {
+      line += word + " ";
+    } else {
+      lines.push(line);
+      line = word + " ";
+    }
+  });
+  lines.push(line);
+  return lines;
+}
 
 const drawEdge = (state) => (e) => {
   const ctx = state.mutables.ctx;
