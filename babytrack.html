@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Baby Log</title>
+        <style>
+            :root {
+                --bg: #f7f7f7;
+                --card: #fff;
+                --muted: #e0e0e0;
+                --primary: #4c84ff;
+            }
+            body {
+                font-family: system-ui, -apple-system, Segoe UI, Roboto,
+                    Helvetica, Arial;
+                margin: 0;
+                background: var(--bg);
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                padding: 14px;
+                box-sizing: border-box;
+                gap: 10px;
+            }
+            h2 {
+                margin: 0;
+                font-size: 18px;
+            }
+            .card {
+                background: var(--card);
+                padding: 10px;
+                border-radius: 12px;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            }
+            .row {
+                display: flex;
+                gap: 8px;
+            }
+            .action {
+                flex: 1;
+                padding: 14px;
+                border-radius: 10px;
+                border: 0;
+                background: var(--muted);
+                font-size: 15px;
+                cursor: pointer;
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            .action.fading {
+                transform: scale(0.85);
+                background: var(--primary);
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(76, 132, 255, 0.4);
+            }
+            .btn {
+                padding: 12px;
+                border-radius: 10px;
+                border: 0;
+                cursor: pointer;
+                font-size: 15px;
+            }
+            #undo {
+                background: #ff6666;
+                color: #fff;
+            }
+            #download {
+                background: #4caf50;
+                color: #fff;
+            }
+            input[type="text"] {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+                font-size: 15px;
+                box-sizing: border-box;
+            }
+            small.timestamp {
+                display: block;
+                margin-top: 6px;
+                color: #666;
+                font-size: 12px;
+            }
+            #log-panel {
+                background: var(--card);
+                padding: 12px;
+                border-radius: 12px;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+                max-height: 200px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .log-entry {
+                padding: 8px 10px;
+                background: var(--bg);
+                border-radius: 6px;
+                font-size: 14px;
+                animation: slideIn 0.3s ease-out;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .log-entry .log-type {
+                font-weight: 600;
+                color: var(--primary);
+                text-transform: capitalize;
+            }
+            .log-entry .log-value {
+                color: #333;
+            }
+            .log-entry .log-time {
+                color: #999;
+                font-size: 12px;
+                margin-left: 8px;
+            }
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+        <script>
+            let db = null;
+
+            // Initialize IndexedDB
+            async function initDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open("BabyLogDB", 1);
+
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        db = request.result;
+                        resolve(db);
+                    };
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains("entries")) {
+                            const objectStore = db.createObjectStore(
+                                "entries",
+                                { keyPath: "id", autoIncrement: true }
+                            );
+                            objectStore.createIndex("timestamp", "ts", {
+                                unique: false,
+                            });
+                        }
+                    };
+                });
+            }
+
+            // Add a single entry to the database
+            async function addEntry(type, value, ts) {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                const entry = { type, value, ts };
+                objectStore.add(entry);
+
+                return new Promise((resolve, reject) => {
+                    transaction.oncomplete = resolve;
+                    transaction.onerror = () => reject(transaction.error);
+                });
+            }
+
+            // Delete the most recent entry from the database
+            async function deleteMostRecentEntry() {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                const index = objectStore.index("timestamp");
+
+                // Get all entries sorted by timestamp descending
+                const request = index.openCursor(null, "prev");
+
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => {
+                        const cursor = event.target.result;
+                        if (cursor) {
+                            const deletedEntry = cursor.value;
+                            cursor.delete();
+                            resolve(deletedEntry);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // Load all entries from database
+            async function loadAllEntries() {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readonly");
+                const objectStore = transaction.objectStore("entries");
+                const request = objectStore.getAll();
+
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            function nowIso() {
+                return new Date().toISOString();
+            }
+
+            async function save(type, value, btn) {
+                const ts = nowIso();
+
+                // Add animation
+                if (btn) {
+                    btn.classList.add("fading");
+                    setTimeout(() => {
+                        btn.classList.remove("fading");
+                    }, 400);
+                }
+
+                // Persist this single entry
+                await addEntry(type, value, ts);
+
+                // Add to log display
+                addLogEntry(type, value, ts);
+
+                updateTimestamp("Saved: " + new Date(ts).toLocaleTimeString());
+            }
+
+            async function undo() {
+                const deletedEntry = await deleteMostRecentEntry();
+
+                if (deletedEntry) {
+                    removeLastLogEntry();
+                    updateTimestamp("Undone");
+                }
+            }
+
+            function updateTimestamp(text) {
+                const stamp = document.getElementById("laststamp");
+                if (stamp) stamp.textContent = text;
+            }
+
+            async function saveNote(e) {
+                const v = e.target.value.trim();
+                if (!v) return;
+                await save("note", v);
+                e.target.value = "";
+            }
+
+            function addLogEntry(type, value, ts) {
+                const logPanel = document.getElementById("log-panel");
+                if (!logPanel) return;
+
+                const entry = document.createElement("div");
+                entry.className = "log-entry";
+
+                const time = new Date(ts);
+                const timeStr = time.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+
+                entry.innerHTML = `
+                    <div>
+                        <span class="log-type">${type}</span>: 
+                        <span class="log-value">${value}</span>
+                    </div>
+                    <span class="log-time">${timeStr}</span>
+                `;
+
+                logPanel.insertBefore(entry, logPanel.firstChild);
+
+                // Keep only last 20 entries
+                while (logPanel.children.length > 20) {
+                    logPanel.removeChild(logPanel.lastChild);
+                }
+            }
+
+            function removeLastLogEntry() {
+                const logPanel = document.getElementById("log-panel");
+                if (logPanel && logPanel.firstChild) {
+                    logPanel.removeChild(logPanel.firstChild);
+                }
+            }
+
+            async function loadRecentLogs() {
+                const entries = await loadAllEntries();
+                const recent = entries.slice(-20).reverse();
+                recent.forEach((e) => {
+                    const logPanel = document.getElementById("log-panel");
+                    if (!logPanel) return;
+
+                    const entry = document.createElement("div");
+                    entry.className = "log-entry";
+
+                    const time = new Date(e.ts);
+                    const timeStr = time.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+
+                    entry.innerHTML = `
+                        <div>
+                            <span class="log-type">${e.type}</span>: 
+                            <span class="log-value">${e.value}</span>
+                        </div>
+                        <span class="log-time">${timeStr}</span>
+                    `;
+
+                    logPanel.appendChild(entry);
+                });
+            }
+
+            async function downloadCSV() {
+                const entries = await loadAllEntries();
+
+                if (!entries || entries.length === 0) {
+                    alert("No data to export");
+                    return;
+                }
+
+                const header = "Timestamp,Type,Value";
+                const rows = entries.map(
+                    (e) => `"${e.ts}","${e.type}","${e.value}"`
+                );
+                const csv = [header, ...rows].join("\n");
+
+                const blob = new Blob([csv], {
+                    type: "text/csv;charset=utf-8;",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download =
+                    "baby_log_" +
+                    new Date().toISOString().split("T")[0] +
+                    ".csv";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            document.addEventListener("keydown", (e) => {
+                if (
+                    e.key === "Enter" &&
+                    document.activeElement?.id === "notes"
+                ) {
+                    saveNote({ target: document.activeElement });
+                }
+            });
+
+            // Initialize database on load
+            initDB().then(() => loadRecentLogs());
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Baby Daily Log</h2>
+
+            <div class="card">
+                <div class="row">
+                    <button
+                        class="action"
+                        data-type="feed"
+                        data-value="bf"
+                        onclick="save('feed','bf',this)"
+                    >
+                        Breastfeed
+                    </button>
+                    <button
+                        class="action"
+                        data-type="feed"
+                        data-value="bottle"
+                        onclick="save('feed','bottle',this)"
+                    >
+                        Bottle
+                    </button>
+                    <button
+                        class="action"
+                        data-type="feed"
+                        data-value="puree"
+                        onclick="save('feed','puree',this)"
+                    >
+                        Puree
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <button
+                        class="action"
+                        data-type="sleep"
+                        data-value="sleeping"
+                        onclick="save('sleep','sleeping',this)"
+                    >
+                        Sleeping
+                    </button>
+                    <button
+                        class="action"
+                        data-type="sleep"
+                        data-value="nap"
+                        onclick="save('sleep','nap',this)"
+                    >
+                        Nap
+                    </button>
+                    <button
+                        class="action"
+                        data-type="sleep"
+                        data-value="awake"
+                        onclick="save('sleep','awake',this)"
+                    >
+                        Awake
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <button
+                        class="action"
+                        data-type="wet"
+                        data-value="yes"
+                        onclick="save('wet','yes',this)"
+                    >
+                        Wet
+                    </button>
+                    <button
+                        class="action"
+                        data-type="wet"
+                        data-value="no"
+                        onclick="save('wet','no',this)"
+                    >
+                        Dry
+                    </button>
+                    <button
+                        class="action"
+                        data-type="dirty"
+                        data-value="yes"
+                        onclick="save('dirty','yes',this)"
+                    >
+                        Dirty
+                    </button>
+                    <button
+                        class="action"
+                        data-type="dirty"
+                        data-value="no"
+                        onclick="save('dirty','no',this)"
+                    >
+                        Clean
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <button
+                        class="action"
+                        data-type="soothe"
+                        data-value="pram"
+                        onclick="save('soothe','pram',this)"
+                    >
+                        Pram
+                    </button>
+                    <button
+                        class="action"
+                        data-type="soothe"
+                        data-value="rocking"
+                        onclick="save('soothe','rocking',this)"
+                    >
+                        Rocking
+                    </button>
+                    <button
+                        class="action"
+                        data-type="soothe"
+                        data-value="wearing"
+                        onclick="save('soothe','wearing',this)"
+                    >
+                        Wearing
+                    </button>
+                    <button
+                        class="action"
+                        data-type="soothe"
+                        data-value="feed-to-sleep"
+                        onclick="save('soothe','feed-to-sleep',this)"
+                    >
+                        Feed to Sleep
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <button
+                        class="action"
+                        data-type="5s"
+                        data-value="swaddle"
+                        onclick="save('5s','swaddle',this)"
+                    >
+                        Swaddle
+                    </button>
+                    <button
+                        class="action"
+                        data-type="5s"
+                        data-value="side-lying"
+                        onclick="save('5s','side-lying',this)"
+                    >
+                        Side/Stomach
+                    </button>
+                    <button
+                        class="action"
+                        data-type="5s"
+                        data-value="shush"
+                        onclick="save('5s','shush',this)"
+                    >
+                        Shush
+                    </button>
+                    <button
+                        class="action"
+                        data-type="5s"
+                        data-value="swing"
+                        onclick="save('5s','swing',this)"
+                    >
+                        Swing
+                    </button>
+                    <button
+                        class="action"
+                        data-type="5s"
+                        data-value="suck"
+                        onclick="save('5s','suck',this)"
+                    >
+                        Suck
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <input
+                    type="text"
+                    id="notes"
+                    placeholder="Notes - type and press Enter"
+                />
+                <small id="laststamp" class="timestamp">Not yet saved</small>
+            </div>
+
+            <div style="display: flex; gap: 8px">
+                <button class="btn" id="undo" onclick="undo()">Undo</button>
+                <div style="flex: 1"></div>
+                <button class="btn" id="download" onclick="downloadCSV()">
+                    Download CSV
+                </button>
+            </div>
+
+            <div id="log-panel"></div>
+        </div>
+    </body>
+</html>
