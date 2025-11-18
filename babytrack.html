@@ -236,8 +236,6 @@
                 display: flex;
                 flex-direction: column;
                 gap: 4px;
-                max-height: 300px;
-                overflow-y: auto;
             }
             .event-entry {
                 padding: 8px 10px;
@@ -1109,6 +1107,8 @@
                     <!-- Will be populated by JS -->
                 </div>
 
+                <div id="timeline-chart"></div>
+
                 <div class="sleep-attempts">
                     <h4>Sleep Attempts</h4>
                     <div class="attempt-list" id="sleep-attempts-list">
@@ -1123,7 +1123,6 @@
                     </div>
                 </div>
 
-                <div id="timeline-chart"></div>
             </div>
 
             <script>
