@@ -339,17 +339,39 @@
                 });
             }
 
-            // Load all entries from database
-            async function loadAllEntries() {
+            async function loadEntriesByDate(date) {
                 if (!db) await initDB();
 
                 const transaction = db.transaction(["entries"], "readonly");
                 const objectStore = transaction.objectStore("entries");
-                const request = objectStore.getAll();
+                const request = date
+                    ? objectStore
+                          .index("timestamp")
+                          .getAll(
+                              IDBKeyRange.bound(
+                                  date.toISOString().split("T")[0] +
+                                      "T00:00:00",
+                                  date.toISOString().split("T")[0] + "T23:59:59"
+                              )
+                          )
+                    : objectStore.getAll();
 
                 return new Promise((resolve, reject) => {
                     request.onsuccess = () => resolve(request.result || []);
                     request.onerror = () => reject(request.error);
+                });
+            }
+
+            async function clearAllEntries() {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                objectStore.clear();
+
+                return new Promise((resolve, reject) => {
+                    transaction.oncomplete = resolve;
+                    transaction.onerror = () => reject(transaction.error);
                 });
             }
 
@@ -390,7 +412,6 @@
                 if (deletedEntry) {
                     removeLastLogEntry();
                     updateTimestamp("Undone");
-
                     updateDailyReport();
                 }
             }
@@ -444,7 +465,7 @@
             }
 
             async function loadRecentLogs() {
-                const entries = await loadAllEntries();
+                const entries = await loadEntriesByDate();
                 const recent = entries.slice(-20).reverse();
                 recent.forEach((e) => {
                     const logPanel = document.getElementById("log-panel");
@@ -472,7 +493,7 @@
             }
 
             async function downloadCSV() {
-                const entries = await loadAllEntries();
+                const entries = await loadEntriesByDate();
 
                 if (!entries || entries.length === 0) {
                     alert("No data to export");
@@ -529,23 +550,14 @@
             }
 
             async function updateDailyReport() {
-                const entries = await loadAllEntries();
-
-                // Filter entries for the selected date
-                const dateStr = currentReportDate.toISOString().split("T")[0];
-                const dayEntries = entries.filter((e) => {
-                    const entryDate = new Date(e.ts)
-                        .toISOString()
-                        .split("T")[0];
-                    return entryDate === dateStr;
-                });
+                const entries = await loadEntriesByDate(currentReportDate);
 
                 // Calculate statistics
-                const stats = calculateDailyStats(dayEntries);
+                const stats = calculateDailyStats(entries);
                 updateStatsDisplay(stats);
-                updateHourlyGrid(dayEntries);
-                updateSleepAttempts(dayEntries);
-                drawTimeline(dayEntries);
+                updateHourlyGrid(entries);
+                updateSleepAttempts(entries);
+                drawTimeline(entries);
             }
 
             function calculateDailyStats(entries) {
@@ -854,6 +866,14 @@
                         onclick="save('sleep','awake',this)"
                     >
                         Awake
+                    </button>
+                    <button
+                        class="action"
+                        data-type="sleep"
+                        data-value="grizzle"
+                        onclick="save('sleep','grizzle',this)"
+                    >
+                        Grizzle
                     </button>
                 </div>
             </div>
