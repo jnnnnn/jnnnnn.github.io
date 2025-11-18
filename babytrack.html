@@ -390,21 +390,17 @@
 
                 const transaction = db.transaction(["entries"], "readonly");
                 const objectStore = transaction.objectStore("entries");
-                const request = objectStore
-                    .index("timestamp")
-                    .getAll(
-                        date
-                            ? IDBKeyRange.bound(
-                                  date.toISOString().split("T")[0] +
-                                      "T00:00:00",
-                                  date.toISOString().split("T")[0] + "T23:59:59"
-                              )
-                            : IDBKeyRange.lowerBound(
-                                  new Date(
-                                      Date.now() - 24 * 60 * 60 * 1000
-                                  ).toISOString()
-                              )
-                    );
+                
+                let range;
+                if (date) {
+                    const { start, end } = getDayBounds(date);
+                    range = IDBKeyRange.bound(start, end);
+                } else {
+                    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+                    range = IDBKeyRange.lowerBound(yesterday);
+                }
+                
+                const request = objectStore.index("timestamp").getAll(range);
 
                 return new Promise((resolve, reject) => {
                     request.onsuccess = () => resolve(request.result || []);
@@ -427,6 +423,32 @@
 
             function nowIso() {
                 return new Date().toISOString();
+            }
+
+            // Helper to format elapsed time
+            function formatElapsedTime(timestampMs) {
+                const elapsed = Math.floor((Date.now() - timestampMs) / 1000 / 60);
+                const hours = Math.floor(elapsed / 60);
+                const mins = elapsed % 60;
+                return hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
+            }
+
+            // Helper to create day boundary timestamps
+            function getDayBounds(date) {
+                const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+                return { start: start.toISOString(), end: end.toISOString() };
+            }
+
+            // Helper to update button display with time and highlight
+            function updateButtonDisplay(btn, label, timeStr = null, highlight = false) {
+                if (!btn) return;
+                const opacity = highlight ? "0.9" : "0.8";
+                btn.style.background = highlight ? "var(--primary)" : "";
+                btn.style.color = highlight ? "#fff" : "";
+                btn.innerHTML = timeStr 
+                    ? `${label}<br><small style="font-size: 11px; opacity: ${opacity};">${timeStr}</small>`
+                    : label;
             }
 
             // Long-press detection
@@ -471,6 +493,35 @@
                 longPressData = null;
             }
 
+            // Helper to find last sleep start entry
+            function findLastSleepStart(entries) {
+                return [...entries]
+                    .reverse()
+                    .find(e => e.type === "sleep" && (e.value === "sleeping" || e.value === "nap"));
+            }
+
+            // Handle short sleep removal (< 5 minutes)
+            async function handleShortSleep(awakeTime) {
+                const allEntries = await loadEntriesByDate();
+                const lastSleepStart = findLastSleepStart(allEntries);
+                
+                if (!lastSleepStart) return false;
+                
+                const sleepDuration = (awakeTime - new Date(lastSleepStart.ts)) / 1000 / 60;
+                
+                if (sleepDuration < 5) {
+                    const transaction = db.transaction(["entries"], "readwrite");
+                    const objectStore = transaction.objectStore("entries");
+                    await new Promise((resolve, reject) => {
+                        const deleteRequest = objectStore.delete(lastSleepStart.id);
+                        deleteRequest.onsuccess = resolve;
+                        deleteRequest.onerror = () => reject(deleteRequest.error);
+                    });
+                    return true;
+                }
+                return false;
+            }
+
             async function save(type, value, btn, customTimestamp = null) {
                 const ts = customTimestamp || nowIso();
                 const eventTime = new Date(ts);
@@ -483,45 +534,14 @@
                     }, 400);
                 }
 
-                // Special handling for sleep awake events
+                // Special handling for sleep awake events - remove short sleeps
                 if (type === "sleep" && value === "awake") {
-                    const allEntries = await loadEntriesByDate();
-                    const lastSleepStart = [...allEntries]
-                        .reverse()
-                        .find(
-                            (e) =>
-                                e.type === "sleep" &&
-                                (e.value === "sleeping" || e.value === "nap")
-                        );
-
-                    if (lastSleepStart) {
-                        const sleepDuration =
-                            (eventTime - new Date(lastSleepStart.ts)) /
-                            1000 /
-                            60;
-
-                        // If sleep was less than 5 minutes, delete the sleep start instead of adding awake
-                        if (sleepDuration < 5) {
-                            const transaction = db.transaction(
-                                ["entries"],
-                                "readwrite"
-                            );
-                            const objectStore =
-                                transaction.objectStore("entries");
-                            await new Promise((resolve, reject) => {
-                                const deleteRequest = objectStore.delete(
-                                    lastSleepStart.id
-                                );
-                                deleteRequest.onsuccess = resolve;
-                                deleteRequest.onerror = () =>
-                                    reject(deleteRequest.error);
-                            });
-
-                            updateTimestamp("Short sleep removed");
-                            updateDailyReport();
-                            updateButtonStates();
-                            return;
-                        }
+                    const removed = await handleShortSleep(eventTime);
+                    if (removed) {
+                        updateTimestamp("Short sleep removed");
+                        updateDailyReport();
+                        updateButtonStates();
+                        return;
                     }
                 }
 
@@ -602,29 +622,12 @@
             async function updateButtonStates() {
                 if (!db) await initDB();
 
-                // Load today's entries to get current state
+                // Load today's entries
                 const today = new Date();
+                const { start, end } = getDayBounds(today);
                 const transaction = db.transaction(["entries"], "readonly");
                 const objectStore = transaction.objectStore("entries");
-                const index = objectStore.index("timestamp");
-
-                const todayStart = new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    today.getDate()
-                ).toISOString();
-                const todayEnd = new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    today.getDate(),
-                    23,
-                    59,
-                    59
-                ).toISOString();
-
-                const request = index.getAll(
-                    IDBKeyRange.bound(todayStart, todayEnd)
-                );
+                const request = objectStore.index("timestamp").getAll(IDBKeyRange.bound(start, end));
 
                 const allEntries = await new Promise((resolve, reject) => {
                     request.onsuccess = () => resolve(request.result || []);
@@ -633,95 +636,28 @@
 
                 if (!allEntries || allEntries.length === 0) return;
 
-                const now = new Date();
+                // Find last feed and update button
+                const lastFeed = [...allEntries].reverse().find(e => e.type === "feed" && e.value === "bf");
+                const feedBtn = document.querySelector('button[data-type="feed"][data-value="bf"]');
+                const feedTime = lastFeed ? formatElapsedTime(new Date(lastFeed.ts).getTime()) : null;
+                updateButtonDisplay(feedBtn, "Feed", feedTime, false);
 
-                // Find last feed
-                const lastFeed = [...allEntries]
-                    .reverse()
-                    .find((e) => e.type === "feed" && e.value === "bf");
-
-                // Find last sleep event (any type)
-                const lastSleepEvent = [...allEntries]
-                    .reverse()
-                    .find((e) => e.type === "sleep");
-
-                // Check if currently sleeping (last sleep event was sleeping/nap, not awake)
-                const isAsleep =
-                    lastSleepEvent &&
-                    (lastSleepEvent.value === "sleeping" ||
-                        lastSleepEvent.value === "nap");
-
-                // Update feed button
-                const feedBtn = document.querySelector(
-                    'button[data-type="feed"][data-value="bf"]'
-                );
-                if (feedBtn) {
-                    if (lastFeed) {
-                        const elapsed = Math.floor(
-                            (now - new Date(lastFeed.ts)) / 1000 / 60
-                        );
-                        const hours = Math.floor(elapsed / 60);
-                        const mins = elapsed % 60;
-                        const timeStr =
-                            hours > 0
-                                ? `${hours}h ${mins}m ago`
-                                : `${mins}m ago`;
-                        feedBtn.innerHTML = `Feed<br><small style="font-size: 11px; opacity: 0.8;">${timeStr}</small>`;
-                    } else {
-                        feedBtn.innerHTML = "Feed";
-                    }
-                }
-
-                // Update sleep and awake buttons
-                const sleepBtn = document.querySelector(
-                    'button[data-type="sleep"][data-value="sleeping"]'
-                );
-                const awakeBtn = document.querySelector(
-                    'button[data-type="sleep"][data-value="awake"]'
-                );
+                // Find last sleep event and update sleep/awake buttons
+                const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep");
+                const sleepBtn = document.querySelector('button[data-type="sleep"][data-value="sleeping"]');
+                const awakeBtn = document.querySelector('button[data-type="sleep"][data-value="awake"]');
 
                 if (sleepBtn && awakeBtn) {
+                    const isAsleep = lastSleepEvent && (lastSleepEvent.value === "sleeping" || lastSleepEvent.value === "nap");
+                    const sleepTime = lastSleepEvent ? formatElapsedTime(new Date(lastSleepEvent.ts).getTime()) : null;
+                    
                     if (lastSleepEvent) {
-                        const elapsed = Math.floor(
-                            (now - new Date(lastSleepEvent.ts)) / 1000 / 60
-                        );
-                        const hours = Math.floor(elapsed / 60);
-                        const mins = elapsed % 60;
-                        const timeStr =
-                            hours > 0
-                                ? `${hours}h ${mins}m ago`
-                                : `${mins}m ago`;
-
-                        if (isAsleep) {
-                            // Highlight Sleeping button
-                            sleepBtn.style.background = "var(--primary)";
-                            sleepBtn.style.color = "#fff";
-                            sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
-
-                            // Unhighlight Awake button
-                            awakeBtn.style.background = "";
-                            awakeBtn.style.color = "";
-                            awakeBtn.innerHTML = "Awake";
-                        } else {
-                            // Unhighlight Sleeping button
-                            sleepBtn.style.background = "";
-                            sleepBtn.style.color = "";
-                            sleepBtn.innerHTML = "Sleeping";
-
-                            // Highlight Awake button
-                            awakeBtn.style.background = "var(--primary)";
-                            awakeBtn.style.color = "#fff";
-                            awakeBtn.innerHTML = `Awake<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
-                        }
+                        updateButtonDisplay(sleepBtn, "Sleeping", isAsleep ? sleepTime : null, isAsleep);
+                        updateButtonDisplay(awakeBtn, "Awake", !isAsleep ? sleepTime : null, !isAsleep);
                     } else {
-                        // No sleep events today - default to awake and highlighted
-                        sleepBtn.style.background = "";
-                        sleepBtn.style.color = "";
-                        sleepBtn.innerHTML = "Sleeping";
-
-                        awakeBtn.style.background = "var(--primary)";
-                        awakeBtn.style.color = "#fff";
-                        awakeBtn.innerHTML = "Awake";
+                        // No sleep events today - default to awake
+                        updateButtonDisplay(sleepBtn, "Sleeping", null, false);
+                        updateButtonDisplay(awakeBtn, "Awake", null, true);
                     }
                 }
             }
