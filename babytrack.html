@@ -438,9 +438,12 @@
 
             // Helper to create day boundary timestamps
             function getDayBounds(date) {
-                // Create start/end in local timezone, then convert to UTC for storage comparison
+                // Create start/end in local timezone - these are Date objects representing
+                // midnight and end-of-day in the local timezone
                 const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
                 const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+                // Return ISO strings for database queries - these will be in UTC but represent
+                // the local day boundaries
                 return { start: start.toISOString(), end: end.toISOString() };
             }
             
@@ -734,14 +737,23 @@
             let currentReportDate = new Date();
 
             function setReportDate(date) {
-                currentReportDate = new Date(date);
+                // Parse date string as local date, not UTC
+                if (typeof date === 'string') {
+                    const parts = date.split('-');
+                    currentReportDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                } else {
+                    currentReportDate = new Date(date);
+                }
                 updateDailyReport();
             }
 
             function changeReportDate(days) {
                 currentReportDate.setDate(currentReportDate.getDate() + days);
-                document.getElementById("report-date").valueAsDate =
-                    currentReportDate;
+                // Format date as YYYY-MM-DD for the date input
+                const year = currentReportDate.getFullYear();
+                const month = String(currentReportDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentReportDate.getDate()).padStart(2, '0');
+                document.getElementById("report-date").value = `${year}-${month}-${day}`;
                 updateDailyReport();
             }
 
@@ -1355,7 +1367,11 @@
 
             <script>
                 // Initialize date selector to today
-                document.getElementById("report-date").valueAsDate = new Date();
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                document.getElementById("report-date").value = `${year}-${month}-${day}`;
 
                 // Build hourly grid
                 const hourlyGrid = document.getElementById("hourly-grid");
