@@ -84,50 +84,6 @@
                 color: #666;
                 font-size: 12px;
             }
-            #log-panel {
-                background: var(--card);
-                padding: 12px;
-                border-radius: 12px;
-                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-                max-height: 200px;
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
-            .log-entry {
-                padding: 8px 10px;
-                background: var(--bg);
-                border-radius: 6px;
-                font-size: 14px;
-                animation: slideIn 0.3s ease-out;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .log-entry .log-type {
-                font-weight: 600;
-                color: var(--primary);
-                text-transform: capitalize;
-            }
-            .log-entry .log-value {
-                color: #333;
-            }
-            .log-entry .log-time {
-                color: #999;
-                font-size: 12px;
-                margin-left: 8px;
-            }
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
             #daily-report {
                 background: var(--card);
                 padding: 12px;
@@ -268,6 +224,43 @@
                 border-top: 1px solid var(--muted);
                 padding-top: 16px;
             }
+            .recent-events {
+                margin-top: 12px;
+            }
+            .recent-events h4 {
+                font-size: 14px;
+                margin: 0 0 8px 0;
+                color: #666;
+            }
+            .event-list {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            .event-entry {
+                padding: 8px 10px;
+                background: var(--bg);
+                border-radius: 6px;
+                font-size: 13px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .event-type {
+                font-weight: 600;
+                color: var(--primary);
+                text-transform: capitalize;
+            }
+            .event-value {
+                color: #333;
+                margin-left: 4px;
+            }
+            .event-time {
+                color: #999;
+                font-size: 12px;
+            }
         </style>
         <script>
             let db = null;
@@ -393,9 +386,6 @@
                 // Persist this single entry
                 await addEntry(type, value, ts);
 
-                // Add to log display
-                addLogEntry(type, value, ts);
-
                 updateTimestamp("Saved: " + new Date(ts).toLocaleTimeString());
 
                 // Update daily report if viewing current day
@@ -404,15 +394,16 @@
                     .toISOString()
                     .split("T")[0];
                 updateDailyReport();
+                updateButtonStates();
             }
 
             async function undo() {
                 const deletedEntry = await deleteMostRecentEntry();
 
                 if (deletedEntry) {
-                    removeLastLogEntry();
                     updateTimestamp("Undone");
                     updateDailyReport();
+                    updateButtonStates();
                 }
             }
 
@@ -426,70 +417,6 @@
                 if (!v) return;
                 await save("note", v);
                 e.target.value = "";
-            }
-
-            function addLogEntry(type, value, ts) {
-                const logPanel = document.getElementById("log-panel");
-                if (!logPanel) return;
-
-                const entry = document.createElement("div");
-                entry.className = "log-entry";
-
-                const time = new Date(ts);
-                const timeStr = time.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-
-                entry.innerHTML = `
-                    <div>
-                        <span class="log-type">${type}</span>: 
-                        <span class="log-value">${value}</span>
-                    </div>
-                    <span class="log-time">${timeStr}</span>
-                `;
-
-                logPanel.insertBefore(entry, logPanel.firstChild);
-
-                // Keep only last 20 entries
-                while (logPanel.children.length > 20) {
-                    logPanel.removeChild(logPanel.lastChild);
-                }
-            }
-
-            function removeLastLogEntry() {
-                const logPanel = document.getElementById("log-panel");
-                if (logPanel && logPanel.firstChild) {
-                    logPanel.removeChild(logPanel.firstChild);
-                }
-            }
-
-            async function loadRecentLogs() {
-                const entries = await loadEntriesByDate();
-                const recent = entries.slice(-20).reverse();
-                recent.forEach((e) => {
-                    const logPanel = document.getElementById("log-panel");
-                    if (!logPanel) return;
-
-                    const entry = document.createElement("div");
-                    entry.className = "log-entry";
-
-                    const time = new Date(e.ts);
-                    const timeStr = time.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-
-                    entry.innerHTML = `
-                        <div>
-                            <span class="log-type">${e.type}</span>: 
-                            <span class="log-value">${e.value}</span>
-                        </div>
-                        <span class="log-time">${timeStr}</span>
-                    `;
-
-                    logPanel.appendChild(entry);
-                });
             }
 
             async function downloadCSV() {
@@ -522,6 +449,67 @@
                 URL.revokeObjectURL(url);
             }
 
+            async function updateButtonStates() {
+                const allEntries = await loadEntriesByDate();
+                if (!allEntries || allEntries.length === 0) return;
+
+                const now = new Date();
+
+                // Find last feed
+                const lastFeed = [...allEntries]
+                    .reverse()
+                    .find((e) => e.type === "feed" && e.value === "bf");
+
+                // Find last sleep event (any type)
+                const lastSleepEvent = [...allEntries]
+                    .reverse()
+                    .find((e) => e.type === "sleep");
+
+                // Check if currently sleeping (last sleep event was sleeping/nap, not awake)
+                const isAsleep = lastSleepEvent && 
+                    (lastSleepEvent.value === "sleeping" || lastSleepEvent.value === "nap");
+
+                // Update feed button
+                const feedBtn = document.querySelector(
+                    'button[data-type="feed"][data-value="bf"]'
+                );
+                if (feedBtn && lastFeed) {
+                    const elapsed = Math.floor(
+                        (now - new Date(lastFeed.ts)) / 1000 / 60
+                    );
+                    const hours = Math.floor(elapsed / 60);
+                    const mins = elapsed % 60;
+                    const timeStr =
+                        hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
+                    feedBtn.innerHTML = `Feed<br><small style="font-size: 11px; opacity: 0.8;">${timeStr}</small>`;
+                }
+
+                // Update sleep button
+                const sleepBtn = document.querySelector(
+                    'button[data-type="sleep"][data-value="sleeping"]'
+                );
+                if (sleepBtn && lastSleepEvent) {
+                    const elapsed = Math.floor(
+                        (now - new Date(lastSleepEvent.ts)) / 1000 / 60
+                    );
+                    const hours = Math.floor(elapsed / 60);
+                    const mins = elapsed % 60;
+                    const timeStr =
+                        hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
+                    
+                    // Keep button highlighted if currently asleep
+                    if (isAsleep) {
+                        sleepBtn.style.background = 'var(--primary)';
+                        sleepBtn.style.color = '#fff';
+                        sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
+                    } else {
+                        sleepBtn.style.background = '';
+                        sleepBtn.style.color = '';
+                        sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.8;">${timeStr}</small>`;
+                    }
+                }
+            }
+
             document.addEventListener("keydown", (e) => {
                 if (
                     e.key === "Enter" &&
@@ -532,7 +520,7 @@
             });
 
             // Initialize database on load
-            initDB().then(() => loadRecentLogs());
+            initDB();
 
             // Daily Report Functions
             let currentReportDate = new Date();
@@ -557,6 +545,7 @@
                 updateStatsDisplay(stats);
                 updateHourlyGrid(entries);
                 updateSleepAttempts(entries);
+                updateRecentEvents(entries);
                 drawTimeline(entries);
             }
 
@@ -714,6 +703,32 @@
                 });
             }
 
+            function updateRecentEvents(entries) {
+                const container = document.getElementById('recent-events-list');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                // Show all events for the selected day in reverse chronological order
+                const allEvents = [...entries].reverse();
+                
+                allEvents.forEach(e => {
+                    const div = document.createElement('div');
+                    div.className = 'event-entry';
+                    
+                    const time = new Date(e.ts);
+                    const timeStr = time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    
+                    div.innerHTML = `
+                        <div>
+                            <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
+                        </div>
+                        <span class="event-time">${timeStr}</span>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
             function drawTimeline(entries) {
                 const container = document.getElementById("timeline-chart");
                 container.innerHTML = "";
@@ -764,13 +779,26 @@
                     .domain([0, 2])
                     .range([height - margin.bottom, margin.top]);
 
-                // Draw axes
+                // Draw gridlines for every hour
+                for (let hour = 0; hour <= 24; hour++) {
+                    svg.append("line")
+                        .attr("x1", x(hour))
+                        .attr("x2", x(hour))
+                        .attr("y1", margin.top)
+                        .attr("y2", height - margin.bottom)
+                        .attr("stroke", "#e0e0e0")
+                        .attr("stroke-width", 1)
+                        .attr("opacity", 0.5);
+                }
+
+                // Draw axes with fewer ticks (every 3 hours)
                 svg.append("g")
                     .attr("transform", `translate(0,${height - margin.bottom})`)
                     .call(
                         d3
                             .axisBottom(x)
-                            .ticks(24)
+                            .ticks(8)
+                            .tickValues([0, 3, 6, 9, 12, 15, 18, 21, 24])
                             .tickFormat((d) => d + "h")
                     );
 
@@ -1010,8 +1038,6 @@
                 </button>
             </div>
 
-            <div id="log-panel"></div>
-
             <div id="daily-report">
                 <h3>Daily Report</h3>
 
@@ -1059,6 +1085,13 @@
                 <div class="sleep-attempts">
                     <h4>Sleep Attempts</h4>
                     <div class="attempt-list" id="sleep-attempts-list">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <div class="recent-events">
+                    <h4>Recent Events</h4>
+                    <div class="event-list" id="recent-events-list">
                         <!-- Will be populated by JS -->
                     </div>
                 </div>
@@ -1112,6 +1145,7 @@
 
                 initDB().then(() => {
                     updateDailyReport();
+                    updateButtonStates();
                 });
 
                 // this function generates several days worth of test data. it is lightly random.
@@ -1315,7 +1349,6 @@
                     }
 
                     console.log(`Generated ${days} days of test data`);
-                    await loadRecentLogs();
                     await updateDailyReport();
                 }
             </script>
