@@ -691,6 +691,11 @@
             // Initialize database on load
             initDB();
 
+            // Update button states every minute to keep elapsed times current
+            setInterval(() => {
+                updateButtonStates();
+            }, 60000); // 60000ms = 1 minute
+
             // Daily Report Functions
             let currentReportDate = new Date();
 
