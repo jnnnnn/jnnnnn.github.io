@@ -390,17 +390,21 @@
 
                 const transaction = db.transaction(["entries"], "readonly");
                 const objectStore = transaction.objectStore("entries");
-                const request = date
-                    ? objectStore
-                          .index("timestamp")
-                          .getAll(
-                              IDBKeyRange.bound(
+                const request = objectStore
+                    .index("timestamp")
+                    .getAll(
+                        date
+                            ? IDBKeyRange.bound(
                                   date.toISOString().split("T")[0] +
                                       "T00:00:00",
                                   date.toISOString().split("T")[0] + "T23:59:59"
                               )
-                          )
-                    : objectStore.getAll();
+                            : IDBKeyRange.lowerBound(
+                                  new Date(
+                                      Date.now() - 24 * 60 * 60 * 1000
+                                  ).toISOString()
+                              )
+                    );
 
                 return new Promise((resolve, reject) => {
                     request.onsuccess = () => resolve(request.result || []);
@@ -446,83 +450,30 @@
             }
 
             function showTimePicker() {
-                const modal = document.getElementById('time-picker-modal');
-                const input = document.getElementById('custom-time');
-                
+                const modal = document.getElementById("time-picker-modal");
+                const input = document.getElementById("custom-time");
+
                 // Set default to current time
                 const now = new Date();
-                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                const localDateTime = new Date(
+                    now.getTime() - now.getTimezoneOffset() * 60000
+                )
                     .toISOString()
                     .slice(0, 16);
                 input.value = localDateTime;
-                
-                modal.classList.add('show');
+
+                modal.classList.add("show");
             }
 
             function hideTimePicker() {
-                const modal = document.getElementById('time-picker-modal');
-                modal.classList.remove('show');
+                const modal = document.getElementById("time-picker-modal");
+                modal.classList.remove("show");
                 longPressData = null;
             }
 
-            async function saveWithCustomTime() {
-                const input = document.getElementById('custom-time');
-                const customTime = new Date(input.value);
-                
-                if (!customTime || isNaN(customTime.getTime())) {
-                    alert('Please select a valid time');
-                    return;
-                }
-                
-                const ts = customTime.toISOString();
-                const { type, value, btn } = longPressData;
-                
-                // Add animation
-                if (btn) {
-                    btn.classList.add('fading');
-                    setTimeout(() => {
-                        btn.classList.remove('fading');
-                    }, 400);
-                }
-
-                // Special handling for sleep awake events
-                if (type === "sleep" && value === "awake") {
-                    const allEntries = await loadEntriesByDate();
-                    const lastSleepStart = [...allEntries]
-                        .reverse()
-                        .find((e) => e.type === "sleep" && 
-                              (e.value === "sleeping" || e.value === "nap"));
-                    
-                    if (lastSleepStart) {
-                        const sleepDuration = (customTime - new Date(lastSleepStart.ts)) / 1000 / 60;
-                        
-                        if (sleepDuration < 5) {
-                            const transaction = db.transaction(["entries"], "readwrite");
-                            const objectStore = transaction.objectStore("entries");
-                            await new Promise((resolve, reject) => {
-                                const deleteRequest = objectStore.delete(lastSleepStart.id);
-                                deleteRequest.onsuccess = resolve;
-                                deleteRequest.onerror = () => reject(deleteRequest.error);
-                            });
-                            
-                            updateTimestamp("Short sleep removed");
-                            updateDailyReport();
-                            updateButtonStates();
-                            hideTimePicker();
-                            return;
-                        }
-                    }
-                }
-
-                await addEntry(type, value, ts);
-                updateTimestamp("Saved: " + customTime.toLocaleTimeString());
-                updateDailyReport();
-                updateButtonStates();
-                hideTimePicker();
-            }
-
-            async function save(type, value, btn) {
-                const ts = nowIso();
+            async function save(type, value, btn, customTimestamp = null) {
+                const ts = customTimestamp || nowIso();
+                const eventTime = new Date(ts);
 
                 // Add animation
                 if (btn) {
@@ -534,27 +485,38 @@
 
                 // Special handling for sleep awake events
                 if (type === "sleep" && value === "awake") {
-                    // Find the last sleep start event
                     const allEntries = await loadEntriesByDate();
                     const lastSleepStart = [...allEntries]
                         .reverse()
-                        .find((e) => e.type === "sleep" && 
-                              (e.value === "sleeping" || e.value === "nap"));
-                    
+                        .find(
+                            (e) =>
+                                e.type === "sleep" &&
+                                (e.value === "sleeping" || e.value === "nap")
+                        );
+
                     if (lastSleepStart) {
-                        const sleepDuration = (new Date(ts) - new Date(lastSleepStart.ts)) / 1000 / 60;
-                        
+                        const sleepDuration =
+                            (eventTime - new Date(lastSleepStart.ts)) /
+                            1000 /
+                            60;
+
                         // If sleep was less than 5 minutes, delete the sleep start instead of adding awake
                         if (sleepDuration < 5) {
-                            // Delete the sleep start entry
-                            const transaction = db.transaction(["entries"], "readwrite");
-                            const objectStore = transaction.objectStore("entries");
+                            const transaction = db.transaction(
+                                ["entries"],
+                                "readwrite"
+                            );
+                            const objectStore =
+                                transaction.objectStore("entries");
                             await new Promise((resolve, reject) => {
-                                const deleteRequest = objectStore.delete(lastSleepStart.id);
+                                const deleteRequest = objectStore.delete(
+                                    lastSleepStart.id
+                                );
                                 deleteRequest.onsuccess = resolve;
-                                deleteRequest.onerror = () => reject(deleteRequest.error);
+                                deleteRequest.onerror = () =>
+                                    reject(deleteRequest.error);
                             });
-                            
+
                             updateTimestamp("Short sleep removed");
                             updateDailyReport();
                             updateButtonStates();
@@ -566,15 +528,23 @@
                 // Persist this single entry
                 await addEntry(type, value, ts);
 
-                updateTimestamp("Saved: " + new Date(ts).toLocaleTimeString());
-
-                // Update daily report if viewing current day
-                const today = new Date().toISOString().split("T")[0];
-                const currentReport = currentReportDate
-                    .toISOString()
-                    .split("T")[0];
+                updateTimestamp("Saved: " + eventTime.toLocaleTimeString());
                 updateDailyReport();
                 updateButtonStates();
+            }
+
+            async function saveWithCustomTime() {
+                const input = document.getElementById("custom-time");
+                const customTime = new Date(input.value);
+
+                if (!customTime || isNaN(customTime.getTime())) {
+                    alert("Please select a valid time");
+                    return;
+                }
+
+                const { type, value, btn } = longPressData;
+                await save(type, value, btn, customTime.toISOString());
+                hideTimePicker();
             }
 
             async function undo() {
@@ -631,18 +601,31 @@
 
             async function updateButtonStates() {
                 if (!db) await initDB();
-                
+
                 // Load today's entries to get current state
                 const today = new Date();
                 const transaction = db.transaction(["entries"], "readonly");
                 const objectStore = transaction.objectStore("entries");
                 const index = objectStore.index("timestamp");
-                
-                const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-                const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59).toISOString();
-                
-                const request = index.getAll(IDBKeyRange.bound(todayStart, todayEnd));
-                
+
+                const todayStart = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate()
+                ).toISOString();
+                const todayEnd = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate(),
+                    23,
+                    59,
+                    59
+                ).toISOString();
+
+                const request = index.getAll(
+                    IDBKeyRange.bound(todayStart, todayEnd)
+                );
+
                 const allEntries = await new Promise((resolve, reject) => {
                     request.onsuccess = () => resolve(request.result || []);
                     request.onerror = () => reject(request.error);
@@ -663,8 +646,10 @@
                     .find((e) => e.type === "sleep");
 
                 // Check if currently sleeping (last sleep event was sleeping/nap, not awake)
-                const isAsleep = lastSleepEvent && 
-                    (lastSleepEvent.value === "sleeping" || lastSleepEvent.value === "nap");
+                const isAsleep =
+                    lastSleepEvent &&
+                    (lastSleepEvent.value === "sleeping" ||
+                        lastSleepEvent.value === "nap");
 
                 // Update feed button
                 const feedBtn = document.querySelector(
@@ -678,10 +663,12 @@
                         const hours = Math.floor(elapsed / 60);
                         const mins = elapsed % 60;
                         const timeStr =
-                            hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
+                            hours > 0
+                                ? `${hours}h ${mins}m ago`
+                                : `${mins}m ago`;
                         feedBtn.innerHTML = `Feed<br><small style="font-size: 11px; opacity: 0.8;">${timeStr}</small>`;
                     } else {
-                        feedBtn.innerHTML = 'Feed';
+                        feedBtn.innerHTML = "Feed";
                     }
                 }
 
@@ -692,7 +679,7 @@
                 const awakeBtn = document.querySelector(
                     'button[data-type="sleep"][data-value="awake"]'
                 );
-                
+
                 if (sleepBtn && awakeBtn) {
                     if (lastSleepEvent) {
                         const elapsed = Math.floor(
@@ -701,38 +688,40 @@
                         const hours = Math.floor(elapsed / 60);
                         const mins = elapsed % 60;
                         const timeStr =
-                            hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
-                        
+                            hours > 0
+                                ? `${hours}h ${mins}m ago`
+                                : `${mins}m ago`;
+
                         if (isAsleep) {
                             // Highlight Sleeping button
-                            sleepBtn.style.background = 'var(--primary)';
-                            sleepBtn.style.color = '#fff';
+                            sleepBtn.style.background = "var(--primary)";
+                            sleepBtn.style.color = "#fff";
                             sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
-                            
+
                             // Unhighlight Awake button
-                            awakeBtn.style.background = '';
-                            awakeBtn.style.color = '';
-                            awakeBtn.innerHTML = 'Awake';
+                            awakeBtn.style.background = "";
+                            awakeBtn.style.color = "";
+                            awakeBtn.innerHTML = "Awake";
                         } else {
                             // Unhighlight Sleeping button
-                            sleepBtn.style.background = '';
-                            sleepBtn.style.color = '';
-                            sleepBtn.innerHTML = 'Sleeping';
-                            
+                            sleepBtn.style.background = "";
+                            sleepBtn.style.color = "";
+                            sleepBtn.innerHTML = "Sleeping";
+
                             // Highlight Awake button
-                            awakeBtn.style.background = 'var(--primary)';
-                            awakeBtn.style.color = '#fff';
+                            awakeBtn.style.background = "var(--primary)";
+                            awakeBtn.style.color = "#fff";
                             awakeBtn.innerHTML = `Awake<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
                         }
                     } else {
                         // No sleep events today - default to awake and highlighted
-                        sleepBtn.style.background = '';
-                        sleepBtn.style.color = '';
-                        sleepBtn.innerHTML = 'Sleeping';
-                        
-                        awakeBtn.style.background = 'var(--primary)';
-                        awakeBtn.style.color = '#fff';
-                        awakeBtn.innerHTML = 'Awake';
+                        sleepBtn.style.background = "";
+                        sleepBtn.style.color = "";
+                        sleepBtn.innerHTML = "Sleeping";
+
+                        awakeBtn.style.background = "var(--primary)";
+                        awakeBtn.style.color = "#fff";
+                        awakeBtn.innerHTML = "Awake";
                     }
                 }
             }
@@ -763,6 +752,104 @@
                     currentReportDate;
                 updateDailyReport();
             }
+
+            // Button Configuration
+            const buttonGroups = [
+                {
+                    buttons: [
+                        { type: "feed", value: "bf", label: "Feed" },
+                        { type: "feed", value: "play", label: "Play" },
+                    ],
+                },
+                {
+                    buttons: [
+                        { type: "sleep", value: "sleeping", label: "Sleeping" },
+                        { type: "sleep", value: "nap", label: "Nap" },
+                        { type: "sleep", value: "awake", label: "Awake" },
+                        { type: "sleep", value: "grizzle", label: "Grizzle" },
+                    ],
+                },
+                {
+                    buttons: [
+                        { type: "nappy", value: "wet", label: "Wet" },
+                        { type: "nappy", value: "dirty", label: "Dirty" },
+                        { type: "nappy", value: "spew", label: "Spew" },
+                    ],
+                },
+                {
+                    buttons: [
+                        { type: "soothe", value: "pram", label: "Pram" },
+                        { type: "soothe", value: "rocking", label: "Rocking" },
+                        { type: "soothe", value: "wearing", label: "Wearing" },
+                        {
+                            type: "soothe",
+                            value: "feed-to-sleep",
+                            label: "Feed to Sleep",
+                        },
+                    ],
+                },
+                {
+                    buttons: [
+                        { type: "5s", value: "swaddle", label: "Swaddle" },
+                        {
+                            type: "5s",
+                            value: "side-lying",
+                            label: "Side/Stomach",
+                        },
+                        { type: "5s", value: "shush", label: "Shush" },
+                        { type: "5s", value: "swing", label: "Swing" },
+                        { type: "5s", value: "suck", label: "Suck" },
+                    ],
+                },
+            ];
+
+            // Generate buttons dynamically
+            function renderButtons() {
+                const container = document.querySelector(".container");
+                const h2 = container.querySelector("h2");
+
+                // Remove existing button cards
+                const existingCards = container.querySelectorAll(
+                    ".card:not(#daily-report .card)"
+                );
+                existingCards.forEach((card) => {
+                    if (!card.querySelector("#notes")) {
+                        card.remove();
+                    }
+                });
+
+                // Insert button groups after the h2
+                buttonGroups.reverse().forEach((group) => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+
+                    const row = document.createElement("div");
+                    row.className = "row";
+
+                    group.buttons.forEach((btn) => {
+                        const button = document.createElement("button");
+                        button.className = "action";
+                        button.dataset.type = btn.type;
+                        button.dataset.value = btn.value;
+                        button.textContent = btn.label;
+                        button.onclick = function () {
+                            save(btn.type, btn.value, this);
+                        };
+                        button.onpointerdown = function (e) {
+                            handleLongPressStart(btn.type, btn.value, this, e);
+                        };
+                        button.onpointerup = handleLongPressEnd;
+                        button.onpointercancel = handleLongPressEnd;
+
+                        row.appendChild(button);
+                    });
+
+                    card.appendChild(row);
+                    h2.insertAdjacentElement("afterend", card);
+                });
+            }
+
+            // Render buttons on load (moved to DOM ready below)
 
             async function updateDailyReport() {
                 const entries = await loadEntriesByDate(currentReportDate);
@@ -931,21 +1018,24 @@
             }
 
             function updateRecentEvents(entries) {
-                const container = document.getElementById('recent-events-list');
+                const container = document.getElementById("recent-events-list");
                 if (!container) return;
-                
-                container.innerHTML = '';
-                
+
+                container.innerHTML = "";
+
                 // Show all events for the selected day in reverse chronological order
                 const allEvents = [...entries].reverse();
-                
-                allEvents.forEach(e => {
-                    const div = document.createElement('div');
-                    div.className = 'event-entry';
-                    
+
+                allEvents.forEach((e) => {
+                    const div = document.createElement("div");
+                    div.className = "event-entry";
+
                     const time = new Date(e.ts);
-                    const timeStr = time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                    
+                    const timeStr = time.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+
                     div.innerHTML = `
                         <div>
                             <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
@@ -1079,228 +1169,7 @@
         <div class="container">
             <h2>Baby Daily Log</h2>
 
-            <div class="card">
-                <div class="row">
-                    <button
-                        class="action"
-                        data-type="feed"
-                        data-value="bf"
-                        onclick="save('feed','bf',this)"
-                        onpointerdown="handleLongPressStart('feed','bf',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Feed
-                    </button>
-                    <button
-                        class="action"
-                        data-type="feed"
-                        data-value="play"
-                        onclick="save('feed','play',this)"
-                        onpointerdown="handleLongPressStart('feed','play',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Play
-                    </button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="row">
-                    <button
-                        class="action"
-                        data-type="sleep"
-                        data-value="sleeping"
-                        onclick="save('sleep','sleeping',this)"
-                        onpointerdown="handleLongPressStart('sleep','sleeping',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Sleeping
-                    </button>
-                    <button
-                        class="action"
-                        data-type="sleep"
-                        data-value="nap"
-                        onclick="save('sleep','nap',this)"
-                        onpointerdown="handleLongPressStart('sleep','nap',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Nap
-                    </button>
-                    <button
-                        class="action"
-                        data-type="sleep"
-                        data-value="awake"
-                        onclick="save('sleep','awake',this)"
-                        onpointerdown="handleLongPressStart('sleep','awake',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Awake
-                    </button>
-                    <button
-                        class="action"
-                        data-type="sleep"
-                        data-value="grizzle"
-                        onclick="save('sleep','grizzle',this)"
-                        onpointerdown="handleLongPressStart('sleep','grizzle',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Grizzle
-                    </button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="row">
-                    <button
-                        class="action"
-                        data-type="nappy"
-                        data-value="wet"
-                        onclick="save('nappy','wet',this)"
-                        onpointerdown="handleLongPressStart('nappy','wet',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Wet
-                    </button>
-                    <button
-                        class="action"
-                        data-type="nappy"
-                        data-value="dirty"
-                        onclick="save('nappy','dirty',this)"
-                        onpointerdown="handleLongPressStart('nappy','dirty',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Dirty
-                    </button>
-                    <button
-                        class="action"
-                        data-type="nappy"
-                        data-value="spew"
-                        onclick="save('nappy','spew',this)"
-                        onpointerdown="handleLongPressStart('nappy','spew',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Spew
-                    </button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="row">
-                    <button
-                        class="action"
-                        data-type="soothe"
-                        data-value="pram"
-                        onclick="save('soothe','pram',this)"
-                        onpointerdown="handleLongPressStart('soothe','pram',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Pram
-                    </button>
-                    <button
-                        class="action"
-                        data-type="soothe"
-                        data-value="rocking"
-                        onclick="save('soothe','rocking',this)"
-                        onpointerdown="handleLongPressStart('soothe','rocking',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Rocking
-                    </button>
-                    <button
-                        class="action"
-                        data-type="soothe"
-                        data-value="wearing"
-                        onclick="save('soothe','wearing',this)"
-                        onpointerdown="handleLongPressStart('soothe','wearing',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Wearing
-                    </button>
-                    <button
-                        class="action"
-                        data-type="soothe"
-                        data-value="feed-to-sleep"
-                        onclick="save('soothe','feed-to-sleep',this)"
-                        onpointerdown="handleLongPressStart('soothe','feed-to-sleep',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Feed to Sleep
-                    </button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="row">
-                    <button
-                        class="action"
-                        data-type="5s"
-                        data-value="swaddle"
-                        onclick="save('5s','swaddle',this)"
-                        onpointerdown="handleLongPressStart('5s','swaddle',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Swaddle
-                    </button>
-                    <button
-                        class="action"
-                        data-type="5s"
-                        data-value="side-lying"
-                        onclick="save('5s','side-lying',this)"
-                        onpointerdown="handleLongPressStart('5s','side-lying',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Side/Stomach
-                    </button>
-                    <button
-                        class="action"
-                        data-type="5s"
-                        data-value="shush"
-                        onclick="save('5s','shush',this)"
-                        onpointerdown="handleLongPressStart('5s','shush',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Shush
-                    </button>
-                    <button
-                        class="action"
-                        data-type="5s"
-                        data-value="swing"
-                        onclick="save('5s','swing',this)"
-                        onpointerdown="handleLongPressStart('5s','swing',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Swing
-                    </button>
-                    <button
-                        class="action"
-                        data-type="5s"
-                        data-value="suck"
-                        onclick="save('5s','suck',this)"
-                        onpointerdown="handleLongPressStart('5s','suck',this,event)"
-                        onpointerup="handleLongPressEnd()"
-                        onpointercancel="handleLongPressEnd()"
-                    >
-                        Suck
-                    </button>
-                </div>
-            </div>
+            <!-- Buttons will be dynamically generated here -->
 
             <div class="card">
                 <input
@@ -1378,7 +1247,6 @@
                         <!-- Will be populated by JS -->
                     </div>
                 </div>
-
             </div>
 
             <script>
@@ -1426,6 +1294,7 @@
                 });
 
                 initDB().then(() => {
+                    renderButtons();
                     updateDailyReport();
                     updateButtonStates();
                 });
@@ -1636,13 +1505,21 @@
             </script>
         </div>
 
-        <div id="time-picker-modal" class="modal-overlay" onclick="if(event.target === this) hideTimePicker()">
+        <div
+            id="time-picker-modal"
+            class="modal-overlay"
+            onclick="if(event.target === this) hideTimePicker()"
+        >
             <div class="modal">
                 <h3>Select Time</h3>
                 <input type="datetime-local" id="custom-time" />
                 <div class="modal-buttons">
-                    <button class="cancel" onclick="hideTimePicker()">Cancel</button>
-                    <button class="confirm" onclick="saveWithCustomTime()">Save</button>
+                    <button class="cancel" onclick="hideTimePicker()">
+                        Cancel
+                    </button>
+                    <button class="confirm" onclick="saveWithCustomTime()">
+                        Save
+                    </button>
                 </div>
             </div>
         </div>
