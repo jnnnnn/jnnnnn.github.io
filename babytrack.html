@@ -685,11 +685,15 @@
                     }
                 }
 
-                // Update sleep button
+                // Update sleep and awake buttons
                 const sleepBtn = document.querySelector(
                     'button[data-type="sleep"][data-value="sleeping"]'
                 );
-                if (sleepBtn) {
+                const awakeBtn = document.querySelector(
+                    'button[data-type="sleep"][data-value="awake"]'
+                );
+                
+                if (sleepBtn && awakeBtn) {
                     if (lastSleepEvent) {
                         const elapsed = Math.floor(
                             (now - new Date(lastSleepEvent.ts)) / 1000 / 60
@@ -699,20 +703,36 @@
                         const timeStr =
                             hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
                         
-                        // Keep button highlighted if currently asleep
                         if (isAsleep) {
+                            // Highlight Sleeping button
                             sleepBtn.style.background = 'var(--primary)';
                             sleepBtn.style.color = '#fff';
                             sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
+                            
+                            // Unhighlight Awake button
+                            awakeBtn.style.background = '';
+                            awakeBtn.style.color = '';
+                            awakeBtn.innerHTML = 'Awake';
                         } else {
+                            // Unhighlight Sleeping button
                             sleepBtn.style.background = '';
                             sleepBtn.style.color = '';
-                            sleepBtn.innerHTML = `Sleeping<br><small style="font-size: 11px; opacity: 0.8;">${timeStr}</small>`;
+                            sleepBtn.innerHTML = 'Sleeping';
+                            
+                            // Highlight Awake button
+                            awakeBtn.style.background = 'var(--primary)';
+                            awakeBtn.style.color = '#fff';
+                            awakeBtn.innerHTML = `Awake<br><small style="font-size: 11px; opacity: 0.9;">${timeStr}</small>`;
                         }
                     } else {
+                        // No sleep events today - default to awake and highlighted
                         sleepBtn.style.background = '';
                         sleepBtn.style.color = '';
                         sleepBtn.innerHTML = 'Sleeping';
+                        
+                        awakeBtn.style.background = 'var(--primary)';
+                        awakeBtn.style.color = '#fff';
+                        awakeBtn.innerHTML = 'Awake';
                     }
                 }
             }
