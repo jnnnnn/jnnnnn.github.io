@@ -435,8 +435,9 @@
 
             // Helper to create day boundary timestamps
             function getDayBounds(date) {
-                const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+                // Create start/end in local timezone, then convert to UTC for storage comparison
+                const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+                const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
                 return { start: start.toISOString(), end: end.toISOString() };
             }
 
@@ -475,14 +476,15 @@
                 const modal = document.getElementById("time-picker-modal");
                 const input = document.getElementById("custom-time");
 
-                // Set default to current time
+                // Set default to current time in local timezone
+                // datetime-local expects format: YYYY-MM-DDTHH:mm
                 const now = new Date();
-                const localDateTime = new Date(
-                    now.getTime() - now.getTimezoneOffset() * 60000
-                )
-                    .toISOString()
-                    .slice(0, 16);
-                input.value = localDateTime;
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                input.value = `${year}-${month}-${day}T${hours}:${minutes}`;
 
                 modal.classList.add("show");
             }
@@ -598,9 +600,24 @@
                 }
 
                 const header = "Timestamp,Type,Value";
-                const rows = entries.map(
-                    (e) => `"${e.ts}","${e.type}","${e.value}"`
-                );
+                const rows = entries.map((e) => {
+                    // Convert UTC timestamp to ISO format with local timezone offset
+                    const date = new Date(e.ts);
+                    const offset = -date.getTimezoneOffset();
+                    const sign = offset >= 0 ? '+' : '-';
+                    const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+                    const mins = String(Math.abs(offset) % 60).padStart(2, '0');
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hour = String(date.getHours()).padStart(2, '0');
+                    const minute = String(date.getMinutes()).padStart(2, '0');
+                    const second = String(date.getSeconds()).padStart(2, '0');
+                    
+                    const localTime = `${year}-${month}-${day}T${hour}:${minute}:${second}${sign}${hours}:${mins}`;
+                    return `"${localTime}","${e.type}","${e.value}"`;
+                });
                 const csv = [header, ...rows].join("\n");
 
                 const blob = new Blob([csv], {
