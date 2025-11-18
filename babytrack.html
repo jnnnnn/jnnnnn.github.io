@@ -757,6 +757,14 @@
                 updateDailyReport();
             }
 
+            function goToToday() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                setReportDate(`${year}-${month}-${day}`);
+            }
+
             // Button Configuration
             const buttonGroups = [
                 {
@@ -1315,9 +1323,7 @@
                         onchange="setReportDate(this.value)"
                     />
                     <button onclick="changeReportDate(1)">Next ▶</button>
-                    <button
-                        onclick="setReportDate(new Date().toISOString().split('T')[0])"
-                    >
+                    <button onclick="goToToday()">
                         Today
                     </button>
                 </div>
