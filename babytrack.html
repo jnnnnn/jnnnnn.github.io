@@ -394,9 +394,12 @@
                 let range;
                 if (date) {
                     const { start, end } = getDayBounds(date);
-                    range = IDBKeyRange.bound(start, end);
+                    // Query 12 hours before and after to catch sleep periods that cross midnight
+                    const expandedStart = new Date(new Date(start).getTime() - 12 * 60 * 60 * 1000).toISOString();
+                    const expandedEnd = new Date(new Date(end).getTime() + 12 * 60 * 60 * 1000).toISOString();
+                    range = IDBKeyRange.bound(expandedStart, expandedEnd);
                 } else {
-                    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+                    const yesterday = new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString();
                     range = IDBKeyRange.lowerBound(yesterday);
                 }
                 
@@ -827,6 +830,11 @@
                     (e) => e.type === "feed" && e.value === "bf"
                 );
 
+                // Get day boundaries for clipping sleep periods
+                const { start, end } = getDayBounds(currentReportDate);
+                const dayStart = new Date(start);
+                const dayEnd = new Date(end);
+
                 let totalSleepMinutes = 0;
                 let currentSleepStart = null;
 
@@ -835,12 +843,44 @@
                         currentSleepStart = new Date(event.ts);
                     } else if (event.value === "awake" && currentSleepStart) {
                         const awakeTime = new Date(event.ts);
-                        const duration =
-                            (awakeTime - currentSleepStart) / 1000 / 60;
-                        totalSleepMinutes += duration;
+                        
+                        // Clip sleep period to the current day's boundaries
+                        const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
+                        const clippedEnd = awakeTime > dayEnd ? dayEnd : awakeTime;
+                        
+                        // Only count if the clipped period is within the day
+                        if (clippedEnd > clippedStart) {
+                            const duration = (clippedEnd - clippedStart) / 1000 / 60;
+                            totalSleepMinutes += duration;
+                        }
                         currentSleepStart = null;
                     }
                 });
+                
+                // Handle ongoing sleep that hasn't ended yet
+                if (currentSleepStart) {
+                    const now = new Date();
+                    const reportDate = currentReportDate;
+                    const isToday = reportDate.toDateString() === now.toDateString();
+                    
+                    if (isToday) {
+                        // Clip to current time if viewing today
+                        const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
+                        const clippedEnd = now > dayEnd ? dayEnd : now;
+                        
+                        if (clippedEnd > clippedStart) {
+                            const duration = (clippedEnd - clippedStart) / 1000 / 60;
+                            totalSleepMinutes += duration;
+                        }
+                    } else {
+                        // For past days, assume sleep continued until end of day
+                        const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
+                        if (dayEnd > clippedStart) {
+                            const duration = (dayEnd - clippedStart) / 1000 / 60;
+                            totalSleepMinutes += duration;
+                        }
+                    }
+                }
 
                 const hours = Math.floor(totalSleepMinutes / 60);
                 const minutes = Math.round(totalSleepMinutes % 60);
@@ -1083,17 +1123,41 @@
                     if (d.value === "sleeping" || d.value === "nap") {
                         sleepStart = d.time;
                     } else if (d.value === "awake" && sleepStart !== null) {
+                        // Clip sleep period to 0-24 hour range
+                        const clippedStart = Math.max(0, sleepStart);
+                        const clippedEnd = Math.min(24, d.time);
+                        
+                        if (clippedEnd > clippedStart) {
+                            svg.append("rect")
+                                .attr("x", x(clippedStart))
+                                .attr("y", y(1.5))
+                                .attr("width", x(clippedEnd) - x(clippedStart))
+                                .attr("height", 40)
+                                .attr("fill", "#2196f3")
+                                .attr("opacity", 0.6)
+                                .attr("rx", 4);
+                        }
+                        sleepStart = null;
+                    }
+                });
+                
+                // Handle sleep that started before midnight (negative time values)
+                if (sleepStart !== null && sleepStart < 0) {
+                    // Draw from 0 to when baby woke up
+                    const firstWake = sleepData.find(e => e.value === "awake" && e.time >= 0);
+                    if (firstWake) {
+                        const clippedEnd = Math.min(24, firstWake.time);
                         svg.append("rect")
-                            .attr("x", x(sleepStart))
+                            .attr("x", x(0))
                             .attr("y", y(1.5))
-                            .attr("width", x(d.time) - x(sleepStart))
+                            .attr("width", x(clippedEnd) - x(0))
                             .attr("height", 40)
                             .attr("fill", "#2196f3")
                             .attr("opacity", 0.6)
                             .attr("rx", 4);
-                        sleepStart = null;
                     }
-                });
+                    sleepStart = null;
+                }
                 
                 // Draw ongoing sleep (if baby is still asleep)
                 if (sleepStart !== null) {
