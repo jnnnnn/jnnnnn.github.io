@@ -1089,6 +1089,30 @@
                         sleepStart = null;
                     }
                 });
+                
+                // Draw ongoing sleep (if baby is still asleep)
+                if (sleepStart !== null) {
+                    // Get current time in hours for the selected date
+                    const now = new Date();
+                    const reportDate = currentReportDate;
+                    const isToday = reportDate.toDateString() === now.toDateString();
+                    
+                    // Only show ongoing sleep if viewing today
+                    if (isToday) {
+                        const currentHour = now.getHours() + now.getMinutes() / 60;
+                        svg.append("rect")
+                            .attr("x", x(sleepStart))
+                            .attr("y", y(1.5))
+                            .attr("width", x(currentHour) - x(sleepStart))
+                            .attr("height", 40)
+                            .attr("fill", "#2196f3")
+                            .attr("opacity", 0.4)
+                            .attr("rx", 4)
+                            .attr("stroke", "#2196f3")
+                            .attr("stroke-width", 2)
+                            .attr("stroke-dasharray", "5,5");
+                    }
+                }
 
                 // Draw feed events as circles
                 feedData.forEach((d) => {
