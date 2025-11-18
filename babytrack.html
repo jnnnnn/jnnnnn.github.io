@@ -588,10 +588,10 @@
                     totalSleep: `${hours}h ${minutes}m`,
                     feedCount: feedEvents.length,
                     wetCount: entries.filter(
-                        (e) => e.type === "wet" && e.value === "yes"
+                        (e) => e.type === "nappy" && e.value === "wet"
                     ).length,
                     dirtyCount: entries.filter(
-                        (e) => e.type === "dirty" && e.value === "yes"
+                        (e) => e.type === "nappy" && e.value === "dirty"
                     ).length,
                 };
             }
@@ -631,7 +631,11 @@
                                         (e.value === "sleeping" ||
                                             e.value === "nap")
                                     );
-                                return e.type === type && e.value === "yes";
+                                if (type === "wet" || type === "dirty")
+                                    return (
+                                        e.type === "nappy" && e.value === type
+                                    );
+                                return e.type === type;
                             });
                             el.style.opacity = hasEvent ? "1" : "0.2";
                         }
@@ -1036,11 +1040,11 @@
                         <div class="value" id="stat-feeds">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="label">Wet Diapers</div>
+                        <div class="label">Wet Nappies</div>
                         <div class="value" id="stat-wet">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="label">Dirty Diapers</div>
+                        <div class="label">Dirty Nappies</div>
                         <div class="value" id="stat-dirty">0</div>
                     </div>
                 </div>
@@ -1232,37 +1236,31 @@
                             }
                         }
 
-                        // Generate diaper changes (roughly 6-10 per day)
-                        const diaperCount = 6 + Math.floor(Math.random() * 5);
+                        // Generate Nappy changes (roughly 6-10 per day)
+                        const NappyCount = 6 + Math.floor(Math.random() * 5);
 
-                        for (let diaper = 0; diaper < diaperCount; diaper++) {
-                            const diaperHour = Math.floor(
-                                (24 / diaperCount) * diaper + Math.random() * 2
+                        for (let Nappy = 0; Nappy < NappyCount; Nappy++) {
+                            const NappyHour = Math.floor(
+                                (24 / NappyCount) * Nappy + Math.random() * 2
                             );
-                            const diaperMinute = Math.floor(Math.random() * 60);
+                            const NappyMinute = Math.floor(Math.random() * 60);
 
-                            const diaperTime = new Date(baseDate);
-                            diaperTime.setHours(diaperHour, diaperMinute);
+                            const NappyTime = new Date(baseDate);
+                            NappyTime.setHours(NappyHour, NappyMinute);
 
-                            // Most diapers are wet
+                            // Most Nappies are wet
                             await addEntry(
+                                "nappy",
                                 "wet",
-                                "yes",
-                                diaperTime.toISOString()
+                                NappyTime.toISOString()
                             );
 
                             // About half are also dirty
                             if (Math.random() > 0.5) {
                                 await addEntry(
+                                    "nappy",
                                     "dirty",
-                                    "yes",
-                                    diaperTime.toISOString()
-                                );
-                            } else {
-                                await addEntry(
-                                    "dirty",
-                                    "no",
-                                    diaperTime.toISOString()
+                                    NappyTime.toISOString()
                                 );
                             }
                         }
