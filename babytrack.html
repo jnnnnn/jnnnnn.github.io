@@ -381,6 +381,37 @@
                     }, 400);
                 }
 
+                // Special handling for sleep awake events
+                if (type === "sleep" && value === "awake") {
+                    // Find the last sleep start event
+                    const allEntries = await loadEntriesByDate();
+                    const lastSleepStart = [...allEntries]
+                        .reverse()
+                        .find((e) => e.type === "sleep" && 
+                              (e.value === "sleeping" || e.value === "nap"));
+                    
+                    if (lastSleepStart) {
+                        const sleepDuration = (new Date(ts) - new Date(lastSleepStart.ts)) / 1000 / 60;
+                        
+                        // If sleep was less than 5 minutes, delete the sleep start instead of adding awake
+                        if (sleepDuration < 5) {
+                            // Delete the sleep start entry
+                            const transaction = db.transaction(["entries"], "readwrite");
+                            const objectStore = transaction.objectStore("entries");
+                            await new Promise((resolve, reject) => {
+                                const deleteRequest = objectStore.delete(lastSleepStart.id);
+                                deleteRequest.onsuccess = resolve;
+                                deleteRequest.onerror = () => reject(deleteRequest.error);
+                            });
+                            
+                            updateTimestamp("Short sleep removed");
+                            updateDailyReport();
+                            updateButtonStates();
+                            return;
+                        }
+                    }
+                }
+
                 // Persist this single entry
                 await addEntry(type, value, ts);
 
