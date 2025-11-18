@@ -259,6 +259,61 @@
                 color: #999;
                 font-size: 12px;
             }
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-overlay.show {
+                display: flex;
+            }
+            .modal {
+                background: var(--card);
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                max-width: 90%;
+                width: 300px;
+            }
+            .modal h3 {
+                margin: 0 0 16px 0;
+                font-size: 16px;
+            }
+            .modal input[type="datetime-local"] {
+                width: 100%;
+                padding: 10px;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+                font-size: 15px;
+                box-sizing: border-box;
+                margin-bottom: 16px;
+            }
+            .modal-buttons {
+                display: flex;
+                gap: 8px;
+            }
+            .modal-buttons button {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                border: 0;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .modal-buttons .cancel {
+                background: var(--muted);
+            }
+            .modal-buttons .confirm {
+                background: var(--primary);
+                color: #fff;
+            }
         </style>
         <script>
             let db = null;
@@ -368,6 +423,102 @@
 
             function nowIso() {
                 return new Date().toISOString();
+            }
+
+            // Long-press detection
+            let longPressTimer = null;
+            let longPressData = null;
+
+            function handleLongPressStart(type, value, btn, event) {
+                event.preventDefault();
+                longPressTimer = setTimeout(() => {
+                    // Show time picker modal
+                    longPressData = { type, value, btn };
+                    showTimePicker();
+                }, 500); // 500ms for long press
+            }
+
+            function handleLongPressEnd() {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            }
+
+            function showTimePicker() {
+                const modal = document.getElementById('time-picker-modal');
+                const input = document.getElementById('custom-time');
+                
+                // Set default to current time
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                    .toISOString()
+                    .slice(0, 16);
+                input.value = localDateTime;
+                
+                modal.classList.add('show');
+            }
+
+            function hideTimePicker() {
+                const modal = document.getElementById('time-picker-modal');
+                modal.classList.remove('show');
+                longPressData = null;
+            }
+
+            async function saveWithCustomTime() {
+                const input = document.getElementById('custom-time');
+                const customTime = new Date(input.value);
+                
+                if (!customTime || isNaN(customTime.getTime())) {
+                    alert('Please select a valid time');
+                    return;
+                }
+                
+                const ts = customTime.toISOString();
+                const { type, value, btn } = longPressData;
+                
+                // Add animation
+                if (btn) {
+                    btn.classList.add('fading');
+                    setTimeout(() => {
+                        btn.classList.remove('fading');
+                    }, 400);
+                }
+
+                // Special handling for sleep awake events
+                if (type === "sleep" && value === "awake") {
+                    const allEntries = await loadEntriesByDate();
+                    const lastSleepStart = [...allEntries]
+                        .reverse()
+                        .find((e) => e.type === "sleep" && 
+                              (e.value === "sleeping" || e.value === "nap"));
+                    
+                    if (lastSleepStart) {
+                        const sleepDuration = (customTime - new Date(lastSleepStart.ts)) / 1000 / 60;
+                        
+                        if (sleepDuration < 5) {
+                            const transaction = db.transaction(["entries"], "readwrite");
+                            const objectStore = transaction.objectStore("entries");
+                            await new Promise((resolve, reject) => {
+                                const deleteRequest = objectStore.delete(lastSleepStart.id);
+                                deleteRequest.onsuccess = resolve;
+                                deleteRequest.onerror = () => reject(deleteRequest.error);
+                            });
+                            
+                            updateTimestamp("Short sleep removed");
+                            updateDailyReport();
+                            updateButtonStates();
+                            hideTimePicker();
+                            return;
+                        }
+                    }
+                }
+
+                await addEntry(type, value, ts);
+                updateTimestamp("Saved: " + customTime.toLocaleTimeString());
+                updateDailyReport();
+                updateButtonStates();
+                hideTimePicker();
             }
 
             async function save(type, value, btn) {
@@ -915,6 +1066,9 @@
                         data-type="feed"
                         data-value="bf"
                         onclick="save('feed','bf',this)"
+                        onpointerdown="handleLongPressStart('feed','bf',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Feed
                     </button>
@@ -923,6 +1077,9 @@
                         data-type="feed"
                         data-value="play"
                         onclick="save('feed','play',this)"
+                        onpointerdown="handleLongPressStart('feed','play',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Play
                     </button>
@@ -936,6 +1093,9 @@
                         data-type="sleep"
                         data-value="sleeping"
                         onclick="save('sleep','sleeping',this)"
+                        onpointerdown="handleLongPressStart('sleep','sleeping',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Sleeping
                     </button>
@@ -944,6 +1104,9 @@
                         data-type="sleep"
                         data-value="nap"
                         onclick="save('sleep','nap',this)"
+                        onpointerdown="handleLongPressStart('sleep','nap',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Nap
                     </button>
@@ -952,6 +1115,9 @@
                         data-type="sleep"
                         data-value="awake"
                         onclick="save('sleep','awake',this)"
+                        onpointerdown="handleLongPressStart('sleep','awake',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Awake
                     </button>
@@ -960,6 +1126,9 @@
                         data-type="sleep"
                         data-value="grizzle"
                         onclick="save('sleep','grizzle',this)"
+                        onpointerdown="handleLongPressStart('sleep','grizzle',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Grizzle
                     </button>
@@ -973,6 +1142,9 @@
                         data-type="nappy"
                         data-value="wet"
                         onclick="save('nappy','wet',this)"
+                        onpointerdown="handleLongPressStart('nappy','wet',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Wet
                     </button>
@@ -981,6 +1153,9 @@
                         data-type="nappy"
                         data-value="dirty"
                         onclick="save('nappy','dirty',this)"
+                        onpointerdown="handleLongPressStart('nappy','dirty',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Dirty
                     </button>
@@ -989,6 +1164,9 @@
                         data-type="nappy"
                         data-value="spew"
                         onclick="save('nappy','spew',this)"
+                        onpointerdown="handleLongPressStart('nappy','spew',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Spew
                     </button>
@@ -1002,6 +1180,9 @@
                         data-type="soothe"
                         data-value="pram"
                         onclick="save('soothe','pram',this)"
+                        onpointerdown="handleLongPressStart('soothe','pram',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Pram
                     </button>
@@ -1010,6 +1191,9 @@
                         data-type="soothe"
                         data-value="rocking"
                         onclick="save('soothe','rocking',this)"
+                        onpointerdown="handleLongPressStart('soothe','rocking',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Rocking
                     </button>
@@ -1018,6 +1202,9 @@
                         data-type="soothe"
                         data-value="wearing"
                         onclick="save('soothe','wearing',this)"
+                        onpointerdown="handleLongPressStart('soothe','wearing',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Wearing
                     </button>
@@ -1026,6 +1213,9 @@
                         data-type="soothe"
                         data-value="feed-to-sleep"
                         onclick="save('soothe','feed-to-sleep',this)"
+                        onpointerdown="handleLongPressStart('soothe','feed-to-sleep',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Feed to Sleep
                     </button>
@@ -1039,6 +1229,9 @@
                         data-type="5s"
                         data-value="swaddle"
                         onclick="save('5s','swaddle',this)"
+                        onpointerdown="handleLongPressStart('5s','swaddle',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Swaddle
                     </button>
@@ -1047,6 +1240,9 @@
                         data-type="5s"
                         data-value="side-lying"
                         onclick="save('5s','side-lying',this)"
+                        onpointerdown="handleLongPressStart('5s','side-lying',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Side/Stomach
                     </button>
@@ -1055,6 +1251,9 @@
                         data-type="5s"
                         data-value="shush"
                         onclick="save('5s','shush',this)"
+                        onpointerdown="handleLongPressStart('5s','shush',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Shush
                     </button>
@@ -1063,6 +1262,9 @@
                         data-type="5s"
                         data-value="swing"
                         onclick="save('5s','swing',this)"
+                        onpointerdown="handleLongPressStart('5s','swing',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Swing
                     </button>
@@ -1071,6 +1273,9 @@
                         data-type="5s"
                         data-value="suck"
                         onclick="save('5s','suck',this)"
+                        onpointerdown="handleLongPressStart('5s','suck',this,event)"
+                        onpointerup="handleLongPressEnd()"
+                        onpointercancel="handleLongPressEnd()"
                     >
                         Suck
                     </button>
@@ -1409,6 +1614,17 @@
                     await updateDailyReport();
                 }
             </script>
+        </div>
+
+        <div id="time-picker-modal" class="modal-overlay" onclick="if(event.target === this) hideTimePicker()">
+            <div class="modal">
+                <h3>Select Time</h3>
+                <input type="datetime-local" id="custom-time" />
+                <div class="modal-buttons">
+                    <button class="cancel" onclick="hideTimePicker()">Cancel</button>
+                    <button class="confirm" onclick="saveWithCustomTime()">Save</button>
+                </div>
+            </div>
         </div>
     </body>
 </html>
