@@ -443,6 +443,24 @@
                 const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
                 return { start: start.toISOString(), end: end.toISOString() };
             }
+            
+            // Helper to get day bounds as Date objects (not ISO strings)
+            function getDayBoundsAsDate(date) {
+                const { start, end } = getDayBounds(date);
+                return { dayStart: new Date(start), dayEnd: new Date(end) };
+            }
+            
+            // Helper to check if an entry is within day boundaries
+            function isEntryInDay(entry, dayStart, dayEnd) {
+                const ts = new Date(entry.ts);
+                return ts >= dayStart && ts <= dayEnd;
+            }
+            
+            // Helper to filter entries to only those within the day
+            function filterEntriesInDay(entries, date) {
+                const { dayStart, dayEnd } = getDayBoundsAsDate(date);
+                return entries.filter(e => isEntryInDay(e, dayStart, dayEnd));
+            }
 
             // Helper to update button display with time and highlight
             function updateButtonDisplay(btn, label, timeStr = null, highlight = false) {
@@ -813,27 +831,42 @@
             // Render buttons on load (moved to DOM ready below)
 
             async function updateDailyReport() {
-                const entries = await loadEntriesByDate(currentReportDate);
+                const allEntries = await loadEntriesByDate(currentReportDate);
+                
+                // Filter to only entries within the current day for display purposes
+                const entriesInDay = filterEntriesInDay(allEntries, currentReportDate);
 
-                // Calculate statistics
-                const stats = calculateDailyStats(entries);
+                // Calculate statistics (uses allEntries for cross-midnight sleep)
+                const stats = calculateDailyStats(allEntries);
                 updateStatsDisplay(stats);
-                updateHourlyGrid(entries);
-                updateSleepAttempts(entries);
-                updateRecentEvents(entries);
-                drawTimeline(entries);
+                
+                // Display functions use filtered entries only
+                updateHourlyGrid(entriesInDay);
+                updateSleepAttempts(entriesInDay);
+                updateRecentEvents(entriesInDay);
+                
+                // Timeline needs allEntries to show cross-midnight sleep properly
+                drawTimeline(allEntries);
             }
 
             function calculateDailyStats(entries) {
                 const sleepEvents = entries.filter((e) => e.type === "sleep");
-                const feedEvents = entries.filter(
-                    (e) => e.type === "feed" && e.value === "bf"
-                );
-
+                
                 // Get day boundaries for clipping sleep periods
-                const { start, end } = getDayBounds(currentReportDate);
-                const dayStart = new Date(start);
-                const dayEnd = new Date(end);
+                const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
+                
+                // Only count feeds and nappies that occurred within the day
+                const feedEvents = entries.filter((e) => {
+                    return e.type === "feed" && e.value === "bf" && isEntryInDay(e, dayStart, dayEnd);
+                });
+                
+                const wetCount = entries.filter((e) => {
+                    return e.type === "nappy" && e.value === "wet" && isEntryInDay(e, dayStart, dayEnd);
+                }).length;
+                
+                const dirtyCount = entries.filter((e) => {
+                    return e.type === "nappy" && e.value === "dirty" && isEntryInDay(e, dayStart, dayEnd);
+                }).length;
 
                 let totalSleepMinutes = 0;
                 let currentSleepStart = null;
@@ -888,12 +921,8 @@
                 return {
                     totalSleep: `${hours}h ${minutes}m`,
                     feedCount: feedEvents.length,
-                    wetCount: entries.filter(
-                        (e) => e.type === "nappy" && e.value === "wet"
-                    ).length,
-                    dirtyCount: entries.filter(
-                        (e) => e.type === "nappy" && e.value === "dirty"
-                    ).length,
+                    wetCount: wetCount,
+                    dirtyCount: dirtyCount,
                 };
             }
 
@@ -1058,7 +1087,19 @@
                     .attr("width", width)
                     .attr("height", height);
 
-                if (entries.length === 0) {
+                // Get day boundaries
+                const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
+                
+                // Filter to entries we care about for display
+                const dayStart12HoursBefore = new Date(dayStart.getTime() - 12 * 60 * 60 * 1000);
+                const dayEnd12HoursAfter = new Date(dayEnd.getTime() + 12 * 60 * 60 * 1000);
+                
+                const relevantEntries = entries.filter(e => {
+                    const ts = new Date(e.ts);
+                    return ts >= dayStart12HoursBefore && ts <= dayEnd12HoursAfter;
+                });
+
+                if (relevantEntries.length === 0) {
                     svg.append("text")
                         .attr("x", width / 2)
                         .attr("y", height / 2)
@@ -1068,18 +1109,22 @@
                     return;
                 }
 
-                // Prepare data for timeline
+                // Prepare data for timeline - convert timestamps to hours relative to day start
                 const sleepData = [];
                 const feedData = [];
 
-                entries.forEach((e) => {
+                relevantEntries.forEach((e) => {
                     const date = new Date(e.ts);
-                    const hours = date.getHours() + date.getMinutes() / 60;
+                    // Calculate hours relative to the start of the viewing day
+                    const hours = (date - dayStart) / (1000 * 60 * 60);
 
                     if (e.type === "sleep") {
                         sleepData.push({ time: hours, value: e.value });
                     } else if (e.type === "feed" && e.value === "bf") {
-                        feedData.push({ time: hours });
+                        // Only show feeds that are within the 0-24 range
+                        if (hours >= 0 && hours < 24) {
+                            feedData.push({ time: hours });
+                        }
                     }
                 });
 
