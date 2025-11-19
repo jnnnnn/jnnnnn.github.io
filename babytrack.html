@@ -259,6 +259,15 @@
                 color: #999;
                 font-size: 12px;
             }
+            .event-action-btn {
+                margin-left: 8px;
+                padding: 2px 8px;
+                font-size: 11px;
+                border-radius: 4px;
+                border: 0;
+                color: white;
+                cursor: pointer;
+            }
             .modal-overlay {
                 display: none;
                 position: fixed;
@@ -1281,18 +1290,41 @@
                         minute: "2-digit",
                     });
                     
-                    const deleteBtn = e.deleted ? 
-                        `<button onclick="undeleteEntry(${e.key}).then(() => { updateDailyReport(); updateButtonStates(); })" style="margin-left: 8px; padding: 2px 8px; font-size: 11px; border-radius: 4px; border: 0; background: #4caf50; color: white; cursor: pointer;">↶</button>` :
-                        `<button onclick="markEntryAsDeleted(${e.key}).then(() => { updateDailyReport(); updateButtonStates(); })" style="margin-left: 8px; padding: 2px 8px; font-size: 11px; border-radius: 4px; border: 0; background: #ff6666; color: white; cursor: pointer;">🗑</button>`;
+                    // Create buttons
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.style.cssText = "margin-left: 8px; padding: 2px 8px; font-size: 11px; border-radius: 4px; border: 0; color: white; cursor: pointer;";
+                    
+                    if (e.deleted) {
+                        deleteBtn.textContent = "↶";
+                        deleteBtn.style.background = "#4caf50";
+                        deleteBtn.onclick = () => undeleteEntry(e.key).then(() => { updateDailyReport(); updateButtonStates(); });
+                    } else {
+                        deleteBtn.textContent = "🗑";
+                        deleteBtn.style.background = "#ff6666";
+                        deleteBtn.onclick = () => markEntryAsDeleted(e.key).then(() => { updateDailyReport(); updateButtonStates(); });
+                    }
 
-                    div.innerHTML = `
-                        <div>
-                            <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
-                        </div>
-                        <span class="event-time" style="display: flex; align-items: center;">
-                            <span onclick="editEntryTime(${e.key}, '${e.ts}')" style="cursor: pointer; text-decoration: underline;">${timeStr}</span>${deleteBtn}
-                        </span>
+                    // Create time span
+                    const timeSpan = document.createElement("span");
+                    timeSpan.textContent = timeStr;
+                    timeSpan.style.cssText = "cursor: pointer; text-decoration: underline;";
+                    timeSpan.onclick = () => editEntryTime(e.key, e.ts);
+
+                    // Create event time container
+                    const eventTimeContainer = document.createElement("span");
+                    eventTimeContainer.className = "event-time";
+                    eventTimeContainer.style.cssText = "display: flex; align-items: center;";
+                    eventTimeContainer.appendChild(timeSpan);
+                    eventTimeContainer.appendChild(deleteBtn);
+
+                    // Create event content
+                    const eventContent = document.createElement("div");
+                    eventContent.innerHTML = `
+                        <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
                     `;
+
+                    div.appendChild(eventContent);
+                    div.appendChild(eventTimeContainer);
                     container.appendChild(div);
                 });
             }
