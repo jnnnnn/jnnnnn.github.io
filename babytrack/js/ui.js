@@ -1,4 +1,4 @@
-import { nowIso, formatElapsedTime } from './database.js';
+import { formatElapsedTime } from './time.js';
 
 // Button Configuration
 const buttonGroups = [

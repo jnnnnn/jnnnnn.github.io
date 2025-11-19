@@ -1,5 +1,15 @@
-import { getDayBoundsAsDate, isEntryInDay, filterEntriesInDay, markEntryAsDeleted, undeleteEntry } from './database.js';
+import { markEntryAsDeleted, undeleteEntry } from './database.js';
 import { editEntryTime } from './ui.js';
+import { 
+    getDayBoundsAsDate, 
+    isEntryInDay, 
+    filterEntriesInDay, 
+    processSleepEventsForDay, 
+    mergeConsecutiveSleepEvents, 
+    calculateSleepDuration, 
+    convertSleepEventsToTimelineData, 
+    processSleepAttempts 
+} from './time.js';
 
 // Daily Report Functions
 let currentReportDate = new Date();
@@ -42,57 +52,9 @@ export function calculateDailyStats(entries) {
     // Get day boundaries for clipping sleep periods
     const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
     
-    // Get sleep events and add mock events at day boundaries
-    let sleepEvents = activeEntries.filter((e) => e.type === "sleep");
-    
-    // Determine initial state (awake by default if no prior sleep event)
-    const preDaySleepEvents = sleepEvents.filter(e => new Date(e.ts) < dayStart);
-    const lastPreDayEvent = preDaySleepEvents.length > 0 ? 
-        preDaySleepEvents[preDaySleepEvents.length - 1] : null;
-    const startAsleep = lastPreDayEvent && 
-        (lastPreDayEvent.value === "sleeping" || lastPreDayEvent.value === "nap");
-    
-    // Add mock event at day start
-    if (startAsleep) {
-        sleepEvents = [
-            { type: "sleep", value: "sleeping", ts: dayStart.toISOString(), mock: true },
-            ...sleepEvents
-        ];
-    } else {
-        sleepEvents = [
-            { type: "sleep", value: "awake", ts: dayStart.toISOString(), mock: true },
-            ...sleepEvents
-        ];
-    }
-    
-    // Add mock event at day end based on current state
-    const inDaySleepEvents = sleepEvents.filter(e => {
-        const ts = new Date(e.ts);
-        return ts >= dayStart && ts <= dayEnd;
-    });
-    if (inDaySleepEvents.length > 0) {
-        const lastInDayEvent = inDaySleepEvents[inDaySleepEvents.length - 1];
-        const endAsleep = lastInDayEvent.value === "sleeping" || lastInDayEvent.value === "nap";
-        if (endAsleep) {
-            sleepEvents.push({ type: "sleep", value: "awake", ts: dayEnd.toISOString(), mock: true });
-        }
-    }
-    
-    // Merge consecutive sleep windows (sleep followed by sleep)
-    const mergedSleepEvents = [];
-    for (let i = 0; i < sleepEvents.length; i++) {
-        const event = sleepEvents[i];
-        if (event.value === "sleeping" || event.value === "nap") {
-            // Check if next event is also a sleep start
-            const nextEvent = sleepEvents[i + 1];
-            if (nextEvent && (nextEvent.value === "sleeping" || nextEvent.value === "nap")) {
-                // Skip this sleep end / next sleep start pair
-                continue;
-            }
-        }
-        mergedSleepEvents.push(event);
-    }
-    sleepEvents = mergedSleepEvents;
+    // Process sleep events using the time module
+    let sleepEvents = processSleepEventsForDay(entries, dayStart, dayEnd);
+    sleepEvents = mergeConsecutiveSleepEvents(sleepEvents);
     
     // Only count feeds and nappies that occurred within the day
     const feedEvents = activeEntries.filter((e) => {
@@ -107,55 +69,8 @@ export function calculateDailyStats(entries) {
         return e.type === "nappy" && e.value === "dirty" && isEntryInDay(e, dayStart, dayEnd);
     }).length;
 
-    let totalSleepMinutes = 0;
-    let currentSleepStart = null;
-
-    sleepEvents.forEach((event, i) => {
-        if (event.value === "sleeping" || event.value === "nap") {
-            currentSleepStart = new Date(event.ts);
-        } else if (event.value === "awake" && currentSleepStart) {
-            const awakeTime = new Date(event.ts);
-            
-            // Clip sleep period to the current day's boundaries
-            const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
-            const clippedEnd = awakeTime > dayEnd ? dayEnd : awakeTime;
-            
-            // Only count if the clipped period is within the day
-            if (clippedEnd > clippedStart) {
-                const duration = (clippedEnd - clippedStart) / 1000 / 60;
-                totalSleepMinutes += duration;
-            }
-            currentSleepStart = null;
-        }
-    });
-    
-    // Handle ongoing sleep that hasn't ended yet
-    if (currentSleepStart) {
-        const now = new Date();
-        const reportDate = currentReportDate;
-        const isToday = reportDate.toDateString() === now.toDateString();
-        
-        if (isToday) {
-            // Clip to current time if viewing today
-            const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
-            const clippedEnd = now > dayEnd ? dayEnd : now;
-            
-            if (clippedEnd > clippedStart) {
-                const duration = (clippedEnd - clippedStart) / 1000 / 60;
-                totalSleepMinutes += duration;
-            }
-        } else {
-            // For past days, assume sleep continued until end of day
-            const clippedStart = currentSleepStart < dayStart ? dayStart : currentSleepStart;
-            if (dayEnd > clippedStart) {
-                const duration = (dayEnd - clippedStart) / 1000 / 60;
-                totalSleepMinutes += duration;
-            }
-        }
-    }
-
-    const hours = Math.floor(totalSleepMinutes / 60);
-    const minutes = Math.round(totalSleepMinutes % 60);
+    // Calculate sleep duration using the time module
+    const { hours, minutes } = calculateSleepDuration(sleepEvents, dayStart, dayEnd, currentReportDate);
 
     return {
         totalSleep: `${hours}h ${minutes}m`,
@@ -200,35 +115,7 @@ export function updateHourlyGrid(entries) {
 }
 
 export function updateSleepAttempts(entries) {
-    const activeEntries = entries.filter(e => !e.deleted);
-    const sleepEvents = activeEntries.filter((e) => e.type === "sleep");
-
-    const attempts = [];
-    let currentAttempt = null;
-
-    sleepEvents.forEach((event, i) => {
-        if (event.value === "sleeping" || event.value === "nap") {
-            if (currentAttempt) {
-                attempts.push(currentAttempt);
-            }
-            currentAttempt = {
-                start: new Date(event.ts),
-                type: event.value,
-                soothe: [],
-            };
-        } else if (event.value === "awake" && currentAttempt) {
-            currentAttempt.end = new Date(event.ts);
-            const duration = (currentAttempt.end - currentAttempt.start) / 1000 / 60;
-            currentAttempt.success = duration > 15; // More than 15 minutes = success
-            attempts.push(currentAttempt);
-            currentAttempt = null;
-        }
-    });
-
-    if (currentAttempt) {
-        currentAttempt.success = true; // Still sleeping
-        attempts.push(currentAttempt);
-    }
+    const attempts = processSleepAttempts(entries);
 
     const container = document.getElementById("sleep-attempts-list");
     container.innerHTML = "";
@@ -348,10 +235,10 @@ export function drawTimeline(entries) {
     // Filter out deleted entries
     const activeEntries = entries.filter(e => !e.deleted);
     
-    // Get sleep events and add mock events at day boundaries
-    let sleepEvents = activeEntries.filter(e => e.type === "sleep");
+    // Get sleep events and process them
+    let sleepEvents = processSleepEventsForDay(entries, dayStart, dayEnd);
     
-    if (sleepEvents.length === 0) {
+    if (sleepEvents.filter(e => !e.mock).length === 0) {
         svg.append("text")
             .attr("x", width / 2)
             .attr("y", height / 2)
@@ -361,63 +248,9 @@ export function drawTimeline(entries) {
         return;
     }
     
-    // Determine initial state
-    const preDaySleepEvents = sleepEvents.filter(e => new Date(e.ts) < dayStart);
-    const lastPreDayEvent = preDaySleepEvents.length > 0 ? 
-        preDaySleepEvents[preDaySleepEvents.length - 1] : null;
-    const startAsleep = lastPreDayEvent && 
-        (lastPreDayEvent.value === "sleeping" || lastPreDayEvent.value === "nap");
-    
-    // Add mock event at day start
-    if (startAsleep) {
-        sleepEvents = [
-            { type: "sleep", value: "sleeping", ts: dayStart.toISOString(), mock: true },
-            ...sleepEvents
-        ];
-    } else {
-        sleepEvents = [
-            { type: "sleep", value: "awake", ts: dayStart.toISOString(), mock: true },
-            ...sleepEvents
-        ];
-    }
-    
-    // Add mock event at day end
-    const inDaySleepEvents = sleepEvents.filter(e => {
-        const ts = new Date(e.ts);
-        return ts >= dayStart && ts <= dayEnd;
-    });
-    if (inDaySleepEvents.length > 0) {
-        const lastInDayEvent = inDaySleepEvents[inDaySleepEvents.length - 1];
-        const endAsleep = lastInDayEvent.value === "sleeping" || lastInDayEvent.value === "nap";
-        if (endAsleep) {
-            sleepEvents.push({ type: "sleep", value: "awake", ts: dayEnd.toISOString(), mock: true });
-        }
-    }
-    
-    // Merge consecutive sleep windows
-    const mergedSleepEvents = [];
-    for (let i = 0; i < sleepEvents.length; i++) {
-        const event = sleepEvents[i];
-        if (event.value === "sleeping" || event.value === "nap") {
-            const nextEvent = sleepEvents[i + 1];
-            if (nextEvent && (nextEvent.value === "sleeping" || nextEvent.value === "nap")) {
-                continue;
-            }
-        }
-        mergedSleepEvents.push(event);
-    }
-    sleepEvents = mergedSleepEvents;
-    
-    // Convert to line graph data (awake=0, asleep=1)
-    const lineData = [];
-    sleepEvents.forEach((e) => {
-        const date = new Date(e.ts);
-        const hours = (date - dayStart) / (1000 * 60 * 60);
-        const value = (e.value === "sleeping" || e.value === "nap") ? 1 : 0;
-        if (hours >= 0 && hours <= 24) {
-            lineData.push({ time: hours, value: value });
-        }
-    });
+    // Merge consecutive sleep events and convert to timeline data
+    sleepEvents = mergeConsecutiveSleepEvents(sleepEvents);
+    const lineData = convertSleepEventsToTimelineData(sleepEvents, dayStart);
     
     // Get feed data for overlay
     const feedData = [];

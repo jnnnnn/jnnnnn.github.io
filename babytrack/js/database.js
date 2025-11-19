@@ -221,34 +221,3 @@ function getDayBounds(date) {
     // the local day boundaries
     return { start: start.toISOString(), end: end.toISOString() };
 }
-
-// Helper to get day bounds as Date objects (not ISO strings)
-export function getDayBoundsAsDate(date) {
-    const { start, end } = getDayBounds(date);
-    return { dayStart: new Date(start), dayEnd: new Date(end) };
-}
-
-// Helper to check if an entry is within day boundaries
-export function isEntryInDay(entry, dayStart, dayEnd) {
-    const ts = new Date(entry.ts);
-    return ts >= dayStart && ts <= dayEnd;
-}
-
-// Helper to filter entries to only those within the day
-export function filterEntriesInDay(entries, date) {
-    const { dayStart, dayEnd } = getDayBoundsAsDate(date);
-    return entries.filter(e => isEntryInDay(e, dayStart, dayEnd));
-}
-
-// Utility functions
-export function nowIso() {
-    return new Date().toISOString();
-}
-
-// Helper to format elapsed time
-export function formatElapsedTime(timestampMs) {
-    const elapsed = Math.floor((Date.now() - timestampMs) / 1000 / 60);
-    const hours = Math.floor(elapsed / 60);
-    const mins = elapsed % 60;
-    return hours > 0 ? `${hours}h ${mins}m ago` : `${mins}m ago`;
-}

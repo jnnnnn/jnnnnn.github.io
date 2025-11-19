@@ -1,5 +1,5 @@
 // Main app entry point and coordination
-import { initDB, addEntry, loadEntriesByDate, loadTodayEntries, markMostRecentAsDeleted, undeleteEntry, updateEntryTimestamp, nowIso, filterEntriesInDay } from './database.js';
+import { initDB, addEntry, loadEntriesByDate, loadTodayEntries, markMostRecentAsDeleted, undeleteEntry, updateEntryTimestamp } from './database.js';
 import { renderButtons, updateButtonStates, updateTimestamp, getLongPressData, hideTimePicker } from './ui.js';
 import { 
     setReportDate, 
@@ -13,6 +13,7 @@ import {
     updateRecentEvents, 
     drawTimeline 
 } from './reports.js';
+import { nowIso, filterEntriesInDay } from './time.js';
 import { downloadCSV } from './export.js';
 import { generateTestData } from './testdata.js';
 
