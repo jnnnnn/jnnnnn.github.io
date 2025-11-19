@@ -334,7 +334,7 @@
                         if (!db.objectStoreNames.contains("entries")) {
                             const objectStore = db.createObjectStore(
                                 "entries",
-                                { keyPath: "id", autoIncrement: true }
+                                { autoIncrement: true }
                             );
                             objectStore.createIndex("timestamp", "ts", {
                                 unique: false,
@@ -345,12 +345,12 @@
             }
 
             // Add a single entry to the database
-            async function addEntry(type, value, ts) {
+            async function addEntry(type, value, ts, deleted = false) {
                 if (!db) await initDB();
 
                 const transaction = db.transaction(["entries"], "readwrite");
                 const objectStore = transaction.objectStore("entries");
-                const entry = { type, value, ts };
+                const entry = { type, value, ts, deleted };
                 objectStore.add(entry);
 
                 return new Promise((resolve, reject) => {
@@ -359,8 +359,8 @@
                 });
             }
 
-            // Delete the most recent entry from the database
-            async function deleteMostRecentEntry() {
+            // Mark the most recent non-deleted entry as deleted
+            async function markMostRecentAsDeleted() {
                 if (!db) await initDB();
 
                 const transaction = db.transaction(["entries"], "readwrite");
@@ -374,9 +374,122 @@
                     request.onsuccess = (event) => {
                         const cursor = event.target.result;
                         if (cursor) {
-                            const deletedEntry = cursor.value;
-                            cursor.delete();
-                            resolve(deletedEntry);
+                            const entry = cursor.value;
+                            // Skip already deleted entries
+                            if (entry.deleted) {
+                                cursor.continue();
+                                return;
+                            }
+                            // Mark as deleted
+                            entry.deleted = true;
+                            const key = cursor.key;
+                            cursor.update(entry);
+                            resolve({ entry, key });
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // Undelete an entry by its key
+            async function undeleteEntry(key) {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                
+                return new Promise((resolve, reject) => {
+                    const request = objectStore.get(key);
+                    request.onsuccess = () => {
+                        const entry = request.result;
+                        if (entry) {
+                            entry.deleted = false;
+                            objectStore.put(entry, key);
+                            resolve(entry);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // Mark a specific entry as deleted by its key
+            async function markEntryAsDeleted(key) {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                
+                return new Promise((resolve, reject) => {
+                    const request = objectStore.get(key);
+                    request.onsuccess = () => {
+                        const entry = request.result;
+                        if (entry) {
+                            entry.deleted = true;
+                            objectStore.put(entry, key);
+                            resolve(entry);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            // Edit an entry's timestamp
+            async function editEntryTime(key, currentTs) {
+                if (!db) await initDB();
+
+                // Show modal with current time pre-filled
+                const modal = document.getElementById("time-picker-modal");
+                const input = document.getElementById("custom-time");
+
+                const current = new Date(currentTs);
+                const year = current.getFullYear();
+                const month = String(current.getMonth() + 1).padStart(2, '0');
+                const day = String(current.getDate()).padStart(2, '0');
+                const hours = String(current.getHours()).padStart(2, '0');
+                const minutes = String(current.getMinutes()).padStart(2, '0');
+                input.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+                modal.classList.add("show");
+
+                // Store the key for updating
+                window.editingEntryKey = key;
+            }
+
+            // Update an entry's timestamp
+            async function updateEntryTime() {
+                const input = document.getElementById("custom-time");
+                const newTime = new Date(input.value);
+
+                if (!newTime || isNaN(newTime.getTime())) {
+                    alert("Please select a valid time");
+                    return;
+                }
+
+                const key = window.editingEntryKey;
+                if (!key) return;
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+                
+                return new Promise((resolve, reject) => {
+                    const request = objectStore.get(key);
+                    request.onsuccess = () => {
+                        const entry = request.result;
+                        if (entry) {
+                            entry.ts = newTime.toISOString();
+                            objectStore.put(entry, key);
+                            updateTimestamp("Time updated");
+                            updateDailyReport();
+                            updateButtonStates();
+                            hideTimePicker();
+                            window.editingEntryKey = null;
+                            resolve(entry);
                         } else {
                             resolve(null);
                         }
@@ -403,10 +516,22 @@
                     range = IDBKeyRange.lowerBound(yesterday);
                 }
                 
-                const request = objectStore.index("timestamp").getAll(range);
+                const index = objectStore.index("timestamp");
+                const request = index.openCursor(range);
+                const results = [];
 
                 return new Promise((resolve, reject) => {
-                    request.onsuccess = () => resolve(request.result || []);
+                    request.onsuccess = (event) => {
+                        const cursor = event.target.result;
+                        if (cursor) {
+                            const entry = cursor.value;
+                            entry.key = cursor.key; // Store the key with the entry
+                            results.push(entry);
+                            cursor.continue();
+                        } else {
+                            resolve(results);
+                        }
+                    };
                     request.onerror = () => reject(request.error);
                 });
             }
@@ -526,27 +651,7 @@
                     .find(e => e.type === "sleep" && (e.value === "sleeping" || e.value === "nap"));
             }
 
-            // Handle short sleep removal (< 5 minutes)
-            async function handleShortSleep(awakeTime) {
-                const allEntries = await loadEntriesByDate();
-                const lastSleepStart = findLastSleepStart(allEntries);
-                
-                if (!lastSleepStart) return false;
-                
-                const sleepDuration = (awakeTime - new Date(lastSleepStart.ts)) / 1000 / 60;
-                
-                if (sleepDuration < 1) {
-                    const transaction = db.transaction(["entries"], "readwrite");
-                    const objectStore = transaction.objectStore("entries");
-                    await new Promise((resolve, reject) => {
-                        const deleteRequest = objectStore.delete(lastSleepStart.id);
-                        deleteRequest.onsuccess = resolve;
-                        deleteRequest.onerror = () => reject(deleteRequest.error);
-                    });
-                    return true;
-                }
-                return false;
-            }
+
 
             async function save(type, value, btn, customTimestamp = null) {
                 const ts = customTimestamp || nowIso();
@@ -563,24 +668,13 @@
                 // Auto-awake: if recording any non-sleep event, mark baby as awake first
                 if (type !== "sleep") {
                     const allEntries = await loadEntriesByDate();
-                    const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep");
+                    const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep" && !e.deleted);
                     const isAsleep = lastSleepEvent && (lastSleepEvent.value === "sleeping" || lastSleepEvent.value === "nap");
                     
                     if (isAsleep) {
                         // Add awake event just before this event (1 second earlier to maintain order)
                         const awakeTs = new Date(eventTime.getTime() - 1000).toISOString();
                         await addEntry("sleep", "awake", awakeTs);
-                    }
-                }
-
-                // Special handling for sleep awake events - remove short sleeps
-                if (type === "sleep" && value === "awake") {
-                    const removed = await handleShortSleep(eventTime);
-                    if (removed) {
-                        updateTimestamp("Short sleep removed");
-                        updateDailyReport();
-                        updateButtonStates();
-                        return;
                     }
                 }
 
@@ -593,6 +687,12 @@
             }
 
             async function saveWithCustomTime() {
+                // Check if we're editing an existing entry
+                if (window.editingEntryKey) {
+                    await updateEntryTime();
+                    return;
+                }
+
                 const input = document.getElementById("custom-time");
                 const customTime = new Date(input.value);
 
@@ -607,13 +707,33 @@
             }
 
             async function undo() {
-                const deletedEntry = await deleteMostRecentEntry();
+                const result = await markMostRecentAsDeleted();
 
-                if (deletedEntry) {
-                    updateTimestamp("Undone");
+                if (result) {
+                    updateTimestamp("Marked as deleted");
                     updateDailyReport();
                     updateButtonStates();
                 }
+            }
+
+            async function undelete() {
+                // Find most recently deleted entry
+                const allEntries = await loadEntriesByDate();
+                const deletedEntries = allEntries.filter(e => e.deleted);
+                
+                if (deletedEntries.length === 0) {
+                    updateTimestamp("No deleted entries to restore");
+                    return;
+                }
+                
+                // Sort by timestamp descending to get most recent
+                deletedEntries.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+                const mostRecentDeleted = deletedEntries[0];
+                
+                await undeleteEntry(mostRecentDeleted.key);
+                updateTimestamp("Entry restored");
+                updateDailyReport();
+                updateButtonStates();
             }
 
             function updateTimestamp(text) {
@@ -690,14 +810,17 @@
 
                 if (!allEntries || allEntries.length === 0) return;
 
+                // Filter out deleted entries
+                const activeEntries = allEntries.filter(e => !e.deleted);
+
                 // Find last feed and update button
-                const lastFeed = [...allEntries].reverse().find(e => e.type === "feed" && e.value === "bf");
+                const lastFeed = [...activeEntries].reverse().find(e => e.type === "feed" && e.value === "bf");
                 const feedBtn = document.querySelector('button[data-type="feed"][data-value="bf"]');
                 const feedTime = lastFeed ? formatElapsedTime(new Date(lastFeed.ts).getTime()) : null;
                 updateButtonDisplay(feedBtn, "Feed", feedTime, false);
 
                 // Find last sleep event and update sleep/awake buttons
-                const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep");
+                const lastSleepEvent = [...activeEntries].reverse().find(e => e.type === "sleep");
                 const sleepBtn = document.querySelector('button[data-type="sleep"][data-value="sleeping"]');
                 const awakeBtn = document.querySelector('button[data-type="sleep"][data-value="awake"]');
 
@@ -883,21 +1006,74 @@
             }
 
             function calculateDailyStats(entries) {
-                const sleepEvents = entries.filter((e) => e.type === "sleep");
+                // Filter out deleted entries
+                const activeEntries = entries.filter(e => !e.deleted);
                 
                 // Get day boundaries for clipping sleep periods
                 const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
                 
+                // Get sleep events and add mock events at day boundaries
+                let sleepEvents = activeEntries.filter((e) => e.type === "sleep");
+                
+                // Determine initial state (awake by default if no prior sleep event)
+                const preDaySleepEvents = sleepEvents.filter(e => new Date(e.ts) < dayStart);
+                const lastPreDayEvent = preDaySleepEvents.length > 0 ? 
+                    preDaySleepEvents[preDaySleepEvents.length - 1] : null;
+                const startAsleep = lastPreDayEvent && 
+                    (lastPreDayEvent.value === "sleeping" || lastPreDayEvent.value === "nap");
+                
+                // Add mock event at day start
+                if (startAsleep) {
+                    sleepEvents = [
+                        { type: "sleep", value: "sleeping", ts: dayStart.toISOString(), mock: true },
+                        ...sleepEvents
+                    ];
+                } else {
+                    sleepEvents = [
+                        { type: "sleep", value: "awake", ts: dayStart.toISOString(), mock: true },
+                        ...sleepEvents
+                    ];
+                }
+                
+                // Add mock event at day end based on current state
+                const inDaySleepEvents = sleepEvents.filter(e => {
+                    const ts = new Date(e.ts);
+                    return ts >= dayStart && ts <= dayEnd;
+                });
+                if (inDaySleepEvents.length > 0) {
+                    const lastInDayEvent = inDaySleepEvents[inDaySleepEvents.length - 1];
+                    const endAsleep = lastInDayEvent.value === "sleeping" || lastInDayEvent.value === "nap";
+                    if (endAsleep) {
+                        sleepEvents.push({ type: "sleep", value: "awake", ts: dayEnd.toISOString(), mock: true });
+                    }
+                }
+                
+                // Merge consecutive sleep windows (sleep followed by sleep)
+                const mergedSleepEvents = [];
+                for (let i = 0; i < sleepEvents.length; i++) {
+                    const event = sleepEvents[i];
+                    if (event.value === "sleeping" || event.value === "nap") {
+                        // Check if next event is also a sleep start
+                        const nextEvent = sleepEvents[i + 1];
+                        if (nextEvent && (nextEvent.value === "sleeping" || nextEvent.value === "nap")) {
+                            // Skip this sleep end / next sleep start pair
+                            continue;
+                        }
+                    }
+                    mergedSleepEvents.push(event);
+                }
+                sleepEvents = mergedSleepEvents;
+                
                 // Only count feeds and nappies that occurred within the day
-                const feedEvents = entries.filter((e) => {
+                const feedEvents = activeEntries.filter((e) => {
                     return e.type === "feed" && e.value === "bf" && isEntryInDay(e, dayStart, dayEnd);
                 });
                 
-                const wetCount = entries.filter((e) => {
+                const wetCount = activeEntries.filter((e) => {
                     return e.type === "nappy" && e.value === "wet" && isEntryInDay(e, dayStart, dayEnd);
                 }).length;
                 
-                const dirtyCount = entries.filter((e) => {
+                const dirtyCount = activeEntries.filter((e) => {
                     return e.type === "nappy" && e.value === "dirty" && isEntryInDay(e, dayStart, dayEnd);
                 }).length;
 
@@ -971,8 +1147,9 @@
             }
 
             function updateHourlyGrid(entries) {
+                const activeEntries = entries.filter(e => !e.deleted);
                 for (let hour = 0; hour < 24; hour++) {
-                    const hourEntries = entries.filter((e) => {
+                    const hourEntries = activeEntries.filter((e) => {
                         const entryHour = new Date(e.ts).getHours();
                         return entryHour === hour;
                     });
@@ -1007,8 +1184,9 @@
             }
 
             function updateSleepAttempts(entries) {
-                const sleepEvents = entries.filter((e) => e.type === "sleep");
-                const sootheEvents = entries.filter(
+                const activeEntries = entries.filter(e => !e.deleted);
+                const sleepEvents = activeEntries.filter((e) => e.type === "sleep");
+                const sootheEvents = activeEntries.filter(
                     (e) => e.type === "soothe" || e.type === "5s"
                 );
 
@@ -1089,18 +1267,31 @@
                 allEvents.forEach((e) => {
                     const div = document.createElement("div");
                     div.className = "event-entry";
+                    
+                    // Style deleted entries
+                    if (e.deleted) {
+                        div.style.opacity = "0.4";
+                        div.style.textDecoration = "line-through";
+                        div.style.color = "#999";
+                    }
 
                     const time = new Date(e.ts);
                     const timeStr = time.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                     });
+                    
+                    const deleteBtn = e.deleted ? 
+                        `<button onclick="undeleteEntry(${e.key}).then(() => { updateDailyReport(); updateButtonStates(); })" style="margin-left: 8px; padding: 2px 8px; font-size: 11px; border-radius: 4px; border: 0; background: #4caf50; color: white; cursor: pointer;">↶</button>` :
+                        `<button onclick="markEntryAsDeleted(${e.key}).then(() => { updateDailyReport(); updateButtonStates(); })" style="margin-left: 8px; padding: 2px 8px; font-size: 11px; border-radius: 4px; border: 0; background: #ff6666; color: white; cursor: pointer;">🗑</button>`;
 
                     div.innerHTML = `
                         <div>
                             <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
                         </div>
-                        <span class="event-time">${timeStr}</span>
+                        <span class="event-time" style="display: flex; align-items: center;">
+                            <span onclick="editEntryTime(${e.key}, '${e.ts}')" style="cursor: pointer; text-decoration: underline;">${timeStr}</span>${deleteBtn}
+                        </span>
                     `;
                     container.appendChild(div);
                 });
@@ -1123,16 +1314,13 @@
                 // Get day boundaries
                 const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
                 
-                // Filter to entries we care about for display
-                const dayStart12HoursBefore = new Date(dayStart.getTime() - 12 * 60 * 60 * 1000);
-                const dayEnd12HoursAfter = new Date(dayEnd.getTime() + 12 * 60 * 60 * 1000);
+                // Filter out deleted entries
+                const activeEntries = entries.filter(e => !e.deleted);
                 
-                const relevantEntries = entries.filter(e => {
-                    const ts = new Date(e.ts);
-                    return ts >= dayStart12HoursBefore && ts <= dayEnd12HoursAfter;
-                });
-
-                if (relevantEntries.length === 0) {
+                // Get sleep events and add mock events at day boundaries
+                let sleepEvents = activeEntries.filter(e => e.type === "sleep");
+                
+                if (sleepEvents.length === 0) {
                     svg.append("text")
                         .attr("x", width / 2)
                         .attr("y", height / 2)
@@ -1141,21 +1329,72 @@
                         .text("No data for this day");
                     return;
                 }
-
-                // Prepare data for timeline - convert timestamps to hours relative to day start
-                const sleepData = [];
-                const feedData = [];
-
-                relevantEntries.forEach((e) => {
+                
+                // Determine initial state
+                const preDaySleepEvents = sleepEvents.filter(e => new Date(e.ts) < dayStart);
+                const lastPreDayEvent = preDaySleepEvents.length > 0 ? 
+                    preDaySleepEvents[preDaySleepEvents.length - 1] : null;
+                const startAsleep = lastPreDayEvent && 
+                    (lastPreDayEvent.value === "sleeping" || lastPreDayEvent.value === "nap");
+                
+                // Add mock event at day start
+                if (startAsleep) {
+                    sleepEvents = [
+                        { type: "sleep", value: "sleeping", ts: dayStart.toISOString(), mock: true },
+                        ...sleepEvents
+                    ];
+                } else {
+                    sleepEvents = [
+                        { type: "sleep", value: "awake", ts: dayStart.toISOString(), mock: true },
+                        ...sleepEvents
+                    ];
+                }
+                
+                // Add mock event at day end
+                const inDaySleepEvents = sleepEvents.filter(e => {
+                    const ts = new Date(e.ts);
+                    return ts >= dayStart && ts <= dayEnd;
+                });
+                if (inDaySleepEvents.length > 0) {
+                    const lastInDayEvent = inDaySleepEvents[inDaySleepEvents.length - 1];
+                    const endAsleep = lastInDayEvent.value === "sleeping" || lastInDayEvent.value === "nap";
+                    if (endAsleep) {
+                        sleepEvents.push({ type: "sleep", value: "awake", ts: dayEnd.toISOString(), mock: true });
+                    }
+                }
+                
+                // Merge consecutive sleep windows
+                const mergedSleepEvents = [];
+                for (let i = 0; i < sleepEvents.length; i++) {
+                    const event = sleepEvents[i];
+                    if (event.value === "sleeping" || event.value === "nap") {
+                        const nextEvent = sleepEvents[i + 1];
+                        if (nextEvent && (nextEvent.value === "sleeping" || nextEvent.value === "nap")) {
+                            continue;
+                        }
+                    }
+                    mergedSleepEvents.push(event);
+                }
+                sleepEvents = mergedSleepEvents;
+                
+                // Convert to line graph data (awake=0, asleep=1)
+                const lineData = [];
+                sleepEvents.forEach((e) => {
                     const date = new Date(e.ts);
-                    // Calculate hours relative to the start of the viewing day
                     const hours = (date - dayStart) / (1000 * 60 * 60);
-
-                    if (e.type === "sleep") {
-                        sleepData.push({ time: hours, value: e.value });
-                    } else if (e.type === "feed" && e.value === "bf") {
-                        // Only show feeds that are within the 0-24 range
-                        if (hours >= 0 && hours < 24) {
+                    const value = (e.value === "sleeping" || e.value === "nap") ? 1 : 0;
+                    if (hours >= 0 && hours <= 24) {
+                        lineData.push({ time: hours, value: value });
+                    }
+                });
+                
+                // Get feed data for overlay
+                const feedData = [];
+                activeEntries.forEach((e) => {
+                    if (e.type === "feed" && e.value === "bf") {
+                        const date = new Date(e.ts);
+                        const hours = (date - dayStart) / (1000 * 60 * 60);
+                        if (hours >= 0 && hours <= 24) {
                             feedData.push({ time: hours });
                         }
                     }
@@ -1169,7 +1408,7 @@
 
                 const y = d3
                     .scaleLinear()
-                    .domain([0, 2])
+                    .domain([0, 1])
                     .range([height - margin.bottom, margin.top]);
 
                 // Draw gridlines for every hour
@@ -1184,7 +1423,7 @@
                         .attr("opacity", 0.5);
                 }
 
-                // Draw axes with fewer ticks (every 3 hours)
+                // Draw axes
                 svg.append("g")
                     .attr("transform", `translate(0,${height - margin.bottom})`)
                     .call(
@@ -1194,72 +1433,41 @@
                             .tickValues([0, 3, 6, 9, 12, 15, 18, 21, 24])
                             .tickFormat((d) => d + "h")
                     );
-
-                // Draw sleep periods as rectangles
-                let sleepStart = null;
-                sleepData.forEach((d, i) => {
-                    if (d.value === "sleeping" || d.value === "nap") {
-                        sleepStart = d.time;
-                    } else if (d.value === "awake" && sleepStart !== null) {
-                        // Clip sleep period to 0-24 hour range
-                        const clippedStart = Math.max(0, sleepStart);
-                        const clippedEnd = Math.min(24, d.time);
-                        
-                        if (clippedEnd > clippedStart) {
-                            svg.append("rect")
-                                .attr("x", x(clippedStart))
-                                .attr("y", y(1.5))
-                                .attr("width", x(clippedEnd) - x(clippedStart))
-                                .attr("height", 40)
-                                .attr("fill", "#2196f3")
-                                .attr("opacity", 0.6)
-                                .attr("rx", 4);
-                        }
-                        sleepStart = null;
-                    }
-                });
-                
-                // Handle sleep that started before midnight (negative time values)
-                if (sleepStart !== null && sleepStart < 0) {
-                    // Draw from 0 to when baby woke up
-                    const firstWake = sleepData.find(e => e.value === "awake" && e.time >= 0);
-                    if (firstWake) {
-                        const clippedEnd = Math.min(24, firstWake.time);
-                        svg.append("rect")
-                            .attr("x", x(0))
-                            .attr("y", y(1.5))
-                            .attr("width", x(clippedEnd) - x(0))
-                            .attr("height", 40)
-                            .attr("fill", "#2196f3")
-                            .attr("opacity", 0.6)
-                            .attr("rx", 4);
-                    }
-                    sleepStart = null;
-                }
-                
-                // Draw ongoing sleep (if baby is still asleep)
-                if (sleepStart !== null) {
-                    // Get current time in hours for the selected date
-                    const now = new Date();
-                    const reportDate = currentReportDate;
-                    const isToday = reportDate.toDateString() === now.toDateString();
                     
-                    // Only show ongoing sleep if viewing today
-                    if (isToday) {
-                        const currentHour = now.getHours() + now.getMinutes() / 60;
-                        svg.append("rect")
-                            .attr("x", x(sleepStart))
-                            .attr("y", y(1.5))
-                            .attr("width", x(currentHour) - x(sleepStart))
-                            .attr("height", 40)
-                            .attr("fill", "#2196f3")
-                            .attr("opacity", 0.4)
-                            .attr("rx", 4)
-                            .attr("stroke", "#2196f3")
-                            .attr("stroke-width", 2)
-                            .attr("stroke-dasharray", "5,5");
-                    }
-                }
+                svg.append("g")
+                    .attr("transform", `translate(${margin.left},0)`)
+                    .call(
+                        d3
+                            .axisLeft(y)
+                            .ticks(2)
+                            .tickFormat((d) => d === 0 ? "Awake" : "Asleep")
+                    );
+
+                // Draw line graph using step interpolation
+                const line = d3.line()
+                    .x(d => x(d.time))
+                    .y(d => y(d.value))
+                    .curve(d3.curveStepAfter);
+
+                svg.append("path")
+                    .datum(lineData)
+                    .attr("fill", "none")
+                    .attr("stroke", "#2196f3")
+                    .attr("stroke-width", 3)
+                    .attr("d", line);
+                    
+                // Add area fill under the line
+                const area = d3.area()
+                    .x(d => x(d.time))
+                    .y0(y(0))
+                    .y1(d => y(d.value))
+                    .curve(d3.curveStepAfter);
+                    
+                svg.append("path")
+                    .datum(lineData)
+                    .attr("fill", "#2196f3")
+                    .attr("opacity", 0.2)
+                    .attr("d", area);
 
                 // Draw feed events as circles
                 feedData.forEach((d) => {
@@ -1269,23 +1477,6 @@
                         .attr("r", 5)
                         .attr("fill", "#4caf50");
                 });
-
-                // Add labels
-                svg.append("text")
-                    .attr("x", margin.left)
-                    .attr("y", y(1.5) + 20)
-                    .attr("text-anchor", "start")
-                    .style("font-size", "12px")
-                    .style("fill", "#666")
-                    .text("Sleep");
-
-                svg.append("text")
-                    .attr("x", margin.left)
-                    .attr("y", y(0.5) + 5)
-                    .attr("text-anchor", "start")
-                    .style("font-size", "12px")
-                    .style("fill", "#666")
-                    .text("Feed");
             }
         </script>
     </head>
@@ -1305,7 +1496,8 @@
             </div>
 
             <div style="display: flex; gap: 8px">
-                <button class="btn" id="undo" onclick="undo()">Undo</button>
+                <button class="btn" id="undo" onclick="undo()">Delete</button>
+                <button class="btn" id="undelete" onclick="undelete()" style="background: #4caf50;">Undelete</button>
                 <div style="flex: 1"></div>
                 <button class="btn" id="download" onclick="downloadCSV()">
                     Download CSV
