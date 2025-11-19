@@ -148,71 +148,128 @@ export function updateRecentEvents(entries, updateDailyReport, updateButtonState
     const container = document.getElementById("recent-events-list");
     if (!container) return;
 
-    container.innerHTML = "";
-
     // Show all events for the selected day in reverse chronological order
     const allEvents = [...entries].reverse();
 
-    allEvents.forEach((e) => {
-        const div = document.createElement("div");
-        div.className = "event-entry";
-        
-        // Style deleted entries
-        if (e.deleted) {
-            div.style.opacity = "0.4";
-            div.style.textDecoration = "line-through";
-            div.style.color = "#999";
-        }
+    // Use D3 for efficient data binding and updates
+    const eventSelection = d3.select(container)
+        .selectAll(".event-entry")
+        .data(allEvents, d => d.key || `${d.type}-${d.value}-${d.ts}`);
 
-        const time = new Date(e.ts);
-        const timeStr = time.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
+    // Remove old entries with transition
+    eventSelection.exit()
+        .transition()
+        .duration(300)
+        .style("opacity", 0)
+        .style("transform", "translateX(-20px)")
+        .remove();
+
+    // Add new entries
+    const newEntries = eventSelection.enter()
+        .append("div")
+        .attr("class", "event-entry")
+        .style("opacity", 0)
+        .style("transform", "translateX(20px)");
+
+    // Update all entries (both new and existing)
+    const allEntries = newEntries.merge(eventSelection);
+
+    // Animate new entries in
+    newEntries
+        .transition()
+        .duration(300)
+        .style("opacity", 1)
+        .style("transform", "translateX(0px)");
+
+    // Update styling based on deleted state
+    allEntries
+        .style("opacity", d => d.deleted ? "0.4" : "1")
+        .style("text-decoration", d => d.deleted ? "line-through" : "none")
+        .style("color", d => d.deleted ? "#999" : "");
+
+    // Create/update event content
+    const eventContent = allEntries.selectAll(".event-content")
+        .data(d => [d]);
+
+    eventContent.enter()
+        .append("div")
+        .attr("class", "event-content")
+        .merge(eventContent)
+        .html(d => `
+            <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>
+        `);
+
+    // Create/update event time container
+    const eventTimeContainer = allEntries.selectAll(".event-time")
+        .data(d => [d]);
+
+    const timeContainers = eventTimeContainer.enter()
+        .append("span")
+        .attr("class", "event-time")
+        .style("display", "flex")
+        .style("align-items", "center");
+
+    const allTimeContainers = timeContainers.merge(eventTimeContainer);
+
+    // Create/update time span
+    const timeSpans = allTimeContainers.selectAll(".time-span")
+        .data(d => [d]);
+
+    timeSpans.enter()
+        .append("span")
+        .attr("class", "time-span")
+        .style("cursor", "pointer")
+        .style("text-decoration", "underline")
+        .merge(timeSpans)
+        .text(d => {
+            const time = new Date(d.ts);
+            return time.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        })
+        .on("click", function(event, d) {
+            editEntryTime(d.key, d.ts);
         });
-        
-        // Create buttons
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "event-action-btn";
-        
-        if (e.deleted) {
-            deleteBtn.textContent = "↶";
-            deleteBtn.style.background = "#4caf50";
-            deleteBtn.onclick = () => undeleteEntry(e.key).then(() => { 
-                updateDailyReport(); 
-                updateButtonStates(); 
-            });
-        } else {
-            deleteBtn.textContent = "🗑";
-            deleteBtn.style.background = "#ff6666";
-            deleteBtn.onclick = () => markEntryAsDeleted(e.key).then(() => { 
-                updateDailyReport(); 
-                updateButtonStates(); 
-            });
-        }
 
-        // Create time span
-        const timeSpan = document.createElement("span");
-        timeSpan.textContent = timeStr;
-        timeSpan.style.cssText = "cursor: pointer; text-decoration: underline;";
-        timeSpan.onclick = () => editEntryTime(e.key, e.ts);
+    // Create/update delete buttons
+    const deleteButtons = allTimeContainers.selectAll(".event-action-btn")
+        .data(d => [d]);
 
-        // Create event time container
-        const eventTimeContainer = document.createElement("span");
-        eventTimeContainer.className = "event-time";
-        eventTimeContainer.style.cssText = "display: flex; align-items: center;";
-        eventTimeContainer.appendChild(timeSpan);
-        eventTimeContainer.appendChild(deleteBtn);
-
-        // Create event content
-        const eventContent = document.createElement("div");
-        eventContent.innerHTML = `
-            <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
-        `;
-
-        div.appendChild(eventContent);
-        div.appendChild(eventTimeContainer);
-        container.appendChild(div);
-    });
+    deleteButtons.enter()
+        .append("button")
+        .attr("class", "event-action-btn")
+        .style("margin-left", "8px")
+        .style("padding", "2px 8px")
+        .style("font-size", "11px")
+        .style("border-radius", "4px")
+        .style("border", "0")
+        .style("color", "white")
+        .style("cursor", "pointer")
+        .merge(deleteButtons)
+        .text(d => d.deleted ? "↶" : "🗑")
+        .style("background", d => d.deleted ? "#4caf50" : "#ff6666")
+        .on("click", async function(event, d) {
+            event.stopPropagation();
+            try {
+                if (d.deleted) {
+                    console.log('Undeleting entry with key:', d.key);
+                    const result = await undeleteEntry(d.key);
+                    console.log('Undelete result:', result);
+                    updateDailyReport(); 
+                    updateButtonStates(); 
+                } else {
+                    console.log('Deleting entry with key:', d.key);
+                    const result = await markEntryAsDeleted(d.key);
+                    console.log('Delete result:', result);
+                    updateDailyReport(); 
+                    updateButtonStates(); 
+                }
+            } catch (error) {
+                console.error('Error in delete/undelete operation:', error);
+                updateTimestamp('Error: ' + error.message);
+            }
+        });
 }
 
 export function drawTimeline(entries) {
