@@ -344,9 +344,36 @@
             
             /* Deleted entry styling */
             .event-entry.deleted {
-                opacity: 0.6;
-                background: #ffebee !important;
-                border-left: 3px solid #ff6666;
+                opacity: 0.5;
+                background: #f5f5f5 !important;
+                color: #999 !important;
+                filter: grayscale(1);
+            }
+            
+            /* Action button styling */
+            .action-btn {
+                border: none;
+                border-radius: 3px;
+                padding: 2px 6px;
+                font-size: 10px;
+                margin-left: 8px;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s ease;
+            }
+            
+            .action-btn:hover {
+                opacity: 1;
+            }
+            
+            .delete-btn {
+                background: #ddd;
+                color: #666;
+            }
+            
+            .undelete-btn {
+                background: #e8f5e9;
+                color: #4caf50;
             }
         </style>
         <script>
@@ -621,19 +648,19 @@
                 hideTimePicker();
             }
 
-            // Delete a specific entry by ID
-            async function deleteEntry(entryId) {
+            // Toggle entry deleted status
+            async function toggleEntryDeleted(entryId, shouldDelete) {
                 if (!db) await initDB();
-
+                
                 const transaction = db.transaction(["entries"], "readwrite");
                 const objectStore = transaction.objectStore("entries");
-
+                
                 return new Promise((resolve, reject) => {
                     const getRequest = objectStore.get(entryId);
                     getRequest.onsuccess = () => {
                         const entry = getRequest.result;
-                        if (entry && !entry.deleted) {
-                            entry.deleted = true;
+                        if (entry && entry.deleted !== shouldDelete) {
+                            entry.deleted = shouldDelete;
                             const updateRequest = objectStore.put(entry);
                             updateRequest.onsuccess = () => resolve(entry);
                             updateRequest.onerror = () => reject(updateRequest.error);
@@ -645,29 +672,9 @@
                 });
             }
 
-            // Undelete a specific entry by ID
-            async function undeleteEntry(entryId) {
-                if (!db) await initDB();
-
-                const transaction = db.transaction(["entries"], "readwrite");
-                const objectStore = transaction.objectStore("entries");
-
-                return new Promise((resolve, reject) => {
-                    const getRequest = objectStore.get(entryId);
-                    getRequest.onsuccess = () => {
-                        const entry = getRequest.result;
-                        if (entry && entry.deleted) {
-                            entry.deleted = false;
-                            const updateRequest = objectStore.put(entry);
-                            updateRequest.onsuccess = () => resolve(entry);
-                            updateRequest.onerror = () => reject(updateRequest.error);
-                        } else {
-                            resolve(null);
-                        }
-                    };
-                    getRequest.onerror = () => reject(getRequest.error);
-                });
-            }
+            // Convenience functions
+            const deleteEntry = (id) => toggleEntryDeleted(id, true);
+            const undeleteEntry = (id) => toggleEntryDeleted(id, false);
 
             async function undo() {
                 const deletedEntry = await markMostRecentAsDeleted();
@@ -1626,25 +1633,14 @@
                     const typeFilter = d3.select("#event-type-filter").property("value");
                     const hideDeleted = d3.select("#hide-deleted-filter").property("checked");
                     
-                    let filteredEntries = allDayEntries;
-                    
-                    // Apply deleted filter
-                    if (hideDeleted) {
-                        filteredEntries = filteredEntries.filter(e => !e.deleted);
-                    }
-                    
-                    // Apply type filter
-                    if (typeFilter) {
-                        filteredEntries = filteredEntries.filter(e => e.type === typeFilter);
-                    }
-                    
-                    // Apply text filter
-                    if (textFilter) {
-                        filteredEntries = filteredEntries.filter(e => 
-                            e.type.toLowerCase().includes(textFilter) ||
-                            e.value.toLowerCase().includes(textFilter)
-                        );
-                    }
+                    const filteredEntries = allDayEntries.filter(e => {
+                        const matchesDeleted = !hideDeleted || !e.deleted;
+                        const matchesType = !typeFilter || e.type === typeFilter;
+                        const matchesText = !textFilter || 
+                            e.type.toLowerCase().includes(textFilter) || 
+                            e.value.toLowerCase().includes(textFilter);
+                        return matchesDeleted && matchesType && matchesText;
+                    });
                     
                     updateRecentEventsDisplay(filteredEntries);
                 }
@@ -1687,69 +1683,50 @@
                     .style("transform", "translateX(0px)");
 
                 allEventEntries.html(d => {
-                    const time = new Date(d.ts);
-                    const timeStr = time.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-                    
-                    const deletedStatus = d.deleted ? ' <span style="color: #ff6666; font-size: 11px;">[DELETED]</span>' : '';
-                    const actionButton = d.deleted 
-                        ? `<button class="undelete-btn" data-id="${d.id}" style="background: #4caf50; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 10px; margin-left: 8px; cursor: pointer;">↶</button>`
-                        : `<button class="delete-btn" data-id="${d.id}" style="background: #ff6666; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 10px; margin-left: 8px; cursor: pointer;">×</button>`;
+                    const timeStr = new Date(d.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    const deletedLabel = d.deleted ? ' <small style="opacity: 0.6;">[deleted]</small>' : '';
+                    const actionBtn = d.deleted 
+                        ? `<button class="action-btn undelete-btn" data-id="${d.id}">↶</button>`
+                        : `<button class="action-btn delete-btn" data-id="${d.id}">×</button>`;
 
                     return `
                         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                             <div>
-                                <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>${deletedStatus}
+                                <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>${deletedLabel}
                             </div>
                             <div style="display: flex; align-items: center;">
-                                <span class="event-time">${timeStr}</span>
-                                ${actionButton}
+                                <span class="event-time">${timeStr}</span>${actionBtn}
                             </div>
                         </div>
                     `;
                 });
 
-                // Add click interaction to show entry details and delete/undelete functionality
+                // Helper function for entry actions
+                const handleEntryAction = async (entry, action) => {
+                    const result = action === 'delete' ? await deleteEntry(entry.id) : await undeleteEntry(entry.id);
+                    if (result) {
+                        const actionText = action === 'delete' ? 'Deleted' : 'Restored';
+                        updateTimestamp(`${actionText}: ${result.type} - ${result.value}`);
+                        updateDailyReport();
+                        updateButtonStates();
+                    }
+                };
+
+                // Add event interactions
                 allEventEntries
                     .style("cursor", "pointer")
                     .on("click", function(event, d) {
-                        // Check if click was on delete button
                         if (event.target.classList.contains('delete-btn')) {
                             event.stopPropagation();
-                            deleteEntry(d.id).then(deletedEntry => {
-                                if (deletedEntry) {
-                                    updateTimestamp(`Deleted: ${deletedEntry.type} - ${deletedEntry.value}`);
-                                    updateDailyReport();
-                                    updateButtonStates();
-                                }
-                            });
+                            handleEntryAction(d, 'delete');
                         } else if (event.target.classList.contains('undelete-btn')) {
                             event.stopPropagation();
-                            undeleteEntry(d.id).then(restoredEntry => {
-                                if (restoredEntry) {
-                                    updateTimestamp(`Restored: ${restoredEntry.type} - ${restoredEntry.value}`);
-                                    updateDailyReport();
-                                    updateButtonStates();
-                                }
-                            });
+                            handleEntryAction(d, 'undelete');
                         } else {
                             showEventDetails(d, event);
                         }
                     })
-                    .on("dblclick", function(event, d) {
-                        // Double-click to delete (if not already deleted)
-                        if (!d.deleted) {
-                            deleteEntry(d.id).then(deletedEntry => {
-                                if (deletedEntry) {
-                                    updateTimestamp(`Deleted: ${deletedEntry.type} - ${deletedEntry.value}`);
-                                    updateDailyReport();
-                                    updateButtonStates();
-                                }
-                            });
-                        }
-                    })
+                    .on("dblclick", (event, d) => !d.deleted && handleEntryAction(d, 'delete'))
                     .on("mouseover", function(event, d) {
                         d3.select(this)
                             .transition()
