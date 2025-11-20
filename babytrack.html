@@ -1114,58 +1114,48 @@
             const buttonGroups = [
                 {
                     buttons: [
-                        { type: "feed", value: "bf", label: "Feed", emoji: "🤱" },
-                        { type: "feed", value: "play", label: "Play", emoji: "🎾" },
-                        { type: "feed", value: "spew", label: "Spew", emoji: "🤮" },
+                        { type: "feed", value: "bf", label: "Feed", emoji: "🤱", },
+                        { type: "feed", value: "play", label: "Play", emoji: "🎾", },
+                        { type: "feed", value: "spew", label: "Spew", emoji: "🤮", },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "" },
-                        { type: "sleep", value: "nap", label: "Nap", emoji: "" },
-                        { type: "sleep", value: "awake", label: "Awake", emoji: "" },
-                        { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
+                        { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "", },
+                        { type: "sleep", value: "nap", label: "Nap", emoji: "", },
+                        { type: "sleep", value: "awake", label: "Awake", emoji: "", },
+                        { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "", },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "nappy", value: "wet", label: "Wet", emoji: "💧" },
-                        { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩" },
+                        { type: "nappy", value: "wet", label: "Wet", emoji: "💧", },
+                        { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩", },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "soothe", value: "pram", label: "Pram", emoji: "🎢" },
-                        { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑" },
-                        { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗" },
-                        {
-                            type: "soothe",
-                            value: "feed-to-sleep",
-                            label: "Feed to Sleep",
-                            emoji: "🍼😴"
-                        },
+                        { type: "soothe", value: "pram", label: "Pram", emoji: "🎢", },
+                        { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑", },
+                        { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗", },
+                        { type: "soothe", value: "feed-to-sleep", label: "Feed to Sleep", emoji: "🍼😴", },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯" },
-                        {
-                            type: "5s",
-                            value: "side-lying",
-                            label: "Side/Stomach",
-                            emoji: "🛏️"
-                        },
-                        { type: "5s", value: "shush", label: "Shush", emoji: "🤫" },
-                        { type: "5s", value: "swing", label: "Swing", emoji: "🎢" },
-                        { type: "5s", value: "suck", label: "Suck", emoji: "🍭" },
+                        { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯", },
+                        { type: "5s", value: "side-lying", label: "Side/Stomach", emoji: "🛏️", },
+                        { type: "5s", value: "shush", label: "Shush", emoji: "🤫", },
+                        { type: "5s", value: "swing", label: "Swing", emoji: "🎢", },
+                        { type: "5s", value: "suck", label: "Suck", emoji: "🍭", },
                     ],
                 },
             ];
-            
+
             // Create emoji lookup map
             const emojiMap = {};
-            buttonGroups.forEach(group => {
-                group.buttons.forEach(btn => {
+            buttonGroups.forEach((group) => {
+                group.buttons.forEach((btn) => {
                     if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
                     emojiMap[btn.type][btn.value] = btn.emoji || "•";
                 });
@@ -1284,13 +1274,19 @@
 
                 let totalSleepMinutes = 0;
                 let currentSleepStart = null;
-                
+
                 // Check if day starts during a sleep period
                 // Find the most recent sleep event before dayStart
-                const eventsBeforeDay = sleepEvents.filter(e => new Date(e.ts) < dayStart);
+                const eventsBeforeDay = sleepEvents.filter(
+                    (e) => new Date(e.ts) < dayStart
+                );
                 if (eventsBeforeDay.length > 0) {
-                    const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
-                    if (lastEventBeforeDay.value === "sleeping" || lastEventBeforeDay.value === "nap") {
+                    const lastEventBeforeDay =
+                        eventsBeforeDay[eventsBeforeDay.length - 1];
+                    if (
+                        lastEventBeforeDay.value === "sleeping" ||
+                        lastEventBeforeDay.value === "nap"
+                    ) {
                         // Day starts during sleep
                         currentSleepStart = new Date(lastEventBeforeDay.ts);
                     }
@@ -1701,14 +1697,26 @@
                     const hours = (date - dayStart) / (1000 * 60 * 60);
 
                     if (e.type === "sleep") {
-                        sleepEvents.push({ time: hours, value: e.value, ts: date });
+                        sleepEvents.push({
+                            time: hours,
+                            value: e.value,
+                            ts: date,
+                        });
                     } else if (hours >= 0 && hours < 24) {
                         // Look up emoji from the map
                         let emoji = "•";
                         if (emojiMap[e.type]) {
-                            emoji = emojiMap[e.type][e.value] || emojiMap[e.type][""] || "•";
+                            emoji =
+                                emojiMap[e.type][e.value] ||
+                                emojiMap[e.type][""] ||
+                                "•";
                         }
-                        eventData.push({ time: hours, emoji: emoji, type: e.type, value: e.value });
+                        eventData.push({
+                            time: hours,
+                            emoji: emoji,
+                            type: e.type,
+                            value: e.value,
+                        });
                     }
                 });
 
@@ -1749,46 +1757,45 @@
                 // Build continuous sleep state line data
                 // States: 2.5 = awake, 1.5 = light sleep (<20 min), 0.5 = deep sleep (>20 min)
                 const lineData = [];
-                
-                // Determine initial state based on previous day
-                let currentState = 2.5; // default to awake
-                let sleepStartTime = null;
-                let sleepStartEvent = null;
-                
-                // Check events before the current day to determine initial state
-                const eventsBeforeDay = sleepEvents.filter(e => e.time < 0);
+
+                // Determine initial state based on previous day - add a mock event at time 0
+                const eventsBeforeDay = sleepEvents.filter((e) => e.time < 0);
                 if (eventsBeforeDay.length > 0) {
-                    const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
-                    if (lastEventBeforeDay.value === "sleeping" || lastEventBeforeDay.value === "nap") {
-                        // Day starts during sleep
-                        sleepStartTime = lastEventBeforeDay.time;
-                        // Calculate how long they've been asleep at the start of the day
-                        const sleepDurationMinutes = (0 - lastEventBeforeDay.time) * 60;
-                        if (sleepDurationMinutes > 20) {
-                            currentState = 0.5; // deep sleep
-                            // Note: deep sleep transition already happened before day start
-                        } else {
-                            currentState = 1.5; // light sleep
-                            // Check if transition to deep sleep happens during the day
-                            const deepSleepTime = lastEventBeforeDay.time + 20/60;
-                            if (deepSleepTime > 0 && deepSleepTime < 24) {
-                                // Will transition to deep sleep during the day - mark this for later
-                                lineData.push({ time: 0, state: 1.5 });
-                                lineData.push({ time: deepSleepTime, state: 0.5 });
-                                currentState = 0.5;
-                            }
-                        }
+                    const lastEventBeforeDay =
+                        eventsBeforeDay[eventsBeforeDay.length - 1];
+                    if (
+                        lastEventBeforeDay.value === "sleeping" ||
+                        lastEventBeforeDay.value === "nap"
+                    ) {
+                        // Add a mock sleep event at midnight to continue the sleep
+                        sleepEvents.unshift({
+                            time: 0,
+                            value: lastEventBeforeDay.value,
+                            ts: dayStart,
+                        });
+                    } else {
+                        // Add a mock awake event at midnight
+                        sleepEvents.unshift({
+                            time: 0,
+                            value: "awake",
+                            ts: dayStart,
+                        });
                     }
+                } else {
+                    // No previous events, assume awake at start
+                    sleepEvents.unshift({
+                        time: 0,
+                        value: "awake",
+                        ts: dayStart,
+                    });
                 }
-                
-                // Add starting point if not already added
-                if (lineData.length === 0) {
-                    lineData.push({ time: 0, state: currentState });
-                }
-                
+
+                let currentState = 2.5; // awake
+                let sleepStartTime = null;
+
                 sleepEvents.forEach((event, i) => {
                     const hour = Math.max(0, Math.min(24, event.time));
-                    
+
                     if (event.value === "sleeping" || event.value === "nap") {
                         // Starting to sleep
                         sleepStartTime = event.time;
@@ -1800,17 +1807,24 @@
                     } else if (event.value === "awake") {
                         // Waking up - check duration
                         if (sleepStartTime !== null) {
-                            const durationMinutes = (event.time - sleepStartTime) * 60;
-                            
+                            const durationMinutes =
+                                (event.time - sleepStartTime) * 60;
+
                             if (durationMinutes > 20) {
                                 // It was a deep sleep - add transition to deep sleep
-                                const deepSleepTime = sleepStartTime + 20/60; // 20 minutes after sleep start
+                                const deepSleepTime = Math.max(
+                                    0,
+                                    sleepStartTime + 20 / 60
+                                ); // 20 minutes after sleep start
                                 if (deepSleepTime >= 0 && deepSleepTime <= 24) {
-                                    lineData.push({ time: deepSleepTime, state: 0.5 });
+                                    lineData.push({
+                                        time: deepSleepTime,
+                                        state: 0.5,
+                                    });
                                 }
                             }
                         }
-                        
+
                         currentState = 2.5; // awake
                         if (hour >= 0 && hour <= 24) {
                             lineData.push({ time: hour, state: currentState });
@@ -1818,39 +1832,58 @@
                         sleepStartTime = null;
                     }
                 });
-                
+
                 // Determine end time and handle ongoing sleep
                 const now = new Date();
-                const isToday = currentReportDate.toDateString() === now.toDateString();
-                const endTime = isToday ? now.getHours() + now.getMinutes() / 60 : 24;
-                
+                const isToday =
+                    currentReportDate.toDateString() === now.toDateString();
+                const endTime = isToday
+                    ? now.getHours() + now.getMinutes() / 60
+                    : 24;
+
                 if (sleepStartTime !== null) {
                     // Still sleeping at end of period
                     const durationMinutes = (endTime - sleepStartTime) * 60;
-                    
+
                     if (durationMinutes > 20) {
-                        const deepSleepTime = sleepStartTime + 20/60;
+                        const deepSleepTime = sleepStartTime + 20 / 60;
                         if (deepSleepTime <= endTime && deepSleepTime >= 0) {
                             lineData.push({ time: deepSleepTime, state: 0.5 });
                         }
                     }
-                    
+
                     const finalState = durationMinutes > 20 ? 0.5 : 1.5;
                     lineData.push({ time: endTime, state: finalState });
                 } else {
                     // End with current awake state
                     lineData.push({ time: endTime, state: currentState });
                 }
-                
+
                 // Sort by time
                 lineData.sort((a, b) => a.time - b.time);
-                
+
                 // Create line generator
-                const line = d3.line()
-                    .x(d => x(d.time))
-                    .y(d => y(d.state))
+                const line = d3
+                    .line()
+                    .x((d) => x(d.time))
+                    .y((d) => y(d.state))
                     .curve(d3.curveStepAfter);
-                
+
+                // Create area generator for shading above the line (but only up to awake level)
+                const area = d3
+                    .area()
+                    .x((d) => x(d.time))
+                    .y0((d) => y(Math.min(d.state, 2.5)))
+                    .y1((d) => y(2.5))
+                    .curve(d3.curveStepAfter);
+
+                // Draw shaded area under the sleep line
+                svg.append("path")
+                    .datum(lineData)
+                    .attr("fill", "#2196f3")
+                    .attr("fill-opacity", 0.1)
+                    .attr("d", area);
+
                 // Draw the sleep state line
                 svg.append("path")
                     .datum(lineData)
