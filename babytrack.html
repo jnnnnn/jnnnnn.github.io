@@ -1668,7 +1668,7 @@
                 }
 
                 // Prepare data for timeline - convert timestamps to hours relative to day start
-                const sleepData = [];
+                const sleepEvents = [];
                 const feedData = [];
 
                 relevantEntries.forEach((e) => {
@@ -1677,7 +1677,7 @@
                     const hours = (date - dayStart) / (1000 * 60 * 60);
 
                     if (e.type === "sleep") {
-                        sleepData.push({ time: hours, value: e.value });
+                        sleepEvents.push({ time: hours, value: e.value, ts: date });
                     } else if (e.type === "feed" && e.value === "bf") {
                         // Only show feeds that are within the 0-24 range
                         if (hours >= 0 && hours < 24) {
@@ -1694,7 +1694,7 @@
 
                 const y = d3
                     .scaleLinear()
-                    .domain([0, 2])
+                    .domain([0, 3])
                     .range([height - margin.bottom, margin.top]);
 
                 // Draw gridlines for every hour
@@ -1720,101 +1720,126 @@
                             .tickFormat((d) => d + "h")
                     );
 
-                // Draw sleep periods as rectangles
-                let sleepStart = null;
-                sleepData.forEach((d, i) => {
-                    if (d.value === "sleeping" || d.value === "nap") {
-                        sleepStart = d.time;
-                    } else if (d.value === "awake" && sleepStart !== null) {
-                        // Clip sleep period to 0-24 hour range
-                        const clippedStart = Math.max(0, sleepStart);
-                        const clippedEnd = Math.min(24, d.time);
-
-                        if (clippedEnd > clippedStart) {
-                            svg.append("rect")
-                                .attr("x", x(clippedStart))
-                                .attr("y", y(1.5))
-                                .attr("width", x(clippedEnd) - x(clippedStart))
-                                .attr("height", 40)
-                                .attr("fill", "#2196f3")
-                                .attr("opacity", 0.6)
-                                .attr("rx", 4);
+                // Build continuous sleep state line data
+                // States: 2.5 = awake, 1.5 = light sleep (<20 min), 0.5 = deep sleep (>20 min)
+                const lineData = [];
+                
+                // Start with awake at hour 0
+                let currentState = 2.5; // awake
+                let sleepStartTime = null;
+                let sleepStartEvent = null;
+                
+                // Add starting point
+                lineData.push({ time: 0, state: currentState });
+                
+                sleepEvents.forEach((event, i) => {
+                    const hour = Math.max(0, Math.min(24, event.time));
+                    
+                    if (event.value === "sleeping" || event.value === "nap") {
+                        // Starting to sleep
+                        sleepStartTime = event.time;
+                        sleepStartEvent = event;
+                        currentState = 1.5; // light sleep
+                        if (hour >= 0 && hour <= 24) {
+                            lineData.push({ time: hour, state: currentState });
                         }
-                        sleepStart = null;
+                    } else if (event.value === "awake") {
+                        // Waking up - check duration
+                        if (sleepStartTime !== null) {
+                            const durationMinutes = (event.time - sleepStartTime) * 60;
+                            
+                            if (durationMinutes > 20) {
+                                // It was a deep sleep - add transition to deep sleep
+                                const deepSleepTime = sleepStartTime + 20/60; // 20 minutes after sleep start
+                                if (deepSleepTime >= 0 && deepSleepTime <= 24) {
+                                    lineData.push({ time: deepSleepTime, state: 0.5 });
+                                }
+                            }
+                        }
+                        
+                        currentState = 2.5; // awake
+                        if (hour >= 0 && hour <= 24) {
+                            lineData.push({ time: hour, state: currentState });
+                        }
+                        sleepStartTime = null;
                     }
                 });
-
-                // Handle sleep that started before midnight (negative time values)
-                if (sleepStart !== null && sleepStart < 0) {
-                    // Draw from 0 to when baby woke up
-                    const firstWake = sleepData.find(
-                        (e) => e.value === "awake" && e.time >= 0
-                    );
-                    if (firstWake) {
-                        const clippedEnd = Math.min(24, firstWake.time);
-                        svg.append("rect")
-                            .attr("x", x(0))
-                            .attr("y", y(1.5))
-                            .attr("width", x(clippedEnd) - x(0))
-                            .attr("height", 40)
-                            .attr("fill", "#2196f3")
-                            .attr("opacity", 0.6)
-                            .attr("rx", 4);
-                    }
-                    sleepStart = null;
-                }
-
-                // Draw ongoing sleep (if baby is still asleep)
-                if (sleepStart !== null) {
-                    // Get current time in hours for the selected date
+                
+                // Handle ongoing sleep
+                if (sleepStartTime !== null) {
                     const now = new Date();
-                    const reportDate = currentReportDate;
-                    const isToday =
-                        reportDate.toDateString() === now.toDateString();
-
-                    // Only show ongoing sleep if viewing today
+                    const isToday = currentReportDate.toDateString() === now.toDateString();
+                    
                     if (isToday) {
-                        const currentHour =
-                            now.getHours() + now.getMinutes() / 60;
-                        svg.append("rect")
-                            .attr("x", x(sleepStart))
-                            .attr("y", y(1.5))
-                            .attr("width", x(currentHour) - x(sleepStart))
-                            .attr("height", 40)
-                            .attr("fill", "#2196f3")
-                            .attr("opacity", 0.4)
-                            .attr("rx", 4)
-                            .attr("stroke", "#2196f3")
-                            .attr("stroke-width", 2)
-                            .attr("stroke-dasharray", "5,5");
+                        const currentHour = now.getHours() + now.getMinutes() / 60;
+                        const durationMinutes = (currentHour - sleepStartTime) * 60;
+                        
+                        if (durationMinutes > 20) {
+                            const deepSleepTime = sleepStartTime + 20/60;
+                            if (deepSleepTime <= currentHour) {
+                                lineData.push({ time: deepSleepTime, state: 0.5 });
+                            }
+                        }
+                        lineData.push({ time: currentHour, state: currentState === 1.5 ? 1.5 : 0.5 });
                     }
+                } else {
+                    // End at hour 24 with current state
+                    lineData.push({ time: 24, state: currentState });
                 }
+                
+                // Sort by time
+                lineData.sort((a, b) => a.time - b.time);
+                
+                // Create line generator
+                const line = d3.line()
+                    .x(d => x(d.time))
+                    .y(d => y(d.state))
+                    .curve(d3.curveStepAfter);
+                
+                // Draw the sleep state line
+                svg.append("path")
+                    .datum(lineData)
+                    .attr("fill", "none")
+                    .attr("stroke", "#2196f3")
+                    .attr("stroke-width", 3)
+                    .attr("d", line);
 
                 // Draw feed events as circles
                 feedData.forEach((d) => {
                     svg.append("circle")
                         .attr("cx", x(d.time))
-                        .attr("cy", y(0.5))
+                        .attr("cy", y(2.5))
                         .attr("r", 5)
                         .attr("fill", "#4caf50");
                 });
 
-                // Add labels
+                // Add Y-axis labels
                 svg.append("text")
-                    .attr("x", margin.left)
-                    .attr("y", y(1.5) + 20)
-                    .attr("text-anchor", "start")
-                    .style("font-size", "12px")
+                    .attr("x", margin.left - 5)
+                    .attr("y", y(2.5))
+                    .attr("text-anchor", "end")
+                    .attr("alignment-baseline", "middle")
+                    .style("font-size", "11px")
                     .style("fill", "#666")
-                    .text("Sleep");
+                    .text("Awake");
 
                 svg.append("text")
-                    .attr("x", margin.left)
-                    .attr("y", y(0.5) + 5)
-                    .attr("text-anchor", "start")
-                    .style("font-size", "12px")
+                    .attr("x", margin.left - 5)
+                    .attr("y", y(1.5))
+                    .attr("text-anchor", "end")
+                    .attr("alignment-baseline", "middle")
+                    .style("font-size", "11px")
                     .style("fill", "#666")
-                    .text("Feed");
+                    .text("Light");
+
+                svg.append("text")
+                    .attr("x", margin.left - 5)
+                    .attr("y", y(0.5))
+                    .attr("text-anchor", "end")
+                    .attr("alignment-baseline", "middle")
+                    .style("font-size", "11px")
+                    .style("fill", "#666")
+                    .text("Deep");
             }
         </script>
     </head>
