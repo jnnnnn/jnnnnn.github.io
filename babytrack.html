@@ -587,7 +587,7 @@
             function findLastSleepStart(entries) {
                 return [...entries]
                     .reverse()
-                    .find(e => e.type === "sleep" && (e.value === "sleeping" || e.value === "nap"));
+                    .find(e => !e.deleted && e.type === "sleep" && (e.value === "sleeping" || e.value === "nap"));
             }
 
             async function save(type, value, btn, customTimestamp = null) {
@@ -766,8 +766,16 @@
                     return;
                 }
 
+                // Filter out deleted entries from CSV export
+                const activeEntries = entries.filter(e => !e.deleted);
+                
+                if (activeEntries.length === 0) {
+                    alert("No active data to export (all entries are deleted)");
+                    return;
+                }
+
                 const header = "Timestamp,Type,Value";
-                const rows = entries.map((e) => {
+                const rows = activeEntries.map((e) => {
                     // Convert UTC timestamp to ISO format with local timezone offset
                     const date = new Date(e.ts);
                     const offset = -date.getTimezoneOffset();
@@ -820,14 +828,18 @@
 
                 if (!allEntries || allEntries.length === 0) return;
 
+                // Filter out deleted entries for button states
+                const activeEntries = allEntries.filter(e => !e.deleted);
+                if (activeEntries.length === 0) return;
+
                 // Find last feed and update button
-                const lastFeed = [...allEntries].reverse().find(e => e.type === "feed" && e.value === "bf");
+                const lastFeed = [...activeEntries].reverse().find(e => e.type === "feed" && e.value === "bf");
                 const feedBtn = document.querySelector('button[data-type="feed"][data-value="bf"]');
                 const feedTime = lastFeed ? formatElapsedTime(new Date(lastFeed.ts).getTime()) : null;
                 updateButtonDisplay(feedBtn, "Feed", feedTime, false);
 
                 // Find last sleep event and update sleep/awake buttons
-                const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep");
+                const lastSleepEvent = [...activeEntries].reverse().find(e => e.type === "sleep");
                 const sleepBtn = document.querySelector('button[data-type="sleep"][data-value="sleeping"]');
                 const awakeBtn = document.querySelector('button[data-type="sleep"][data-value="awake"]');
 
@@ -996,11 +1008,14 @@
             async function updateDailyReport() {
                 const allEntries = await loadEntriesByDate(currentReportDate);
                 
+                // Filter out deleted entries centrally
+                const activeEntries = allEntries.filter((e) => !e.deleted);
+                
                 // Filter to only entries within the current day for display purposes
-                const entriesInDay = filterEntriesInDay(allEntries, currentReportDate);
+                const entriesInDay = filterEntriesInDay(activeEntries, currentReportDate);
 
-                // Calculate statistics (uses allEntries for cross-midnight sleep)
-                const stats = calculateDailyStats(allEntries);
+                // Calculate statistics (uses activeEntries for cross-midnight sleep)
+                const stats = calculateDailyStats(activeEntries);
                 updateStatsDisplay(stats);
                 
                 // Display functions use filtered entries only
@@ -1008,8 +1023,8 @@
                 updateSleepAttempts(entriesInDay);
                 updateRecentEvents(entriesInDay);
                 
-                // Timeline needs allEntries to show cross-midnight sleep properly
-                drawTimeline(allEntries);
+                // Timeline needs activeEntries to show cross-midnight sleep properly
+                drawTimeline(activeEntries);
             }
 
             function calculateDailyStats(entries) {
