@@ -1114,51 +1114,64 @@
             const buttonGroups = [
                 {
                     buttons: [
-                        { type: "feed", value: "bf", label: "Feed" },
-                        { type: "feed", value: "play", label: "Play" },
+                        { type: "feed", value: "bf", label: "Feed", emoji: "🤱" },
+                        { type: "feed", value: "play", label: "Play", emoji: "🎾" },
+                        { type: "feed", value: "spew", label: "Spew", emoji: "🤮" },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "sleep", value: "sleeping", label: "Sleeping" },
-                        { type: "sleep", value: "nap", label: "Nap" },
-                        { type: "sleep", value: "awake", label: "Awake" },
-                        { type: "sleep", value: "grizzle", label: "Grizzle" },
+                        { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "" },
+                        { type: "sleep", value: "nap", label: "Nap", emoji: "" },
+                        { type: "sleep", value: "awake", label: "Awake", emoji: "" },
+                        { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "nappy", value: "wet", label: "Wet" },
-                        { type: "nappy", value: "dirty", label: "Dirty" },
-                        { type: "nappy", value: "spew", label: "Spew" },
+                        { type: "nappy", value: "wet", label: "Wet", emoji: "💧" },
+                        { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩" },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "soothe", value: "pram", label: "Pram" },
-                        { type: "soothe", value: "rocking", label: "Rocking" },
-                        { type: "soothe", value: "wearing", label: "Wearing" },
+                        { type: "soothe", value: "pram", label: "Pram", emoji: "🎢" },
+                        { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑" },
+                        { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗" },
                         {
                             type: "soothe",
                             value: "feed-to-sleep",
                             label: "Feed to Sleep",
+                            emoji: "🍼😴"
                         },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "5s", value: "swaddle", label: "Swaddle" },
+                        { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯" },
                         {
                             type: "5s",
                             value: "side-lying",
                             label: "Side/Stomach",
+                            emoji: "🛏️"
                         },
-                        { type: "5s", value: "shush", label: "Shush" },
-                        { type: "5s", value: "swing", label: "Swing" },
-                        { type: "5s", value: "suck", label: "Suck" },
+                        { type: "5s", value: "shush", label: "Shush", emoji: "🤫" },
+                        { type: "5s", value: "swing", label: "Swing", emoji: "🎢" },
+                        { type: "5s", value: "suck", label: "Suck", emoji: "🍭" },
                     ],
                 },
             ];
+            
+            // Create emoji lookup map
+            const emojiMap = {};
+            buttonGroups.forEach(group => {
+                group.buttons.forEach(btn => {
+                    if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
+                    emojiMap[btn.type][btn.value] = btn.emoji || "•";
+                });
+            });
+            // Add emoji for notes
+            emojiMap["note"] = { "": "📝" };
 
             // Generate buttons dynamically
             function renderButtons() {
@@ -1271,6 +1284,17 @@
 
                 let totalSleepMinutes = 0;
                 let currentSleepStart = null;
+                
+                // Check if day starts during a sleep period
+                // Find the most recent sleep event before dayStart
+                const eventsBeforeDay = sleepEvents.filter(e => new Date(e.ts) < dayStart);
+                if (eventsBeforeDay.length > 0) {
+                    const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
+                    if (lastEventBeforeDay.value === "sleeping" || lastEventBeforeDay.value === "nap") {
+                        // Day starts during sleep
+                        currentSleepStart = new Date(lastEventBeforeDay.ts);
+                    }
+                }
 
                 sleepEvents.forEach((event, i) => {
                     if (event.value === "sleeping" || event.value === "nap") {
@@ -1669,7 +1693,7 @@
 
                 // Prepare data for timeline - convert timestamps to hours relative to day start
                 const sleepEvents = [];
-                const feedData = [];
+                const eventData = []; // All non-sleep events
 
                 relevantEntries.forEach((e) => {
                     const date = new Date(e.ts);
@@ -1678,11 +1702,13 @@
 
                     if (e.type === "sleep") {
                         sleepEvents.push({ time: hours, value: e.value, ts: date });
-                    } else if (e.type === "feed" && e.value === "bf") {
-                        // Only show feeds that are within the 0-24 range
-                        if (hours >= 0 && hours < 24) {
-                            feedData.push({ time: hours });
+                    } else if (hours >= 0 && hours < 24) {
+                        // Look up emoji from the map
+                        let emoji = "•";
+                        if (emojiMap[e.type]) {
+                            emoji = emojiMap[e.type][e.value] || emojiMap[e.type][""] || "•";
                         }
+                        eventData.push({ time: hours, emoji: emoji, type: e.type, value: e.value });
                     }
                 });
 
@@ -1724,13 +1750,41 @@
                 // States: 2.5 = awake, 1.5 = light sleep (<20 min), 0.5 = deep sleep (>20 min)
                 const lineData = [];
                 
-                // Start with awake at hour 0
-                let currentState = 2.5; // awake
+                // Determine initial state based on previous day
+                let currentState = 2.5; // default to awake
                 let sleepStartTime = null;
                 let sleepStartEvent = null;
                 
-                // Add starting point
-                lineData.push({ time: 0, state: currentState });
+                // Check events before the current day to determine initial state
+                const eventsBeforeDay = sleepEvents.filter(e => e.time < 0);
+                if (eventsBeforeDay.length > 0) {
+                    const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
+                    if (lastEventBeforeDay.value === "sleeping" || lastEventBeforeDay.value === "nap") {
+                        // Day starts during sleep
+                        sleepStartTime = lastEventBeforeDay.time;
+                        // Calculate how long they've been asleep at the start of the day
+                        const sleepDurationMinutes = (0 - lastEventBeforeDay.time) * 60;
+                        if (sleepDurationMinutes > 20) {
+                            currentState = 0.5; // deep sleep
+                            // Note: deep sleep transition already happened before day start
+                        } else {
+                            currentState = 1.5; // light sleep
+                            // Check if transition to deep sleep happens during the day
+                            const deepSleepTime = lastEventBeforeDay.time + 20/60;
+                            if (deepSleepTime > 0 && deepSleepTime < 24) {
+                                // Will transition to deep sleep during the day - mark this for later
+                                lineData.push({ time: 0, state: 1.5 });
+                                lineData.push({ time: deepSleepTime, state: 0.5 });
+                                currentState = 0.5;
+                            }
+                        }
+                    }
+                }
+                
+                // Add starting point if not already added
+                if (lineData.length === 0) {
+                    lineData.push({ time: 0, state: currentState });
+                }
                 
                 sleepEvents.forEach((event, i) => {
                     const hour = Math.max(0, Math.min(24, event.time));
@@ -1765,26 +1819,27 @@
                     }
                 });
                 
-                // Handle ongoing sleep
+                // Determine end time and handle ongoing sleep
+                const now = new Date();
+                const isToday = currentReportDate.toDateString() === now.toDateString();
+                const endTime = isToday ? now.getHours() + now.getMinutes() / 60 : 24;
+                
                 if (sleepStartTime !== null) {
-                    const now = new Date();
-                    const isToday = currentReportDate.toDateString() === now.toDateString();
+                    // Still sleeping at end of period
+                    const durationMinutes = (endTime - sleepStartTime) * 60;
                     
-                    if (isToday) {
-                        const currentHour = now.getHours() + now.getMinutes() / 60;
-                        const durationMinutes = (currentHour - sleepStartTime) * 60;
-                        
-                        if (durationMinutes > 20) {
-                            const deepSleepTime = sleepStartTime + 20/60;
-                            if (deepSleepTime <= currentHour) {
-                                lineData.push({ time: deepSleepTime, state: 0.5 });
-                            }
+                    if (durationMinutes > 20) {
+                        const deepSleepTime = sleepStartTime + 20/60;
+                        if (deepSleepTime <= endTime && deepSleepTime >= 0) {
+                            lineData.push({ time: deepSleepTime, state: 0.5 });
                         }
-                        lineData.push({ time: currentHour, state: currentState === 1.5 ? 1.5 : 0.5 });
                     }
+                    
+                    const finalState = durationMinutes > 20 ? 0.5 : 1.5;
+                    lineData.push({ time: endTime, state: finalState });
                 } else {
-                    // End at hour 24 with current state
-                    lineData.push({ time: 24, state: currentState });
+                    // End with current awake state
+                    lineData.push({ time: endTime, state: currentState });
                 }
                 
                 // Sort by time
@@ -1804,13 +1859,18 @@
                     .attr("stroke-width", 3)
                     .attr("d", line);
 
-                // Draw feed events as circles
-                feedData.forEach((d) => {
-                    svg.append("circle")
-                        .attr("cx", x(d.time))
-                        .attr("cy", y(2.5))
-                        .attr("r", 5)
-                        .attr("fill", "#4caf50");
+                // Draw events as emoji text
+                eventData.forEach((d) => {
+                    svg.append("text")
+                        .attr("x", x(d.time))
+                        .attr("y", y(2.5))
+                        .attr("text-anchor", "middle")
+                        .attr("dominant-baseline", "middle")
+                        .style("font-size", "16px")
+                        .style("cursor", "pointer")
+                        .text(d.emoji)
+                        .append("title")
+                        .text(`${d.type}: ${d.value}`);
                 });
 
                 // Add Y-axis labels
