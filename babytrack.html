@@ -314,6 +314,33 @@
                 background: var(--primary);
                 color: #fff;
             }
+            
+            /* D3 Enhanced Event Styles */
+            .event-entry {
+                transition: all 0.2s ease;
+            }
+            
+            .event-tooltip {
+                font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+                line-height: 1.4;
+            }
+            
+            .event-tooltip strong {
+                color: var(--primary);
+            }
+            
+            /* Enhanced interaction styles */
+            .attempt {
+                transition: all 0.2s ease;
+            }
+            
+            /* Filter controls styling */
+            #event-filter:focus,
+            #event-type-filter:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(76, 132, 255, 0.2);
+            }
         </style>
         <script>
             let db = null;
@@ -960,14 +987,61 @@
             }
 
             function updateStatsDisplay(stats) {
-                document.getElementById("stat-sleep").textContent =
-                    stats.totalSleep;
-                document.getElementById("stat-feeds").textContent =
-                    stats.feedCount;
-                document.getElementById("stat-wet").textContent =
-                    stats.wetCount;
-                document.getElementById("stat-dirty").textContent =
-                    stats.dirtyCount;
+                // Use D3 for animated stat updates
+                const statData = [
+                    { id: "stat-sleep", value: stats.totalSleep, label: "Total Sleep" },
+                    { id: "stat-feeds", value: stats.feedCount, label: "Feeds", isNumeric: true },
+                    { id: "stat-wet", value: stats.wetCount, label: "Wet Nappies", isNumeric: true },
+                    { id: "stat-dirty", value: stats.dirtyCount, label: "Dirty Nappies", isNumeric: true }
+                ];
+
+                statData.forEach(stat => {
+                    const element = d3.select(`#${stat.id}`);
+                    
+                    if (stat.isNumeric) {
+                        // Animate numeric values
+                        const currentValue = parseInt(element.text()) || 0;
+                        const targetValue = stat.value;
+                        
+                        if (currentValue !== targetValue) {
+                            element
+                                .transition()
+                                .duration(500)
+                                .tween("text", function() {
+                                    const i = d3.interpolateNumber(currentValue, targetValue);
+                                    return function(t) {
+                                        this.textContent = Math.round(i(t));
+                                    };
+                                })
+                                .on("start", function() {
+                                    d3.select(this)
+                                        .style("color", "var(--primary)")
+                                        .style("transform", "scale(1.1)");
+                                })
+                                .on("end", function() {
+                                    d3.select(this)
+                                        .transition()
+                                        .duration(200)
+                                        .style("color", "")
+                                        .style("transform", "scale(1)");
+                                });
+                        }
+                    } else {
+                        // Simple text update for non-numeric values
+                        if (element.text() !== stat.value) {
+                            element
+                                .transition()
+                                .duration(200)
+                                .style("opacity", 0.5)
+                                .transition()
+                                .duration(200)
+                                .style("opacity", 1)
+                                .on("start", function() {
+                                    this.textContent = stat.value;
+                                });
+                        }
+                    }
+                });
             }
 
             function updateHourlyGrid(entries) {
@@ -1042,68 +1116,125 @@
                     attempts.push(currentAttempt);
                 }
 
-                const container = document.getElementById(
-                    "sleep-attempts-list"
-                );
-                container.innerHTML = "";
+                const container = d3.select("#sleep-attempts-list");
 
-                attempts.forEach((attempt) => {
-                    const div = document.createElement("div");
-                    div.className = `attempt ${
-                        attempt.success ? "success" : "fail"
-                    }`;
+                // Add unique IDs to attempts for D3 data binding
+                const attemptsWithIds = attempts.map((attempt, index) => ({
+                    ...attempt,
+                    attemptId: `${attempt.start.getTime()}-${index}`
+                }));
 
-                    const timeStr = attempt.start.toLocaleTimeString([], {
+                // D3 data binding for sleep attempts
+                const attemptElements = container
+                    .selectAll(".attempt")
+                    .data(attemptsWithIds, d => d.attemptId);
+
+                // Remove exiting attempts
+                attemptElements.exit()
+                    .transition()
+                    .duration(300)
+                    .style("opacity", 0)
+                    .style("height", "0px")
+                    .style("padding", "0px")
+                    .remove();
+
+                // Add new attempts
+                const enteringAttempts = attemptElements.enter()
+                    .append("div")
+                    .attr("class", d => `attempt ${d.success ? "success" : "fail"}`)
+                    .style("opacity", 0)
+                    .style("transform", "translateY(-10px)");
+
+                // Update all attempts
+                const allAttempts = enteringAttempts.merge(attemptElements);
+
+                allAttempts
+                    .attr("class", d => `attempt ${d.success ? "success" : "fail"}`)
+                    .transition()
+                    .duration(300)
+                    .style("opacity", 1)
+                    .style("transform", "translateY(0px)");
+
+                allAttempts.html(d => {
+                    const timeStr = d.start.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                     });
                     let durationStr = "";
-                    if (attempt.end) {
+                    if (d.end) {
                         const mins = Math.round(
-                            (attempt.end - attempt.start) / 1000 / 60
+                            (d.end - d.start) / 1000 / 60
                         );
                         durationStr = `${mins}m`;
                     } else {
                         durationStr = "ongoing";
                     }
 
-                    div.innerHTML = `
-                        <span>${timeStr} - ${attempt.type}</span>
+                    return `
+                        <span>${timeStr} - ${d.type}</span>
                         <span>${durationStr} ${
-                        attempt.success ? "✓" : "✗"
+                        d.success ? "✓" : "✗"
                     }</span>
                     `;
-                    container.appendChild(div);
                 });
             }
 
             function updateRecentEvents(entries) {
-                const container = document.getElementById("recent-events-list");
-                if (!container) return;
+                // Store entries globally for filtering
+                allDayEntries = entries;
+                
+                // Clear any existing filters and show all events
+                d3.select("#event-filter").property("value", "");
+                d3.select("#event-type-filter").property("value", "");
+                
+                updateRecentEventsDisplay(entries);
+            }
 
-                container.innerHTML = "";
+            function showEventDetails(entry, event) {
+                // Create or select tooltip div
+                let tooltip = d3.select("body").select(".event-tooltip");
+                if (tooltip.empty()) {
+                    tooltip = d3.select("body")
+                        .append("div")
+                        .attr("class", "event-tooltip")
+                        .style("position", "absolute")
+                        .style("background", "var(--card)")
+                        .style("padding", "12px")
+                        .style("border-radius", "8px")
+                        .style("box-shadow", "0 4px 12px rgba(0,0,0,0.2)")
+                        .style("border", "1px solid var(--muted)")
+                        .style("font-size", "14px")
+                        .style("max-width", "250px")
+                        .style("z-index", "1001")
+                        .style("opacity", 0)
+                        .style("pointer-events", "none");
+                }
 
-                // Show all events for the selected day in reverse chronological order
-                const allEvents = [...entries].reverse();
+                const time = new Date(entry.ts);
+                const fullTimeStr = time.toLocaleString();
+                const elapsed = formatElapsedTime(time.getTime());
 
-                allEvents.forEach((e) => {
-                    const div = document.createElement("div");
-                    div.className = "event-entry";
+                tooltip.html(`
+                    <strong>Entry #${entry.id}</strong><br>
+                    <strong>Type:</strong> ${entry.type}<br>
+                    <strong>Value:</strong> ${entry.value}<br>
+                    <strong>Time:</strong> ${fullTimeStr}<br>
+                    <strong>Elapsed:</strong> ${elapsed}
+                `);
 
-                    const time = new Date(e.ts);
-                    const timeStr = time.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
+                // Position tooltip near mouse - use the passed event object
+                const [mouseX, mouseY] = d3.pointer(event, d3.select("body").node());
+                tooltip
+                    .style("left", (mouseX + 10) + "px")
+                    .style("top", (mouseY - 10) + "px")
+                    .transition()
+                    .duration(200)
+                    .style("opacity", 1);
 
-                    div.innerHTML = `
-                        <div>
-                            <span class="event-type">${e.type}</span><span class="event-value">: ${e.value}</span>
-                        </div>
-                        <span class="event-time">${timeStr}</span>
-                    `;
-                    container.appendChild(div);
-                });
+                // Hide tooltip after 3 seconds
+                setTimeout(() => {
+                    tooltip.transition().duration(300).style("opacity", 0);
+                }, 3000);
             }
 
             function drawTimeline(entries) {
@@ -1364,7 +1495,21 @@
                 </div>
 
                 <div class="recent-events">
-                    <h4>Recent Events</h4>
+                    <h4>Recent Events
+                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
+                            <input type="text" id="event-filter" placeholder="Filter events..." 
+                                   style="flex: 1; padding: 6px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;">
+                            <select id="event-type-filter" style="padding: 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;">
+                                <option value="">All Types</option>
+                                <option value="feed">Feed</option>
+                                <option value="sleep">Sleep</option>
+                                <option value="nappy">Nappy</option>
+                                <option value="soothe">Soothe</option>
+                                <option value="5s">5 S's</option>
+                                <option value="note">Notes</option>
+                            </select>
+                        </div>
+                    </h4>
                     <div class="event-list" id="recent-events-list">
                         <!-- Will be populated by JS -->
                     </div>
@@ -1423,7 +1568,110 @@
                     renderButtons();
                     updateDailyReport();
                     updateButtonStates();
+                    
+                    // Setup event filters
+                    d3.select("#event-filter").on("input", applyEventFilters);
+                    d3.select("#event-type-filter").on("change", applyEventFilters);
                 });
+
+                let allDayEntries = []; // Store all entries for filtering
+
+                function applyEventFilters() {
+                    const textFilter = d3.select("#event-filter").property("value").toLowerCase();
+                    const typeFilter = d3.select("#event-type-filter").property("value");
+                    
+                    let filteredEntries = allDayEntries;
+                    
+                    // Apply type filter
+                    if (typeFilter) {
+                        filteredEntries = filteredEntries.filter(e => e.type === typeFilter);
+                    }
+                    
+                    // Apply text filter
+                    if (textFilter) {
+                        filteredEntries = filteredEntries.filter(e => 
+                            e.type.toLowerCase().includes(textFilter) ||
+                            e.value.toLowerCase().includes(textFilter)
+                        );
+                    }
+                    
+                    updateRecentEventsDisplay(filteredEntries);
+                }
+
+                function updateRecentEventsDisplay(entries) {
+                    const container = d3.select("#recent-events-list");
+                    if (!container.node()) return;
+
+                    // Show all events for the selected day in reverse chronological order
+                    const allEvents = [...entries].reverse();
+
+                    // D3 data binding using IndexedDB primary key
+                    const eventEntries = container
+                        .selectAll(".event-entry")
+                        .data(allEvents, d => d.id); // Key by IndexedDB primary key
+
+                    // Remove exiting events
+                    eventEntries.exit()
+                        .transition()
+                        .duration(300)
+                        .style("opacity", 0)
+                        .style("transform", "translateX(-20px)")
+                        .remove();
+
+                    // Add new events
+                    const enteringEvents = eventEntries.enter()
+                        .append("div")
+                        .attr("class", "event-entry")
+                        .style("opacity", 0)
+                        .style("transform", "translateX(20px)");
+
+                    // Update all events (both new and existing)
+                    const allEventEntries = enteringEvents.merge(eventEntries);
+
+                    allEventEntries
+                        .transition()
+                        .duration(300)
+                        .style("opacity", 1)
+                        .style("transform", "translateX(0px)");
+
+                    allEventEntries.html(d => {
+                        const time = new Date(d.ts);
+                        const timeStr = time.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+
+                        return `
+                            <div>
+                                <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>
+                            </div>
+                            <span class="event-time">${timeStr}</span>
+                        `;
+                    });
+
+                    // Add click interaction to show entry details
+                    allEventEntries
+                        .style("cursor", "pointer")
+                        .on("click", function(event, d) {
+                            showEventDetails(d, event);
+                        })
+                        .on("mouseover", function(event, d) {
+                            d3.select(this)
+                                .transition()
+                                .duration(150)
+                                .style("background", "var(--primary)")
+                                .style("color", "#fff")
+                                .style("transform", "scale(1.02)");
+                        })
+                        .on("mouseout", function(event, d) {
+                            d3.select(this)
+                                .transition()
+                                .duration(150)
+                                .style("background", "var(--bg)")
+                                .style("color", "")
+                                .style("transform", "scale(1)");
+                        });
+                }
 
                 // this function generates several days worth of test data. it is lightly random.
                 async function generateTestData() {
