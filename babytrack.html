@@ -1173,11 +1173,12 @@
                 // Store entries globally for filtering
                 allDayEntries = entries;
                 
-                // Clear any existing filters and show all events
+                // Clear text and type filters but keep hide deleted checked by default
                 d3.select("#event-filter").property("value", "");
                 d3.select("#event-type-filter").property("value", "");
                 
-                updateRecentEventsDisplay(entries);
+                // Apply current filter settings
+                applyEventFilters();
             }
 
             function showEventDetails(entry, event) {
@@ -1486,7 +1487,7 @@
                 </div>
 
                 <div class="recent-events">
-                    <h4>Recent Events
+                    <h4>Events
                         <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
                             <input type="text" id="event-filter" placeholder="Filter events..." 
                                    style="flex: 1; padding: 6px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #ddd;">
@@ -1499,6 +1500,10 @@
                                 <option value="5s">5 S's</option>
                                 <option value="note">Notes</option>
                             </select>
+                            <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap;">
+                                <input type="checkbox" id="hide-deleted-filter" checked>
+                                Hide deleted
+                            </label>
                         </div>
                     </h4>
                     <div class="event-list" id="recent-events-list">
@@ -1563,6 +1568,7 @@
                     // Setup event filters
                     d3.select("#event-filter").on("input", applyEventFilters);
                     d3.select("#event-type-filter").on("change", applyEventFilters);
+                    d3.select("#hide-deleted-filter").on("change", applyEventFilters);
                 });
 
                 let allDayEntries = []; // Store all entries for filtering
@@ -1570,8 +1576,14 @@
                 function applyEventFilters() {
                     const textFilter = d3.select("#event-filter").property("value").toLowerCase();
                     const typeFilter = d3.select("#event-type-filter").property("value");
+                    const hideDeleted = d3.select("#hide-deleted-filter").property("checked");
                     
                     let filteredEntries = allDayEntries;
+                    
+                    // Apply deleted filter
+                    if (hideDeleted) {
+                        filteredEntries = filteredEntries.filter(e => !e.deleted);
+                    }
                     
                     // Apply type filter
                     if (typeFilter) {
