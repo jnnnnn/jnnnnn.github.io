@@ -341,6 +341,13 @@
                 border-color: var(--primary);
                 box-shadow: 0 0 0 2px rgba(76, 132, 255, 0.2);
             }
+            
+            /* Deleted entry styling */
+            .event-entry.deleted {
+                opacity: 0.6;
+                background: #ffebee !important;
+                border-left: 3px solid #ff6666;
+            }
         </style>
         <script>
             let db = null;
@@ -348,7 +355,7 @@
             // Initialize IndexedDB
             async function initDB() {
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open("BabyLogDB", 1);
+                    const request = indexedDB.open("BabyLogDB", 2);
 
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => {
@@ -358,7 +365,10 @@
 
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
-                        if (!db.objectStoreNames.contains("entries")) {
+                        const oldVersion = event.oldVersion;
+                        
+                        if (oldVersion < 1) {
+                            // Create initial schema
                             const objectStore = db.createObjectStore(
                                 "entries",
                                 { keyPath: "id", autoIncrement: true }
@@ -366,6 +376,24 @@
                             objectStore.createIndex("timestamp", "ts", {
                                 unique: false,
                             });
+                        }
+                        
+                        if (oldVersion < 2) {
+                            // Migration to version 2: Add deleted field to existing entries
+                            const transaction = event.target.transaction;
+                            const objectStore = transaction.objectStore("entries");
+                            
+                            objectStore.openCursor().onsuccess = (cursorEvent) => {
+                                const cursor = cursorEvent.target.result;
+                                if (cursor) {
+                                    const entry = cursor.value;
+                                    if (!entry.hasOwnProperty('deleted')) {
+                                        entry.deleted = false;
+                                        cursor.update(entry);
+                                    }
+                                    cursor.continue();
+                                }
+                            };
                         }
                     };
                 });
@@ -377,7 +405,7 @@
 
                 const transaction = db.transaction(["entries"], "readwrite");
                 const objectStore = transaction.objectStore("entries");
-                const entry = { type, value, ts };
+                const entry = { type, value, ts, deleted: false };
                 objectStore.add(entry);
 
                 return new Promise((resolve, reject) => {
@@ -386,8 +414,8 @@
                 });
             }
 
-            // Delete the most recent entry from the database
-            async function deleteMostRecentEntry() {
+            // Mark the most recent undeleted entry as deleted
+            async function markMostRecentAsDeleted() {
                 if (!db) await initDB();
 
                 const transaction = db.transaction(["entries"], "readwrite");
@@ -401,9 +429,15 @@
                     request.onsuccess = (event) => {
                         const cursor = event.target.result;
                         if (cursor) {
-                            const deletedEntry = cursor.value;
-                            cursor.delete();
-                            resolve(deletedEntry);
+                            const entry = cursor.value;
+                            // Find the first undeleted entry
+                            if (!entry.deleted) {
+                                entry.deleted = true;
+                                cursor.update(entry);
+                                resolve(entry);
+                            } else {
+                                cursor.continue();
+                            }
                         } else {
                             resolve(null);
                         }
@@ -588,12 +622,14 @@
             }
 
             async function undo() {
-                const deletedEntry = await deleteMostRecentEntry();
+                const deletedEntry = await markMostRecentAsDeleted();
 
                 if (deletedEntry) {
-                    updateTimestamp("Undone");
+                    updateTimestamp(`Deleted entry: ${deletedEntry.type} - ${deletedEntry.value}`);
                     updateDailyReport();
                     updateButtonStates();
+                } else {
+                    updateTimestamp("No undeleted entries to delete");
                 }
             }
 
@@ -1173,7 +1209,8 @@
                     <strong>Type:</strong> ${entry.type}<br>
                     <strong>Value:</strong> ${entry.value}<br>
                     <strong>Time:</strong> ${fullTimeStr}<br>
-                    <strong>Elapsed:</strong> ${elapsed}
+                    <strong>Elapsed:</strong> ${elapsed}<br>
+                    <strong>Deleted:</strong> ${entry.deleted ? 'Yes' : 'No'}
                 `);
 
                 // Position tooltip near mouse - use the passed event object
@@ -1390,7 +1427,7 @@
             </div>
 
             <div style="display: flex; gap: 8px">
-                <button class="btn" id="undo" onclick="undo()">Undo</button>
+                <button class="btn" id="undo" onclick="undo()">Delete Last</button>
                 <div style="flex: 1"></div>
                 <button class="btn" id="download" onclick="downloadCSV()">
                     Download CSV
@@ -1572,38 +1609,39 @@
                         .style("transform", "translateX(-20px)")
                         .remove();
 
-                    // Add new events
-                    const enteringEvents = eventEntries.enter()
-                        .append("div")
-                        .attr("class", "event-entry")
-                        .style("opacity", 0)
-                        .style("transform", "translateX(20px)");
+                // Add new events
+                const enteringEvents = eventEntries.enter()
+                    .append("div")
+                    .attr("class", d => `event-entry${d.deleted ? ' deleted' : ''}`)
+                    .style("opacity", 0)
+                    .style("transform", "translateX(20px)");
 
-                    // Update all events (both new and existing)
-                    const allEventEntries = enteringEvents.merge(eventEntries);
+                // Update all events (both new and existing)
+                const allEventEntries = enteringEvents.merge(eventEntries);
 
-                    allEventEntries
-                        .transition()
-                        .duration(300)
-                        .style("opacity", 1)
-                        .style("transform", "translateX(0px)");
+                allEventEntries
+                    .attr("class", d => `event-entry${d.deleted ? ' deleted' : ''}`)
+                    .transition()
+                    .duration(300)
+                    .style("opacity", 1)
+                    .style("transform", "translateX(0px)");
 
-                    allEventEntries.html(d => {
-                        const time = new Date(d.ts);
-                        const timeStr = time.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        });
-
-                        return `
-                            <div>
-                                <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>
-                            </div>
-                            <span class="event-time">${timeStr}</span>
-                        `;
+                allEventEntries.html(d => {
+                    const time = new Date(d.ts);
+                    const timeStr = time.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
                     });
+                    
+                    const deletedStatus = d.deleted ? ' <span style="color: #ff6666; font-size: 11px;">[DELETED]</span>' : '';
 
-                    // Add click interaction to show entry details
+                    return `
+                        <div>
+                            <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>${deletedStatus}
+                        </div>
+                        <span class="event-time">${timeStr}</span>
+                    `;
+                });                    // Add click interaction to show entry details
                     allEventEntries
                         .style("cursor", "pointer")
                         .on("click", function(event, d) {
