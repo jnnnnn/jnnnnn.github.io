@@ -58,7 +58,7 @@
         }
 
         .action.fading {
-            transform: scaleY(0.05);
+            transform: scale(0.85);
             background: var(--primary);
             color: #fff;
             box-shadow: 0 4px 12px rgba(76, 132, 255, 0.4);
@@ -846,16 +846,17 @@
                 return;
             }
 
-            // Filter out deleted entries from CSV export
-            const activeEntries = entries.filter(e => !e.deleted);
+            // Filter deleted entries based on checkbox state
+            const hideDeleted = document.getElementById("hide-deleted-filter")?.checked ?? true;
+            const exportEntries = hideDeleted ? entries.filter(e => !e.deleted) : entries;
 
-            if (activeEntries.length === 0) {
-                alert("No active data to export (all entries are deleted)");
+            if (exportEntries.length === 0) {
+                alert("No data to export (all entries are deleted)");
                 return;
             }
 
             const header = "Timestamp,Type,Value";
-            const rows = activeEntries.map((e) => {
+            const rows = exportEntries.map((e) => {
                 // Convert UTC timestamp to ISO format with local timezone offset
                 const date = new Date(e.ts);
                 const offset = -date.getTimezoneOffset();
@@ -1088,20 +1089,21 @@
         async function updateDailyReport() {
             const allEntries = await loadEntriesByDate(currentReportDate);
 
-            // Filter out deleted entries centrally
+            // Filter out deleted entries for graphs/stats only
             const activeEntries = allEntries.filter((e) => !e.deleted);
 
-            // Filter to only entries within the current day for display purposes
-            const entriesInDay = filterEntriesInDay(activeEntries, currentReportDate);
+            // Filter to only entries within the current day
+            const entriesInDay = filterEntriesInDay(allEntries, currentReportDate);
+            const activeEntriesInDay = filterEntriesInDay(activeEntries, currentReportDate);
 
             // Calculate statistics (uses activeEntries for cross-midnight sleep)
             const stats = calculateDailyStats(activeEntries);
             updateStatsDisplay(stats);
 
-            // Display functions use filtered entries only
-            updateHourlyGrid(entriesInDay);
-            updateSleepAttempts(entriesInDay);
-            updateRecentEvents(entriesInDay);
+            // Display functions - graphs use active entries only, log uses all entries
+            updateHourlyGrid(activeEntriesInDay);
+            updateSleepAttempts(activeEntriesInDay);
+            updateRecentEvents(entriesInDay); // Pass all entries including deleted
 
             // Timeline needs activeEntries to show cross-midnight sleep properly
             drawTimeline(activeEntries);
@@ -1339,7 +1341,7 @@
                 .append("div")
                 .attr("class", d => `attempt ${d.success ? "success" : "fail"}`)
                 .style("opacity", 0)
-                .style("transform", "translateY(-10px)");
+                .style("transform", "scaleY(0.01)");
 
             // Update all attempts
             const allAttempts = enteringAttempts.merge(attemptElements);
@@ -1349,7 +1351,7 @@
                 .transition()
                 .duration(300)
                 .style("opacity", 1)
-                .style("transform", "translateY(0px)");
+                .style("transform", "");
 
             allAttempts.html(d => {
                 const timeStr = d.start.toLocaleTimeString([], {
