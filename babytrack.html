@@ -62,9 +62,15 @@
                 cursor: pointer;
                 font-size: 15px;
             }
-            #undo {
-                background: #ff6666;
+            #undo-btn, #redo-btn {
+                background: #4c84ff;
                 color: #fff;
+            }
+            
+            #undo-btn:disabled, #redo-btn:disabled {
+                background: #ccc;
+                color: #999;
+                cursor: not-allowed;
             }
             #download {
                 background: #4caf50;
@@ -441,37 +447,7 @@
                 });
             }
 
-            // Mark the most recent undeleted entry as deleted
-            async function markMostRecentAsDeleted() {
-                if (!db) await initDB();
 
-                const transaction = db.transaction(["entries"], "readwrite");
-                const objectStore = transaction.objectStore("entries");
-                const index = objectStore.index("timestamp");
-
-                // Get all entries sorted by timestamp descending
-                const request = index.openCursor(null, "prev");
-
-                return new Promise((resolve, reject) => {
-                    request.onsuccess = (event) => {
-                        const cursor = event.target.result;
-                        if (cursor) {
-                            const entry = cursor.value;
-                            // Find the first undeleted entry
-                            if (!entry.deleted) {
-                                entry.deleted = true;
-                                cursor.update(entry);
-                                resolve(entry);
-                            } else {
-                                cursor.continue();
-                            }
-                        } else {
-                            resolve(null);
-                        }
-                    };
-                    request.onerror = () => reject(request.error);
-                });
-            }
 
             async function loadEntriesByDate(date) {
                 if (!db) await initDB();
@@ -627,7 +603,7 @@
                 }
 
                 // Persist this single entry
-                await addEntry(type, value, ts);
+                await addEntryWithUndo(type, value, ts);
 
                 updateTimestamp("Saved: " + eventTime.toLocaleTimeString());
                 updateDailyReport();
@@ -672,20 +648,102 @@
                 });
             }
 
-            // Convenience functions
-            const deleteEntry = (id) => toggleEntryDeleted(id, true);
-            const undeleteEntry = (id) => toggleEntryDeleted(id, false);
+            // Simple undo system with single stack
+            let actionStack = [];
+            let currentPosition = -1;
+            const MAX_STACK_SIZE = 20;
+
+            function addAction(action) {
+                // Remove any actions after current position (for new actions after undo)
+                actionStack = actionStack.slice(0, currentPosition + 1);
+                actionStack.push(action);
+                currentPosition = actionStack.length - 1;
+                
+                // Limit stack size
+                if (actionStack.length > MAX_STACK_SIZE) {
+                    actionStack.shift();
+                    currentPosition--;
+                }
+                
+                updateUndoRedoButtons();
+            }
+
+            function updateUndoRedoButtons() {
+                const undoBtn = document.getElementById("undo-btn");
+                const redoBtn = document.getElementById("redo-btn");
+                
+                if (undoBtn) {
+                    undoBtn.disabled = currentPosition < 0;
+                    undoBtn.textContent = currentPosition >= 0 ? 'Undo' : 'Undo';
+                }
+                if (redoBtn) {
+                    redoBtn.disabled = currentPosition >= actionStack.length - 1;
+                    redoBtn.textContent = currentPosition < actionStack.length - 1 ? 'Redo' : 'Redo';
+                }
+            }
+
+            // Simple entry functions
+            async function deleteEntry(id) {
+                const entry = await toggleEntryDeleted(id, true);
+                if (entry) {
+                    addAction({ type: 'toggle', entryId: id, wasDeleted: false });
+                }
+                return entry;
+            }
+
+            async function undeleteEntry(id) {
+                const entry = await toggleEntryDeleted(id, false);
+                if (entry) {
+                    addAction({ type: 'toggle', entryId: id, wasDeleted: true });
+                }
+                return entry;
+            }
+
+            async function addEntryWithUndo(type, value, ts) {
+                await addEntry(type, value, ts);
+                const allEntries = await loadEntriesByDate();
+                const newEntry = allEntries[allEntries.length - 1];
+                if (newEntry) {
+                    addAction({ type: 'add', entryId: newEntry.id });
+                }
+            }
 
             async function undo() {
-                const deletedEntry = await markMostRecentAsDeleted();
+                if (currentPosition < 0) return;
 
-                if (deletedEntry) {
-                    updateTimestamp(`Deleted entry: ${deletedEntry.type} - ${deletedEntry.value}`);
-                    updateDailyReport();
-                    updateButtonStates();
-                } else {
-                    updateTimestamp("No undeleted entries to delete");
+                const action = actionStack[currentPosition];
+                currentPosition--;
+
+                if (action.type === 'add') {
+                    await toggleEntryDeleted(action.entryId, true);
+                    updateTimestamp('Undid add');
+                } else if (action.type === 'toggle') {
+                    await toggleEntryDeleted(action.entryId, action.wasDeleted);
+                    updateTimestamp(action.wasDeleted ? 'Undid undelete' : 'Undid delete');
                 }
+
+                updateDailyReport();
+                updateButtonStates();
+                updateUndoRedoButtons();
+            }
+
+            async function redo() {
+                if (currentPosition >= actionStack.length - 1) return;
+
+                currentPosition++;
+                const action = actionStack[currentPosition];
+
+                if (action.type === 'add') {
+                    await toggleEntryDeleted(action.entryId, false);
+                    updateTimestamp('Redid add');
+                } else if (action.type === 'toggle') {
+                    await toggleEntryDeleted(action.entryId, !action.wasDeleted);
+                    updateTimestamp(action.wasDeleted ? 'Redid undelete' : 'Redid delete');
+                }
+
+                updateDailyReport();
+                updateButtonStates();
+                updateUndoRedoButtons();
             }
 
             function updateTimestamp(text) {
@@ -1483,7 +1541,8 @@
             </div>
 
             <div style="display: flex; gap: 8px">
-                <button class="btn" id="undo" onclick="undo()">Delete Last</button>
+                <button class="btn" id="undo-btn" onclick="undo()" disabled>Undo</button>
+                <button class="btn" id="redo-btn" onclick="redo()" disabled>Redo</button>
                 <div style="flex: 1"></div>
                 <button class="btn" id="download" onclick="downloadCSV()">
                     Download CSV
@@ -1619,6 +1678,7 @@
                     renderButtons();
                     updateDailyReport();
                     updateButtonStates();
+                    updateUndoRedoButtons();
                     
                     // Setup event filters
                     d3.select("#event-filter").on("input", applyEventFilters);
