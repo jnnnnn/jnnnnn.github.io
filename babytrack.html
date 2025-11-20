@@ -621,6 +621,54 @@
                 hideTimePicker();
             }
 
+            // Delete a specific entry by ID
+            async function deleteEntry(entryId) {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+
+                return new Promise((resolve, reject) => {
+                    const getRequest = objectStore.get(entryId);
+                    getRequest.onsuccess = () => {
+                        const entry = getRequest.result;
+                        if (entry && !entry.deleted) {
+                            entry.deleted = true;
+                            const updateRequest = objectStore.put(entry);
+                            updateRequest.onsuccess = () => resolve(entry);
+                            updateRequest.onerror = () => reject(updateRequest.error);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    getRequest.onerror = () => reject(getRequest.error);
+                });
+            }
+
+            // Undelete a specific entry by ID
+            async function undeleteEntry(entryId) {
+                if (!db) await initDB();
+
+                const transaction = db.transaction(["entries"], "readwrite");
+                const objectStore = transaction.objectStore("entries");
+
+                return new Promise((resolve, reject) => {
+                    const getRequest = objectStore.get(entryId);
+                    getRequest.onsuccess = () => {
+                        const entry = getRequest.result;
+                        if (entry && entry.deleted) {
+                            entry.deleted = false;
+                            const updateRequest = objectStore.put(entry);
+                            updateRequest.onsuccess = () => resolve(entry);
+                            updateRequest.onerror = () => reject(updateRequest.error);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    getRequest.onerror = () => reject(getRequest.error);
+                });
+            }
+
             async function undo() {
                 const deletedEntry = await markMostRecentAsDeleted();
 
@@ -1646,35 +1694,78 @@
                     });
                     
                     const deletedStatus = d.deleted ? ' <span style="color: #ff6666; font-size: 11px;">[DELETED]</span>' : '';
+                    const actionButton = d.deleted 
+                        ? `<button class="undelete-btn" data-id="${d.id}" style="background: #4caf50; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 10px; margin-left: 8px; cursor: pointer;">↶</button>`
+                        : `<button class="delete-btn" data-id="${d.id}" style="background: #ff6666; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 10px; margin-left: 8px; cursor: pointer;">×</button>`;
 
                     return `
-                        <div>
-                            <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>${deletedStatus}
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <div>
+                                <span class="event-type">${d.type}</span><span class="event-value">: ${d.value}</span>${deletedStatus}
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span class="event-time">${timeStr}</span>
+                                ${actionButton}
+                            </div>
                         </div>
-                        <span class="event-time">${timeStr}</span>
                     `;
-                });                    // Add click interaction to show entry details
-                    allEventEntries
-                        .style("cursor", "pointer")
-                        .on("click", function(event, d) {
+                });
+
+                // Add click interaction to show entry details and delete/undelete functionality
+                allEventEntries
+                    .style("cursor", "pointer")
+                    .on("click", function(event, d) {
+                        // Check if click was on delete button
+                        if (event.target.classList.contains('delete-btn')) {
+                            event.stopPropagation();
+                            deleteEntry(d.id).then(deletedEntry => {
+                                if (deletedEntry) {
+                                    updateTimestamp(`Deleted: ${deletedEntry.type} - ${deletedEntry.value}`);
+                                    updateDailyReport();
+                                    updateButtonStates();
+                                }
+                            });
+                        } else if (event.target.classList.contains('undelete-btn')) {
+                            event.stopPropagation();
+                            undeleteEntry(d.id).then(restoredEntry => {
+                                if (restoredEntry) {
+                                    updateTimestamp(`Restored: ${restoredEntry.type} - ${restoredEntry.value}`);
+                                    updateDailyReport();
+                                    updateButtonStates();
+                                }
+                            });
+                        } else {
                             showEventDetails(d, event);
-                        })
-                        .on("mouseover", function(event, d) {
-                            d3.select(this)
-                                .transition()
-                                .duration(150)
-                                .style("background", "var(--primary)")
-                                .style("color", "#fff")
-                                .style("transform", "scale(1.02)");
-                        })
-                        .on("mouseout", function(event, d) {
-                            d3.select(this)
-                                .transition()
-                                .duration(150)
-                                .style("background", "var(--bg)")
-                                .style("color", "")
-                                .style("transform", "scale(1)");
-                        });
+                        }
+                    })
+                    .on("dblclick", function(event, d) {
+                        // Double-click to delete (if not already deleted)
+                        if (!d.deleted) {
+                            deleteEntry(d.id).then(deletedEntry => {
+                                if (deletedEntry) {
+                                    updateTimestamp(`Deleted: ${deletedEntry.type} - ${deletedEntry.value}`);
+                                    updateDailyReport();
+                                    updateButtonStates();
+                                }
+                            });
+                        }
+                    })
+                    .on("mouseover", function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .style("background", "var(--primary)")
+                            .style("color", "#fff")
+                            .style("transform", "scale(1.02)");
+                    })
+                    .on("mouseout", function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .style("background", "var(--bg)")
+                            .style("color", "")
+                            .style("transform", "scale(1)");
+                    });
                 }
 
                 // this function generates several days worth of test data. it is lightly random.
