@@ -89,13 +89,20 @@ export async function undeleteEntry(key) {
             const entry = request.result;
             if (entry) {
                 entry.deleted = false;
-                objectStore.put(entry, key);
-                resolve(entry);
+                const putRequest = objectStore.put(entry, key);
+                putRequest.onsuccess = () => {
+                    resolve(entry);
+                };
+                putRequest.onerror = () => {
+                    reject(putRequest.error);
+                };
             } else {
                 resolve(null);
             }
         };
-        request.onerror = () => reject(request.error);
+        request.onerror = () => {
+            reject(request.error);
+        };
     });
 }
 
@@ -190,10 +197,23 @@ export async function loadTodayEntries() {
     const { start, end } = getDayBounds(today);
     const transaction = db.transaction(["entries"], "readonly");
     const objectStore = transaction.objectStore("entries");
-    const request = objectStore.index("timestamp").getAll(IDBKeyRange.bound(start, end));
-
+    
     return new Promise((resolve, reject) => {
-        request.onsuccess = () => resolve(request.result || []);
+        const results = [];
+        const index = objectStore.index("timestamp");
+        const request = index.openCursor(IDBKeyRange.bound(start, end));
+        
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                const entry = cursor.value;
+                entry.key = cursor.primaryKey; // Add the IndexedDB key to the entry
+                results.push(entry);
+                cursor.continue();
+            } else {
+                resolve(results);
+            }
+        };
         request.onerror = () => reject(request.error);
     });
 }

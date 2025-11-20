@@ -154,7 +154,7 @@ export function updateRecentEvents(entries, updateDailyReport, updateButtonState
     // Use D3 for efficient data binding and updates
     const eventSelection = d3.select(container)
         .selectAll(".event-entry")
-        .data(allEvents, d => d.key || `${d.type}-${d.value}-${d.ts}`);
+        .data(allEvents, d => d.key);
 
     // Remove old entries with transition
     eventSelection.exit()
@@ -253,15 +253,11 @@ export function updateRecentEvents(entries, updateDailyReport, updateButtonState
             event.stopPropagation();
             try {
                 if (d.deleted) {
-                    console.log('Undeleting entry with key:', d.key);
-                    const result = await undeleteEntry(d.key);
-                    console.log('Undelete result:', result);
+                    await undeleteEntry(d.key);
                     updateDailyReport(); 
                     updateButtonStates(); 
                 } else {
-                    console.log('Deleting entry with key:', d.key);
-                    const result = await markEntryAsDeleted(d.key);
-                    console.log('Delete result:', result);
+                    await markEntryAsDeleted(d.key);
                     updateDailyReport(); 
                     updateButtonStates(); 
                 }
