@@ -553,28 +553,6 @@
                     .find(e => e.type === "sleep" && (e.value === "sleeping" || e.value === "nap"));
             }
 
-            // Handle short sleep removal (< 5 minutes)
-            async function handleShortSleep(awakeTime) {
-                const allEntries = await loadEntriesByDate();
-                const lastSleepStart = findLastSleepStart(allEntries);
-                
-                if (!lastSleepStart) return false;
-                
-                const sleepDuration = (awakeTime - new Date(lastSleepStart.ts)) / 1000 / 60;
-                
-                if (sleepDuration < 1) {
-                    const transaction = db.transaction(["entries"], "readwrite");
-                    const objectStore = transaction.objectStore("entries");
-                    await new Promise((resolve, reject) => {
-                        const deleteRequest = objectStore.delete(lastSleepStart.id);
-                        deleteRequest.onsuccess = resolve;
-                        deleteRequest.onerror = () => reject(deleteRequest.error);
-                    });
-                    return true;
-                }
-                return false;
-            }
-
             async function save(type, value, btn, customTimestamp = null) {
                 const ts = customTimestamp || nowIso();
                 const eventTime = new Date(ts);
@@ -585,30 +563,6 @@
                     setTimeout(() => {
                         btn.classList.remove("fading");
                     }, 400);
-                }
-
-                // Auto-awake: if recording any non-sleep event, mark baby as awake first
-                if (type !== "sleep") {
-                    const allEntries = await loadEntriesByDate();
-                    const lastSleepEvent = [...allEntries].reverse().find(e => e.type === "sleep");
-                    const isAsleep = lastSleepEvent && (lastSleepEvent.value === "sleeping" || lastSleepEvent.value === "nap");
-                    
-                    if (isAsleep) {
-                        // Add awake event just before this event (1 second earlier to maintain order)
-                        const awakeTs = new Date(eventTime.getTime() - 1000).toISOString();
-                        await addEntry("sleep", "awake", awakeTs);
-                    }
-                }
-
-                // Special handling for sleep awake events - remove short sleeps
-                if (type === "sleep" && value === "awake") {
-                    const removed = await handleShortSleep(eventTime);
-                    if (removed) {
-                        updateTimestamp("Short sleep removed");
-                        updateDailyReport();
-                        updateButtonStates();
-                        return;
-                    }
                 }
 
                 // Persist this single entry
