@@ -788,20 +788,10 @@
                     return;
                 }
 
-                // Filter deleted entries based on checkbox state
-                const hideDeleted =
-                    document.getElementById("hide-deleted-filter")?.checked ??
-                    true;
-                const exportEntries = hideDeleted
-                    ? entries.filter((e) => !e.deleted)
-                    : entries;
+                // Always export all entries including deleted ones
+                const exportEntries = entries;
 
-                if (exportEntries.length === 0) {
-                    alert("No data to export (all entries are deleted)");
-                    return;
-                }
-
-                const header = "Timestamp,Type,Value";
+                const header = "ID,Timestamp,Type,Value,Deleted";
                 const rows = exportEntries.map((e) => {
                     // Convert UTC timestamp to ISO format with local timezone offset
                     const date = new Date(e.ts);
@@ -820,7 +810,8 @@
                     const second = String(date.getSeconds()).padStart(2, "0");
 
                     const localTime = `${year}-${month}-${day}T${hour}:${minute}:${second}${sign}${hours}:${mins}`;
-                    return `"${localTime}","${e.type}","${e.value}"`;
+                    const deletedFlag = e.deleted ? "true" : "false";
+                    return `${e.id},"${localTime}","${e.type}","${e.value}",${deletedFlag}`;
                 });
                 const csv = [header, ...rows].join("\n");
 
@@ -838,6 +829,95 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+            }
+
+            async function importCSV() {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = ".csv";
+                
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const text = await file.text();
+                    const lines = text.split("\n");
+                    
+                    if (lines.length < 2) {
+                        alert("CSV file is empty or invalid");
+                        return;
+                    }
+
+                    // Skip header line
+                    const dataLines = lines.slice(1).filter(line => line.trim());
+                    
+                    let imported = 0;
+                    let updated = 0;
+                    let skipped = 0;
+
+                    for (const line of dataLines) {
+                        try {
+                            // Parse CSV line (handle quoted fields)
+                            const matches = line.match(/(?:^|,)(?:"([^"]*)"|([^",]*))/g);
+                            if (!matches || matches.length < 4) continue;
+
+                            const fields = matches.map(m => m.replace(/^,?"?|"?$/g, ''));
+                            
+                            const id = parseInt(fields[0]);
+                            const timestamp = fields[1];
+                            const type = fields[2];
+                            const value = fields[3];
+                            const deleted = fields[4] === "true";
+
+                            if (!timestamp || !type || !value) continue;
+
+                            // Convert local time back to UTC ISO string
+                            const date = new Date(timestamp);
+                            const ts = date.toISOString();
+
+                            if (!db) await initDB();
+
+                            // Check if entry with this ID already exists
+                            const transaction = db.transaction(["entries"], "readwrite");
+                            const objectStore = transaction.objectStore("entries");
+                            
+                            const existingEntry = await new Promise((resolve, reject) => {
+                                const request = objectStore.get(id);
+                                request.onsuccess = () => resolve(request.result);
+                                request.onerror = () => reject(request.error);
+                            });
+
+                            if (existingEntry) {
+                                // Update existing entry
+                                const updatedEntry = { id, type, value, ts, deleted };
+                                await new Promise((resolve, reject) => {
+                                    const updateRequest = objectStore.put(updatedEntry);
+                                    updateRequest.onsuccess = () => resolve();
+                                    updateRequest.onerror = () => reject(updateRequest.error);
+                                });
+                                updated++;
+                            } else {
+                                // Add new entry with specific ID
+                                const newEntry = { id, type, value, ts, deleted };
+                                await new Promise((resolve, reject) => {
+                                    const addRequest = objectStore.put(newEntry);
+                                    addRequest.onsuccess = () => resolve();
+                                    addRequest.onerror = () => reject(addRequest.error);
+                                });
+                                imported++;
+                            }
+                        } catch (err) {
+                            console.error("Error processing line:", line, err);
+                            skipped++;
+                        }
+                    }
+
+                    alert(`Import complete!\nImported: ${imported}\nUpdated: ${updated}\nSkipped: ${skipped}`);
+                    updateDailyReport();
+                    updateButtonStates();
+                };
+
+                input.click();
             }
 
             async function updateButtonStates() {
@@ -2048,6 +2128,14 @@
                                         style="margin: 0"
                                     >
                                         Download CSV
+                                    </button>
+                                    <button
+                                        class="btn"
+                                        id="import"
+                                        onclick="importCSV()"
+                                        style="margin: 0; background: #ff9800"
+                                    >
+                                        Import CSV
                                     </button>
                                     <input
                                         type="text"
