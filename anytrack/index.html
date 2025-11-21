@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Baby Log</title>
+        <title>Activity Tracker</title>
         <script src="https://unpkg.com/d3@7"></script>
         <style>
             :root {
@@ -219,6 +219,16 @@
             .modal-buttons .cancel { background: var(--muted); }
             .modal-buttons .confirm { background: var(--primary); color: #fff; }
 
+            .config-editor { max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto; }
+            .config-editor textarea { width: 100%; min-height: 400px; font-family: monospace; font-size: 12px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); box-sizing: border-box; resize: vertical; }
+            .config-templates { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+            .config-templates button { padding: 8px 12px; border-radius: 6px; border: 0; background: var(--muted); color: var(--text); cursor: pointer; font-size: 13px; }
+            .config-templates button:hover { background: var(--primary); color: #fff; }
+            .config-error { color: #f44336; font-size: 13px; margin-top: 8px; display: none; }
+
+            #settings-btn { position: fixed; top: 14px; right: 14px; padding: 10px; border-radius: 50%; border: 0; background: var(--muted); color: var(--text); cursor: pointer; font-size: 18px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--shadow); z-index: 100; }
+            #settings-btn:hover { background: var(--primary); color: #fff; }
+
             .event-tooltip { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; line-height: 1.4; }
             .event-tooltip strong { color: var(--primary); }
 
@@ -325,7 +335,7 @@
             // Initialize IndexedDB
             async function initDB() {
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open("BabyLogDB", 2);
+                    const request = indexedDB.open("ActivityTrackerDB", 1);
 
                     request.onerror = () => reject(request.error);
                     request.onsuccess = () => {
@@ -338,7 +348,7 @@
                         const oldVersion = event.oldVersion;
 
                         if (oldVersion < 1) {
-                            // Create initial schema
+                            // Create initial schema with deleted column included
                             const objectStore = db.createObjectStore(
                                 "entries",
                                 { keyPath: "id", autoIncrement: true }
@@ -346,27 +356,7 @@
                             objectStore.createIndex("timestamp", "ts", {
                                 unique: false,
                             });
-                        }
-
-                        if (oldVersion < 2) {
-                            // Migration to version 2: Add deleted field to existing entries
-                            const transaction = event.target.transaction;
-                            const objectStore =
-                                transaction.objectStore("entries");
-
-                            objectStore.openCursor().onsuccess = (
-                                cursorEvent
-                            ) => {
-                                const cursor = cursorEvent.target.result;
-                                if (cursor) {
-                                    const entry = cursor.value;
-                                    if (!entry.hasOwnProperty("deleted")) {
-                                        entry.deleted = false;
-                                        cursor.update(entry);
-                                    }
-                                    cursor.continue();
-                                }
-                            };
+                            // Note: deleted field will be added when creating entries
                         }
                     };
                 });
@@ -841,7 +831,7 @@
                 const a = document.createElement("a");
                 a.href = url;
                 a.download =
-                    "baby_log_" +
+                    "activity_log_" +
                     new Date().toISOString().split("T")[0] +
                     ".csv";
                 document.body.appendChild(a);
@@ -873,59 +863,44 @@
                 const activeEntries = allEntries.filter((e) => !e.deleted);
                 if (activeEntries.length === 0) return;
 
-                // Find last feed and update button
-                const lastFeed = [...activeEntries]
-                    .reverse()
-                    .find((e) => e.type === "feed" && e.value === "bf");
-                const feedBtn = document.querySelector(
-                    'button[data-type="feed"][data-value="bf"]'
-                );
-                const feedTime = lastFeed
-                    ? formatElapsedTime(new Date(lastFeed.ts).getTime())
-                    : null;
-                updateButtonDisplay(feedBtn, "Feed", feedTime, false);
+                // Update button states for each group in config
+                currentConfig.groups.forEach((group) => {
+                    // For counted buttons, show the last timestamp
+                    group.buttons.forEach((btn) => {
+                        if (btn.counted) {
+                            const lastEvent = [...activeEntries]
+                                .reverse()
+                                .find((e) => e.type === btn.type && e.value === btn.value);
+                            const button = document.querySelector(
+                                `button[data-type="${btn.type}"][data-value="${btn.value}"]`
+                            );
+                            const eventTime = lastEvent
+                                ? formatElapsedTime(new Date(lastEvent.ts).getTime())
+                                : null;
+                            updateButtonDisplay(button, btn.label, eventTime, false);
+                        }
+                    });
 
-                // Find last sleep event and update sleep/awake buttons
-                const lastSleepEvent = [...activeEntries]
-                    .reverse()
-                    .find((e) => e.type === "sleep");
-                const sleepBtn = document.querySelector(
-                    'button[data-type="sleep"][data-value="sleeping"]'
-                );
-                const awakeBtn = document.querySelector(
-                    'button[data-type="sleep"][data-value="awake"]'
-                );
+                    // For stateful groups, highlight the current state
+                    if (group.stateful) {
+                        const lastEvent = [...activeEntries]
+                            .reverse()
+                            .find((e) => group.buttons.some(btn => btn.type === e.type));
 
-                if (sleepBtn && awakeBtn) {
-                    const isAsleep =
-                        lastSleepEvent &&
-                        (lastSleepEvent.value === "sleeping" ||
-                            lastSleepEvent.value === "nap");
-                    const sleepTime = lastSleepEvent
-                        ? formatElapsedTime(
-                              new Date(lastSleepEvent.ts).getTime()
-                          )
-                        : null;
-
-                    if (lastSleepEvent) {
-                        updateButtonDisplay(
-                            sleepBtn,
-                            "Sleeping",
-                            isAsleep ? sleepTime : null,
-                            isAsleep
-                        );
-                        updateButtonDisplay(
-                            awakeBtn,
-                            "Awake",
-                            !isAsleep ? sleepTime : null,
-                            !isAsleep
-                        );
-                    } else {
-                        // No sleep events today - default to awake
-                        updateButtonDisplay(sleepBtn, "Sleeping", null, false);
-                        updateButtonDisplay(awakeBtn, "Awake", null, true);
+                        group.buttons.forEach((btn) => {
+                            const button = document.querySelector(
+                                `button[data-type="${btn.type}"][data-value="${btn.value}"]`
+                            );
+                            if (button) {
+                                const isActive = lastEvent && lastEvent.value === btn.value;
+                                const eventTime = (lastEvent && lastEvent.value === btn.value)
+                                    ? formatElapsedTime(new Date(lastEvent.ts).getTime())
+                                    : null;
+                                updateButtonDisplay(button, btn.label, eventTime, isActive);
+                            }
+                        });
                     }
-                }
+                });
             }
 
             document.addEventListener("keydown", (e) => {
@@ -989,153 +964,274 @@
                 setReportDate(`${year}-${month}-${day}`);
             }
 
-            // Button Configuration
-            const buttonGroups = [
-                {
-                    buttons: [
+            // Default Configuration Templates
+            const configTemplates = {
+                baby: {
+                    title: "Baby Daily Log",
+                    groups: [
                         {
-                            type: "feed",
-                            value: "bf",
-                            label: "Feed",
-                            emoji: "🤱",
+                            name: "Feed",
+                            stateful: false,
+                            counted: true,
+                            buttons: [
+                                { type: "feed", value: "bf", label: "Feed", emoji: "🤱", counted: true },
+                                { type: "feed", value: "play", label: "Play", emoji: "🎾" },
+                                { type: "feed", value: "spew", label: "Spew", emoji: "🤮" },
+                            ],
                         },
                         {
-                            type: "feed",
-                            value: "play",
-                            label: "Play",
-                            emoji: "🎾",
+                            name: "Sleep",
+                            stateful: true,
+                            counted: false,
+                            buttons: [
+                                { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "" },
+                                { type: "sleep", value: "nap", label: "Nap", emoji: "" },
+                                { type: "sleep", value: "awake", label: "Awake", emoji: "" },
+                                { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
+                            ],
                         },
                         {
-                            type: "feed",
-                            value: "spew",
-                            label: "Spew",
-                            emoji: "🤮",
-                        },
-                    ],
-                },
-                {
-                    buttons: [
-                        {
-                            type: "sleep",
-                            value: "sleeping",
-                            label: "Sleeping",
-                            emoji: "",
+                            name: "Nappy",
+                            stateful: false,
+                            counted: true,
+                            buttons: [
+                                { type: "nappy", value: "wet", label: "Wet", emoji: "💧", counted: true },
+                                { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩", counted: true },
+                            ],
                         },
                         {
-                            type: "sleep",
-                            value: "nap",
-                            label: "Nap",
-                            emoji: "",
+                            name: "Soothe",
+                            stateful: false,
+                            counted: false,
+                            buttons: [
+                                { type: "soothe", value: "pram", label: "Pram", emoji: "🎢" },
+                                { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑" },
+                                { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗" },
+                                { type: "soothe", value: "feed-to-sleep", label: "Feed to Sleep", emoji: "🍼😴" },
+                            ],
                         },
                         {
-                            type: "sleep",
-                            value: "awake",
-                            label: "Awake",
-                            emoji: "",
-                        },
-                        {
-                            type: "sleep",
-                            value: "grizzle",
-                            label: "Grizzle",
-                            emoji: "",
-                        },
-                    ],
-                },
-                {
-                    buttons: [
-                        {
-                            type: "nappy",
-                            value: "wet",
-                            label: "Wet",
-                            emoji: "💧",
-                        },
-                        {
-                            type: "nappy",
-                            value: "dirty",
-                            label: "Dirty",
-                            emoji: "💩",
+                            name: "5 S's",
+                            stateful: false,
+                            counted: false,
+                            buttons: [
+                                { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯" },
+                                { type: "5s", value: "side-lying", label: "Side/Stomach", emoji: "🛏️" },
+                                { type: "5s", value: "shush", label: "Shush", emoji: "🤫" },
+                                { type: "5s", value: "swing", label: "Swing", emoji: "🎢" },
+                                { type: "5s", value: "suck", label: "Suck", emoji: "🍭" },
+                            ],
                         },
                     ],
                 },
-                {
-                    buttons: [
+                warehouse: {
+                    title: "Warehouse Inventory",
+                    groups: [
                         {
-                            type: "soothe",
-                            value: "pram",
-                            label: "Pram",
-                            emoji: "🎢",
+                            name: "Receiving",
+                            stateful: false,
+                            counted: true,
+                            buttons: [
+                                { type: "receiving", value: "pallet", label: "Pallet", emoji: "📦", counted: true },
+                                { type: "receiving", value: "box", label: "Box", emoji: "📦", counted: true },
+                                { type: "receiving", value: "damage", label: "Damage", emoji: "⚠️", counted: true },
+                            ],
                         },
                         {
-                            type: "soothe",
-                            value: "rocking",
-                            label: "Rocking",
-                            emoji: "🪑",
+                            name: "Status",
+                            stateful: true,
+                            counted: false,
+                            buttons: [
+                                { type: "status", value: "open", label: "Open", emoji: "🟢" },
+                                { type: "status", value: "lunch", label: "Lunch Break", emoji: "🍽️" },
+                                { type: "status", value: "closed", label: "Closed", emoji: "🔴" },
+                            ],
                         },
                         {
-                            type: "soothe",
-                            value: "wearing",
-                            label: "Wearing",
-                            emoji: "🤗",
-                        },
-                        {
-                            type: "soothe",
-                            value: "feed-to-sleep",
-                            label: "Feed to Sleep",
-                            emoji: "🍼😴",
-                        },
-                    ],
-                },
-                {
-                    buttons: [
-                        {
-                            type: "5s",
-                            value: "swaddle",
-                            label: "Swaddle",
-                            emoji: "🌯",
-                        },
-                        {
-                            type: "5s",
-                            value: "side-lying",
-                            label: "Side/Stomach",
-                            emoji: "🛏️",
-                        },
-                        {
-                            type: "5s",
-                            value: "shush",
-                            label: "Shush",
-                            emoji: "🤫",
-                        },
-                        {
-                            type: "5s",
-                            value: "swing",
-                            label: "Swing",
-                            emoji: "🎢",
-                        },
-                        {
-                            type: "5s",
-                            value: "suck",
-                            label: "Suck",
-                            emoji: "🍭",
+                            name: "Shipping",
+                            stateful: false,
+                            counted: true,
+                            buttons: [
+                                { type: "shipping", value: "standard", label: "Standard", emoji: "🚚", counted: true },
+                                { type: "shipping", value: "express", label: "Express", emoji: "⚡", counted: true },
+                                { type: "shipping", value: "pickup", label: "Pickup", emoji: "🤝", counted: true },
+                            ],
                         },
                     ],
                 },
-            ];
+                lab: {
+                    title: "Lab Experiment Log",
+                    groups: [
+                        {
+                            name: "Equipment",
+                            stateful: true,
+                            counted: false,
+                            buttons: [
+                                { type: "equipment", value: "on", label: "Equipment On", emoji: "🔛" },
+                                { type: "equipment", value: "off", label: "Equipment Off", emoji: "⏹️" },
+                                { type: "equipment", value: "maintenance", label: "Maintenance", emoji: "🔧" },
+                            ],
+                        },
+                        {
+                            name: "Samples",
+                            stateful: false,
+                            counted: true,
+                            buttons: [
+                                { type: "sample", value: "collected", label: "Collected", emoji: "🧪", counted: true },
+                                { type: "sample", value: "processed", label: "Processed", emoji: "⚗️", counted: true },
+                                { type: "sample", value: "stored", label: "Stored", emoji: "❄️", counted: true },
+                            ],
+                        },
+                        {
+                            name: "Observations",
+                            stateful: false,
+                            counted: false,
+                            buttons: [
+                                { type: "observation", value: "normal", label: "Normal", emoji: "✅" },
+                                { type: "observation", value: "anomaly", label: "Anomaly", emoji: "⚠️" },
+                                { type: "observation", value: "critical", label: "Critical", emoji: "🚨" },
+                            ],
+                        },
+                    ],
+                },
+            };
 
-            // Create emoji lookup map
-            const emojiMap = {};
-            buttonGroups.forEach((group) => {
-                group.buttons.forEach((btn) => {
-                    if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
-                    emojiMap[btn.type][btn.value] = btn.emoji || "•";
+            // Load or initialize configuration
+            function loadConfig() {
+                const saved = localStorage.getItem("trackerConfig");
+                if (saved) {
+                    try {
+                        return JSON.parse(saved);
+                    } catch (e) {
+                        console.error("Failed to parse saved config:", e);
+                    }
+                }
+                // Default to baby template
+                return configTemplates.baby;
+            }
+
+            function saveConfig(config) {
+                localStorage.setItem("trackerConfig", JSON.stringify(config));
+            }
+
+            let currentConfig = loadConfig();
+
+            // Config Editor Functions
+            function showConfigEditor() {
+                const modal = document.getElementById("config-editor-modal");
+                const textarea = document.getElementById("config-json");
+                textarea.value = JSON.stringify(currentConfig, null, 2);
+                document.getElementById("config-error").style.display = "none";
+                modal.classList.add("show");
+            }
+
+            function hideConfigEditor() {
+                const modal = document.getElementById("config-editor-modal");
+                modal.classList.remove("show");
+            }
+
+            function loadTemplate(templateName) {
+                const template = configTemplates[templateName];
+                if (template) {
+                    const textarea = document.getElementById("config-json");
+                    textarea.value = JSON.stringify(template, null, 2);
+                    document.getElementById("config-error").style.display = "none";
+                }
+            }
+
+            function saveConfigFromEditor() {
+                const textarea = document.getElementById("config-json");
+                const errorDiv = document.getElementById("config-error");
+                
+                try {
+                    const newConfig = JSON.parse(textarea.value);
+                    
+                    // Validate config structure
+                    if (!newConfig.title || !Array.isArray(newConfig.groups)) {
+                        throw new Error("Config must have 'title' and 'groups' array");
+                    }
+                    
+                    newConfig.groups.forEach((group, i) => {
+                        if (!group.name || !Array.isArray(group.buttons)) {
+                            throw new Error(`Group ${i} must have 'name' and 'buttons' array`);
+                        }
+                        group.buttons.forEach((btn, j) => {
+                            if (!btn.type || !btn.value || !btn.label) {
+                                throw new Error(`Button ${j} in group ${i} must have 'type', 'value', and 'label'`);
+                            }
+                        });
+                    });
+                    
+                    // Save and apply config
+                    currentConfig = newConfig;
+                    saveConfig(currentConfig);
+                    emojiMap = buildEmojiMap(currentConfig);
+                    renderButtons();
+                    updateEventTypeFilter();
+                    updateDailyReport();
+                    updateButtonStates();
+                    hideConfigEditor();
+                    updateTimestamp("Configuration updated");
+                } catch (e) {
+                    errorDiv.textContent = "Error: " + e.message;
+                    errorDiv.style.display = "block";
+                }
+            }
+
+            // Create emoji lookup map from config
+            function buildEmojiMap(config) {
+                const emojiMap = {};
+                config.groups.forEach((group) => {
+                    group.buttons.forEach((btn) => {
+                        if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
+                        emojiMap[btn.type][btn.value] = btn.emoji || "•";
+                    });
                 });
-            });
-            // Add emoji for notes
-            emojiMap["note"] = { "": "📝" };
+                // Add emoji for notes
+                emojiMap["note"] = { "": "📝" };
+                return emojiMap;
+            }
 
-            // Generate buttons dynamically
+            let emojiMap = buildEmojiMap(currentConfig);
+
+            // Update event type filter options based on config
+            function updateEventTypeFilter() {
+                const select = document.getElementById("event-type-filter");
+                if (!select) return;
+
+                // Keep "All Types" option and clear the rest
+                select.innerHTML = '<option value="">All Types</option>';
+
+                // Get unique types from config
+                const types = new Set();
+                currentConfig.groups.forEach((group) => {
+                    group.buttons.forEach((btn) => {
+                        types.add(btn.type);
+                    });
+                });
+
+                // Add option for each type
+                Array.from(types).sort().forEach((type) => {
+                    const option = document.createElement("option");
+                    option.value = type;
+                    option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                    select.appendChild(option);
+                });
+
+                // Add notes option
+                const notesOption = document.createElement("option");
+                notesOption.value = "note";
+                notesOption.textContent = "Notes";
+                select.appendChild(notesOption);
+            }
+
+            // Generate buttons dynamically from config
             function renderButtons() {
                 const container = document.querySelector(".container");
                 const h2 = container.querySelector("h2");
+
+                // Update title
+                h2.textContent = currentConfig.title || "Activity Tracker";
 
                 // Remove existing button cards
                 const existingCards = container.querySelectorAll(
@@ -1147,8 +1243,8 @@
                     }
                 });
 
-                // Insert button groups after the h2
-                buttonGroups.reverse().forEach((group) => {
+                // Insert button groups after the h2 (in reverse so they appear in correct order)
+                [...currentConfig.groups].reverse().forEach((group) => {
                     const card = document.createElement("div");
                     card.className = "card";
 
@@ -1160,6 +1256,7 @@
                         button.className = "action";
                         button.dataset.type = btn.type;
                         button.dataset.value = btn.value;
+                        button.dataset.stateful = group.stateful || false;
                         button.textContent = btn.label;
                         button.onclick = function () {
                             save(btn.type, btn.value, this);
@@ -1177,8 +1274,6 @@
                     h2.insertAdjacentElement("afterend", card);
                 });
             }
-
-            // Render buttons on load (moved to DOM ready below)
 
             async function updateDailyReport() {
                 const allEntries = await loadEntriesByDate(currentReportDate);
@@ -1202,7 +1297,7 @@
 
                 // Display functions - graphs use active entries only, log uses all entries
                 updateHourlyGrid(activeEntriesInDay);
-                updateSleepAttempts(activeEntriesInDay);
+                updateStateChanges(activeEntriesInDay);
                 updateRecentEvents(entriesInDay); // Pass all entries including deleted
 
                 // Timeline needs activeEntries to show cross-midnight sleep properly
@@ -1210,202 +1305,150 @@
             }
 
             function calculateDailyStats(entries) {
-                const sleepEvents = entries.filter((e) => e.type === "sleep");
+                const stats = {};
 
-                // Get day boundaries for clipping sleep periods
-                const { dayStart, dayEnd } =
-                    getDayBoundsAsDate(currentReportDate);
+                // Get day boundaries for clipping
+                const { dayStart, dayEnd } = getDayBoundsAsDate(currentReportDate);
 
-                // Only count feeds and nappies that occurred within the day
-                const feedEvents = entries.filter((e) => {
-                    return (
-                        e.type === "feed" &&
-                        e.value === "bf" &&
-                        isEntryInDay(e, dayStart, dayEnd)
-                    );
-                });
+                // Calculate stats for each group based on config
+                currentConfig.groups.forEach((group) => {
+                    // For stateful groups, calculate total duration
+                    if (group.stateful) {
+                        const stateEvents = entries.filter((e) => 
+                            group.buttons.some(btn => btn.type === e.type)
+                        );
 
-                const wetCount = entries.filter((e) => {
-                    return (
-                        e.type === "nappy" &&
-                        e.value === "wet" &&
-                        isEntryInDay(e, dayStart, dayEnd)
-                    );
-                }).length;
+                        // Find the "active" states (not the default/off state)
+                        // Assuming the first button is typically the "on" state
+                        const activeValues = group.buttons
+                            .filter((btn, idx) => idx < group.buttons.length - 1)
+                            .map(btn => btn.value);
 
-                const dirtyCount = entries.filter((e) => {
-                    return (
-                        e.type === "nappy" &&
-                        e.value === "dirty" &&
-                        isEntryInDay(e, dayStart, dayEnd)
-                    );
-                }).length;
+                        let totalMinutes = 0;
+                        let currentStateStart = null;
 
-                let totalSleepMinutes = 0;
-                let currentSleepStart = null;
-
-                // Check if day starts during a sleep period
-                // Find the most recent sleep event before dayStart
-                const eventsBeforeDay = sleepEvents.filter(
-                    (e) => new Date(e.ts) < dayStart
-                );
-                if (eventsBeforeDay.length > 0) {
-                    const lastEventBeforeDay =
-                        eventsBeforeDay[eventsBeforeDay.length - 1];
-                    if (
-                        lastEventBeforeDay.value === "sleeping" ||
-                        lastEventBeforeDay.value === "nap"
-                    ) {
-                        // Day starts during sleep
-                        currentSleepStart = new Date(lastEventBeforeDay.ts);
-                    }
-                }
-
-                sleepEvents.forEach((event, i) => {
-                    if (event.value === "sleeping" || event.value === "nap") {
-                        currentSleepStart = new Date(event.ts);
-                    } else if (event.value === "awake" && currentSleepStart) {
-                        const awakeTime = new Date(event.ts);
-
-                        // Clip sleep period to the current day's boundaries
-                        const clippedStart =
-                            currentSleepStart < dayStart
-                                ? dayStart
-                                : currentSleepStart;
-                        const clippedEnd =
-                            awakeTime > dayEnd ? dayEnd : awakeTime;
-
-                        // Only count if the clipped period is within the day
-                        if (clippedEnd > clippedStart) {
-                            const duration =
-                                (clippedEnd - clippedStart) / 1000 / 60;
-                            totalSleepMinutes += duration;
+                        // Check if day starts during an active state
+                        const eventsBeforeDay = stateEvents.filter(
+                            (e) => new Date(e.ts) < dayStart
+                        );
+                        if (eventsBeforeDay.length > 0) {
+                            const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
+                            if (activeValues.includes(lastEventBeforeDay.value)) {
+                                currentStateStart = new Date(lastEventBeforeDay.ts);
+                            }
                         }
-                        currentSleepStart = null;
-                    }
-                });
 
-                // Handle ongoing sleep that hasn't ended yet
-                if (currentSleepStart) {
-                    const now = new Date();
-                    const reportDate = currentReportDate;
-                    const isToday =
-                        reportDate.toDateString() === now.toDateString();
+                        stateEvents.forEach((event) => {
+                            if (activeValues.includes(event.value)) {
+                                currentStateStart = new Date(event.ts);
+                            } else if (currentStateStart) {
+                                const endTime = new Date(event.ts);
+                                const clippedStart = currentStateStart < dayStart ? dayStart : currentStateStart;
+                                const clippedEnd = endTime > dayEnd ? dayEnd : endTime;
 
-                    if (isToday) {
-                        // Clip to current time if viewing today
-                        const clippedStart =
-                            currentSleepStart < dayStart
-                                ? dayStart
-                                : currentSleepStart;
-                        const clippedEnd = now > dayEnd ? dayEnd : now;
+                                if (clippedEnd > clippedStart) {
+                                    const duration = (clippedEnd - clippedStart) / 1000 / 60;
+                                    totalMinutes += duration;
+                                }
+                                currentStateStart = null;
+                            }
+                        });
 
-                        if (clippedEnd > clippedStart) {
-                            const duration =
-                                (clippedEnd - clippedStart) / 1000 / 60;
-                            totalSleepMinutes += duration;
+                        // Handle ongoing state
+                        if (currentStateStart) {
+                            const now = new Date();
+                            const reportDate = currentReportDate;
+                            const isToday = reportDate.toDateString() === now.toDateString();
+
+                            if (isToday) {
+                                const clippedStart = currentStateStart < dayStart ? dayStart : currentStateStart;
+                                const clippedEnd = now > dayEnd ? dayEnd : now;
+
+                                if (clippedEnd > clippedStart) {
+                                    const duration = (clippedEnd - clippedStart) / 1000 / 60;
+                                    totalMinutes += duration;
+                                }
+                            } else {
+                                const clippedStart = currentStateStart < dayStart ? dayStart : currentStateStart;
+                                if (dayEnd > clippedStart) {
+                                    const duration = (dayEnd - clippedStart) / 1000 / 60;
+                                    totalMinutes += duration;
+                                }
+                            }
                         }
+
+                        const hours = Math.floor(totalMinutes / 60);
+                        const minutes = Math.round(totalMinutes % 60);
+                        stats[group.name] = { value: `${hours}h ${minutes}m`, type: 'duration' };
+                    }
+
+                    // For counted groups or buttons, count events in the day
+                    if (group.counted) {
+                        const typeSet = new Set(group.buttons.map(btn => btn.type));
+                        const count = entries.filter((e) => {
+                            return typeSet.has(e.type) && isEntryInDay(e, dayStart, dayEnd);
+                        }).length;
+                        stats[group.name] = { value: count, type: 'count' };
                     } else {
-                        // For past days, assume sleep continued until end of day
-                        const clippedStart =
-                            currentSleepStart < dayStart
-                                ? dayStart
-                                : currentSleepStart;
-                        if (dayEnd > clippedStart) {
-                            const duration =
-                                (dayEnd - clippedStart) / 1000 / 60;
-                            totalSleepMinutes += duration;
-                        }
+                        // Check for individual counted buttons within non-counted groups
+                        group.buttons.forEach((btn) => {
+                            if (btn.counted) {
+                                const count = entries.filter((e) => {
+                                    return e.type === btn.type && 
+                                           e.value === btn.value && 
+                                           isEntryInDay(e, dayStart, dayEnd);
+                                }).length;
+                                stats[btn.label] = { value: count, type: 'count' };
+                            }
+                        });
                     }
-                }
+                });
 
-                const hours = Math.floor(totalSleepMinutes / 60);
-                const minutes = Math.round(totalSleepMinutes % 60);
-
-                return {
-                    totalSleep: `${hours}h ${minutes}m`,
-                    feedCount: feedEvents.length,
-                    wetCount: wetCount,
-                    dirtyCount: dirtyCount,
-                };
+                return stats;
             }
 
             function updateStatsDisplay(stats) {
-                // Use D3 for animated stat updates
-                const statData = [
-                    {
-                        id: "stat-sleep",
-                        value: stats.totalSleep,
-                        label: "Total Sleep",
-                    },
-                    {
-                        id: "stat-feeds",
-                        value: stats.feedCount,
-                        label: "Feeds",
-                        isNumeric: true,
-                    },
-                    {
-                        id: "stat-wet",
-                        value: stats.wetCount,
-                        label: "Wet Nappies",
-                        isNumeric: true,
-                    },
-                    {
-                        id: "stat-dirty",
-                        value: stats.dirtyCount,
-                        label: "Dirty Nappies",
-                        isNumeric: true,
-                    },
-                ];
+                // Build stat data from stats object
+                const statData = Object.entries(stats).map(([label, data]) => ({
+                    id: 'stat-' + label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                    value: data.value,
+                    label: label,
+                    isNumeric: data.type === 'count'
+                }));
 
-                statData.forEach((stat) => {
-                    const element = d3.select(`#${stat.id}`);
+                // Clear and rebuild stats grid
+                const statsGrid = d3.select('.stats-grid');
+                statsGrid.selectAll('.stat-card').remove();
 
-                    if (stat.isNumeric) {
-                        // Animate numeric values
-                        const currentValue = parseInt(element.text()) || 0;
-                        const targetValue = stat.value;
+                const statCards = statsGrid.selectAll('.stat-card')
+                    .data(statData)
+                    .enter()
+                    .append('div')
+                    .attr('class', 'stat-card');
 
-                        if (currentValue !== targetValue) {
-                            element
-                                .transition()
-                                .duration(500)
-                                .tween("text", function () {
-                                    const i = d3.interpolateNumber(
-                                        currentValue,
-                                        targetValue
-                                    );
-                                    return function (t) {
-                                        this.textContent = Math.round(i(t));
-                                    };
-                                })
-                                .on("start", function () {
-                                    d3.select(this).style(
-                                        "color",
-                                        "var(--primary)"
-                                    );
-                                })
-                                .on("end", function () {
-                                    d3.select(this)
-                                        .transition()
-                                        .duration(200)
-                                        .style("color", "");
-                                });
-                        }
+                statCards.append('div')
+                    .attr('class', 'label')
+                    .text(d => d.label);
+
+                const values = statCards.append('div')
+                    .attr('class', 'value')
+                    .attr('id', d => d.id);
+
+                // Animate numeric values
+                values.each(function(d) {
+                    const element = d3.select(this);
+                    if (d.isNumeric) {
+                        element
+                            .transition()
+                            .duration(500)
+                            .tween("text", function() {
+                                const i = d3.interpolateNumber(0, d.value);
+                                return function(t) {
+                                    this.textContent = Math.round(i(t));
+                                };
+                            });
                     } else {
-                        // Simple text update for non-numeric values
-                        if (element.text() !== stat.value) {
-                            element
-                                .transition()
-                                .duration(200)
-                                .style("opacity", 0.5)
-                                .transition()
-                                .duration(200)
-                                .style("opacity", 1)
-                                .on("start", function () {
-                                    this.textContent = stat.value;
-                                });
-                        }
+                        element.text(d.value);
                     }
                 });
             }
@@ -1446,57 +1489,74 @@
                 }
             }
 
-            function updateSleepAttempts(entries) {
-                const sleepEvents = entries.filter((e) => e.type === "sleep");
-                const sootheEvents = entries.filter(
-                    (e) => e.type === "soothe" || e.type === "5s"
+            function updateStateChanges(entries) {
+                // Find first stateful group
+                const statefulGroup = currentConfig.groups.find(g => g.stateful);
+                if (!statefulGroup) {
+                    // Hide the section if no stateful groups
+                    const section = document.querySelector('.sleep-attempts');
+                    if (section) section.style.display = 'none';
+                    return;
+                }
+
+                // Show the section
+                const section = document.querySelector('.sleep-attempts');
+                if (section) section.style.display = 'block';
+
+                // Update section title
+                const title = section.querySelector('h4');
+                if (title) title.textContent = `${statefulGroup.name} Sessions`;
+
+                const stateEvents = entries.filter((e) => 
+                    statefulGroup.buttons.some(btn => btn.type === e.type)
                 );
 
-                const attempts = [];
-                let currentAttempt = null;
+                // Determine which values are "active" states (first buttons) vs "inactive" (last button typically)
+                const activeValues = statefulGroup.buttons
+                    .filter((btn, idx) => idx < statefulGroup.buttons.length - 1)
+                    .map(btn => btn.value);
 
-                sleepEvents.forEach((event, i) => {
-                    if (event.value === "sleeping" || event.value === "nap") {
-                        if (currentAttempt) {
-                            attempts.push(currentAttempt);
+                const sessions = [];
+                let currentSession = null;
+
+                stateEvents.forEach((event) => {
+                    if (activeValues.includes(event.value)) {
+                        if (currentSession) {
+                            sessions.push(currentSession);
                         }
-                        currentAttempt = {
+                        currentSession = {
                             start: new Date(event.ts),
                             type: event.value,
-                            soothe: [],
                         };
-                    } else if (event.value === "awake" && currentAttempt) {
-                        currentAttempt.end = new Date(event.ts);
-                        const duration =
-                            (currentAttempt.end - currentAttempt.start) /
-                            1000 /
-                            60;
-                        currentAttempt.success = duration > 15; // More than 15 minutes = success
-                        attempts.push(currentAttempt);
-                        currentAttempt = null;
+                    } else if (currentSession) {
+                        currentSession.end = new Date(event.ts);
+                        const duration = (currentSession.end - currentSession.start) / 1000 / 60;
+                        currentSession.success = duration > 15; // More than 15 minutes = success
+                        sessions.push(currentSession);
+                        currentSession = null;
                     }
                 });
 
-                if (currentAttempt) {
-                    currentAttempt.success = true; // Still sleeping
-                    attempts.push(currentAttempt);
+                if (currentSession) {
+                    currentSession.success = true; // Still in state
+                    sessions.push(currentSession);
                 }
 
                 const container = d3.select("#sleep-attempts-list");
 
-                // Add unique IDs to attempts for D3 data binding
-                const attemptsWithIds = attempts.map((attempt, index) => ({
-                    ...attempt,
-                    attemptId: `${attempt.start.getTime()}-${index}`,
+                // Add unique IDs for D3 data binding
+                const sessionsWithIds = sessions.map((session, index) => ({
+                    ...session,
+                    sessionId: `${session.start.getTime()}-${index}`,
                 }));
 
-                // D3 data binding for sleep attempts
-                const attemptElements = container
+                // D3 data binding
+                const sessionElements = container
                     .selectAll(".attempt")
-                    .data(attemptsWithIds, (d) => d.attemptId);
+                    .data(sessionsWithIds, (d) => d.sessionId);
 
-                // Remove exiting attempts
-                attemptElements
+                // Remove exiting
+                sessionElements
                     .exit()
                     .transition()
                     .duration(300)
@@ -1505,31 +1565,25 @@
                     .style("padding", "0px")
                     .remove();
 
-                // Add new attempts
-                const enteringAttempts = attemptElements
+                // Add new
+                const entering = sessionElements
                     .enter()
                     .append("div")
-                    .attr(
-                        "class",
-                        (d) => `attempt ${d.success ? "success" : "fail"}`
-                    )
+                    .attr("class", (d) => `attempt ${d.success ? "success" : "fail"}`)
                     .style("opacity", 0)
                     .style("transform", "scaleY(0.01)");
 
-                // Update all attempts
-                const allAttempts = enteringAttempts.merge(attemptElements);
+                // Update all
+                const all = entering.merge(sessionElements);
 
-                allAttempts
-                    .attr(
-                        "class",
-                        (d) => `attempt ${d.success ? "success" : "fail"}`
-                    )
+                all
+                    .attr("class", (d) => `attempt ${d.success ? "success" : "fail"}`)
                     .transition()
                     .duration(300)
                     .style("opacity", 1)
                     .style("transform", "");
 
-                allAttempts.html((d) => {
+                all.html((d) => {
                     const timeStr = d.start.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -1909,6 +1963,8 @@
     </head>
 
     <body>
+        <button id="settings-btn" onclick="showConfigEditor()" title="Settings">⚙️</button>
+        
         <div class="container">
             <h2>Baby Daily Log</h2>
 
@@ -2006,12 +2062,7 @@
                                         "
                                     >
                                         <option value="">All Types</option>
-                                        <option value="feed">Feed</option>
-                                        <option value="sleep">Sleep</option>
-                                        <option value="nappy">Nappy</option>
-                                        <option value="soothe">Soothe</option>
-                                        <option value="5s">5 S's</option>
-                                        <option value="note">Notes</option>
+                                        <!-- Will be populated by JS -->
                                     </select>
                                     <label
                                         style="
@@ -2074,7 +2125,7 @@
                         <div id="timeline-chart"></div>
 
                         <div class="sleep-attempts">
-                            <h4>Sleep Attempts</h4>
+                            <h4>State Sessions</h4>
                             <div class="attempt-list" id="sleep-attempts-list">
                                 <!-- Will be populated by JS -->
                             </div>
@@ -2136,6 +2187,7 @@
 
                 initDB().then(() => {
                     renderButtons();
+                    updateEventTypeFilter();
                     updateDailyReport();
                     updateButtonStates();
                     updateUndoRedoButtons();
@@ -2524,6 +2576,31 @@
                     </button>
                     <button class="confirm" onclick="saveWithCustomTime()">
                         Save
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="config-editor-modal"
+            class="modal-overlay"
+            onclick="if(event.target === this) hideConfigEditor()"
+        >
+            <div class="modal config-editor">
+                <h3>Configuration Editor</h3>
+                <div class="config-templates">
+                    <button onclick="loadTemplate('baby')">Baby Template</button>
+                    <button onclick="loadTemplate('warehouse')">Warehouse Template</button>
+                    <button onclick="loadTemplate('lab')">Lab Template</button>
+                </div>
+                <textarea id="config-json" spellcheck="false"></textarea>
+                <div id="config-error" class="config-error"></div>
+                <div class="modal-buttons" style="margin-top: 12px;">
+                    <button class="cancel" onclick="hideConfigEditor()">
+                        Cancel
+                    </button>
+                    <button class="confirm" onclick="saveConfigFromEditor()">
+                        Save Configuration
                     </button>
                 </div>
             </div>
