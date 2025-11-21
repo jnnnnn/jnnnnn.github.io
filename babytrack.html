@@ -439,9 +439,102 @@
                 background: #e8f5e9;
                 color: #4caf50;
             }
+
+            /* Tab styles */
+            .tab-container {
+                margin-top: 12px;
+            }
+
+            .tab-buttons {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 12px;
+                border-bottom: 2px solid var(--muted);
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 15px;
+                color: #666;
+                border-bottom: 3px solid transparent;
+                margin-bottom: -2px;
+                transition: all 0.2s ease;
+            }
+
+            .tab-btn:hover {
+                color: var(--primary);
+            }
+
+            .tab-btn.active {
+                color: var(--primary);
+                border-bottom-color: var(--primary);
+                font-weight: 600;
+            }
+
+            .tabs-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            /* Side-by-side layout on wide screens */
+            @media (min-width: 1200px) {
+                .tab-buttons {
+                    display: none;
+                }
+
+                .tabs-wrapper {
+                    display: grid;
+                    grid-template-columns: 30em 1fr;
+                    gap: 16px;
+                }
+
+                .tab-content {
+                    display: block;
+                }
+
+                #log-tab {
+                    order: 1;
+                }
+
+                #graphs-tab {
+                    order: 2;
+                }
+            }
         </style>
         <script>
             let db = null;
+
+            // Tab switching
+            function switchTab(tabName) {
+                // Hide all tab contents
+                document.querySelectorAll(".tab-content").forEach((tab) => {
+                    tab.classList.remove("active");
+                });
+                // Deactivate all tab buttons
+                document.querySelectorAll(".tab-btn").forEach((btn) => {
+                    btn.classList.remove("active");
+                });
+                // Show selected tab content
+                document
+                    .getElementById(tabName + "-tab")
+                    .classList.add("active");
+                // Activate selected tab button
+                document
+                    .querySelector(`[data-tab="${tabName}"]`)
+                    .classList.add("active");
+            }
 
             // Initialize IndexedDB
             async function initDB() {
@@ -1114,40 +1207,130 @@
             const buttonGroups = [
                 {
                     buttons: [
-                        { type: "feed", value: "bf", label: "Feed", emoji: "🤱", },
-                        { type: "feed", value: "play", label: "Play", emoji: "🎾", },
-                        { type: "feed", value: "spew", label: "Spew", emoji: "🤮", },
+                        {
+                            type: "feed",
+                            value: "bf",
+                            label: "Feed",
+                            emoji: "🤱",
+                        },
+                        {
+                            type: "feed",
+                            value: "play",
+                            label: "Play",
+                            emoji: "🎾",
+                        },
+                        {
+                            type: "feed",
+                            value: "spew",
+                            label: "Spew",
+                            emoji: "🤮",
+                        },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "", },
-                        { type: "sleep", value: "nap", label: "Nap", emoji: "", },
-                        { type: "sleep", value: "awake", label: "Awake", emoji: "", },
-                        { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "", },
+                        {
+                            type: "sleep",
+                            value: "sleeping",
+                            label: "Sleeping",
+                            emoji: "",
+                        },
+                        {
+                            type: "sleep",
+                            value: "nap",
+                            label: "Nap",
+                            emoji: "",
+                        },
+                        {
+                            type: "sleep",
+                            value: "awake",
+                            label: "Awake",
+                            emoji: "",
+                        },
+                        {
+                            type: "sleep",
+                            value: "grizzle",
+                            label: "Grizzle",
+                            emoji: "",
+                        },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "nappy", value: "wet", label: "Wet", emoji: "💧", },
-                        { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩", },
+                        {
+                            type: "nappy",
+                            value: "wet",
+                            label: "Wet",
+                            emoji: "💧",
+                        },
+                        {
+                            type: "nappy",
+                            value: "dirty",
+                            label: "Dirty",
+                            emoji: "💩",
+                        },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "soothe", value: "pram", label: "Pram", emoji: "🎢", },
-                        { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑", },
-                        { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗", },
-                        { type: "soothe", value: "feed-to-sleep", label: "Feed to Sleep", emoji: "🍼😴", },
+                        {
+                            type: "soothe",
+                            value: "pram",
+                            label: "Pram",
+                            emoji: "🎢",
+                        },
+                        {
+                            type: "soothe",
+                            value: "rocking",
+                            label: "Rocking",
+                            emoji: "🪑",
+                        },
+                        {
+                            type: "soothe",
+                            value: "wearing",
+                            label: "Wearing",
+                            emoji: "🤗",
+                        },
+                        {
+                            type: "soothe",
+                            value: "feed-to-sleep",
+                            label: "Feed to Sleep",
+                            emoji: "🍼😴",
+                        },
                     ],
                 },
                 {
                     buttons: [
-                        { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯", },
-                        { type: "5s", value: "side-lying", label: "Side/Stomach", emoji: "🛏️", },
-                        { type: "5s", value: "shush", label: "Shush", emoji: "🤫", },
-                        { type: "5s", value: "swing", label: "Swing", emoji: "🎢", },
-                        { type: "5s", value: "suck", label: "Suck", emoji: "🍭", },
+                        {
+                            type: "5s",
+                            value: "swaddle",
+                            label: "Swaddle",
+                            emoji: "🌯",
+                        },
+                        {
+                            type: "5s",
+                            value: "side-lying",
+                            label: "Side/Stomach",
+                            emoji: "🛏️",
+                        },
+                        {
+                            type: "5s",
+                            value: "shush",
+                            label: "Shush",
+                            emoji: "🤫",
+                        },
+                        {
+                            type: "5s",
+                            value: "swing",
+                            label: "Swing",
+                            emoji: "🎢",
+                        },
+                        {
+                            type: "5s",
+                            value: "suck",
+                            label: "Suck",
+                            emoji: "🍭",
+                        },
                     ],
                 },
             ];
@@ -1953,24 +2136,12 @@
             </div>
 
             <div style="display: flex; gap: 8px">
-                <button class="btn" id="undo-btn" onclick="undo()" disabled>
-                    Undo
-                </button>
-                <button class="btn" id="redo-btn" onclick="redo()" disabled>
-                    Redo
-                </button>
                 <div style="flex: 1"></div>
-                <button class="btn" id="download" onclick="downloadCSV()">
-                    Download CSV
-                </button>
             </div>
 
             <div id="daily-report">
                 <h3>Daily Report</h3>
 
-                <div class="event-list" id="recent-events-list">
-                    <!-- Will be populated by JS -->
-                </div>
                 <div id="date-selector">
                     <button onclick="changeReportDate(-1)">◀ Prev</button>
                     <input
@@ -1982,98 +2153,141 @@
                     <button onclick="goToToday()">Today</button>
                 </div>
 
-                <div class="recent-events">
-                    <h4>
-                        Events
-                        <div
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button
+                            class="tab-btn active"
+                            data-tab="log"
+                            onclick="switchTab('log')"
+                        >
+                            Event Log
+                        </button>
+                        <button
+                            class="tab-btn"
+                            data-tab="graphs"
+                            onclick="switchTab('graphs')"
+                        >
+                            Graphs & Stats
+                        </button>
+                    </div>
+
+                    <div class="tabs-wrapper">
+                    <div id="log-tab" class="tab-content active">
+                        <div class="recent-events">
+                            <h4>
+                                Events
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 8px;
+                                        align-items: center;
+                                        margin-top: 8px;
+                                    "
+                                >
+                                    <button
+                                        class="btn"
+                                        id="download"
+                                        onclick="downloadCSV()"
+                                        style="margin: 0"
+                                    >
+                                        Download CSV
+                                    </button>
+                                    <input
+                                        type="text"
+                                        id="event-filter"
+                                        placeholder="Filter events..."
+                                        style="
+                                            flex: 1;
+                                            padding: 6px 10px;
+                                            font-size: 12px;
+                                            border-radius: 4px;
+                                            border: 1px solid #ddd;
+                                        "
+                                    />
+                                    <select
+                                        id="event-type-filter"
+                                        style="
+                                            padding: 6px;
+                                            font-size: 12px;
+                                            border-radius: 4px;
+                                            border: 1px solid #ddd;
+                                        "
+                                    >
+                                        <option value="">All Types</option>
+                                        <option value="feed">Feed</option>
+                                        <option value="sleep">Sleep</option>
+                                        <option value="nappy">Nappy</option>
+                                        <option value="soothe">Soothe</option>
+                                        <option value="5s">5 S's</option>
+                                        <option value="note">Notes</option>
+                                    </select>
+                                    <label
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 4px;
+                                            font-size: 12px;
+                                            white-space: nowrap;
+                                        "
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            id="hide-deleted-filter"
+                                            checked
+                                        />
+                                        Hide deleted
+                                    </label>
+                                </div>
+                            </h4>
+
+                            <div class="event-list" id="recent-events-list">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="graphs-tab" class="tab-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="label">Total Sleep</div>
+                                <div class="value" id="stat-sleep">0h 0m</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Feeds</div>
+                                <div class="value" id="stat-feeds">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Wet Nappies</div>
+                                <div class="value" id="stat-wet">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Dirty Nappies</div>
+                                <div class="value" id="stat-dirty">0</div>
+                            </div>
+                        </div>
+
+                        <h4
                             style="
-                                display: flex;
-                                gap: 8px;
-                                align-items: center;
-                                margin-top: 8px;
+                                font-size: 14px;
+                                margin: 16px 0 8px 0;
+                                color: #666;
                             "
                         >
-                            <input
-                                type="text"
-                                id="event-filter"
-                                placeholder="Filter events..."
-                                style="
-                                    flex: 1;
-                                    padding: 6px 10px;
-                                    font-size: 12px;
-                                    border-radius: 4px;
-                                    border: 1px solid #ddd;
-                                "
-                            />
-                            <select
-                                id="event-type-filter"
-                                style="
-                                    padding: 6px;
-                                    font-size: 12px;
-                                    border-radius: 4px;
-                                    border: 1px solid #ddd;
-                                "
-                            >
-                                <option value="">All Types</option>
-                                <option value="feed">Feed</option>
-                                <option value="sleep">Sleep</option>
-                                <option value="nappy">Nappy</option>
-                                <option value="soothe">Soothe</option>
-                                <option value="5s">5 S's</option>
-                                <option value="note">Notes</option>
-                            </select>
-                            <label
-                                style="
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 4px;
-                                    font-size: 12px;
-                                    white-space: nowrap;
-                                "
-                            >
-                                <input
-                                    type="checkbox"
-                                    id="hide-deleted-filter"
-                                    checked
-                                />
-                                Hide deleted
-                            </label>
+                            Hourly Activity
+                        </h4>
+                        <div class="hourly-grid" id="hourly-grid">
+                            <!-- Will be populated by JS -->
                         </div>
-                    </h4>
-                </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="label">Total Sleep</div>
-                        <div class="value" id="stat-sleep">0h 0m</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Feeds</div>
-                        <div class="value" id="stat-feeds">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Wet Nappies</div>
-                        <div class="value" id="stat-wet">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Dirty Nappies</div>
-                        <div class="value" id="stat-dirty">0</div>
-                    </div>
-                </div>
+                        <div id="timeline-chart"></div>
 
-                <h4 style="font-size: 14px; margin: 16px 0 8px 0; color: #666">
-                    Hourly Activity
-                </h4>
-                <div class="hourly-grid" id="hourly-grid">
-                    <!-- Will be populated by JS -->
-                </div>
-
-                <div id="timeline-chart"></div>
-
-                <div class="sleep-attempts">
-                    <h4>Sleep Attempts</h4>
-                    <div class="attempt-list" id="sleep-attempts-list">
-                        <!-- Will be populated by JS -->
+                        <div class="sleep-attempts">
+                            <h4>Sleep Attempts</h4>
+                            <div class="attempt-list" id="sleep-attempts-list">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
