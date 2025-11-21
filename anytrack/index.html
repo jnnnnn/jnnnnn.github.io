@@ -1312,50 +1312,51 @@
 
                 // Calculate stats for each group based on config
                 currentConfig.groups.forEach((group) => {
-                    // For stateful groups, calculate total duration
+                    // For stateful groups, calculate duration per state
                     if (group.stateful) {
                         const stateEvents = entries.filter((e) => 
                             group.buttons.some(btn => btn.type === e.type)
                         );
 
-                        // Find the "active" states (not the default/off state)
-                        // Assuming the first button is typically the "on" state
-                        const activeValues = group.buttons
-                            .filter((btn, idx) => idx < group.buttons.length - 1)
-                            .map(btn => btn.value);
+                        // Initialize minutes counter for each state
+                        const stateMinutes = {};
+                        group.buttons.forEach(btn => {
+                            stateMinutes[btn.value] = 0;
+                        });
 
-                        let totalMinutes = 0;
+                        let currentState = null;
                         let currentStateStart = null;
 
-                        // Check if day starts during an active state
+                        // Check if day starts during a state
                         const eventsBeforeDay = stateEvents.filter(
                             (e) => new Date(e.ts) < dayStart
                         );
                         if (eventsBeforeDay.length > 0) {
                             const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
-                            if (activeValues.includes(lastEventBeforeDay.value)) {
-                                currentStateStart = new Date(lastEventBeforeDay.ts);
-                            }
+                            currentState = lastEventBeforeDay.value;
+                            currentStateStart = new Date(lastEventBeforeDay.ts);
                         }
 
                         stateEvents.forEach((event) => {
-                            if (activeValues.includes(event.value)) {
-                                currentStateStart = new Date(event.ts);
-                            } else if (currentStateStart) {
+                            // End previous state
+                            if (currentStateStart && currentState) {
                                 const endTime = new Date(event.ts);
                                 const clippedStart = currentStateStart < dayStart ? dayStart : currentStateStart;
                                 const clippedEnd = endTime > dayEnd ? dayEnd : endTime;
 
                                 if (clippedEnd > clippedStart) {
                                     const duration = (clippedEnd - clippedStart) / 1000 / 60;
-                                    totalMinutes += duration;
+                                    stateMinutes[currentState] += duration;
                                 }
-                                currentStateStart = null;
                             }
+                            
+                            // Start new state
+                            currentState = event.value;
+                            currentStateStart = new Date(event.ts);
                         });
 
                         // Handle ongoing state
-                        if (currentStateStart) {
+                        if (currentStateStart && currentState) {
                             const now = new Date();
                             const reportDate = currentReportDate;
                             const isToday = reportDate.toDateString() === now.toDateString();
@@ -1366,20 +1367,26 @@
 
                                 if (clippedEnd > clippedStart) {
                                     const duration = (clippedEnd - clippedStart) / 1000 / 60;
-                                    totalMinutes += duration;
+                                    stateMinutes[currentState] += duration;
                                 }
                             } else {
                                 const clippedStart = currentStateStart < dayStart ? dayStart : currentStateStart;
                                 if (dayEnd > clippedStart) {
                                     const duration = (dayEnd - clippedStart) / 1000 / 60;
-                                    totalMinutes += duration;
+                                    stateMinutes[currentState] += duration;
                                 }
                             }
                         }
 
-                        const hours = Math.floor(totalMinutes / 60);
-                        const minutes = Math.round(totalMinutes % 60);
-                        stats[group.name] = { value: `${hours}h ${minutes}m`, type: 'duration' };
+                        // Store state breakdown
+                        stats[group.name] = { 
+                            type: 'stateful',
+                            states: Object.entries(stateMinutes).map(([state, mins]) => {
+                                const hours = Math.floor(mins / 60);
+                                const minutes = Math.round(mins % 60);
+                                return { state, value: `${hours}h ${minutes}m`, minutes: mins };
+                            }).filter(s => s.minutes > 0) // Only show states with time
+                        };
                     }
 
                     // For counted groups or buttons, count events in the day
@@ -1409,12 +1416,27 @@
 
             function updateStatsDisplay(stats) {
                 // Build stat data from stats object
-                const statData = Object.entries(stats).map(([label, data]) => ({
-                    id: 'stat-' + label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-                    value: data.value,
-                    label: label,
-                    isNumeric: data.type === 'count'
-                }));
+                const statData = [];
+                Object.entries(stats).forEach(([label, data]) => {
+                    if (data.type === 'stateful') {
+                        // For stateful groups, add each state as a separate card
+                        data.states.forEach(stateData => {
+                            statData.push({
+                                id: 'stat-' + label.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + stateData.state.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                                value: stateData.value,
+                                label: `${label}: ${stateData.state}`,
+                                isNumeric: false
+                            });
+                        });
+                    } else {
+                        statData.push({
+                            id: 'stat-' + label.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                            value: data.value,
+                            label: label,
+                            isNumeric: data.type === 'count'
+                        });
+                    }
+                });
 
                 // Clear and rebuild stats grid
                 const statsGrid = d3.select('.stats-grid');
@@ -1672,8 +1694,14 @@
                 container.innerHTML = "";
 
                 const width = container.clientWidth || 600;
-                const height = 200;
-                const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                const margin = { top: 20, right: 20, bottom: 30, left: 60 };
+
+                // Get all stateful groups from config
+                const statefulGroups = currentConfig.groups.filter(g => g.stateful);
+                
+                // Calculate height based on number of stateful groups (60px per group + margins)
+                const heightPerGroup = 60;
+                const height = Math.max(150, statefulGroups.length * heightPerGroup + margin.top + margin.bottom + 40);
 
                 const svg = d3
                     .select("#timeline-chart")
@@ -1710,49 +1738,11 @@
                     return;
                 }
 
-                // Prepare data for timeline - convert timestamps to hours relative to day start
-                const sleepEvents = [];
-                const eventData = []; // All non-sleep events
-
-                relevantEntries.forEach((e) => {
-                    const date = new Date(e.ts);
-                    // Calculate hours relative to the start of the viewing day
-                    const hours = (date - dayStart) / (1000 * 60 * 60);
-
-                    if (e.type === "sleep") {
-                        sleepEvents.push({
-                            time: hours,
-                            value: e.value,
-                            ts: date,
-                        });
-                    } else if (hours >= 0 && hours < 24) {
-                        // Look up emoji from the map
-                        let emoji = "•";
-                        if (emojiMap[e.type]) {
-                            emoji =
-                                emojiMap[e.type][e.value] ||
-                                emojiMap[e.type][""] ||
-                                "•";
-                        }
-                        eventData.push({
-                            time: hours,
-                            emoji: emoji,
-                            type: e.type,
-                            value: e.value,
-                        });
-                    }
-                });
-
                 // Create scales
                 const x = d3
                     .scaleLinear()
                     .domain([0, 24])
                     .range([margin.left, width - margin.right]);
-
-                const y = d3
-                    .scaleLinear()
-                    .domain([0, 3])
-                    .range([height - margin.bottom, margin.top]);
 
                 // Draw gridlines for every hour
                 for (let hour = 0; hour <= 24; hour++) {
@@ -1766,7 +1756,7 @@
                         .attr("opacity", 0.5);
                 }
 
-                // Draw axes with fewer ticks (every 3 hours)
+                // Draw X-axis with fewer ticks (every 3 hours)
                 svg.append("g")
                     .attr("transform", `translate(0,${height - margin.bottom})`)
                     .call(
@@ -1777,149 +1767,197 @@
                             .tickFormat((d) => d + "h")
                     );
 
-                // Build continuous sleep state line data
-                // States: 2.5 = awake, 1.5 = light sleep (<20 min), 0.5 = deep sleep (>20 min)
-                const lineData = [];
+                const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
 
-                // Determine initial state based on previous day - add a mock event at time 0
-                const eventsBeforeDay = sleepEvents.filter((e) => e.time < 0);
-                if (eventsBeforeDay.length > 0) {
-                    const lastEventBeforeDay =
-                        eventsBeforeDay[eventsBeforeDay.length - 1];
-                    if (
-                        lastEventBeforeDay.value === "sleeping" ||
-                        lastEventBeforeDay.value === "nap"
-                    ) {
-                        // Add a mock sleep event at midnight to continue the sleep
-                        sleepEvents.unshift({
-                            time: 0,
-                            value: lastEventBeforeDay.value,
-                            ts: dayStart,
-                        });
-                    } else {
-                        // Add a mock awake event at midnight
-                        sleepEvents.unshift({
-                            time: 0,
-                            value: "awake",
-                            ts: dayStart,
-                        });
-                    }
-                } else {
-                    // No previous events, assume awake at start
-                    sleepEvents.unshift({
-                        time: 0,
-                        value: "awake",
-                        ts: dayStart,
-                    });
-                }
+                // Process each stateful group
+                statefulGroups.forEach((group, groupIndex) => {
+                    // Calculate Y range for this group
+                    const groupTop = margin.top + groupIndex * heightPerGroup;
+                    const groupBottom = groupTop + heightPerGroup - 10;
+                    
+                    const numStates = group.buttons.length;
+                    const y = d3
+                        .scaleLinear()
+                        .domain([0, numStates])
+                        .range([groupBottom, groupTop]);
 
-                let currentState = 2.5; // awake
-                let sleepStartTime = null;
+                    // Add group label on left
+                    svg.append("text")
+                        .attr("x", 5)
+                        .attr("y", (groupTop + groupBottom) / 2)
+                        .attr("text-anchor", "start")
+                        .attr("alignment-baseline", "middle")
+                        .style("font-size", "12px")
+                        .style("font-weight", "600")
+                        .style("fill", axisColor)
+                        .text(group.name);
 
-                sleepEvents.forEach((event, i) => {
-                    const hour = Math.max(0, Math.min(24, event.time));
-
-                    if (event.value === "sleeping" || event.value === "nap") {
-                        // Starting to sleep
-                        sleepStartTime = event.time;
-                        sleepStartEvent = event;
-                        currentState = 1.5; // light sleep
-                        if (hour >= 0 && hour <= 24) {
-                            lineData.push({ time: hour, state: currentState });
+                    // Get events for this group
+                    const groupEvents = [];
+                    relevantEntries.forEach((e) => {
+                        if (group.buttons.some(btn => btn.type === e.type && btn.value === e.value)) {
+                            const date = new Date(e.ts);
+                            const hours = (date - dayStart) / (1000 * 60 * 60);
+                            groupEvents.push({
+                                time: hours,
+                                value: e.value,
+                                ts: date,
+                            });
                         }
-                    } else if (event.value === "awake") {
-                        // Waking up - check duration
-                        if (sleepStartTime !== null) {
-                            const durationMinutes =
-                                (event.time - sleepStartTime) * 60;
+                    });
 
-                            if (durationMinutes > 20) {
-                                // It was a deep sleep - add transition to deep sleep
-                                const deepSleepTime = Math.max(
-                                    0,
-                                    sleepStartTime + 20 / 60
-                                ); // 20 minutes after sleep start
-                                if (deepSleepTime >= 0 && deepSleepTime <= 24) {
-                                    lineData.push({
-                                        time: deepSleepTime,
-                                        state: 0.5,
-                                    });
-                                }
+                    // Build line data
+                    const lineData = [];
+                    
+                    // Determine initial state
+                    const eventsBeforeDay = groupEvents.filter((e) => e.time < 0);
+                    let currentState = null;
+                    if (eventsBeforeDay.length > 0) {
+                        const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
+                        currentState = lastEventBeforeDay.value;
+                        const stateIndex = group.buttons.findIndex(btn => btn.value === currentState);
+                        if (stateIndex >= 0) {
+                            lineData.push({ time: 0, state: stateIndex + 0.5 });
+                        }
+                    }
+
+                    groupEvents.forEach((event) => {
+                        const hour = Math.max(0, Math.min(24, event.time));
+                        if (hour >= 0 && hour <= 24) {
+                            const stateIndex = group.buttons.findIndex(btn => btn.value === event.value);
+                            if (stateIndex >= 0) {
+                                lineData.push({ time: hour, state: stateIndex + 0.5 });
+                                currentState = event.value;
                             }
                         }
+                    });
 
-                        currentState = 2.5; // awake
-                        if (hour >= 0 && hour <= 24) {
-                            lineData.push({ time: hour, state: currentState });
+                    // Determine end time
+                    const now = new Date();
+                    const isToday = currentReportDate.toDateString() === now.toDateString();
+                    const endTime = isToday ? now.getHours() + now.getMinutes() / 60 : 24;
+
+                    if (lineData.length > 0) {
+                        lineData.push({ time: endTime, state: lineData[lineData.length - 1].state });
+                    }
+
+                    // Sort by time
+                    lineData.sort((a, b) => a.time - b.time);
+
+                    if (lineData.length > 0) {
+                        // Create line generator
+                        const line = d3
+                            .line()
+                            .x((d) => x(d.time))
+                            .y((d) => y(d.state))
+                            .curve(d3.curveStepAfter);
+
+                        // Draw the state line
+                        svg.append("path")
+                            .datum(lineData)
+                            .attr("fill", "none")
+                            .attr("stroke", "#2196f3")
+                            .attr("stroke-width", 2)
+                            .attr("d", line);
+
+                        // Draw shaded areas for each state
+                        group.buttons.forEach((btn, btnIndex) => {
+                            const stateValue = btnIndex + 0.5;
+                            const stateSegments = [];
+                            let inState = false;
+                            let segmentStart = null;
+
+                            lineData.forEach((point, i) => {
+                                if (point.state === stateValue) {
+                                    if (!inState) {
+                                        segmentStart = point.time;
+                                        inState = true;
+                                    }
+                                } else if (inState) {
+                                    stateSegments.push({ start: segmentStart, end: point.time });
+                                    inState = false;
+                                }
+                            });
+
+                            if (inState) {
+                                stateSegments.push({ start: segmentStart, end: endTime });
+                            }
+
+                            // Draw rectangles for each segment
+                            stateSegments.forEach(seg => {
+                                svg.append("rect")
+                                    .attr("x", x(seg.start))
+                                    .attr("y", y(stateValue + 0.4))
+                                    .attr("width", x(seg.end) - x(seg.start))
+                                    .attr("height", y(stateValue - 0.4) - y(stateValue + 0.4))
+                                    .attr("fill", "#2196f3")
+                                    .attr("fill-opacity", 0.15);
+                            });
+                        });
+                    }
+
+                    // Add Y-axis labels for states
+                    group.buttons.forEach((btn, btnIndex) => {
+                        svg.append("text")
+                            .attr("x", margin.left - 5)
+                            .attr("y", y(btnIndex + 0.5))
+                            .attr("text-anchor", "end")
+                            .attr("alignment-baseline", "middle")
+                            .style("font-size", "10px")
+                            .style("fill", axisColor)
+                            .text(btn.value);
+                    });
+                });
+
+                // Draw non-stateful events as emoji text - distribute vertically
+                const eventData = [];
+                relevantEntries.forEach((e) => {
+                    const date = new Date(e.ts);
+                    const hours = (date - dayStart) / (1000 * 60 * 60);
+                    
+                    // Skip if this is a stateful group event
+                    const isStateful = statefulGroups.some(g => 
+                        g.buttons.some(btn => btn.type === e.type && btn.value === e.value)
+                    );
+                    
+                    if (!isStateful && hours >= 0 && hours < 24) {
+                        let emoji = "•";
+                        if (emojiMap[e.type]) {
+                            emoji = emojiMap[e.type][e.value] || emojiMap[e.type][""] || "•";
                         }
-                        sleepStartTime = null;
+                        eventData.push({
+                            time: hours,
+                            emoji: emoji,
+                            type: e.type,
+                            value: e.value,
+                        });
                     }
                 });
 
-                // Determine end time and handle ongoing sleep
-                const now = new Date();
-                const isToday =
-                    currentReportDate.toDateString() === now.toDateString();
-                const endTime = isToday
-                    ? now.getHours() + now.getMinutes() / 60
-                    : 24;
-
-                if (sleepStartTime !== null) {
-                    // Still sleeping at end of period
-                    const durationMinutes = (endTime - sleepStartTime) * 60;
-
-                    if (durationMinutes > 20) {
-                        const deepSleepTime = sleepStartTime + 20 / 60;
-                        if (deepSleepTime <= endTime && deepSleepTime >= 0) {
-                            lineData.push({ time: deepSleepTime, state: 0.5 });
-                        }
+                // Space out emojis vertically by offsetting based on hash
+                const emojiYBase = height - margin.bottom - 10;
+                const emojiSpacing = 18;
+                const numLevels = 10;
+                
+                // Simple hash function for strings
+                function hashString(str) {
+                    let hash = 0;
+                    for (let i = 0; i < str.length; i++) {
+                        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                        hash = hash & hash; // Convert to 32bit integer
                     }
-
-                    const finalState = durationMinutes > 20 ? 0.5 : 1.5;
-                    lineData.push({ time: endTime, state: finalState });
-                } else {
-                    // End with current awake state
-                    lineData.push({ time: endTime, state: currentState });
+                    return Math.abs(hash);
                 }
-
-                // Sort by time
-                lineData.sort((a, b) => a.time - b.time);
-
-                // Create line generator
-                const line = d3
-                    .line()
-                    .x((d) => x(d.time))
-                    .y((d) => y(d.state))
-                    .curve(d3.curveStepAfter);
-
-                // Create area generator for shading above the line (but only up to awake level)
-                const area = d3
-                    .area()
-                    .x((d) => x(d.time))
-                    .y0((d) => y(Math.min(d.state, 2.5)))
-                    .y1((d) => y(2.5))
-                    .curve(d3.curveStepAfter);
-
-                // Draw shaded area under the sleep line
-                svg.append("path")
-                    .datum(lineData)
-                    .attr("fill", "#2196f3")
-                    .attr("fill-opacity", 0.1)
-                    .attr("d", area);
-
-                // Draw the sleep state line
-                svg.append("path")
-                    .datum(lineData)
-                    .attr("fill", "none")
-                    .attr("stroke", "#2196f3")
-                    .attr("stroke-width", 3)
-                    .attr("d", line);
-
-                // Draw events as emoji text
-                eventData.forEach((d) => {
+                
+                eventData.forEach((d, i) => {
+                    // Calculate vertical offset - choose level based on hash of type+value
+                    const hashInput = `${d.type}:${d.value}`;
+                    const level = hashString(hashInput) % numLevels;
+                    const yOffset = level * (emojiSpacing / 2);
+                    
                     svg.append("text")
                         .attr("x", x(d.time))
-                        .attr("y", y(2.5))
+                        .attr("y", emojiYBase - yOffset)
                         .attr("text-anchor", "middle")
                         .attr("dominant-baseline", "middle")
                         .style("font-size", "16px")
@@ -1928,36 +1966,6 @@
                         .append("title")
                         .text(`${d.type}: ${d.value}`);
                 });
-
-                // Add Y-axis labels
-                const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
-                
-                svg.append("text")
-                    .attr("x", margin.left - 5)
-                    .attr("y", y(2.5))
-                    .attr("text-anchor", "end")
-                    .attr("alignment-baseline", "middle")
-                    .style("font-size", "11px")
-                    .style("fill", axisColor)
-                    .text("Awake");
-
-                svg.append("text")
-                    .attr("x", margin.left - 5)
-                    .attr("y", y(1.5))
-                    .attr("text-anchor", "end")
-                    .attr("alignment-baseline", "middle")
-                    .style("font-size", "11px")
-                    .style("fill", axisColor)
-                    .text("Light");
-
-                svg.append("text")
-                    .attr("x", margin.left - 5)
-                    .attr("y", y(0.5))
-                    .attr("text-anchor", "end")
-                    .attr("alignment-baseline", "middle")
-                    .style("font-size", "11px")
-                    .style("fill", axisColor)
-                    .text("Deep");
             }
         </script>
     </head>
