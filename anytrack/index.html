@@ -984,8 +984,8 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "" },
-                                { type: "sleep", value: "nap", label: "Nap", emoji: "" },
+                                { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "", successDurationMinutes: 20 },
+                                { type: "sleep", value: "nap", label: "Nap", emoji: "", successDurationMinutes: 15 },
                                 { type: "sleep", value: "awake", label: "Awake", emoji: "" },
                                 { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
                             ],
@@ -1042,8 +1042,8 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "status", value: "open", label: "Open", emoji: "🟢" },
-                                { type: "status", value: "lunch", label: "Lunch Break", emoji: "🍽️" },
+                                { type: "status", value: "open", label: "Open", emoji: "🟢", successDurationMinutes: 60 },
+                                { type: "status", value: "lunch", label: "Lunch Break", emoji: "🍽️", successDurationMinutes: 30 },
                                 { type: "status", value: "closed", label: "Closed", emoji: "🔴" },
                             ],
                         },
@@ -1067,9 +1067,9 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "equipment", value: "on", label: "Equipment On", emoji: "🔛" },
+                                { type: "equipment", value: "on", label: "Equipment On", emoji: "🔛", successDurationMinutes: 30 },
                                 { type: "equipment", value: "off", label: "Equipment Off", emoji: "⏹️" },
-                                { type: "equipment", value: "maintenance", label: "Maintenance", emoji: "🔧" },
+                                { type: "equipment", value: "maintenance", label: "Maintenance", emoji: "🔧", successDurationMinutes: 60 },
                             ],
                         },
                         {
@@ -1553,7 +1553,12 @@
                     } else if (currentSession) {
                         currentSession.end = new Date(event.ts);
                         const duration = (currentSession.end - currentSession.start) / 1000 / 60;
-                        currentSession.success = duration > 15; // More than 15 minutes = success
+                        
+                        // Get success duration from the button config (default to 15 minutes)
+                        const stateButton = statefulGroup.buttons.find(btn => btn.value === currentSession.type);
+                        const successDuration = stateButton?.successDurationMinutes || 15;
+                        
+                        currentSession.success = duration > successDuration;
                         sessions.push(currentSession);
                         currentSession = null;
                     }
