@@ -3,6 +3,8 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Activity Tracker</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<style id="theme-default"></style><style id="theme-bootstrap4"></style>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="jsoneditor.0-7-28.min.js"></script>
         <style>
@@ -946,14 +948,16 @@
 
                 // Update button states for each group in config
                 currentConfig.groups.forEach((group) => {
+                    const groupType = group.name.toLowerCase();
+                    
                     // For counted buttons, show the last timestamp
                     group.buttons.forEach((btn) => {
                         if (btn.counted) {
                             const lastEvent = [...activeEntries]
                                 .reverse()
-                                .find((e) => e.type === btn.type && e.value === btn.value);
+                                .find((e) => e.type === groupType && e.value === btn.label);
                             const button = document.querySelector(
-                                `button[data-type="${btn.type}"][data-value="${btn.value}"]`
+                                `button[data-type="${groupType}"][data-value="${btn.label}"]`
                             );
                             const eventTime = lastEvent
                                 ? formatElapsedTime(new Date(lastEvent.ts).getTime())
@@ -966,15 +970,15 @@
                     if (group.stateful) {
                         const lastEvent = [...activeEntries]
                             .reverse()
-                            .find((e) => group.buttons.some(btn => btn.type === e.type));
+                            .find((e) => e.type === groupType);
 
                         group.buttons.forEach((btn) => {
                             const button = document.querySelector(
-                                `button[data-type="${btn.type}"][data-value="${btn.value}"]`
+                                `button[data-type="${groupType}"][data-value="${btn.label}"]`
                             );
                             if (button) {
-                                const isActive = lastEvent && lastEvent.value === btn.value;
-                                const eventTime = (lastEvent && lastEvent.value === btn.value)
+                                const isActive = lastEvent && lastEvent.value === btn.label;
+                                const eventTime = (lastEvent && lastEvent.value === btn.label)
                                     ? formatElapsedTime(new Date(lastEvent.ts).getTime())
                                     : null;
                                 updateButtonDisplay(button, btn.label, eventTime, isActive);
@@ -1055,9 +1059,9 @@
                             stateful: false,
                             counted: true,
                             buttons: [
-                                { type: "feed", value: "bf", label: "Feed", emoji: "🤱", counted: true },
-                                { type: "feed", value: "play", label: "Play", emoji: "🎾" },
-                                { type: "feed", value: "spew", label: "Spew", emoji: "🤮" },
+                                { label: "Feed", emoji: "🤱", counted: true },
+                                { label: "Play", emoji: "🎾" },
+                                { label: "Spew", emoji: "🤮" },
                             ],
                         },
                         {
@@ -1065,10 +1069,10 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "", successDurationMinutes: 20 },
-                                { type: "sleep", value: "nap", label: "Nap", emoji: "", successDurationMinutes: 15 },
-                                { type: "sleep", value: "awake", label: "Awake", emoji: "" },
-                                { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
+                                { label: "Sleeping", emoji: "", successDurationMinutes: 20 },
+                                { label: "Nap", emoji: "", successDurationMinutes: 15 },
+                                { label: "Awake", emoji: "" },
+                                { label: "Grizzle", emoji: "" },
                             ],
                         },
                         {
@@ -1076,8 +1080,8 @@
                             stateful: false,
                             counted: true,
                             buttons: [
-                                { type: "nappy", value: "wet", label: "Wet", emoji: "💧", counted: true },
-                                { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩", counted: true },
+                                { label: "Wet", emoji: "💧", counted: true },
+                                { label: "Dirty", emoji: "💩", counted: true },
                             ],
                         },
                         {
@@ -1085,10 +1089,10 @@
                             stateful: false,
                             counted: false,
                             buttons: [
-                                { type: "soothe", value: "pram", label: "Pram", emoji: "🎢" },
-                                { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑" },
-                                { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗" },
-                                { type: "soothe", value: "feed-to-sleep", label: "Feed to Sleep", emoji: "🍼😴" },
+                                { label: "Pram", emoji: "🎢" },
+                                { label: "Rocking", emoji: "🪑" },
+                                { label: "Wearing", emoji: "🤗" },
+                                { label: "Feed to Sleep", emoji: "🍼😴" },
                             ],
                         },
                         {
@@ -1096,11 +1100,11 @@
                             stateful: false,
                             counted: false,
                             buttons: [
-                                { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯" },
-                                { type: "5s", value: "side-lying", label: "Side/Stomach", emoji: "🛏️" },
-                                { type: "5s", value: "shush", label: "Shush", emoji: "🤫" },
-                                { type: "5s", value: "swing", label: "Swing", emoji: "🎢" },
-                                { type: "5s", value: "suck", label: "Suck", emoji: "🍭" },
+                                { label: "Swaddle", emoji: "🌯" },
+                                { label: "Side/Stomach", emoji: "🛏️" },
+                                { label: "Shush", emoji: "🤫" },
+                                { label: "Swing", emoji: "🎢" },
+                                { label: "Suck", emoji: "🍭" },
                             ],
                         },
                     ],
@@ -1113,9 +1117,9 @@
                             stateful: false,
                             counted: true,
                             buttons: [
-                                { type: "receiving", value: "pallet", label: "Pallet", emoji: "📦", counted: true },
-                                { type: "receiving", value: "box", label: "Box", emoji: "📦", counted: true },
-                                { type: "receiving", value: "damage", label: "Damage", emoji: "⚠️", counted: true },
+                                { label: "Pallet", emoji: "📦", counted: true },
+                                { label: "Box", emoji: "📦", counted: true },
+                                { label: "Damage", emoji: "⚠️", counted: true },
                             ],
                         },
                         {
@@ -1123,9 +1127,9 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "status", value: "open", label: "Open", emoji: "🟢", successDurationMinutes: 60 },
-                                { type: "status", value: "lunch", label: "Lunch Break", emoji: "🍽️", successDurationMinutes: 30 },
-                                { type: "status", value: "closed", label: "Closed", emoji: "🔴" },
+                                { label: "Open", emoji: "🟢", successDurationMinutes: 60 },
+                                { label: "Lunch Break", emoji: "🍽️", successDurationMinutes: 30 },
+                                { label: "Closed", emoji: "🔴" },
                             ],
                         },
                         {
@@ -1133,9 +1137,9 @@
                             stateful: false,
                             counted: true,
                             buttons: [
-                                { type: "shipping", value: "standard", label: "Standard", emoji: "🚚", counted: true },
-                                { type: "shipping", value: "express", label: "Express", emoji: "⚡", counted: true },
-                                { type: "shipping", value: "pickup", label: "Pickup", emoji: "🤝", counted: true },
+                                { label: "Standard", emoji: "🚚", counted: true },
+                                { label: "Express", emoji: "⚡", counted: true },
+                                { label: "Pickup", emoji: "🤝", counted: true },
                             ],
                         },
                     ],
@@ -1148,9 +1152,9 @@
                             stateful: true,
                             counted: false,
                             buttons: [
-                                { type: "equipment", value: "on", label: "Equipment On", emoji: "🔛", successDurationMinutes: 30 },
-                                { type: "equipment", value: "off", label: "Equipment Off", emoji: "⏹️" },
-                                { type: "equipment", value: "maintenance", label: "Maintenance", emoji: "🔧", successDurationMinutes: 60 },
+                                { label: "Equipment On", emoji: "🔛", successDurationMinutes: 30 },
+                                { label: "Equipment Off", emoji: "⏹️" },
+                                { label: "Maintenance", emoji: "🔧", successDurationMinutes: 60 },
                             ],
                         },
                         {
@@ -1158,9 +1162,9 @@
                             stateful: false,
                             counted: true,
                             buttons: [
-                                { type: "sample", value: "collected", label: "Collected", emoji: "🧪", counted: true },
-                                { type: "sample", value: "processed", label: "Processed", emoji: "⚗️", counted: true },
-                                { type: "sample", value: "stored", label: "Stored", emoji: "❄️", counted: true },
+                                { label: "Collected", emoji: "🧪", counted: true },
+                                { label: "Processed", emoji: "⚗️", counted: true },
+                                { label: "Stored", emoji: "❄️", counted: true },
                             ],
                         },
                         {
@@ -1168,9 +1172,9 @@
                             stateful: false,
                             counted: false,
                             buttons: [
-                                { type: "observation", value: "normal", label: "Normal", emoji: "✅" },
-                                { type: "observation", value: "anomaly", label: "Anomaly", emoji: "⚠️" },
-                                { type: "observation", value: "critical", label: "Critical", emoji: "🚨" },
+                                { label: "Normal", emoji: "✅" },
+                                { label: "Anomaly", emoji: "⚠️" },
+                                { label: "Critical", emoji: "🚨" },
                             ],
                         },
                     ],
@@ -1237,14 +1241,6 @@
                                         type: "object",
                                         title: "Button",
                                         properties: {
-                                            type: {
-                                                type: "string",
-                                                title: "Event Type"
-                                            },
-                                            value: {
-                                                type: "string",
-                                                title: "Event Value"
-                                            },
                                             label: {
                                                 type: "string",
                                                 title: "Button Label"
@@ -1264,7 +1260,7 @@
                                                 minimum: 0
                                             }
                                         },
-                                        required: ["type", "value", "label"]
+                                        required: ["label"]
                                     }
                                 }
                             },
@@ -1286,7 +1282,7 @@
                 // Initialize JSON Editor
                 jsonEditor = new JSONEditor(container, {
                     schema: configSchema,
-                    theme: 'html',
+                    theme: 'bootstrap4',
                     iconlib: 'fontawesome4',
                     disable_collapse: false,
                     disable_properties: false,
@@ -1352,8 +1348,8 @@
                 const emojiMap = {};
                 config.groups.forEach((group) => {
                     group.buttons.forEach((btn) => {
-                        if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
-                        emojiMap[btn.type][btn.value] = btn.emoji || "•";
+                        if (!emojiMap[group.name.toLowerCase()]) emojiMap[group.name.toLowerCase()] = {};
+                        emojiMap[group.name.toLowerCase()][btn.label] = btn.emoji || "•";
                     });
                 });
                 // Add emoji for notes
@@ -1371,19 +1367,11 @@
                 // Keep "All Types" option and clear the rest
                 select.innerHTML = '<option value="">All Types</option>';
 
-                // Get unique types from config
-                const types = new Set();
+                // Get group names from config
                 currentConfig.groups.forEach((group) => {
-                    group.buttons.forEach((btn) => {
-                        types.add(btn.type);
-                    });
-                });
-
-                // Add option for each type
-                Array.from(types).sort().forEach((type) => {
                     const option = document.createElement("option");
-                    option.value = type;
-                    option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                    option.value = group.name.toLowerCase();
+                    option.textContent = group.name;
                     select.appendChild(option);
                 });
 
@@ -1423,15 +1411,15 @@
                     group.buttons.forEach((btn) => {
                         const button = document.createElement("button");
                         button.className = "action";
-                        button.dataset.type = btn.type;
-                        button.dataset.value = btn.value;
+                        button.dataset.type = group.name.toLowerCase();
+                        button.dataset.value = btn.label;
                         button.dataset.stateful = group.stateful || false;
                         button.textContent = btn.label;
                         button.onclick = function () {
-                            save(btn.type, btn.value, this);
+                            save(group.name.toLowerCase(), btn.label, this);
                         };
                         button.onpointerdown = function (e) {
-                            handleLongPressStart(btn.type, btn.value, this, e);
+                            handleLongPressStart(group.name.toLowerCase(), btn.label, this, e);
                         };
                         button.onpointerup = handleLongPressEnd;
                         button.onpointercancel = handleLongPressEnd;
@@ -1481,16 +1469,16 @@
 
                 // Calculate stats for each group based on config
                 currentConfig.groups.forEach((group) => {
+                    const groupType = group.name.toLowerCase();
+                    
                     // For stateful groups, calculate duration per state
                     if (group.stateful) {
-                        const stateEvents = entries.filter((e) => 
-                            group.buttons.some(btn => btn.type === e.type)
-                        );
+                        const stateEvents = entries.filter((e) => e.type === groupType);
 
                         // Initialize minutes counter for each state
                         const stateMinutes = {};
                         group.buttons.forEach(btn => {
-                            stateMinutes[btn.value] = 0;
+                            stateMinutes[btn.label] = 0;
                         });
 
                         let currentState = null;
@@ -1560,9 +1548,8 @@
 
                     // For counted groups or buttons, count events in the day
                     if (group.counted) {
-                        const typeSet = new Set(group.buttons.map(btn => btn.type));
                         const count = entries.filter((e) => {
-                            return typeSet.has(e.type) && isEntryInDay(e, dayStart, dayEnd);
+                            return e.type === groupType && isEntryInDay(e, dayStart, dayEnd);
                         }).length;
                         stats[group.name] = { value: count, type: 'count' };
                     } else {
@@ -1570,8 +1557,8 @@
                         group.buttons.forEach((btn) => {
                             if (btn.counted) {
                                 const count = entries.filter((e) => {
-                                    return e.type === btn.type && 
-                                           e.value === btn.value && 
+                                    return e.type === groupType && 
+                                           e.value === btn.label && 
                                            isEntryInDay(e, dayStart, dayEnd);
                                 }).length;
                                 stats[btn.label] = { value: count, type: 'count' };
@@ -1660,17 +1647,17 @@
                             const hasEvent = hourEntries.some((e) => {
                                 if (type === "feed")
                                     return (
-                                        e.type === "feed" && e.value === "bf"
+                                        e.type === "feed" && e.value === "Feed"
                                     );
                                 if (type === "sleep")
                                     return (
                                         e.type === "sleep" &&
-                                        (e.value === "sleeping" ||
-                                            e.value === "nap")
+                                        (e.value === "Sleeping" ||
+                                            e.value === "Nap")
                                     );
                                 if (type === "wet" || type === "dirty")
                                     return (
-                                        e.type === "nappy" && e.value === type
+                                        e.type === "nappy" && e.value === (type === "wet" ? "Wet" : "Dirty")
                                     );
                                 return e.type === type;
                             });
@@ -1699,13 +1686,13 @@
                 if (title) title.textContent = `${statefulGroup.name} Sessions`;
 
                 const stateEvents = entries.filter((e) => 
-                    statefulGroup.buttons.some(btn => btn.type === e.type)
+                    e.type === statefulGroup.name.toLowerCase()
                 );
 
                 // Determine which values are "active" states (first buttons) vs "inactive" (last button typically)
                 const activeValues = statefulGroup.buttons
                     .filter((btn, idx) => idx < statefulGroup.buttons.length - 1)
-                    .map(btn => btn.value);
+                    .map(btn => btn.label);
 
                 const sessions = [];
                 let currentSession = null;
@@ -1724,7 +1711,7 @@
                         const duration = (currentSession.end - currentSession.start) / 1000 / 60;
                         
                         // Get success duration from the button config (default to 15 minutes)
-                        const stateButton = statefulGroup.buttons.find(btn => btn.value === currentSession.type);
+                        const stateButton = statefulGroup.buttons.find(btn => btn.label === currentSession.type);
                         const successDuration = stateButton?.successDurationMinutes || 15;
                         
                         currentSession.success = duration > successDuration;
@@ -1969,7 +1956,7 @@
                     // Get events for this group
                     const groupEvents = [];
                     relevantEntries.forEach((e) => {
-                        if (group.buttons.some(btn => btn.type === e.type && btn.value === e.value)) {
+                        if (e.type === group.name.toLowerCase()) {
                             const date = new Date(e.ts);
                             const hours = (date - dayStart) / (1000 * 60 * 60);
                             groupEvents.push({
@@ -1989,7 +1976,7 @@
                     if (eventsBeforeDay.length > 0) {
                         const lastEventBeforeDay = eventsBeforeDay[eventsBeforeDay.length - 1];
                         currentState = lastEventBeforeDay.value;
-                        const stateIndex = group.buttons.findIndex(btn => btn.value === currentState);
+                        const stateIndex = group.buttons.findIndex(btn => btn.label === currentState);
                         if (stateIndex >= 0) {
                             lineData.push({ time: 0, state: stateIndex + 0.5 });
                         }
@@ -1998,7 +1985,7 @@
                     groupEvents.forEach((event) => {
                         const hour = Math.max(0, Math.min(24, event.time));
                         if (hour >= 0 && hour <= 24) {
-                            const stateIndex = group.buttons.findIndex(btn => btn.value === event.value);
+                            const stateIndex = group.buttons.findIndex(btn => btn.label === event.value);
                             if (stateIndex >= 0) {
                                 lineData.push({ time: hour, state: stateIndex + 0.5 });
                                 currentState = event.value;
@@ -2079,7 +2066,7 @@
                             .attr("alignment-baseline", "middle")
                             .style("font-size", "10px")
                             .style("fill", axisColor)
-                            .text(btn.value);
+                            .text(btn.label);
                     });
                 });
 
@@ -2091,7 +2078,7 @@
                     
                     // Skip if this is a stateful group event
                     const isStateful = statefulGroups.some(g => 
-                        g.buttons.some(btn => btn.type === e.type && btn.value === e.value)
+                        e.type === g.name.toLowerCase()
                     );
                     
                     if (!isStateful && hours >= 0 && hours < 24) {
@@ -2572,8 +2559,8 @@
                             // Sleep type: longer sleep at night, naps during day
                             const sleepType =
                                 sleepHour >= 20 || sleepHour < 6
-                                    ? "sleeping"
-                                    : "nap";
+                                    ? "Sleeping"
+                                    : "Nap";
                             await addEntry(
                                 "sleep",
                                 sleepType,
@@ -2582,7 +2569,7 @@
 
                             // Sleep duration: 30min to 3 hours for naps, 2-5 hours for night sleep
                             let durationMinutes;
-                            if (sleepType === "nap") {
+                            if (sleepType === "Nap") {
                                 durationMinutes = 30 + Math.random() * 150;
                             } else {
                                 durationMinutes = 120 + Math.random() * 180;
@@ -2600,10 +2587,10 @@
                                     sootheBefore.getMinutes() - 5
                                 );
                                 const sootheMethod = [
-                                    "rocking",
-                                    "pram",
-                                    "wearing",
-                                    "feed-to-sleep",
+                                    "Rocking",
+                                    "Pram",
+                                    "Wearing",
+                                    "Feed to Sleep",
                                 ][Math.floor(Math.random() * 4)];
                                 await addEntry(
                                     "soothe",
@@ -2614,7 +2601,7 @@
 
                             await addEntry(
                                 "sleep",
-                                "awake",
+                                "Awake",
                                 awakeTime.toISOString()
                             );
                         }
@@ -2633,7 +2620,7 @@
 
                             await addEntry(
                                 "feed",
-                                "bf",
+                                "Feed",
                                 feedTime.toISOString()
                             );
 
@@ -2647,23 +2634,8 @@
                                 );
                                 await addEntry(
                                     "feed",
-                                    "spew",
+                                    "Spew",
                                     spewTime.toISOString()
-                                );
-                            }
-
-                            // Occasional grizzle
-                            if (Math.random() > 0.8) {
-                                const grizzleTime = new Date(feedTime);
-                                grizzleTime.setMinutes(
-                                    grizzleTime.getMinutes() -
-                                        5 -
-                                        Math.random() * 10
-                                );
-                                await addEntry(
-                                    "feed",
-                                    "grizzle",
-                                    grizzleTime.toISOString()
                                 );
                             }
                         }
@@ -2683,7 +2655,7 @@
                             // Most Nappies are wet
                             await addEntry(
                                 "nappy",
-                                "wet",
+                                "Wet",
                                 NappyTime.toISOString()
                             );
 
@@ -2691,7 +2663,7 @@
                             if (Math.random() > 0.5) {
                                 await addEntry(
                                     "nappy",
-                                    "dirty",
+                                    "Dirty",
                                     NappyTime.toISOString()
                                 );
                             }
@@ -2707,14 +2679,14 @@
                             fiveSTime.setHours(fiveSHour, fiveSMinute);
 
                             const technique = [
-                                "swaddle",
-                                "side-lying",
-                                "shush",
-                                "swing",
-                                "suck",
+                                "Swaddle",
+                                "Side/Stomach",
+                                "Shush",
+                                "Swing",
+                                "Suck",
                             ][Math.floor(Math.random() * 5)];
                             await addEntry(
-                                "5s",
+                                "5 s's",
                                 technique,
                                 fiveSTime.toISOString()
                             );
