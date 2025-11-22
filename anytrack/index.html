@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Activity Tracker</title>
         <script src="https://unpkg.com/d3@7"></script>
+        <script src="jsoneditor.0-7-28.min.js"></script>
         <style>
             :root {
                 --bg: #f7f7f7;
@@ -1196,11 +1197,103 @@
 
             let currentConfig = loadConfig();
 
+            // JSON Editor instance
+            let jsonEditor = null;
+
+            // Config schema for JSON Editor
+            const configSchema = {
+                type: "object",
+                title: "Activity Tracker Configuration",
+                properties: {
+                    title: {
+                        type: "string",
+                        title: "Tracker Title"
+                    },
+                    groups: {
+                        type: "array",
+                        title: "Button Groups",
+                        items: {
+                            type: "object",
+                            title: "Group",
+                            properties: {
+                                name: {
+                                    type: "string",
+                                    title: "Group Name"
+                                },
+                                stateful: {
+                                    type: "boolean",
+                                    title: "Stateful (tracks state transitions)",
+                                    format: "checkbox"
+                                },
+                                counted: {
+                                    type: "boolean",
+                                    title: "Counted (counts button presses)",
+                                    format: "checkbox"
+                                },
+                                buttons: {
+                                    type: "array",
+                                    title: "Buttons",
+                                    items: {
+                                        type: "object",
+                                        title: "Button",
+                                        properties: {
+                                            type: {
+                                                type: "string",
+                                                title: "Event Type"
+                                            },
+                                            value: {
+                                                type: "string",
+                                                title: "Event Value"
+                                            },
+                                            label: {
+                                                type: "string",
+                                                title: "Button Label"
+                                            },
+                                            emoji: {
+                                                type: "string",
+                                                title: "Emoji (optional)"
+                                            },
+                                            counted: {
+                                                type: "boolean",
+                                                title: "Counted (for this button only)",
+                                                format: "checkbox"
+                                            },
+                                            successDurationMinutes: {
+                                                type: "number",
+                                                title: "Success Duration (minutes, for stateful)",
+                                                minimum: 0
+                                            }
+                                        },
+                                        required: ["type", "value", "label"]
+                                    }
+                                }
+                            },
+                            required: ["name", "buttons"]
+                        }
+                    }
+                },
+                required: ["title", "groups"]
+            };
+
             // Config Editor Functions
             function showConfigEditor() {
                 const modal = document.getElementById("config-editor-modal");
-                const textarea = document.getElementById("config-json");
-                textarea.value = JSON.stringify(currentConfig, null, 2);
+                const container = document.getElementById("config-editor-container");
+                
+                // Clear previous editor
+                container.innerHTML = "";
+                
+                // Initialize JSON Editor
+                jsonEditor = new JSONEditor(container, {
+                    schema: configSchema,
+                    theme: 'html',
+                    iconlib: 'fontawesome4',
+                    disable_collapse: false,
+                    disable_properties: false,
+                    disable_edit_json: false,
+                    startval: currentConfig
+                });
+                
                 document.getElementById("config-error").style.display = "none";
                 modal.classList.add("show");
             }
@@ -1208,39 +1301,35 @@
             function hideConfigEditor() {
                 const modal = document.getElementById("config-editor-modal");
                 modal.classList.remove("show");
+                if (jsonEditor) {
+                    jsonEditor.destroy();
+                    jsonEditor = null;
+                }
             }
 
             function loadTemplate(templateName) {
                 const template = configTemplates[templateName];
-                if (template) {
-                    const textarea = document.getElementById("config-json");
-                    textarea.value = JSON.stringify(template, null, 2);
+                if (template && jsonEditor) {
+                    jsonEditor.setValue(template);
                     document.getElementById("config-error").style.display = "none";
                 }
             }
 
             function saveConfigFromEditor() {
-                const textarea = document.getElementById("config-json");
                 const errorDiv = document.getElementById("config-error");
                 
                 try {
-                    const newConfig = JSON.parse(textarea.value);
-                    
-                    // Validate config structure
-                    if (!newConfig.title || !Array.isArray(newConfig.groups)) {
-                        throw new Error("Config must have 'title' and 'groups' array");
+                    if (!jsonEditor) {
+                        throw new Error("Editor not initialized");
                     }
-                    
-                    newConfig.groups.forEach((group, i) => {
-                        if (!group.name || !Array.isArray(group.buttons)) {
-                            throw new Error(`Group ${i} must have 'name' and 'buttons' array`);
-                        }
-                        group.buttons.forEach((btn, j) => {
-                            if (!btn.type || !btn.value || !btn.label) {
-                                throw new Error(`Button ${j} in group ${i} must have 'type', 'value', and 'label'`);
-                            }
-                        });
-                    });
+
+                    // Validate the form
+                    const errors = jsonEditor.validate();
+                    if (errors.length > 0) {
+                        throw new Error("Validation errors: " + errors.map(e => e.path + ": " + e.message).join(", "));
+                    }
+
+                    const newConfig = jsonEditor.getValue();
                     
                     // Save and apply config
                     currentConfig = newConfig;
@@ -2694,7 +2783,7 @@
                     <button onclick="loadTemplate('warehouse')">Warehouse Template</button>
                     <button onclick="loadTemplate('lab')">Lab Template</button>
                 </div>
-                <textarea id="config-json" spellcheck="false"></textarea>
+                <div id="config-editor-container" style="max-height: 60vh; overflow-y: auto; margin: 12px 0; padding: 10px; background: var(--bg); border-radius: 8px;"></div>
                 <div id="config-error" class="config-error"></div>
                 <div class="modal-buttons" style="margin-top: 12px;">
                     <button class="cancel" onclick="hideConfigEditor()">
