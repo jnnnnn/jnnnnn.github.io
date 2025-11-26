@@ -1196,7 +1196,7 @@
                 addGroupBtn.onclick = addNewGroup;
                 container.appendChild(addGroupBtn);
 
-                document.getElementById("config-modal").classList.add("active");
+                document.getElementById("config-modal").classList.add("show");
             }
 
             function createButtonRow(groupIndex, btnIndex, btn) {
@@ -1254,14 +1254,14 @@
             function closeConfigModal() {
                 // Reload from storage to discard changes
                 buttonGroups = loadButtonGroups();
-                document.getElementById("config-modal").classList.remove("active");
+                document.getElementById("config-modal").classList.remove("show");
             }
 
             function saveConfig() {
                 localStorage.setItem("babytrack-buttons", JSON.stringify(buttonGroups));
                 rebuildEmojiMap();
                 renderButtons();
-                document.getElementById("config-modal").classList.remove("active");
+                document.getElementById("config-modal").classList.remove("show");
                 updateDailyReport(); // Refresh graphs with new emoji map
             }
 
@@ -1271,7 +1271,7 @@
                     buttonGroups = loadButtonGroups();
                     rebuildEmojiMap();
                     renderButtons();
-                    document.getElementById("config-modal").classList.remove("active");
+                    document.getElementById("config-modal").classList.remove("show");
                     updateDailyReport();
                 }
             }
@@ -2032,7 +2032,7 @@
 
                 eventData.forEach((d) => {
                     // Hash based on time and type to distribute vertically
-                    const hash = hashStr(`${d.time.toFixed(3)}-${d.type}-${d.value}`);
+                    const hash = hashStr(`${d.value}`);
                     const levelOffset = (hash % emojiYLevels) / emojiYLevels;
                     const yPos = margin.top + 10 + levelOffset * emojiYRange;
 
