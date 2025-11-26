@@ -949,6 +949,224 @@
                 URL.revokeObjectURL(url);
             }
 
+            async function importCSV() {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = ".csv";
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const text = await file.text();
+                    const lines = text.trim().split("\n");
+                    const header = lines[0];
+
+                    // Skip header row
+                    let imported = 0;
+                    let skipped = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+
+                        // Parse CSV (handle quoted values)
+                        const match = line.match(/"([^"]*)","([^"]*)","([^"]*)"/);
+                        if (!match) {
+                            skipped++;
+                            continue;
+                        }
+
+                        const [, timestamp, type, value] = match;
+                        const ts = new Date(timestamp).toISOString();
+
+                        // Check if entry already exists
+                        const exists = await checkEntryExists(ts, type, value);
+                        if (exists) {
+                            skipped++;
+                            continue;
+                        }
+
+                        await addEntry(type, value, ts);
+                        imported++;
+                    }
+
+                    alert(`Imported ${imported} entries, skipped ${skipped} duplicates`);
+                    updateDailyReport();
+                };
+                input.click();
+            }
+
+            async function checkEntryExists(ts, type, value) {
+                if (!db) await initDB();
+                const transaction = db.transaction(["entries"], "readonly");
+                const objectStore = transaction.objectStore("entries");
+                const index = objectStore.index("ts");
+                const request = index.getAll(IDBKeyRange.only(ts));
+
+                const entries = await new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
+
+                return entries.some(e => e.type === type && e.value === value);
+            }
+
+            async function downloadHourlyReport() {
+                if (!db) await initDB();
+
+                // Load ALL entries from the database
+                const transaction = db.transaction(["entries"], "readonly");
+                const objectStore = transaction.objectStore("entries");
+                const request = objectStore.getAll();
+
+                const entries = await new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
+
+                if (!entries || entries.length === 0) {
+                    alert("No data to export");
+                    return;
+                }
+
+                // Filter out deleted entries
+                const activeEntries = entries.filter(e => !e.deleted);
+
+                // Group entries by date
+                const entriesByDate = {};
+                activeEntries.forEach(e => {
+                    const date = new Date(e.ts);
+                    const dateKey = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+                    if (!entriesByDate[dateKey]) entriesByDate[dateKey] = [];
+                    entriesByDate[dateKey].push(e);
+                });
+
+                // Build the hourly report
+                const header = "DATE\tTIME\tFood and Fluids Taken\tSleep\tSleep routine and how long it took to get to sleep once put down\tActivity\tWet Nappy\tDirty Nappy\tTOTAL SLEEP hh:mm\tComments";
+                const rows = [];
+
+                // Sort dates
+                const sortedDates = Object.keys(entriesByDate).sort((a, b) => {
+                    const [da, ma, ya] = a.split('/').map(Number);
+                    const [db, mb, yb] = b.split('/').map(Number);
+                    return new Date(2000 + ya, ma - 1, da) - new Date(2000 + yb, mb - 1, db);
+                });
+
+                for (const dateKey of sortedDates) {
+                    const dayEntries = entriesByDate[dateKey];
+
+                    // Group by hour
+                    const hourlyData = {};
+                    for (let h = 0; h < 24; h++) {
+                        hourlyData[h] = {
+                            feed: [],
+                            sleep: [],
+                            sleepRoutine: [],
+                            activity: [],
+                            wet: false,
+                            dirty: false,
+                            comments: []
+                        };
+                    }
+
+                    // Track sleep periods for duration calculation
+                    let sleepStart = null;
+                    let totalSleepMs = 0;
+                    const sleepByHour = {};
+
+                    // Sort entries by time
+                    dayEntries.sort((a, b) => new Date(a.ts) - new Date(b.ts));
+
+                    dayEntries.forEach(e => {
+                        const date = new Date(e.ts);
+                        const hour = date.getHours();
+
+                        if (e.type === 'feed') {
+                            hourlyData[hour].feed.push(e.value);
+                        } else if (e.type === 'sleep') {
+                            if (e.value === 'sleeping' || e.value === 'nap') {
+                                sleepStart = date;
+                                const sleepType = e.value === 'nap' ? 'nap' : 'sleep';
+                                hourlyData[hour].sleep.push(sleepType);
+                            } else if (e.value === 'awake' && sleepStart) {
+                                // Calculate sleep duration
+                                const duration = date - sleepStart;
+                                totalSleepMs += duration;
+
+                                // Distribute sleep across hours
+                                let current = new Date(sleepStart);
+                                while (current < date) {
+                                    const h = current.getHours();
+                                    const nextHour = new Date(current);
+                                    nextHour.setHours(h + 1, 0, 0, 0);
+                                    const endOfPeriod = nextHour < date ? nextHour : date;
+                                    const periodMs = endOfPeriod - current;
+                                    sleepByHour[h] = (sleepByHour[h] || 0) + periodMs;
+                                    current = nextHour;
+                                }
+                                sleepStart = null;
+                            } else if (e.value === 'grizzle') {
+                                hourlyData[hour].comments.push('grizzle');
+                            }
+                        } else if (e.type === 'nappy') {
+                            if (e.value === 'wet') hourlyData[hour].wet = true;
+                            if (e.value === 'dirty') hourlyData[hour].dirty = true;
+                        } else if (e.type === 'soothe' || e.type === '5s') {
+                            hourlyData[hour].sleepRoutine.push(e.value);
+                        } else if (e.type === 'note') {
+                            hourlyData[hour].comments.push(e.value);
+                        } else {
+                            hourlyData[hour].activity.push(`${e.type}: ${e.value}`);
+                        }
+                    });
+
+                    // Generate rows for each hour that has data
+                    let isFirstRowOfDay = true;
+                    for (let h = 0; h < 24; h++) {
+                        const data = hourlyData[h];
+                        const hasData = data.feed.length > 0 || data.sleep.length > 0 ||
+                            data.sleepRoutine.length > 0 || data.activity.length > 0 ||
+                            data.wet || data.dirty || data.comments.length > 0 ||
+                            sleepByHour[h];
+
+                        if (!hasData) continue;
+
+                        const sleepMs = sleepByHour[h] || 0;
+                        const sleepMins = Math.round(sleepMs / 60000);
+                        const sleepHrs = Math.floor(sleepMins / 60);
+                        const sleepRemMins = sleepMins % 60;
+                        const sleepStr = sleepMs > 0 ? `${sleepHrs}:${sleepRemMins.toString().padStart(2, '0')}` : '0:00';
+
+                        const row = [
+                            isFirstRowOfDay ? dateKey : '',
+                            `${h.toString().padStart(2, '0')}:00`,
+                            data.feed.join(', '),
+                            data.sleep.join(', '),
+                            data.sleepRoutine.join(', '),
+                            data.activity.join(', '),
+                            data.wet ? 'yes' : '',
+                            data.dirty ? 'yes' : '',
+                            sleepStr,
+                            data.comments.join(', ')
+                        ];
+                        rows.push(row.join('\t'));
+                        isFirstRowOfDay = false;
+                    }
+                }
+
+                const tsv = [header, ...rows].join('\n');
+
+                const blob = new Blob([tsv], { type: 'text/tab-separated-values;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'baby_hourly_report_' + new Date().toISOString().split('T')[0] + '.tsv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
             async function updateButtonStates() {
                 if (!db) await initDB();
 
@@ -2138,78 +2356,93 @@
                     <div class="tabs-wrapper">
                     <div id="log-tab" class="tab-content active">
                         <div class="recent-events">
-                            <h4>
-                                Events
-                                <div
-                                    style="
-                                        display: flex;
-                                        gap: 8px;
-                                        align-items: center;
-                                        margin-top: 8px;
-                                    "
-                                >
-                                    <button
-                                        class="btn"
-                                        id="download"
-                                        onclick="downloadCSV()"
-                                        style="margin: 0"
-                                    >
-                                        Download CSV
-                                    </button>
-                                    <input
-                                        type="text"
-                                        id="event-filter"
-                                        placeholder="Filter events..."
-                                        style="
-                                            flex: 1;
-                                            padding: 6px 10px;
-                                            font-size: 12px;
-                                            border-radius: 4px;
-                                            border: 1px solid var(--border);
-                                            background: var(--card);
-                                            color: var(--text);
-                                        "
-                                    />
-                                    <select
-                                        id="event-type-filter"
-                                        style="
-                                            padding: 6px;
-                                            font-size: 12px;
-                                            border-radius: 4px;
-                                            border: 1px solid var(--border);
-                                            background: var(--card);
-                                            color: var(--text);
-                                        "
-                                    >
-                                        <option value="">All Types</option>
-                                        <option value="feed">Feed</option>
-                                        <option value="sleep">Sleep</option>
-                                        <option value="nappy">Nappy</option>
-                                        <option value="soothe">Soothe</option>
-                                        <option value="5s">5 S's</option>
-                                        <option value="note">Notes</option>
-                                    </select>
-                                    <label
-                                        style="
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 4px;
-                                            font-size: 12px;
-                                            white-space: nowrap;
-                                        "
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            id="hide-deleted-filter"
-                                            checked
-                                        />
-                                        Hide deleted
-                                    </label>
-                                </div>
-                            </h4>
+                            <h4>Events</h4>
 
                             <div class="event-list" id="recent-events-list">
                                 <!-- Will be populated by JS -->
+                            </div>
+
+                            <div
+                                style="
+                                    display: flex;
+                                    gap: 8px;
+                                    align-items: center;
+                                    margin-top: 12px;
+                                    flex-wrap: wrap;
+                                "
+                            >
+                                <input
+                                    type="text"
+                                    id="event-filter"
+                                    placeholder="Filter events..."
+                                    style="
+                                        flex: 1;
+                                        min-width: 100px;
+                                        padding: 6px 10px;
+                                        font-size: 12px;
+                                        border-radius: 4px;
+                                        border: 1px solid var(--border);
+                                        background: var(--card);
+                                        color: var(--text);
+                                    "
+                                />
+                                <select
+                                    id="event-type-filter"
+                                    style="
+                                        padding: 6px;
+                                        font-size: 12px;
+                                        border-radius: 4px;
+                                        border: 1px solid var(--border);
+                                        background: var(--card);
+                                        color: var(--text);
+                                    "
+                                >
+                                    <option value="">All Types</option>
+                                    <option value="feed">Feed</option>
+                                    <option value="sleep">Sleep</option>
+                                    <option value="nappy">Nappy</option>
+                                    <option value="soothe">Soothe</option>
+                                    <option value="5s">5 S's</option>
+                                    <option value="note">Notes</option>
+                                </select>
+                                <label
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 4px;
+                                        font-size: 12px;
+                                        white-space: nowrap;
+                                    "
+                                >
+                                    <input
+                                        type="checkbox"
+                                        id="hide-deleted-filter"
+                                        checked
+                                    />
+                                    Hide deleted
+                                </label>
+                                <button
+                                    class="btn"
+                                    id="download"
+                                    onclick="downloadCSV()"
+                                    style="margin: 0"
+                                >
+                                    CSV
+                                </button>
+                                <button
+                                    class="btn"
+                                    onclick="downloadHourlyReport()"
+                                    style="margin: 0; background: #2196f3"
+                                >
+                                    Hourly
+                                </button>
+                                <button
+                                    class="btn"
+                                    onclick="importCSV()"
+                                    style="margin: 0; background: #ff9800"
+                                >
+                                    Import
+                                </button>
                             </div>
                         </div>
                     </div>
