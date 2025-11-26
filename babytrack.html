@@ -47,12 +47,12 @@
 
             .action {
                 flex: 1;
-                padding: 14px;
+                padding: 8px 6px;
                 border-radius: 10px;
                 border: 0;
                 background: var(--muted);
                 color: var(--text);
-                font-size: 15px;
+                font-size: 14px;
                 cursor: pointer;
                 transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
@@ -298,6 +298,95 @@
                 #log-tab { order: 1; }
                 #graphs-tab { order: 2; }
             }
+
+            /* Config Modal Styles */
+            .header-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+            .settings-btn {
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 6px;
+            }
+            .settings-btn:hover { background: var(--muted); }
+
+            #config-modal .modal {
+                max-width: 500px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            .config-group {
+                margin-bottom: 16px;
+                padding: 12px;
+                background: var(--bg);
+                border-radius: 8px;
+            }
+            .config-group-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+            .config-button-row {
+                display: grid;
+                grid-template-columns: 40px 1fr 80px 30px;
+                gap: 6px;
+                align-items: center;
+                margin-bottom: 6px;
+            }
+            .config-button-row input {
+                padding: 6px;
+                border-radius: 4px;
+                border: 1px solid var(--border);
+                background: var(--card);
+                color: var(--text);
+                font-size: 13px;
+            }
+            .config-button-row input.emoji-input {
+                text-align: center;
+                font-size: 16px;
+            }
+            .config-button-row button.remove-btn {
+                background: #e53935;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                padding: 4px;
+            }
+            .add-btn {
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 6px 12px;
+                cursor: pointer;
+                font-size: 13px;
+            }
+            .config-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 16px;
+                justify-content: flex-end;
+            }
+            .config-actions button {
+                padding: 10px 20px;
+                border-radius: 6px;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .config-actions .save-btn { background: var(--primary); color: white; }
+            .config-actions .cancel-btn { background: var(--muted); color: var(--text); }
+            .config-actions .reset-btn { background: #ff9800; color: white; }
         </style>
         <script>
             let db = null;
@@ -999,137 +1088,193 @@
                 setReportDate(`${year}-${month}-${day}`);
             }
 
-            // Button Configuration
-            const buttonGroups = [
+            // Button Configuration - Default config
+            const defaultButtonGroups = [
                 {
                     buttons: [
-                        {
-                            type: "feed",
-                            value: "bf",
-                            label: "Feed",
-                            emoji: "🤱",
-                        },
-                        {
-                            type: "feed",
-                            value: "play",
-                            label: "Play",
-                            emoji: "🎾",
-                        },
-                        {
-                            type: "feed",
-                            value: "spew",
-                            label: "Spew",
-                            emoji: "🤮",
-                        },
+                        { type: "feed", value: "bf", label: "Feed", emoji: "🤱" },
+                        { type: "feed", value: "play", label: "Play", emoji: "🎾" },
+                        { type: "feed", value: "spew", label: "Spew", emoji: "🤮" },
                     ],
                 },
                 {
                     buttons: [
-                        {
-                            type: "sleep",
-                            value: "sleeping",
-                            label: "Sleeping",
-                            emoji: "",
-                        },
-                        {
-                            type: "sleep",
-                            value: "nap",
-                            label: "Nap",
-                            emoji: "",
-                        },
-                        {
-                            type: "sleep",
-                            value: "awake",
-                            label: "Awake",
-                            emoji: "",
-                        },
-                        {
-                            type: "sleep",
-                            value: "grizzle",
-                            label: "Grizzle",
-                            emoji: "",
-                        },
+                        { type: "sleep", value: "sleeping", label: "Sleeping", emoji: "" },
+                        { type: "sleep", value: "nap", label: "Nap", emoji: "" },
+                        { type: "sleep", value: "awake", label: "Awake", emoji: "" },
+                        { type: "sleep", value: "grizzle", label: "Grizzle", emoji: "" },
                     ],
                 },
                 {
                     buttons: [
-                        {
-                            type: "nappy",
-                            value: "wet",
-                            label: "Wet",
-                            emoji: "💧",
-                        },
-                        {
-                            type: "nappy",
-                            value: "dirty",
-                            label: "Dirty",
-                            emoji: "💩",
-                        },
+                        { type: "nappy", value: "wet", label: "Wet", emoji: "💧" },
+                        { type: "nappy", value: "dirty", label: "Dirty", emoji: "💩" },
                     ],
                 },
                 {
                     buttons: [
-                        {
-                            type: "soothe",
-                            value: "pram",
-                            label: "Pram",
-                            emoji: "🎢",
-                        },
-                        {
-                            type: "soothe",
-                            value: "rocking",
-                            label: "Rocking",
-                            emoji: "🪑",
-                        },
-                        {
-                            type: "soothe",
-                            value: "wearing",
-                            label: "Wearing",
-                            emoji: "🤗",
-                        },
-                        {
-                            type: "soothe",
-                            value: "feed-to-sleep",
-                            label: "Feed to Sleep",
-                            emoji: "🍼😴",
-                        },
+                        { type: "soothe", value: "pram", label: "Pram", emoji: "🎢" },
+                        { type: "soothe", value: "rocking", label: "Rocking", emoji: "🪑" },
+                        { type: "soothe", value: "wearing", label: "Wearing", emoji: "🤗" },
+                        { type: "soothe", value: "feed-to-sleep", label: "Feed to Sleep", emoji: "🍼😴" },
                     ],
                 },
                 {
                     buttons: [
-                        {
-                            type: "5s",
-                            value: "swaddle",
-                            label: "Swaddle",
-                            emoji: "🌯",
-                        },
-                        {
-                            type: "5s",
-                            value: "side-lying",
-                            label: "Side/Stomach",
-                            emoji: "🛏️",
-                        },
-                        {
-                            type: "5s",
-                            value: "shush",
-                            label: "Shush",
-                            emoji: "🤫",
-                        },
-                        {
-                            type: "5s",
-                            value: "swing",
-                            label: "Swing",
-                            emoji: "🎢",
-                        },
-                        {
-                            type: "5s",
-                            value: "suck",
-                            label: "Suck",
-                            emoji: "🍭",
-                        },
+                        { type: "5s", value: "swaddle", label: "Swaddle", emoji: "🌯" },
+                        { type: "5s", value: "side-lying", label: "Side/Stomach", emoji: "🛏️" },
+                        { type: "5s", value: "shush", label: "Shush", emoji: "🤫" },
+                        { type: "5s", value: "swing", label: "Swing", emoji: "🎢" },
+                        { type: "5s", value: "suck", label: "Suck", emoji: "🍭" },
                     ],
                 },
             ];
+
+            // Load config from localStorage or use default
+            function loadButtonGroups() {
+                const saved = localStorage.getItem("babytrack-buttons");
+                if (saved) {
+                    try {
+                        return JSON.parse(saved);
+                    } catch (e) {
+                        console.error("Failed to parse saved button config:", e);
+                    }
+                }
+                return JSON.parse(JSON.stringify(defaultButtonGroups)); // Deep copy
+            }
+
+            let buttonGroups = loadButtonGroups();
+
+            // Rebuild emoji map from button groups
+            function rebuildEmojiMap() {
+                // Clear existing
+                for (const key in emojiMap) {
+                    if (key !== "note") delete emojiMap[key];
+                }
+                // Rebuild from button groups
+                buttonGroups.forEach((group) => {
+                    group.buttons.forEach((btn) => {
+                        if (!emojiMap[btn.type]) emojiMap[btn.type] = {};
+                        emojiMap[btn.type][btn.value] = btn.emoji || "•";
+                    });
+                });
+            }
+
+            // Config Modal Functions
+            function openConfigModal() {
+                const container = document.getElementById("config-groups");
+                container.innerHTML = "";
+
+                buttonGroups.forEach((group, groupIndex) => {
+                    const groupDiv = document.createElement("div");
+                    groupDiv.className = "config-group";
+                    groupDiv.dataset.groupIndex = groupIndex;
+
+                    // Group header with type from first button
+                    const groupType = group.buttons.length > 0 ? group.buttons[0].type : "new";
+                    groupDiv.innerHTML = `
+                        <div class="config-group-header">
+                            <span>Group: ${groupType}</span>
+                            <button class="add-btn" onclick="addButtonToGroup(${groupIndex})">+ Add Button</button>
+                        </div>
+                        <div class="config-buttons" data-group="${groupIndex}"></div>
+                    `;
+
+                    const buttonsContainer = groupDiv.querySelector(".config-buttons");
+                    group.buttons.forEach((btn, btnIndex) => {
+                        buttonsContainer.appendChild(createButtonRow(groupIndex, btnIndex, btn));
+                    });
+
+                    container.appendChild(groupDiv);
+                });
+
+                // Add "Add New Group" button
+                const addGroupBtn = document.createElement("button");
+                addGroupBtn.className = "add-btn";
+                addGroupBtn.style.width = "100%";
+                addGroupBtn.textContent = "+ Add New Button Group";
+                addGroupBtn.onclick = addNewGroup;
+                container.appendChild(addGroupBtn);
+
+                document.getElementById("config-modal").classList.add("active");
+            }
+
+            function createButtonRow(groupIndex, btnIndex, btn) {
+                const row = document.createElement("div");
+                row.className = "config-button-row";
+                row.innerHTML = `
+                    <input type="text" class="emoji-input" value="${btn.emoji || ''}" placeholder="😀" maxlength="4" 
+                           onchange="updateConfigButton(${groupIndex}, ${btnIndex}, 'emoji', this.value)">
+                    <input type="text" value="${btn.label}" placeholder="Label" 
+                           onchange="updateConfigButton(${groupIndex}, ${btnIndex}, 'label', this.value)">
+                    <input type="text" value="${btn.type}" placeholder="Type" 
+                           onchange="updateConfigButton(${groupIndex}, ${btnIndex}, 'type', this.value)">
+                    <button class="remove-btn" onclick="removeButton(${groupIndex}, ${btnIndex})">×</button>
+                `;
+                return row;
+            }
+
+            function updateConfigButton(groupIndex, btnIndex, field, value) {
+                if (field === "label") {
+                    // Also update value to be a slug of the label
+                    buttonGroups[groupIndex].buttons[btnIndex].value = value.toLowerCase().replace(/\s+/g, "-");
+                }
+                buttonGroups[groupIndex].buttons[btnIndex][field] = value;
+            }
+
+            function addButtonToGroup(groupIndex) {
+                const groupType = buttonGroups[groupIndex].buttons.length > 0 
+                    ? buttonGroups[groupIndex].buttons[0].type 
+                    : "event";
+                buttonGroups[groupIndex].buttons.push({
+                    type: groupType,
+                    value: "new",
+                    label: "New",
+                    emoji: "⭐"
+                });
+                openConfigModal(); // Refresh
+            }
+
+            function removeButton(groupIndex, btnIndex) {
+                buttonGroups[groupIndex].buttons.splice(btnIndex, 1);
+                // Remove group if empty
+                if (buttonGroups[groupIndex].buttons.length === 0) {
+                    buttonGroups.splice(groupIndex, 1);
+                }
+                openConfigModal(); // Refresh
+            }
+
+            function addNewGroup() {
+                buttonGroups.push({
+                    buttons: [{ type: "custom", value: "new", label: "New Button", emoji: "⭐" }]
+                });
+                openConfigModal(); // Refresh
+            }
+
+            function closeConfigModal() {
+                // Reload from storage to discard changes
+                buttonGroups = loadButtonGroups();
+                document.getElementById("config-modal").classList.remove("active");
+            }
+
+            function saveConfig() {
+                localStorage.setItem("babytrack-buttons", JSON.stringify(buttonGroups));
+                rebuildEmojiMap();
+                renderButtons();
+                document.getElementById("config-modal").classList.remove("active");
+                updateDailyReport(); // Refresh graphs with new emoji map
+            }
+
+            function resetConfig() {
+                if (confirm("Reset all buttons to default? This will remove any custom buttons you've added.")) {
+                    localStorage.removeItem("babytrack-buttons");
+                    buttonGroups = loadButtonGroups();
+                    rebuildEmojiMap();
+                    renderButtons();
+                    document.getElementById("config-modal").classList.remove("active");
+                    updateDailyReport();
+                }
+            }
 
             // Create emoji lookup map
             const emojiMap = {};
@@ -1145,7 +1290,7 @@
             // Generate buttons dynamically
             function renderButtons() {
                 const container = document.querySelector(".container");
-                const h2 = container.querySelector("h2");
+                const headerRow = container.querySelector(".header-row");
 
                 // Remove existing button cards
                 const existingCards = container.querySelectorAll(
@@ -1157,8 +1302,8 @@
                     }
                 });
 
-                // Insert button groups after the h2
-                buttonGroups.reverse().forEach((group) => {
+                // Insert button groups after the header row (in reverse so first group is at top)
+                [...buttonGroups].reverse().forEach((group) => {
                     const card = document.createElement("div");
                     card.className = "card";
 
@@ -1184,7 +1329,7 @@
                     });
 
                     card.appendChild(row);
-                    h2.insertAdjacentElement("afterend", card);
+                    headerRow.insertAdjacentElement("afterend", card);
                 });
             }
 
@@ -1871,11 +2016,29 @@
                     .attr("stroke-width", 3)
                     .attr("d", line);
 
-                // Draw events as emoji text
+                // Draw events as emoji text with hash-based vertical spacing to avoid overlap
+                // Simple hash function to spread emojis across vertical levels
+                function hashStr(str) {
+                    let hash = 0;
+                    for (let i = 0; i < str.length; i++) {
+                        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                        hash |= 0;
+                    }
+                    return Math.abs(hash);
+                }
+
+                const emojiYLevels = 8; // Number of vertical levels for emoji distribution
+                const emojiYRange = height - margin.top - margin.bottom - 30; // Leave space for labels
+
                 eventData.forEach((d) => {
+                    // Hash based on time and type to distribute vertically
+                    const hash = hashStr(`${d.time.toFixed(3)}-${d.type}-${d.value}`);
+                    const levelOffset = (hash % emojiYLevels) / emojiYLevels;
+                    const yPos = margin.top + 10 + levelOffset * emojiYRange;
+
                     svg.append("text")
                         .attr("x", x(d.time))
-                        .attr("y", y(2.5))
+                        .attr("y", yPos)
                         .attr("text-anchor", "middle")
                         .attr("dominant-baseline", "middle")
                         .style("font-size", "16px")
@@ -1920,7 +2083,10 @@
 
     <body>
         <div class="container">
-            <h2>Baby Daily Log</h2>
+            <div class="header-row">
+                <h2>Baby Daily Log</h2>
+                <button class="settings-btn" onclick="openConfigModal()" title="Settings">⚙️</button>
+            </div>
 
             <!-- Buttons will be dynamically generated here -->
 
@@ -2535,6 +2701,25 @@
                     <button class="confirm" onclick="saveWithCustomTime()">
                         Save
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="config-modal"
+            class="modal-overlay"
+            onclick="if(event.target === this) closeConfigModal()"
+        >
+            <div class="modal">
+                <h3>Customize Buttons</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                    Add, remove, or reorder buttons. Each button has an emoji, label, and type (for grouping events).
+                </p>
+                <div id="config-groups"></div>
+                <div class="config-actions">
+                    <button class="reset-btn" onclick="resetConfig()">Reset to Default</button>
+                    <button class="cancel-btn" onclick="closeConfigModal()">Cancel</button>
+                    <button class="save-btn" onclick="saveConfig()">Save</button>
                 </div>
             </div>
         </div>
