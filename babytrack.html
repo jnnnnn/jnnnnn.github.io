@@ -791,7 +791,17 @@
             }
 
             async function downloadCSV() {
-                const entries = await loadEntriesByDate();
+                if (!db) await initDB();
+
+                // Load ALL entries from the database (no date filter)
+                const transaction = db.transaction(["entries"], "readonly");
+                const objectStore = transaction.objectStore("entries");
+                const request = objectStore.getAll();
+
+                const entries = await new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
+                });
 
                 if (!entries || entries.length === 0) {
                     alert("No data to export");
