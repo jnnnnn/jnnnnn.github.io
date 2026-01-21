@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+#!uv run
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
+#     "fonttools",
 #     "lxml",
 #     "pypdf",
 # ]
@@ -35,6 +36,7 @@ import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from fontTools import ttLib
 from lxml import etree
 from pypdf import PdfReader, PdfWriter, PageObject, Transformation
 
@@ -123,6 +125,9 @@ class EPUBParser:
 
         # Filter out footnote-only files from main content
         content_items = [h for h in spine_items if "footnote" not in h.lower()]
+        
+        # Filter out TOC/navigation files (files that are mostly links to chapters)
+        content_items = [h for h in content_items if not self._is_toc_file(h)]
 
         # Second pass: parse chapters
         chapters = []
@@ -145,6 +150,53 @@ class EPUBParser:
         if self.opf_dir:
             return f"{self.opf_dir}/{href}"
         return href
+
+    def _is_toc_file(self, href: str) -> bool:
+        """Check if a file is a table of contents / navigation file.
+        
+        TOC files are characterized by having multiple chapter-heading-like
+        paragraphs that are all links to other files.
+        """
+        full_path = self._resolve_path(href)
+        try:
+            content = self.zip.read(full_path)
+            doc = etree.fromstring(content)
+        except (KeyError, etree.XMLSyntaxError):
+            return False
+        
+        body = doc.find(".//{http://www.w3.org/1999/xhtml}body")
+        if body is None:
+            return False
+        
+        # Count chapter-like link entries vs total paragraphs
+        chapter_links = 0
+        total_paragraphs = 0
+        
+        for p in body.iter("{http://www.w3.org/1999/xhtml}p"):
+            text = self._extract_text(p).strip()
+            if not text:
+                continue
+            total_paragraphs += 1
+            
+            # Check if this paragraph is a chapter-heading-like link
+            if self._is_chapter_heading(text):
+                # Check if the paragraph is primarily a link to another file
+                for a in p.iter("{http://www.w3.org/1999/xhtml}a"):
+                    a_href = a.get("href", "")
+                    a_text = self._extract_text(a).strip()
+                    # If the link text matches the paragraph and links to another file
+                    if a_text == text and a_href and not a_href.startswith("#"):
+                        href_file = a_href.split("#")[0] if "#" in a_href else a_href
+                        # Link points to a different file (not same file anchor)
+                        if href_file and href_file != Path(href).name:
+                            chapter_links += 1
+                            break
+        
+        # If more than half the paragraphs are chapter links, it's a TOC
+        if total_paragraphs > 0 and chapter_links >= 3 and chapter_links / total_paragraphs > 0.3:
+            return True
+        
+        return False
 
     def _collect_all_footnotes(self) -> None:
         """Collect all footnotes from the EPUB, including dedicated footnote files."""
@@ -233,7 +285,36 @@ class EPUBParser:
                 elem = body.find(f".//{ns}{tag}")
                 if elem is not None:
                     return self._extract_text(elem).strip()
+        
+        # Look for chapter patterns in paragraphs (common in Calibre-converted EPUBs)
+        for ns in ["{http://www.w3.org/1999/xhtml}", ""]:
+            for p in body.findall(f".//{ns}p"):
+                text = self._extract_text(p).strip()
+                if self._is_chapter_heading(text):
+                    return text
         return ""
+
+    def _is_chapter_heading(self, text: str) -> bool:
+        """Check if text looks like a chapter heading."""
+        if not text:
+            return False
+        # Chapter headings should be short (typically just the title)
+        if len(text) > 50:
+            return False
+        # Common chapter patterns - must match the ENTIRE text
+        patterns = [
+            r'^Chapter\s+(\d+|One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve|\w+)$',
+            r'^Part\s+(\d+|One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|I+|IV|V|VI+)$',
+            r'^Prologue$',
+            r'^Epilogue$',
+            r'^Introduction$',
+            r'^Acknowledgments$',
+            r'^About the Author$',
+        ]
+        for pattern in patterns:
+            if re.match(pattern, text, re.IGNORECASE):
+                return True
+        return False
 
     def _extract_text(self, elem: etree._Element) -> str:
         """Extract all text from an element."""
@@ -290,6 +371,14 @@ class EPUBParser:
             return ""
 
         elif tag == "p":
+            # Check if this paragraph is actually a chapter heading
+            raw_text = self._extract_text(elem).strip()
+            
+            if self._is_chapter_heading(raw_text):
+                escaped = self._escape_typst(raw_text)
+                result.append(f"\n= {escaped}\n")
+                return ""
+            
             content = self._convert_children(elem, doc_href, images, result)
             if content.strip():
                 result.append(f"\n{content}\n")
@@ -499,11 +588,28 @@ class TypstGenerator:
 
         return "\n".join(parts)
 
+    def _get_font_family_name(self, font_path: Path) -> str:
+        """Extract the font family name from a TTF/OTF file."""
+        try:
+            font = ttLib.TTFont(font_path)
+            # Name ID 1 is the font family name
+            for record in font["name"].names:
+                if record.nameID == 1 and record.platformID == 3:  # Windows platform
+                    return record.toUnicode()
+            # Fallback: try any platform
+            for record in font["name"].names:
+                if record.nameID == 1:
+                    return record.toUnicode()
+        except Exception:
+            pass
+        # Last resort: use filename stem
+        return font_path.stem
+
     def _generate_setup(self) -> str:
         """Generate document setup."""
         font_config = ""
         if self.font_path:
-            font_name = self.font_path.stem
+            font_name = self._get_font_family_name(self.font_path)
             font_config = f'#set text(font: "{font_name}")'
 
         return f'''// Document setup
@@ -784,6 +890,7 @@ def convert_epub_to_pdf(
     impose: bool = True,
     pages_per_signature: int = 16,
     a3_mode: bool = False,
+    wait: bool = False,
 ) -> None:
     """Convert an EPUB to a print-ready PDF."""
 
@@ -801,6 +908,7 @@ def convert_epub_to_pdf(
     # Create temp directory for Typst compilation
     with tempfile.TemporaryDirectory() as tmpdir:
         tmppath = Path(tmpdir)
+        print(f"Using temporary directory {tmppath}")
 
         # Write Typst source
         typst_file = tmppath / "book.typ"
@@ -847,6 +955,13 @@ def convert_epub_to_pdf(
             output_pdf.write_bytes(intermediate_pdf.read_bytes())
             print(f"Saved PDF to {output_pdf}")
 
+        
+
+        if wait:
+            input("Press Enter to exit...")
+
+
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -854,38 +969,14 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("epub", type=Path, help="Input EPUB file")
-    parser.add_argument(
-        "-o", "--output", type=Path, help="Output PDF file (default: <epub-name>.pdf)"
-    )
-    parser.add_argument(
-        "--font", type=Path, help="Path to a local font file to use"
-    )
-    parser.add_argument(
-        "--page-size",
-        default="a5",
-        help="Page size (e.g., a5, a4, letter)",
-    )
-    parser.add_argument(
-        "--reading-pdf",
-        type=Path,
-        help="Also save the intermediate (non-imposed) reading PDF",
-    )
-    parser.add_argument(
-        "--no-impose",
-        action="store_true",
-        help="Don't impose pages; output the reading PDF directly",
-    )
-    parser.add_argument(
-        "--pages-per-signature",
-        type=int,
-        default=16,
-        help="Pages per signature (must be multiple of 4)",
-    )
-    parser.add_argument(
-        "--a3-mode",
-        action="store_true",
-        help="Use A5-to-A3 duplex imposition mode",
-    )
+    parser.add_argument( "-o", "--output", type=Path, help="Output PDF file (default: <epub-name>.pdf)" )
+    parser.add_argument( "--font", type=Path, help="Path to a local font file to use" )
+    parser.add_argument( "--page-size", default="a5", help="Page size (e.g., a5, a4, letter)", )
+    parser.add_argument( "--reading-pdf", type=Path, help="Also save the intermediate (non-imposed) reading PDF", )
+    parser.add_argument( "--no-impose", action="store_true", help="Don't impose pages; output the reading PDF directly", ) 
+    parser.add_argument( "--pages-per-signature", type=int, default=16, help="Pages per signature (must be multiple of 4)", )
+    parser.add_argument( "--a3-mode", action="store_true", help="Use A5-to-A3 duplex imposition mode", )
+    parser.add_argument( "--wait", action="store_true", help="Wait for user input before exiting (for debugging)", )
 
     args = parser.parse_args()
 
@@ -902,8 +993,8 @@ def main():
         impose=not args.no_impose,
         pages_per_signature=args.pages_per_signature,
         a3_mode=args.a3_mode,
+        wait=args.wait,
     )
-
 
 if __name__ == "__main__":
     main()
