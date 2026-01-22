@@ -4,6 +4,7 @@
 # dependencies = [
 #     "fonttools",
 #     "lxml",
+#     "pillow",
 #     "pypdf",
 # ]
 # ///
@@ -26,6 +27,9 @@ uv run epub2print.py mybook.epub --a3-mode
 
 # Custom font and page size
 uv run epub2print.py mybook.epub --font ./MyFont.ttf --page-size a4
+
+# Exclude high-ink images (e.g., dark photos that waste printer ink)
+uv run epub2print.py mybook.epub --max-ink 0.3
 """
 
 import argparse
@@ -72,12 +76,36 @@ class Book:
 class EPUBParser:
     """Parses EPUB files and extracts content."""
 
-    def __init__(self, epub_path: Path):
+    def __init__(self, epub_path: Path, max_ink: float | None = None):
         self.epub_path = epub_path
         self.zip = zipfile.ZipFile(epub_path, "r")
         self.opf_path: str = ""
         self.opf_dir: str = ""
         self.footnotes: dict[str, str] = {}  # id -> footnote content
+        self.max_ink = max_ink  # Maximum ink coverage (0.0-1.0) for images, None = no limit
+
+    def _calculate_ink_coverage(self, img_data: bytes) -> float:
+        """Calculate the ink coverage of an image (0.0 = white, 1.0 = black).
+        
+        Uses the average darkness of pixels as a proxy for ink usage.
+        """
+        try:
+            from PIL import Image
+            import io
+            
+            img = Image.open(io.BytesIO(img_data))
+            # Convert to grayscale
+            gray = img.convert("L")
+            # Get pixel data
+            pixels = list(gray.get_flattened_data())
+            # Calculate average darkness (0=black, 255=white)
+            # Invert so 0=white, 1=black (ink coverage)
+            avg_brightness = sum(pixels) / len(pixels)
+            ink_coverage = 1.0 - (avg_brightness / 255.0)
+            return ink_coverage
+        except Exception:
+            # If we can't analyze the image, assume it's okay to include
+            return 0.0
 
     def parse(self) -> Book:
         """Parse the EPUB and return a Book object."""
@@ -444,6 +472,12 @@ class EPUBParser:
                 img_path = self._resolve_image_path(doc_href, src)
                 try:
                     img_data = self.zip.read(img_path)
+                    # Check ink coverage if threshold is set
+                    if self.max_ink is not None:
+                        ink = self._calculate_ink_coverage(img_data)
+                        if ink > self.max_ink:
+                            # Skip this image - too much ink
+                            return ""
                     img_name = Path(src).name.replace(" ", "_")
                     images[img_name] = img_data
                     result.append(f'\n#image("{img_name}", width: 80%)\n')
@@ -458,6 +492,12 @@ class EPUBParser:
                 img_path = self._resolve_image_path(doc_href, href)
                 try:
                     img_data = self.zip.read(img_path)
+                    # Check ink coverage if threshold is set
+                    if self.max_ink is not None:
+                        ink = self._calculate_ink_coverage(img_data)
+                        if ink > self.max_ink:
+                            # Skip this image - too much ink
+                            return ""
                     img_name = Path(href).name.replace(" ", "_")
                     images[img_name] = img_data
                     result.append(f'\n#image("{img_name}", width: 80%)\n')
@@ -891,12 +931,13 @@ def convert_epub_to_pdf(
     pages_per_signature: int = 16,
     a3_mode: bool = False,
     wait: bool = False,
+    max_ink: float | None = None,
 ) -> None:
     """Convert an EPUB to a print-ready PDF."""
 
     # Parse EPUB
     print(f"Parsing {epub_path}...")
-    parser = EPUBParser(epub_path)
+    parser = EPUBParser(epub_path, max_ink=max_ink)
     book = parser.parse()
     print(f"  Found {len(book.chapters)} chapters")
 
@@ -970,13 +1011,14 @@ def main():
     )
     parser.add_argument("epub", type=Path, help="Input EPUB file")
     parser.add_argument( "-o", "--output", type=Path, help="Output PDF file (default: <epub-name>.pdf)" )
-    parser.add_argument( "--font", type=Path, help="Path to a local font file to use" )
+    parser.add_argument( "--font", type=Path, default="Dyslexie-Regular.ttf", help="Path to a local font file to use" )
     parser.add_argument( "--page-size", default="a5", help="Page size (e.g., a5, a4, letter)", )
     parser.add_argument( "--reading-pdf", type=Path, help="Also save the intermediate (non-imposed) reading PDF", )
     parser.add_argument( "--no-impose", action="store_true", help="Don't impose pages; output the reading PDF directly", ) 
-    parser.add_argument( "--pages-per-signature", type=int, default=16, help="Pages per signature (must be multiple of 4)", )
+    parser.add_argument( "--pages-per-signature", type=int, default=32, help="Pages per signature (must be multiple of 4)", )
     parser.add_argument( "--a3-mode", action="store_true", help="Use A5-to-A3 duplex imposition mode", )
     parser.add_argument( "--wait", action="store_true", help="Wait for user input before exiting (for debugging)", )
+    parser.add_argument( "--max-ink", type=float, default=0.4, help="Exclude images with ink coverage above this threshold (0.0-1.0, e.g., 0.3 for 30%%)", )
 
     args = parser.parse_args()
 
@@ -994,6 +1036,7 @@ def main():
         pages_per_signature=args.pages_per_signature,
         a3_mode=args.a3_mode,
         wait=args.wait,
+        max_ink=args.max_ink,
     )
 
 if __name__ == "__main__":
