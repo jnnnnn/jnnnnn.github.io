@@ -63,3 +63,29 @@ Interpretation/goal:
 
 This mode will require rotations and page placement to match the above reading order.
 
+for a two- sheet signature, we want pages:
+
+3 4
+--- fold spine ---
+13 14
+
+then on the other side (next page in pdf):
+
+15 16
+---- outside of fold
+1 2
+
+
+Then the next sheet is 
+
+7 8
+inner fold
+9 10
+
+and 
+
+11 12
+outer fold
+5 6
+
+so after doing the 2-up bit I think there needs to be a rotation

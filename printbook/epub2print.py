@@ -774,65 +774,7 @@ class Impositioner:
         if self.pages_per_signature % 4 != 0:
             self.pages_per_signature = ((self.pages_per_signature // 4) + 1) * 4
 
-    def impose_booklet(self, input_pdf: Path, output_pdf: Path) -> None:
-        """
-        Create a booklet-imposed PDF.
-        
-        Pages are arranged so that when printed duplex and folded,
-        they create a booklet with correct page order.
-        """
-        reader = PdfReader(input_pdf)
-        writer = PdfWriter()
-
-        total_pages = len(reader.pages)
-        page_width = float(reader.pages[0].mediabox.width)
-        page_height = float(reader.pages[0].mediabox.height)
-
-        # Pad to multiple of signature size
-        padded_total = (
-            (total_pages + self.pages_per_signature - 1)
-            // self.pages_per_signature
-            * self.pages_per_signature
-        )
-
-        # Process each signature
-        for sig_start in range(0, padded_total, self.pages_per_signature):
-            sig_pages = list(range(sig_start, sig_start + self.pages_per_signature))
-            sheet_order = self._get_booklet_order(len(sig_pages))
-
-            for sheet_idx in range(0, len(sheet_order), 2):
-                left_page_num = sheet_order[sheet_idx]
-                right_page_num = sheet_order[sheet_idx + 1]
-
-                # Create new sheet (landscape, 2x page width)
-                sheet = PageObject.create_blank_page(
-                    width=page_width * 2, height=page_height
-                )
-
-                # Add left page
-                if left_page_num is not None:
-                    actual_page = sig_start + left_page_num
-                    if actual_page < total_pages:
-                        src_page = reader.pages[actual_page]
-                        sheet.merge_transformed_page(
-                            src_page, Transformation()
-                        )
-
-                # Add right page
-                if right_page_num is not None:
-                    actual_page = sig_start + right_page_num
-                    if actual_page < total_pages:
-                        src_page = reader.pages[actual_page]
-                        sheet.merge_transformed_page(
-                            src_page, Transformation().translate(tx=page_width)
-                        )
-
-                writer.add_page(sheet)
-
-        with open(output_pdf, "wb") as f:
-            writer.write(f)
-
-    def _get_booklet_order(self, num_pages: int) -> list[int | None]:
+    def _get_booklet_order(self, num_pages: int) -> list[int]:
         """
         Get page order for booklet imposition.
         
@@ -852,70 +794,146 @@ class Impositioner:
             order.extend([left, right])
         return order
 
+    def _impose_virtual_pages(
+        self,
+        writer: PdfWriter,
+        virtual_pages: list[PageObject | None],
+        page_width: float,
+        page_height: float,
+    ) -> None:
+        """
+        Impose virtual pages as a booklet.
+        
+        Takes a list of virtual pages (which may be None for blanks) and
+        arranges them 2-up for booklet printing.
+        """
+        num_pages = len(virtual_pages)
+        
+        # Pad to multiple of signature size
+        padded_total = (
+            (num_pages + self.pages_per_signature - 1)
+            // self.pages_per_signature
+            * self.pages_per_signature
+        )
+        
+        # Extend with None for padding
+        virtual_pages = virtual_pages + [None] * (padded_total - num_pages)
+        
+        # Process each signature
+        for sig_start in range(0, padded_total, self.pages_per_signature):
+            sheet_order = self._get_booklet_order(self.pages_per_signature)
+
+            for sheet_idx in range(0, len(sheet_order), 2):
+                left_idx = sig_start + sheet_order[sheet_idx]
+                right_idx = sig_start + sheet_order[sheet_idx + 1]
+
+                # Create new sheet (2x page width)
+                sheet = PageObject.create_blank_page(
+                    width=page_width * 2, height=page_height
+                )
+
+                # Add left page
+                if left_idx < len(virtual_pages) and virtual_pages[left_idx] is not None:
+                    sheet.merge_transformed_page(
+                        virtual_pages[left_idx], Transformation()
+                    )
+
+                # Add right page
+                if right_idx < len(virtual_pages) and virtual_pages[right_idx] is not None:
+                    sheet.merge_transformed_page(
+                        virtual_pages[right_idx], Transformation().translate(tx=page_width)
+                    )
+
+                writer.add_page(sheet)
+
+    def impose_booklet(self, input_pdf: Path, output_pdf: Path) -> None:
+        """
+        Create a booklet-imposed PDF.
+        
+        Pages are arranged so that when printed duplex and folded,
+        they create a booklet with correct page order.
+        """
+        reader = PdfReader(input_pdf)
+        writer = PdfWriter()
+
+        page_width = float(reader.pages[0].mediabox.width)
+        page_height = float(reader.pages[0].mediabox.height)
+
+        # Use source pages directly as virtual pages
+        virtual_pages = list(reader.pages)
+        
+        self._impose_virtual_pages(writer, virtual_pages, page_width, page_height)
+
+        with open(output_pdf, "wb") as f:
+            writer.write(f)
+
     def impose_a5_to_a3(self, input_pdf: Path, output_pdf: Path) -> None:
         """
         Impose A5 pages for A3 duplex printing.
         
-        Layout per A3 sheet:
-        - Reading order: top-left, top-right, bottom-left, bottom-right
-        - Bottom pages are rotated 180° so reader flips bottom up
+        Process:
+        1. Combine A5 pages 2-up into A4 spreads (landscape)
+        2. Rotate each spread 90° to become portrait A4 pages
+        3. Use standard booklet imposition on those A4 pages
         
-        Each A3 sheet holds 4 A5 pages (2x2 grid).
-        The folded result is A4 sized, with A5 pages.
+        Output is landscape A3 sheets. When printed duplex and folded,
+        the result is a booklet with A5-sized pages.
         """
         reader = PdfReader(input_pdf)
         writer = PdfWriter()
 
         total_pages = len(reader.pages)
-        page_width = float(reader.pages[0].mediabox.width)
-        page_height = float(reader.pages[0].mediabox.height)
+        a5_width = float(reader.pages[0].mediabox.width)
+        a5_height = float(reader.pages[0].mediabox.height)
 
-        # A3 dimensions (2x A4, or 4x A5 in 2x2)
-        # A5: 148mm x 210mm, A3: 297mm x 420mm
-        a3_width = page_width * 2  # Two A5 pages wide
-        a3_height = page_height * 2  # Two A5 pages tall
+        # A4 spread = 2 A5 pages side by side (landscape)
+        a4_landscape_width = a5_width * 2
+        a4_landscape_height = a5_height
+        
+        # After 90° rotation: portrait A4
+        a4_portrait_width = a5_height
+        a4_portrait_height = a5_width * 2
 
-        # Pad to multiple of 8 (4 pages per side, duplex = 8 per sheet)
-        pages_per_sheet = 8
-        padded_total = (
-            (total_pages + pages_per_sheet - 1) // pages_per_sheet * pages_per_sheet
+        # Create A4 spreads from consecutive A5 pages, then rotate 90°
+        rotated_spreads = []
+        for i in range(0, total_pages, 2):
+            # Create landscape A4 spread
+            spread = PageObject.create_blank_page(
+                width=a4_landscape_width, height=a4_landscape_height
+            )
+            
+            # Left A5 page
+            spread.merge_transformed_page(
+                reader.pages[i], Transformation()
+            )
+            
+            # Right A5 page (if exists)
+            if i + 1 < total_pages:
+                spread.merge_transformed_page(
+                    reader.pages[i + 1], Transformation().translate(tx=a5_width)
+                )
+            
+            # Create rotated version (portrait A4)
+            rotated = PageObject.create_blank_page(
+                width=a4_portrait_width, height=a4_portrait_height
+            )
+            # Rotate 90° counter-clockwise around origin, then translate to fit
+            # After 90° CCW: (x,y) → (-y, x)
+            # Content spans x from -height to 0, so translate by (height, 0)
+            rotated.merge_transformed_page(
+                spread,
+                Transformation()
+                .rotate(90)
+                .translate(tx=a4_landscape_height, ty=0)
+            )
+            
+            rotated_spreads.append(rotated)
+
+        # Use standard booklet imposition on the rotated A4 pages
+        # This will create landscape A3 output (2 portrait A4s side by side)
+        self._impose_virtual_pages(
+            writer, rotated_spreads, a4_portrait_width, a4_portrait_height
         )
-
-        # Process sheets
-        for sheet_start in range(0, padded_total, pages_per_sheet):
-            # Front side: pages 0, 1, 2, 3 (top-left, top-right, bottom-left, bottom-right)
-            # Back side: pages 4, 5, 6, 7
-            for side in range(2):
-                sheet = PageObject.create_blank_page(width=a3_width, height=a3_height)
-
-                base = sheet_start + side * 4
-                positions = [
-                    # (page_offset, x, y, rotation)
-                    (0, 0, page_height, 0),  # top-left
-                    (1, page_width, page_height, 0),  # top-right
-                    (2, page_width, page_height, 180),  # bottom-left (rotated)
-                    (3, 0, page_height, 180),  # bottom-right (rotated)
-                ]
-
-                for offset, x, y, rotation in positions:
-                    page_num = base + offset
-                    if page_num < total_pages:
-                        src_page = reader.pages[page_num]
-                        transform = Transformation()
-                        if rotation == 180:
-                            # Rotate 180° around page center, then translate
-                            transform = (
-                                Transformation()
-                                .translate(tx=-page_width / 2, ty=-page_height / 2)
-                                .rotate(180)
-                                .translate(tx=page_width / 2, ty=page_height / 2)
-                                .translate(tx=x, ty=y - page_height)
-                            )
-                        else:
-                            transform = Transformation().translate(tx=x, ty=y)
-                        sheet.merge_transformed_page(src_page, transform)
-
-                writer.add_page(sheet)
 
         with open(output_pdf, "wb") as f:
             writer.write(f)
