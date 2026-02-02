@@ -5,7 +5,6 @@
     <title>Baby Log</title>
     <script src="https://unpkg.com/d3@7"></script>
     <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
     <style>
       :root {
         --bg: #f7f7f7;
@@ -1627,465 +1626,42 @@
         }
       }
 
-      // ==================== Google Sheets Sync ====================
-      
-      // Google API Configuration
-      // To set up: See instructions in the Sync modal
-      const GOOGLE_CLIENT_ID = localStorage.getItem('babytrack-client-id') || '';
-      const GOOGLE_API_KEY = localStorage.getItem('babytrack-api-key') || '';
-      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-      
-      let tokenClient = null;
-      let gapiInited = false;
-      let gisInited = false;
-      let accessToken = null;
+      // ==================== jsonbin.io Sync ====================
 
-      // Initialize Google API
-      function gapiLoaded() {
-        gapi.load('client', initializeGapiClient);
-      }
+      const JSONBIN_API_KEY = localStorage.getItem('babytrack-jsonbin-api-key') || '';
+      const JSONBIN_BIN_ID = localStorage.getItem('babytrack-jsonbin-bin-id') || '';
 
-      async function initializeGapiClient() {
-        const apiKey = localStorage.getItem('babytrack-api-key');
-        if (!apiKey) return;
-        
-        await gapi.client.init({
-          apiKey: apiKey,
-          discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-        });
-        gapiInited = true;
-        maybeEnableSync();
-      }
-
-      function gisLoaded() {
-        const clientId = localStorage.getItem('babytrack-client-id');
-        if (!clientId) return;
-        
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: SCOPES,
-          callback: (response) => {
-            if (response.error) {
-              console.error('Token error:', response);
-              return;
-            }
-            accessToken = response.access_token;
-            localStorage.setItem('babytrack-token', accessToken);
-            updateSyncStatus('Authenticated ✓');
-          },
-        });
-        gisInited = true;
-        maybeEnableSync();
-      }
-
-      function maybeEnableSync() {
-        const syncBtn = document.getElementById('sync-now-btn');
-        if (syncBtn && gapiInited && gisInited) {
-          syncBtn.disabled = false;
-        }
-      }
-
-      // Check for saved token on load
-      function checkSavedToken() {
-        const saved = localStorage.getItem('babytrack-token');
-        if (saved) {
-          accessToken = saved;
-        }
-      }
-
-      // Get/set sync settings
-      function getSyncSettings() {
-        const stored = localStorage.getItem('babytrack-sync');
-        return stored ? JSON.parse(stored) : { sheetUrl: '', lastSync: null };
-      }
-
-      function saveSyncSettings(settings) {
-        localStorage.setItem('babytrack-sync', JSON.stringify(settings));
-      }
-
-      // Parse Google Sheet URL to extract sheet ID
-      function parseSheetUrl(url) {
-        // Handle various Google Sheets URL formats:
-        // https://docs.google.com/spreadsheets/d/SHEET_ID/edit
-        // https://docs.google.com/spreadsheets/d/SHEET_ID/edit#gid=0
-        const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-        return match ? match[1] : null;
-      }
-
-      // Fetch data from Google Sheet using Sheets API
-      async function fetchSheetData(sheetId) {
-        try {
-          const response = await gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: sheetId,
-            range: 'Sheet1',
-          });
-          
-          const rows = response.result.values || [];
-          if (rows.length < 2) return { entries: [], sheetRowCount: rows.length };
-          
-          // Expected columns: id, ts, type, value, deleted, updated
-          const header = rows[0].map(h => h.toLowerCase().trim());
-          const idCol = header.indexOf('id');
-          const tsCol = header.indexOf('ts');
-          const typeCol = header.indexOf('type');
-          const valueCol = header.indexOf('value');
-          const deletedCol = header.indexOf('deleted');
-          const updatedCol = header.indexOf('updated');
-
-          if (idCol === -1 || tsCol === -1 || typeCol === -1 || valueCol === -1) {
-            throw new Error('Sheet missing required columns (id, ts, type, value). First row should be: id, ts, type, value, deleted, updated');
-          }
-
-          const entries = [];
-          for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (!row[tsCol]) continue; // Skip empty rows
-
-            entries.push({
-              id: parseInt(row[idCol]) || null,
-              ts: row[tsCol],
-              type: row[typeCol],
-              value: row[valueCol] || '',
-              deleted: deletedCol >= 0 ? (row[deletedCol] === 'true' || row[deletedCol] === '1') : false,
-              updated: updatedCol >= 0 ? row[updatedCol] : row[tsCol],
-              sheetRow: i + 1 // 1-indexed row number in sheet
-            });
-          }
-          
-          return { entries, sheetRowCount: rows.length };
-        } catch (error) {
-          console.error('Error fetching sheet:', error);
-          throw error;
-        }
-      }
-
-      // Write rows to Google Sheet
-      async function appendToSheet(sheetId, entries) {
-        if (entries.length === 0) return;
-        
-        const rows = entries.map(e => [
-          e.id,
-          e.ts,
-          e.type,
-          e.value || '',
-          e.deleted ? 'true' : 'false',
-          e.updated || e.ts
-        ]);
-
-        await gapi.client.sheets.spreadsheets.values.append({
-          spreadsheetId: sheetId,
-          range: 'Sheet1',
-          valueInputOption: 'RAW',
-          insertDataOption: 'INSERT_ROWS',
-          resource: { values: rows }
-        });
-      }
-
-      // Update a specific row in the sheet
-      async function updateSheetRow(sheetId, rowNumber, entry) {
-        const row = [
-          entry.id,
-          entry.ts,
-          entry.type,
-          entry.value || '',
-          entry.deleted ? 'true' : 'false',
-          entry.updated || entry.ts
-        ];
-
-        await gapi.client.sheets.spreadsheets.values.update({
-          spreadsheetId: sheetId,
-          range: `Sheet1!A${rowNumber}:F${rowNumber}`,
-          valueInputOption: 'RAW',
-          resource: { values: [row] }
-        });
-      }
-
-      // Initialize sheet with headers if empty
-      async function initializeSheetIfNeeded(sheetId) {
-        try {
-          const response = await gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: sheetId,
-            range: 'Sheet1!A1:F1',
-          });
-          
-          const firstRow = response.result.values?.[0] || [];
-          if (firstRow.length === 0 || firstRow[0].toLowerCase() !== 'id') {
-            // Add headers
-            await gapi.client.sheets.spreadsheets.values.update({
-              spreadsheetId: sheetId,
-              range: 'Sheet1!A1:F1',
-              valueInputOption: 'RAW',
-              resource: { values: [['id', 'ts', 'type', 'value', 'deleted', 'updated']] }
-            });
-            return true; // Sheet was initialized
-          }
-          return false;
-        } catch (error) {
-          console.error('Error initializing sheet:', error);
-          throw error;
-        }
-      }
-
-      // Authenticate with Google
-      async function authenticate() {
-        const clientId = localStorage.getItem('babytrack-client-id');
-        const apiKey = localStorage.getItem('babytrack-api-key');
-        
-        if (!clientId || !apiKey) {
-          alert('Please enter your Google API credentials first (Client ID and API Key)');
-          return false;
-        }
-
-        // Re-initialize if needed
-        if (!gapiInited) {
-          await gapi.client.init({
-            apiKey: apiKey,
-            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-          });
-          gapiInited = true;
-        }
-
-        if (!gisInited) {
-          tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: SCOPES,
-            callback: () => {}, // Will be set in requestToken
-          });
-          gisInited = true;
-        }
-
-        return new Promise((resolve) => {
-          tokenClient.callback = (response) => {
-            if (response.error) {
-              console.error('Auth error:', response);
-              resolve(false);
-              return;
-            }
-            accessToken = response.access_token;
-            localStorage.setItem('babytrack-token', accessToken);
-            resolve(true);
-          };
-          
-          if (accessToken) {
-            resolve(true);
-          } else {
-            tokenClient.requestAccessToken({ prompt: 'consent' });
-          }
-        });
-      }
-
-      // Get all local entries
-      async function getAllLocalEntries() {
-        if (!db) await initDB();
-        const transaction = db.transaction(['entries'], 'readonly');
-        const objectStore = transaction.objectStore('entries');
-        const request = objectStore.getAll();
-
-        return new Promise((resolve, reject) => {
-          request.onsuccess = () => resolve(request.result || []);
-          request.onerror = () => reject(request.error);
-        });
-      }
-
-      // Get local entries updated since a timestamp
-      async function getLocalEntriesSince(since) {
-        if (!db) await initDB();
-        const transaction = db.transaction(['entries'], 'readonly');
-        const objectStore = transaction.objectStore('entries');
-        
-        // Use the updated index if available
-        if (objectStore.indexNames.contains('updated')) {
-          const index = objectStore.index('updated');
-          const range = IDBKeyRange.lowerBound(since, true); // exclusive lower bound
-          const request = index.getAll(range);
-          
-          return new Promise((resolve, reject) => {
-            request.onsuccess = () => resolve(request.result || []);
-            request.onerror = () => reject(request.error);
-          });
-        } else {
-          // Fallback: get all and filter
-          const all = await getAllLocalEntries();
-          return all.filter(e => e.updated && new Date(e.updated) > new Date(since));
-        }
-      }
-
-      // Update a local entry by id
-      async function updateLocalEntry(id, updates) {
-        if (!db) await initDB();
-        const transaction = db.transaction(['entries'], 'readwrite');
-        const objectStore = transaction.objectStore('entries');
-
-        return new Promise((resolve, reject) => {
-          const getRequest = objectStore.get(id);
-          getRequest.onsuccess = () => {
-            const entry = getRequest.result;
-            if (entry) {
-              Object.assign(entry, updates);
-              const putRequest = objectStore.put(entry);
-              putRequest.onsuccess = () => resolve(entry);
-              putRequest.onerror = () => reject(putRequest.error);
-            } else {
-              resolve(null);
-            }
-          };
-          getRequest.onerror = () => reject(getRequest.error);
-        });
-      }
-
-      // Add or update entry from sheet data - uses ID as primary key
-      async function upsertFromSheet(sheetEntry) {
-        if (!db) await initDB();
-        const transaction = db.transaction(['entries'], 'readwrite');
-        const objectStore = transaction.objectStore('entries');
-
-        return new Promise((resolve, reject) => {
-          // If sheet entry has an ID, try to find by ID first
-          if (sheetEntry.id) {
-            const getRequest = objectStore.get(sheetEntry.id);
-            getRequest.onsuccess = () => {
-              const existing = getRequest.result;
-              if (existing) {
-                // Update if sheet is newer
-                if (!existing.updated || new Date(sheetEntry.updated) > new Date(existing.updated)) {
-                  existing.ts = sheetEntry.ts;
-                  existing.type = sheetEntry.type;
-                  existing.value = sheetEntry.value;
-                  existing.deleted = sheetEntry.deleted;
-                  existing.updated = sheetEntry.updated;
-                  const putRequest = objectStore.put(existing);
-                  putRequest.onsuccess = () => resolve({ action: 'updated', entry: existing });
-                  putRequest.onerror = () => reject(putRequest.error);
-                } else {
-                  resolve({ action: 'skipped', entry: existing });
-                }
-              } else {
-                // ID doesn't exist locally - insert with that ID
-                const newEntry = {
-                  id: sheetEntry.id,
-                  ts: sheetEntry.ts,
-                  type: sheetEntry.type,
-                  value: sheetEntry.value,
-                  deleted: sheetEntry.deleted,
-                  updated: sheetEntry.updated
-                };
-                const putRequest = objectStore.put(newEntry); // put allows specifying ID
-                putRequest.onsuccess = () => resolve({ action: 'added', entry: newEntry });
-                putRequest.onerror = () => reject(putRequest.error);
-              }
-            };
-            getRequest.onerror = () => reject(getRequest.error);
-          } else {
-            // No ID - insert new
-            const newEntry = {
-              ts: sheetEntry.ts,
-              type: sheetEntry.type,
-              value: sheetEntry.value,
-              deleted: sheetEntry.deleted,
-              updated: sheetEntry.updated
-            };
-            const addRequest = objectStore.add(newEntry);
-            addRequest.onsuccess = () => {
-              newEntry.id = addRequest.result;
-              resolve({ action: 'added', entry: newEntry });
-            };
-            addRequest.onerror = () => reject(addRequest.error);
-          }
-        });
-      }
-
-      // Main sync function - two-way sync with Google Sheets
-      async function syncWithSheet() {
-        const settings = getSyncSettings();
-        if (!settings.sheetUrl) {
-          alert('Please set a Google Sheet URL first');
-          return;
-        }
-
-        const sheetId = parseSheetUrl(settings.sheetUrl);
-        if (!sheetId) {
-          alert('Invalid Google Sheet URL');
+      async function syncWithJsonBin() {
+        if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID) {
+          alert('Please set your jsonbin.io API Key and Bin ID in the settings.');
           return;
         }
 
         const statusEl = document.getElementById('sync-status');
-        if (statusEl) statusEl.textContent = 'Authenticating...';
-
-        // Authenticate first
-        const authed = await authenticate();
-        if (!authed) {
-          if (statusEl) statusEl.textContent = 'Authentication failed';
-          return;
-        }
-
         if (statusEl) statusEl.textContent = 'Syncing...';
 
         try {
-          // 1. Initialize sheet with headers if needed
-          await initializeSheetIfNeeded(sheetId);
+          const localEntries = await getAllLocalEntries();
 
-          // 2. Fetch all data from sheet
-          const { entries: sheetEntries } = await fetchSheetData(sheetId);
-          
-          // 3. Build a map of sheet entries by ID
-          const sheetById = new Map();
-          sheetEntries.forEach(e => {
-            if (e.id) sheetById.set(e.id, e);
+          // Push all local entries as a full snapshot
+          const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Master-Key': JSONBIN_API_KEY
+            },
+            body: JSON.stringify(localEntries)
           });
 
-          // 4. Get all local entries
-          const localEntries = await getAllLocalEntries();
-          const localById = new Map();
-          localEntries.forEach(e => localById.set(e.id, e));
-
-          // 5. Merge: Apply sheet changes to local
-          let pulledCount = 0;
-          for (const sheetEntry of sheetEntries) {
-            const result = await upsertFromSheet(sheetEntry);
-            if (result.action === 'added' || result.action === 'updated') pulledCount++;
+          if (!response.ok) {
+            throw new Error(`Failed to sync: ${response.statusText}`);
           }
 
-          // 6. Find local entries not in sheet (new local entries to push)
-          const toPush = [];
-          const toUpdate = [];
-          
-          // Re-fetch local entries after merge
-          const updatedLocalEntries = await getAllLocalEntries();
-          
-          for (const local of updatedLocalEntries) {
-            const sheetEntry = sheetById.get(local.id);
-            if (!sheetEntry) {
-              // New local entry - push to sheet
-              toPush.push(local);
-            } else if (local.updated && sheetEntry.updated && 
-                       new Date(local.updated) > new Date(sheetEntry.updated)) {
-              // Local is newer - update sheet row
-              toUpdate.push({ entry: local, sheetRow: sheetEntry.sheetRow });
-            }
-          }
+          const result = await response.json();
+          console.log('Sync successful:', result);
 
-          // 7. Push new entries to sheet
-          if (toPush.length > 0) {
-            await appendToSheet(sheetId, toPush);
-          }
-
-          // 8. Update changed entries in sheet
-          for (const { entry, sheetRow } of toUpdate) {
-            await updateSheetRow(sheetId, sheetRow, entry);
-          }
-
-          // 9. Update last sync time
-          settings.lastSync = new Date().toISOString();
-          saveSyncSettings(settings);
-
-          // 10. Show results
-          const msg = `Sync complete!\n↓ Pulled: ${pulledCount}\n↑ Pushed: ${toPush.length}\n↻ Updated: ${toUpdate.length}`;
           if (statusEl) statusEl.textContent = `Last sync: ${new Date().toLocaleTimeString()}`;
-          updateSyncStatus(`Synced: ↓${pulledCount} ↑${toPush.length} ↻${toUpdate.length}`);
-
-          // Refresh display
-          await updateDailyReport();
-
+          alert('Sync successful!');
         } catch (error) {
           console.error('Sync error:', error);
           if (statusEl) statusEl.textContent = 'Sync failed';
@@ -2093,59 +1669,7 @@
         }
       }
 
-      function updateSyncStatus(msg) {
-        const el = document.getElementById('sync-status');
-        if (el) el.textContent = msg;
-      }
-
-      // Open sync settings modal
-      function openSyncModal() {
-        const settings = getSyncSettings();
-        document.getElementById('sheet-url-input').value = settings.sheetUrl || '';
-        document.getElementById('api-key-input').value = localStorage.getItem('babytrack-api-key') || '';
-        document.getElementById('client-id-input').value = localStorage.getItem('babytrack-client-id') || '';
-        document.getElementById('sync-status').textContent = settings.lastSync 
-          ? `Last sync: ${new Date(settings.lastSync).toLocaleString()}`
-          : 'Never synced';
-        document.getElementById('sync-modal').classList.add('show');
-      }
-
-      function closeSyncModal() {
-        document.getElementById('sync-modal').classList.remove('show');
-      }
-
-      function saveSyncSettings_UI() {
-        const url = document.getElementById('sheet-url-input').value.trim();
-        const apiKey = document.getElementById('api-key-input').value.trim();
-        const clientId = document.getElementById('client-id-input').value.trim();
-        
-        const settings = getSyncSettings();
-        settings.sheetUrl = url;
-        saveSyncSettings(settings);
-        
-        localStorage.setItem('babytrack-api-key', apiKey);
-        localStorage.setItem('babytrack-client-id', clientId);
-        
-        // Reset auth state to re-init with new credentials
-        gapiInited = false;
-        gisInited = false;
-        accessToken = null;
-        localStorage.removeItem('babytrack-token');
-        
-        alert('Settings saved! Click Sync Now to connect.');
-      }
-
-      function signOut() {
-        accessToken = null;
-        localStorage.removeItem('babytrack-token');
-        if (google.accounts.oauth2.revoke) {
-          const token = localStorage.getItem('babytrack-token');
-          if (token) google.accounts.oauth2.revoke(token);
-        }
-        updateSyncStatus('Signed out');
-      }
-
-      // ==================== End Google Sheets Sync ====================
+      // ==================== End jsonbin.io Sync ====================
 
       // Create emoji lookup map
       const emojiMap = {};
@@ -2648,7 +2172,7 @@
             d3
               .axisBottom(x)
               .ticks(8)
-              .tickValues([0, 3, 6, 9, 12, 15, 18, 21, 24])
+              .tickValues([0, 3,  6, 9, 12, 15, 18, 21, 24])
               .tickFormat((d) => d + 'h')
           );
 
@@ -3027,11 +2551,6 @@
           d3.select('#event-filter').on('input', applyEventFilters);
           d3.select('#event-type-filter').on('change', applyEventFilters);
           d3.select('#hide-deleted-filter').on('change', applyEventFilters);
-          
-          // Initialize Google APIs for sync
-          checkSavedToken();
-          if (typeof gapi !== 'undefined') gapiLoaded();
-          if (typeof google !== 'undefined' && google.accounts) gisLoaded();
         });
 
         let allDayEntries = []; // Store all entries for filtering
@@ -3310,74 +2829,6 @@
           <button class="cancel-btn" onclick="closeConfigModal()">Cancel</button>
           <button class="save-btn" onclick="saveConfig()">Save</button>
         </div>
-      </div>
-    </div>
-
-    <div id="sync-modal" class="modal-overlay" onclick="if(event.target === this) closeSyncModal()">
-      <div class="modal" style="max-width: 550px;">
-        <h3>🔄 Sync with Google Sheets</h3>
-        
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 13px; font-weight: 600;">Google Sheet URL:</label>
-          <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/..." 
-                 style="width: 100%; margin-top: 4px; padding: 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); box-sizing: border-box;">
-        </div>
-
-        <details style="margin-bottom: 12px;">
-          <summary style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--primary);">API Credentials (click to expand)</summary>
-          <div style="margin-top: 8px; padding: 12px; background: var(--bg); border-radius: 8px;">
-            <label style="font-size: 12px;">API Key:</label>
-            <input type="text" id="api-key-input" placeholder="AIza..." 
-                   style="width: 100%; margin: 4px 0 8px 0; padding: 6px; font-size: 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--card); color: var(--text); box-sizing: border-box;">
-            
-            <label style="font-size: 12px;">OAuth Client ID:</label>
-            <input type="text" id="client-id-input" placeholder="xxxxx.apps.googleusercontent.com" 
-                   style="width: 100%; margin: 4px 0; padding: 6px; font-size: 12px; border-radius: 4px; border: 1px solid var(--border); background: var(--card); color: var(--text); box-sizing: border-box;">
-          </div>
-        </details>
-        
-        <div id="sync-status" style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Never synced</div>
-        
-        <div class="config-actions" style="flex-wrap: wrap; gap: 8px;">
-          <button class="cancel-btn" onclick="saveSyncSettings_UI()">Save Settings</button>
-          <button class="save-btn" id="sync-now-btn" onclick="syncWithSheet()">Sync Now</button>
-          <button class="cancel-btn" onclick="closeSyncModal()">Close</button>
-        </div>
-        
-        <details style="margin-top: 16px;">
-          <summary style="cursor: pointer; font-size: 13px; font-weight: 600;">Setup Instructions (one-time)</summary>
-          <div style="margin-top: 8px; padding: 12px; background: var(--bg); border-radius: 8px; font-size: 12px;">
-            <strong>1. Create Google Cloud Project:</strong>
-            <ol style="margin: 4px 0 12px 16px; padding: 0;">
-              <li>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a></li>
-              <li>Create a new project (or select existing)</li>
-              <li>Enable the <strong>Google Sheets API</strong>: APIs & Services → Library → Search "Sheets" → Enable</li>
-            </ol>
-            
-            <strong>2. Create API Key:</strong>
-            <ol style="margin: 4px 0 12px 16px; padding: 0;">
-              <li>APIs & Services → Credentials → Create Credentials → API Key</li>
-              <li>Copy the key and paste above</li>
-              <li>(Optional) Restrict to Sheets API for security</li>
-            </ol>
-            
-            <strong>3. Create OAuth Client ID:</strong>
-            <ol style="margin: 4px 0 12px 16px; padding: 0;">
-              <li>APIs & Services → Credentials → Create Credentials → OAuth Client ID</li>
-              <li>Configure consent screen first (External, just your email as test user)</li>
-              <li>Application type: <strong>Web application</strong></li>
-              <li>Add Authorized JavaScript origin: <code>https://jnnnnn.github.io</code></li>
-              <li>Copy the Client ID and paste above</li>
-            </ol>
-            
-            <strong>4. Create a Google Sheet:</strong>
-            <ol style="margin: 4px 0 0 16px; padding: 0;">
-              <li>Create a new Google Sheet</li>
-              <li>Copy its URL and paste above</li>
-              <li>First sync will add headers automatically</li>
-            </ol>
-          </div>
-        </details>
       </div>
     </div>
   </body>

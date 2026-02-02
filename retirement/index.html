@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retirement Calculator</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --green: #22c55e;
+      --green-bg: #dcfce7;
+      --red: #ef4444;
+      --red-bg: #fee2e2;
+      --gold: #eab308;
+      --gold-bg: #fef9c3;
+      --blue: #3b82f6;
+      --slider-track: #cbd5e1;
+      --slider-thumb: #3b82f6;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --green-bg: #14532d;
+        --red-bg: #7f1d1d;
+        --gold-bg: #713f12;
+        --slider-track: #475569;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.75rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Big Number Display */
+    .big-number {
+      background: var(--green-bg);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      transition: background-color 0.3s ease;
+    }
+
+    .big-number.negative {
+      background: var(--red-bg);
+    }
+
+    .big-number.infinity {
+      background: var(--gold-bg);
+    }
+
+    .big-number .value {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .big-number .description {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+
+    .big-number .details {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 16px 0;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    /* Sliders */
+    .param {
+      margin-bottom: 24px;
+    }
+
+    .param:last-child {
+      margin-bottom: 0;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .param-name {
+      font-weight: 500;
+    }
+
+    .param-value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .param input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--slider-track);
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .param input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--slider-thumb);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .param input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--slider-thumb);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .param-range {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Sensitivity Indicator */
+    .sensitivity {
+      margin-top: 8px;
+      height: 28px;
+    }
+
+    .sensitivity svg {
+      width: 100%;
+      height: 28px;
+    }
+
+    /* Chart */
+    .chart-container {
+      width: 100%;
+      height: 300px;
+    }
+
+    .chart-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-axis text {
+      fill: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .chart-axis line,
+    .chart-axis path {
+      stroke: var(--border);
+    }
+
+    .chart-area {
+      fill: url(#areaGradient);
+    }
+
+    .chart-line {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 2;
+    }
+
+    .chart-marker {
+      stroke: var(--text-muted);
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+    }
+
+    .chart-marker-label {
+      fill: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Collapsible */
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 12px 0;
+      user-select: none;
+    }
+
+    .collapsible-header::before {
+      content: '▸';
+      margin-right: 8px;
+      transition: transform 0.2s;
+    }
+
+    .collapsible-header.open::before {
+      transform: rotate(90deg);
+    }
+
+    .collapsible-content {
+      display: none;
+    }
+
+    .collapsible-content.open {
+      display: block;
+    }
+
+    /* Function Editor */
+    .function-editor {
+      position: relative;
+    }
+
+    .function-editor textarea {
+      width: 100%;
+      height: 200px;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      font-size: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      resize: vertical;
+    }
+
+    .function-editor .reset-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 12px;
+      background: var(--border);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .function-editor .reset-btn:hover {
+      background: var(--slider-track);
+    }
+
+    .function-error {
+      color: var(--red);
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Retirement Calculator</h1>
+    <p class="subtitle">All values in today's dollars (inflation-adjusted)</p>
+
+    <!-- Big Number Display -->
+    <div id="bigNumber" class="big-number">
+      <div class="value">+0 years</div>
+      <div class="description">Calculating...</div>
+      <div class="details"></div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <h2>Portfolio Over Time</h2>
+      <div class="chart-container" id="chart"></div>
+    </div>
+
+    <!-- The Basics -->
+    <div class="card">
+      <h2>The Basics</h2>
+      <div id="basics-params"></div>
+    </div>
+
+    <!-- Contributions -->
+    <div class="card">
+      <h2>Contributions</h2>
+      <div id="contributions-params"></div>
+    </div>
+
+    <!-- Market Assumptions (collapsible) -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        Market Assumptions
+      </div>
+      <div class="collapsible-content">
+        <div id="market-params"></div>
+      </div>
+    </div>
+
+    <!-- Taxes (collapsible) -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        Taxes
+      </div>
+      <div class="collapsible-content">
+        <div id="taxes-params"></div>
+      </div>
+    </div>
+
+    <!-- Calculation Function (collapsible) -->
+    <div class="card">
+      <div class="collapsible-header" onclick="toggleCollapsible(this)">
+        Calculation Function
+      </div>
+      <div class="collapsible-content">
+        <div class="function-editor">
+          <textarea id="functionEditor"></textarea>
+          <button class="reset-btn" onclick="resetFunction()">Reset</button>
+        </div>
+        <div id="functionError" class="function-error"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    // ========== CONFIGURATION ==========
+    const params = {
+      // The Basics
+      currentAge: { label: 'Current Age', default: 30, min: 18, max: 80, step: 1, unit: 'years', group: 'basics' },
+      retirementAge: { label: 'Retirement Age', default: 65, min: 40, max: 80, step: 1, unit: 'years', group: 'basics' },
+      lifeExpectancy: { label: 'Life Expectancy', default: 90, min: 70, max: 110, step: 1, unit: 'years', group: 'basics' },
+      currentSavings: { label: 'Current Savings', default: 50000, min: 0, max: 5000000, step: 10000, unit: 'dollars', format: 'currency', group: 'basics' },
+      annualSalary: { label: 'Annual Salary', default: 80000, min: 0, max: 500000, step: 5000, unit: 'dollars', format: 'currency', group: 'basics' },
+      desiredMonthlyIncome: { label: 'Desired Monthly Retirement Income', default: 5000, min: 1000, max: 20000, step: 250, unit: 'dollars/month', format: 'currency', group: 'basics' },
+
+      // Contributions
+      contributionRate: { label: 'Contribution Rate', default: 0.10, min: 0, max: 0.50, step: 0.01, unit: '% of salary', format: 'percent', group: 'contributions' },
+      employerMatchRate: { label: 'Employer Match', default: 0.50, min: 0, max: 1.00, step: 0.05, unit: '% of contribution', format: 'percent', group: 'contributions' },
+      matchCap: { label: 'Match Cap', default: 0.06, min: 0, max: 0.10, step: 0.01, unit: '% of salary', format: 'percent', group: 'contributions' },
+
+      // Market Assumptions
+      nominalReturn: { label: 'Nominal Investment Return', default: 0.07, min: 0, max: 0.15, step: 0.005, unit: '% per year', format: 'percent', group: 'market' },
+      inflationRate: { label: 'Inflation Rate', default: 0.03, min: 0, max: 0.10, step: 0.005, unit: '% per year', format: 'percent', group: 'market' },
+      realSalaryGrowth: { label: 'Salary Growth (Real)', default: 0.01, min: 0, max: 0.05, step: 0.005, unit: '% per year', format: 'percent', group: 'market' },
+
+      // Taxes
+      incomeTaxRate: { label: 'Income Tax Rate', default: 0.20, min: 0, max: 0.50, step: 0.01, unit: 'effective rate', format: 'percent', group: 'taxes' },
+    };
+
+    // Current input values
+    let inputs = {};
+    for (const [key, config] of Object.entries(params)) {
+      inputs[key] = config.default;
+    }
+
+    // ========== DEFAULT CALCULATION FUNCTION ==========
+    const defaultFunctionCode = `function calculate(inputs) {
+  const {
+    currentAge, retirementAge, lifeExpectancy,
+    currentSavings, annualSalary,
+    contributionRate, employerMatchRate, matchCap,
+    nominalReturn, inflationRate, realSalaryGrowth,
+    incomeTaxRate,
+    desiredMonthlyIncome
+  } = inputs;
+
+  // Real (inflation-adjusted) return
+  const realReturn = (1 + nominalReturn) / (1 + inflationRate) - 1;
+
+  // Build year-by-year projection
+  const maxAge = 120;
+  const years = [];
+  let portfolio = currentSavings;
+  let salary = annualSalary;
+  let moneyRunsOutAge = null;
+
+  for (let age = currentAge; age <= maxAge; age++) {
+    const year = { age, portfolioStart: portfolio, salary };
+
+    if (age < retirementAge) {
+      // Accumulation phase
+      const employeeContrib = salary * contributionRate;
+      const employerContrib = salary * Math.min(contributionRate, matchCap) * employerMatchRate;
+      const totalContrib = employeeContrib + employerContrib;
+
+      portfolio = portfolio * (1 + realReturn) + totalContrib;
+      salary = salary * (1 + realSalaryGrowth);
+      year.contribution = totalContrib;
+    } else {
+      // Withdrawal phase
+      const desiredAfterTax = desiredMonthlyIncome * 12;
+      const grossWithdrawal = desiredAfterTax / (1 - incomeTaxRate);
+      const actualWithdrawal = Math.min(grossWithdrawal, portfolio);
+      const afterTaxIncome = actualWithdrawal * (1 - incomeTaxRate);
+
+      portfolio = (portfolio - actualWithdrawal) * (1 + realReturn);
+      year.grossWithdrawal = actualWithdrawal;
+      year.afterTaxIncome = afterTaxIncome;
+      year.monthlyIncome = afterTaxIncome / 12;
+    }
+
+    year.portfolioEnd = Math.max(0, portfolio);
+    years.push(year);
+
+    if (portfolio <= 0 && moneyRunsOutAge === null) {
+      moneyRunsOutAge = age;
+    }
+
+    if (age > lifeExpectancy && portfolio <= 0) {
+      break;
+    }
+  }
+
+  const atRetirement = years.find(y => y.age === retirementAge);
+
+  let yearsOfBuffer;
+  if (moneyRunsOutAge === null) {
+    yearsOfBuffer = Infinity;
+  } else {
+    yearsOfBuffer = moneyRunsOutAge - lifeExpectancy;
+  }
+
+  return {
+    years,
+    yearsOfBuffer,
+    portfolioAtRetirement: atRetirement?.portfolioEnd ?? 0,
+    moneyRunsOutAge,
+    desiredMonthlyIncome,
+    lifeExpectancy,
+  };
+}`;
+
+    let currentFunctionCode = defaultFunctionCode;
+    let calculateFn = null;
+
+    // ========== UTILITY FUNCTIONS ==========
+    function formatValue(value, format) {
+      if (format === 'currency') {
+        if (value >= 1000000) return '$' + (value / 1000000).toFixed(1) + 'M';
+        if (value >= 1000) return '$' + (value / 1000).toFixed(0) + 'k';
+        return '$' + value.toLocaleString();
+      }
+      if (format === 'percent') {
+        return (value * 100).toFixed(1) + '%';
+      }
+      return value.toString();
+    }
+
+    function formatCurrency(value) {
+      return '$' + value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    // ========== BUILD UI ==========
+    function buildSlider(key, config) {
+      const container = document.createElement('div');
+      container.className = 'param';
+      container.dataset.param = key;
+
+      container.innerHTML = `
+        <div class="param-header">
+          <span class="param-name">${config.label}</span>
+          <span class="param-value">${formatValue(config.default, config.format)}</span>
+        </div>
+        <input type="range" 
+          min="${config.min}" 
+          max="${config.max}" 
+          step="${config.step}" 
+          value="${config.default}">
+        <div class="param-range">
+          <span>${formatValue(config.min, config.format)}</span>
+          <span>${formatValue(config.max, config.format)}</span>
+        </div>
+        <div class="sensitivity"></div>
+      `;
+
+      const slider = container.querySelector('input');
+      const valueDisplay = container.querySelector('.param-value');
+
+      slider.addEventListener('input', () => {
+        const value = parseFloat(slider.value);
+        inputs[key] = value;
+        valueDisplay.textContent = formatValue(value, config.format);
+        update();
+      });
+
+      return container;
+    }
+
+    function buildUI() {
+      const groups = {
+        basics: document.getElementById('basics-params'),
+        contributions: document.getElementById('contributions-params'),
+        market: document.getElementById('market-params'),
+        taxes: document.getElementById('taxes-params'),
+      };
+
+      for (const [key, config] of Object.entries(params)) {
+        const slider = buildSlider(key, config);
+        groups[config.group].appendChild(slider);
+      }
+
+      // Function editor
+      const editor = document.getElementById('functionEditor');
+      editor.value = currentFunctionCode;
+      editor.addEventListener('input', debounce(() => {
+        currentFunctionCode = editor.value;
+        compileFunction();
+        update();
+      }, 300));
+    }
+
+    function toggleCollapsible(header) {
+      header.classList.toggle('open');
+      header.nextElementSibling.classList.toggle('open');
+    }
+
+    function resetFunction() {
+      currentFunctionCode = defaultFunctionCode;
+      document.getElementById('functionEditor').value = currentFunctionCode;
+      compileFunction();
+      update();
+    }
+
+    // ========== CALCULATION ==========
+    function compileFunction() {
+      try {
+        // Create function from string
+        const fn = new Function('return ' + currentFunctionCode)();
+        if (typeof fn !== 'function') throw new Error('Not a function');
+        calculateFn = fn;
+        document.getElementById('functionError').textContent = '';
+      } catch (e) {
+        document.getElementById('functionError').textContent = 'Error: ' + e.message;
+        calculateFn = null;
+      }
+    }
+
+    function calculate(inputsOverride) {
+      if (!calculateFn) return null;
+      try {
+        return calculateFn(inputsOverride || inputs);
+      } catch (e) {
+        console.error('Calculation error:', e);
+        return null;
+      }
+    }
+
+    // ========== SENSITIVITY ==========
+    function calculateSensitivity(paramKey) {
+      const config = params[paramKey];
+      const steps = 20;
+      const results = [];
+
+      for (let i = 0; i <= steps; i++) {
+        const testValue = config.min + (config.max - config.min) * (i / steps);
+        const testInputs = { ...inputs, [paramKey]: testValue };
+        const result = calculate(testInputs);
+        if (result) {
+          results.push({
+            inputValue: testValue,
+            buffer: Math.min(result.yearsOfBuffer, 30),
+          });
+        }
+      }
+
+      return results;
+    }
+
+    function renderSensitivity(container, paramKey, currentBuffer) {
+      const sensitivityDiv = container.querySelector('.sensitivity');
+      const results = calculateSensitivity(paramKey);
+
+      if (results.length === 0) {
+        sensitivityDiv.innerHTML = '';
+        return;
+      }
+
+      const width = sensitivityDiv.clientWidth || 300;
+      const height = 28;
+
+      const minBuffer = Math.min(...results.map(r => r.buffer));
+      const maxBuffer = Math.max(...results.map(r => r.buffer));
+      const range = maxBuffer - minBuffer || 1;
+
+      // Find current position
+      const config = params[paramKey];
+      const currentPos = (inputs[paramKey] - config.min) / (config.max - config.min);
+
+      // Find zero crossing position (if in range)
+      let zeroPos = null;
+      if (minBuffer < 0 && maxBuffer > 0) {
+        zeroPos = (0 - minBuffer) / range;
+      }
+
+      const svg = d3.create('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      // Gradient
+      const gradientId = `grad-${paramKey}`;
+      const defs = svg.append('defs');
+      const gradient = defs.append('linearGradient')
+        .attr('id', gradientId);
+
+      // Build gradient stops based on buffer values
+      results.forEach((r, i) => {
+        const offset = (i / (results.length - 1)) * 100;
+        let color;
+        if (r.buffer < 0) {
+          color = '#ef4444'; // Red
+        } else if (r.buffer > 10) {
+          color = '#22c55e'; // Green
+        } else {
+          // Transition zone
+          const t = r.buffer / 10;
+          color = d3.interpolateRgb('#fbbf24', '#22c55e')(t);
+        }
+        gradient.append('stop')
+          .attr('offset', offset + '%')
+          .attr('stop-color', color);
+      });
+
+      // Background track
+      svg.append('rect')
+        .attr('x', 0)
+        .attr('y', 8)
+        .attr('width', width)
+        .attr('height', 8)
+        .attr('fill', `url(#${gradientId})`)
+        .attr('rx', 4);
+
+      // Zero line
+      if (zeroPos !== null) {
+        svg.append('line')
+          .attr('x1', zeroPos * width)
+          .attr('y1', 4)
+          .attr('x2', zeroPos * width)
+          .attr('y2', 20)
+          .attr('stroke', '#000')
+          .attr('stroke-width', 1)
+          .attr('opacity', 0.3);
+      }
+
+      // Current position marker
+      svg.append('line')
+        .attr('x1', currentPos * width)
+        .attr('y1', 2)
+        .attr('x2', currentPos * width)
+        .attr('y2', 22)
+        .attr('stroke', '#1e40af')
+        .attr('stroke-width', 3);
+
+      // Labels
+      const formatBuffer = (b) => b === 30 ? '∞' : (b >= 0 ? '+' : '') + b.toFixed(0) + ' yrs';
+
+      svg.append('text')
+        .attr('x', 2)
+        .attr('y', 26)
+        .attr('font-size', 9)
+        .attr('fill', '#64748b')
+        .text(formatBuffer(minBuffer));
+
+      svg.append('text')
+        .attr('x', width - 2)
+        .attr('y', 26)
+        .attr('text-anchor', 'end')
+        .attr('font-size', 9)
+        .attr('fill', '#64748b')
+        .text(formatBuffer(maxBuffer));
+
+      sensitivityDiv.innerHTML = '';
+      sensitivityDiv.appendChild(svg.node());
+    }
+
+    // ========== BIG NUMBER DISPLAY ==========
+    function updateBigNumber(result) {
+      const container = document.getElementById('bigNumber');
+      const valueEl = container.querySelector('.value');
+      const descEl = container.querySelector('.description');
+      const detailsEl = container.querySelector('.details');
+
+      container.classList.remove('negative', 'infinity');
+
+      if (!result) {
+        valueEl.textContent = 'Error';
+        descEl.textContent = 'Check the calculation function';
+        detailsEl.innerHTML = '';
+        return;
+      }
+
+      const { yearsOfBuffer, portfolioAtRetirement, moneyRunsOutAge, lifeExpectancy, desiredMonthlyIncome } = result;
+      const taxRate = inputs.incomeTaxRate;
+
+      if (yearsOfBuffer === Infinity) {
+        container.classList.add('infinity');
+        valueEl.textContent = '∞ Forever';
+        descEl.textContent = 'Your portfolio grows faster than your spending';
+
+        const portfolioAtLE = result.years.find(y => y.age === lifeExpectancy)?.portfolioEnd ?? 0;
+        detailsEl.innerHTML = `
+          <span>Portfolio at ${inputs.retirementAge}: ${formatCurrency(portfolioAtRetirement)}</span>
+          <span>Monthly income: ${formatCurrency(desiredMonthlyIncome)} (after ${(taxRate*100).toFixed(0)}% tax)</span>
+          <span>Portfolio at ${lifeExpectancy}: ${formatCurrency(portfolioAtLE)}</span>
+        `;
+      } else if (yearsOfBuffer >= 0) {
+        valueEl.textContent = `+${yearsOfBuffer} years buffer`;
+        descEl.textContent = `Your money lasts ${yearsOfBuffer} years past life expectancy`;
+        detailsEl.innerHTML = `
+          <span>Money lasts to: ${moneyRunsOutAge}</span>
+          <span>Life expectancy: ${lifeExpectancy}</span>
+          <span>Portfolio at ${inputs.retirementAge}: ${formatCurrency(portfolioAtRetirement)}</span>
+        `;
+      } else {
+        container.classList.add('negative');
+        valueEl.textContent = `${yearsOfBuffer} years short`;
+        descEl.textContent = `Your money runs out ${Math.abs(yearsOfBuffer)} years before life expectancy`;
+        detailsEl.innerHTML = `
+          <span>Money runs out at: ${moneyRunsOutAge}</span>
+          <span>Life expectancy: ${lifeExpectancy}</span>
+          <span>Portfolio at ${inputs.retirementAge}: ${formatCurrency(portfolioAtRetirement)}</span>
+        `;
+      }
+    }
+
+    // ========== CHART ==========
+    let chartSvg = null;
+
+    function initChart() {
+      const container = document.getElementById('chart');
+      const width = container.clientWidth;
+      const height = 300;
+      const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+
+      chartSvg = d3.select(container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      // Gradient for area
+      const defs = chartSvg.append('defs');
+      const areaGradient = defs.append('linearGradient')
+        .attr('id', 'areaGradient')
+        .attr('x1', '0%').attr('y1', '0%')
+        .attr('x2', '0%').attr('y2', '100%');
+      areaGradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', '#3b82f6')
+        .attr('stop-opacity', 0.3);
+      areaGradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', '#3b82f6')
+        .attr('stop-opacity', 0.05);
+
+      chartSvg.append('g').attr('class', 'chart-axis x-axis');
+      chartSvg.append('g').attr('class', 'chart-axis y-axis');
+      chartSvg.append('path').attr('class', 'chart-area');
+      chartSvg.append('path').attr('class', 'chart-line');
+      chartSvg.append('g').attr('class', 'chart-markers');
+
+      // Hover overlay
+      chartSvg.append('rect')
+        .attr('class', 'overlay')
+        .attr('fill', 'none')
+        .attr('pointer-events', 'all');
+    }
+
+    function updateChart(result) {
+      if (!result || !chartSvg) return;
+
+      const container = document.getElementById('chart');
+      const width = container.clientWidth;
+      const height = 300;
+      const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const { years } = result;
+      const { currentAge, retirementAge, lifeExpectancy } = inputs;
+
+      // Scales
+      const xExtent = d3.extent(years, d => d.age);
+      const x = d3.scaleLinear()
+        .domain(xExtent)
+        .range([margin.left, width - margin.right]);
+
+      const maxPortfolio = d3.max(years, d => d.portfolioEnd);
+      const y = d3.scaleLinear()
+        .domain([0, maxPortfolio * 1.1])
+        .range([height - margin.bottom, margin.top]);
+
+      // Axes
+      chartSvg.select('.x-axis')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(10).tickFormat(d => d));
+
+      chartSvg.select('.y-axis')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(6).tickFormat(d => {
+          if (d >= 1000000) return '$' + (d/1000000).toFixed(1) + 'M';
+          if (d >= 1000) return '$' + (d/1000).toFixed(0) + 'k';
+          return '$' + d;
+        }));
+
+      // Area
+      const area = d3.area()
+        .x(d => x(d.age))
+        .y0(y(0))
+        .y1(d => y(d.portfolioEnd))
+        .curve(d3.curveMonotoneX);
+
+      chartSvg.select('.chart-area')
+        .datum(years)
+        .transition()
+        .duration(300)
+        .attr('d', area);
+
+      // Line
+      const line = d3.line()
+        .x(d => x(d.age))
+        .y(d => y(d.portfolioEnd))
+        .curve(d3.curveMonotoneX);
+
+      chartSvg.select('.chart-line')
+        .datum(years)
+        .transition()
+        .duration(300)
+        .attr('d', line);
+
+      // Markers
+      const markers = chartSvg.select('.chart-markers');
+      markers.selectAll('*').remove();
+
+      const markerData = [
+        { age: currentAge, label: 'Today' },
+        { age: retirementAge, label: 'Retire' },
+        { age: lifeExpectancy, label: 'Life Exp.' },
+      ];
+
+      if (result.moneyRunsOutAge) {
+        markerData.push({ age: result.moneyRunsOutAge, label: 'Runs Out', color: '#ef4444' });
+      }
+
+      markerData.forEach(m => {
+        if (m.age >= xExtent[0] && m.age <= xExtent[1]) {
+          markers.append('line')
+            .attr('class', 'chart-marker')
+            .attr('x1', x(m.age))
+            .attr('x2', x(m.age))
+            .attr('y1', margin.top)
+            .attr('y2', height - margin.bottom)
+            .attr('stroke', m.color || '#64748b');
+
+          markers.append('text')
+            .attr('class', 'chart-marker-label')
+            .attr('x', x(m.age))
+            .attr('y', margin.top - 5)
+            .attr('text-anchor', 'middle')
+            .attr('fill', m.color || '#64748b')
+            .text(m.label);
+        }
+      });
+
+      // Hover
+      const overlay = chartSvg.select('.overlay')
+        .attr('x', margin.left)
+        .attr('y', margin.top)
+        .attr('width', innerWidth)
+        .attr('height', innerHeight);
+
+      const tooltip = document.getElementById('tooltip');
+      const bisect = d3.bisector(d => d.age).left;
+
+      overlay
+        .on('mousemove', function(event) {
+          const [mx] = d3.pointer(event);
+          const age = x.invert(mx);
+          const i = bisect(years, age, 1);
+          const d = years[Math.min(i, years.length - 1)];
+
+          tooltip.style.opacity = 1;
+          tooltip.style.left = (event.pageX + 10) + 'px';
+          tooltip.style.top = (event.pageY - 10) + 'px';
+
+          let html = `<strong>Age ${d.age}</strong><br>Portfolio: ${formatCurrency(d.portfolioEnd)}`;
+          if (d.monthlyIncome !== undefined) {
+            html += `<br>Monthly Income: ${formatCurrency(d.monthlyIncome)}`;
+          }
+          if (d.contribution !== undefined) {
+            html += `<br>Annual Contribution: ${formatCurrency(d.contribution)}`;
+          }
+          tooltip.innerHTML = html;
+        })
+        .on('mouseout', () => {
+          tooltip.style.opacity = 0;
+        });
+    }
+
+    // ========== MAIN UPDATE ==========
+    let updateTimeout = null;
+
+    function update() {
+      const result = calculate();
+      updateBigNumber(result);
+      updateChart(result);
+
+      // Update sensitivity indicators (debounced)
+      clearTimeout(updateTimeout);
+      updateTimeout = setTimeout(() => {
+        for (const key of Object.keys(params)) {
+          const container = document.querySelector(`.param[data-param="${key}"]`);
+          if (container) {
+            renderSensitivity(container, key, result?.yearsOfBuffer ?? 0);
+          }
+        }
+      }, 100);
+    }
+
+    function debounce(fn, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    // ========== INIT ==========
+    function init() {
+      compileFunction();
+      buildUI();
+      initChart();
+
+      // Load from localStorage
+      const saved = localStorage.getItem('retirement-inputs');
+      if (saved) {
+        try {
+          const savedInputs = JSON.parse(saved);
+          for (const [key, value] of Object.entries(savedInputs)) {
+            if (params[key]) {
+              inputs[key] = value;
+              const slider = document.querySelector(`.param[data-param="${key}"] input`);
+              const valueDisplay = document.querySelector(`.param[data-param="${key}"] .param-value`);
+              if (slider) {
+                slider.value = value;
+                valueDisplay.textContent = formatValue(value, params[key].format);
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
+      update();
+
+      // Save to localStorage on change
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem('retirement-inputs', JSON.stringify(inputs));
+      });
+
+      // Handle resize
+      window.addEventListener('resize', debounce(() => {
+        const container = document.getElementById('chart');
+        container.innerHTML = '';
+        initChart();
+        update();
+      }, 200));
+    }
+
+    init();
+  </script>
+</body>
+</html>
