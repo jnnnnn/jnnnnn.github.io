@@ -119,6 +119,9 @@ class EPUBParser:
         if self.opf_dir == ".":
             self.opf_dir = ""
 
+        # Parse NCX/nav TOC for chapter title fallback
+        self.toc_titles = self._parse_toc_titles()
+
         opf_xml = self.zip.read(self.opf_path)
         opf = etree.fromstring(opf_xml)
 
@@ -167,6 +170,39 @@ class EPUBParser:
                 images.update(chapter_images)
 
         return Book(title=title, author=author, chapters=chapters, images=images)
+
+    def _parse_toc_titles(self) -> dict[str, str]:
+        """Parse the NCX table of contents to build a href -> title mapping.
+        
+        This provides chapter titles as a fallback when they can't be detected
+        from heading tags (e.g. EPUBs that use styled <p>/<span> for headings).
+        """
+        titles = {}
+        # Try NCX first
+        try:
+            ncx_content = None
+            for filename in self.zip.namelist():
+                if filename.endswith(".ncx"):
+                    ncx_content = self.zip.read(filename)
+                    break
+            if ncx_content:
+                ncx = etree.fromstring(ncx_content)
+                for nav_point in ncx.iter("{http://www.daisy.org/z3986/2005/ncx/}navPoint"):
+                    label = nav_point.find(
+                        "ncx:navLabel/ncx:text", namespaces=NAMESPACES
+                    )
+                    content = nav_point.find(
+                        "ncx:content", namespaces=NAMESPACES
+                    )
+                    if label is not None and content is not None and label.text:
+                        src = content.get("src", "")
+                        # Strip fragment (e.g. "text/part0005.html#Chapter_1" -> "text/part0005.html")
+                        href = src.split("#")[0] if "#" in src else src
+                        # Store relative to OPF dir (matching spine href format)
+                        titles[href] = label.text.strip()
+        except Exception:
+            pass
+        return titles
 
     def _get_metadata(self, opf: etree._Element, name: str) -> str | None:
         """Extract metadata from OPF."""
@@ -296,12 +332,18 @@ class EPUBParser:
         if body is None:
             return None, {}
 
-        # Find chapter title
+        # Find chapter title from content, falling back to NCX TOC
         title = self._find_title(body)
+        toc_title = self.toc_titles.get(href, "")
+        # Prefer the NCX title over a bare number (e.g. "Chapter 1" vs "1")
+        if not title or (re.match(r'^\d+$', title) and toc_title):
+            title = toc_title or title
 
-        # Convert body to Typst
+        # Convert body to Typst, passing the TOC title so bare-number
+        # paragraphs can be replaced with the proper chapter name
         images = {}
-        typst_content = self._element_to_typst(body, href, images)
+        toc_title = self.toc_titles.get(href, "")
+        typst_content = self._element_to_typst(body, href, images, toc_title=toc_title)
 
         return Chapter(title=title, content=typst_content), images
 
@@ -333,11 +375,14 @@ class EPUBParser:
         patterns = [
             r'^Chapter\s+(\d+|One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve|\w+)$',
             r'^Part\s+(\d+|One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|I+|IV|V|VI+)$',
+            r'^\d+$',  # Bare chapter numbers (e.g. "1", "23")
             r'^Prologue$',
             r'^Epilogue$',
             r'^Introduction$',
             r'^Acknowledgments$',
+            r'^Acknowledgements$',
             r'^About the Author$',
+            r"^Author'?s? Note$",
         ]
         for pattern in patterns:
             if re.match(pattern, text, re.IGNORECASE):
@@ -349,11 +394,13 @@ class EPUBParser:
         return "".join(elem.itertext())
 
     def _element_to_typst(
-        self, elem: etree._Element, doc_href: str, images: dict[str, bytes]
+        self, elem: etree._Element, doc_href: str, images: dict[str, bytes],
+        toc_title: str = "",
     ) -> str:
         """Convert an XHTML element to Typst markup."""
         result = []
-        self._convert_element(elem, doc_href, images, result, in_paragraph=False)
+        self._convert_element(elem, doc_href, images, result, in_paragraph=False,
+                              toc_title=toc_title)
         return "\n".join(result)
 
     def _get_local_name(self, elem: etree._Element) -> str:
@@ -370,6 +417,7 @@ class EPUBParser:
         images: dict[str, bytes],
         result: list[str],
         in_paragraph: bool = False,
+        toc_title: str = "",
     ) -> str:
         """Convert element and children to Typst, returning inline content."""
         tag = self._get_local_name(elem)
@@ -403,7 +451,12 @@ class EPUBParser:
             raw_text = self._extract_text(elem).strip()
             
             if self._is_chapter_heading(raw_text):
-                escaped = self._escape_typst(raw_text)
+                # Use the NCX TOC title if available (e.g. "Chapter 1" instead of bare "1")
+                if toc_title and re.match(r'^\d+$', raw_text):
+                    heading_text = toc_title
+                else:
+                    heading_text = raw_text
+                escaped = self._escape_typst(heading_text)
                 result.append(f"\n= {escaped}\n")
                 return ""
             
@@ -522,7 +575,8 @@ class EPUBParser:
             return self._convert_children(elem, doc_href, images, result)
 
         elif tag in ("div", "section", "article", "body", "html"):
-            return self._convert_children(elem, doc_href, images, result)
+            return self._convert_children(elem, doc_href, images, result,
+                                          toc_title=toc_title)
 
         elif tag == "sup":
             content = self._convert_children(elem, doc_href, images, result)
@@ -542,6 +596,7 @@ class EPUBParser:
         doc_href: str,
         images: dict[str, bytes],
         result: list[str],
+        toc_title: str = "",
     ) -> str:
         """Convert all children of an element, returning inline content."""
         parts = []
@@ -549,7 +604,8 @@ class EPUBParser:
             parts.append(self._escape_typst(elem.text))
 
         for child in elem:
-            inline = self._convert_element(child, doc_href, images, result)
+            inline = self._convert_element(child, doc_href, images, result,
+                                           toc_title=toc_title)
             if inline:
                 parts.append(inline)
             if child.tail:
