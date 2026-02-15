@@ -1,0 +1,19 @@
+[project]
+name = "printbook"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fonttools>=4.61.1",
+    "lxml>=6.0.2",
+    "nltk>=3.9.2",
+    "pillow>=12.1.1",
+    "pypdf>=6.7.0",
+    "wordfreq>=3.1.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

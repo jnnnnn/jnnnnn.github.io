@@ -4,8 +4,10 @@
 # dependencies = [
 #     "fonttools",
 #     "lxml",
+#     "nltk",
 #     "pillow",
 #     "pypdf",
+#     "wordfreq",
 # ]
 # ///
 """
@@ -33,16 +35,438 @@ uv run epub2print.py mybook.epub --max-ink 0.3
 """
 
 import argparse
+import math
 import re
 import subprocess
 import tempfile
 import zipfile
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from fontTools import ttLib
 from lxml import etree
 from pypdf import PdfReader, PdfWriter, PageObject, Transformation
+
+
+# Scene signal word lexicon — clusters of these in a paragraph trigger index markers
+SCENE_SIGNALS: dict[str, set[str]] = {
+    "Intimate": {
+        "breath", "skin", "lips", "pulse", "heat", "fingers", "mouth", "kiss",
+        "touch", "shiver", "ache", "whisper", "naked", "desire", "moan", "gasp",
+        "caress", "tongue", "throat", "hips", "chest", "thigh", "flush", "tremble",
+        "pressed", "stroked", "tasted", "breathless", "hunger", "pleasure",
+        "sweat", "arched", "clenched", "bare", "bed", "silk",
+    },
+    "Violence": {
+        "blood", "blade", "sword", "fight", "scream", "pain", "wound", "strike",
+        "kill", "death", "arrow", "battle", "slash", "stab", "shield", "war",
+        "weapon", "dagger", "fist", "punch", "slammed", "crushed", "bleeding",
+        "corpse", "gun", "shot", "explosion", "shattered", "steel",
+    },
+    "Magic": {
+        "spell", "magic", "power", "glow", "shimmer", "ward", "rune", "enchant",
+        "summon", "conjure", "aura", "sorcery", "incantation", "ritual", "arcane",
+        "elemental", "mana", "curse", "hex", "alchemy", "potion", "wand",
+        "crystal", "mystic", "ethereal", "sigil", "channeled", "invocation",
+    },
+    "Tension": {
+        "secret", "betray", "lie", "reveal", "confront", "demand", "threaten",
+        "warn", "suspect", "accuse", "confess", "ultimatum", "deceive", "scheme",
+        "manipulate", "blackmail", "conspire", "fury", "rage", "desperate",
+    },
+}
+
+# Minimum number of signal words in a paragraph to trigger a scene index marker
+SCENE_SIGNAL_THRESHOLD = 3
+
+
+# Proper noun rarity ceiling for scoring.  Words with zipf >= 5.0
+# (War=5.46, King=5.17) score 0 and are excluded.  Character names
+# sit well below (Kira=3.21, Phoenix=4.21).  No hard cutoff — scoring
+# handles ranking naturally via --index-size.
+_PROPER_NOUN_RARITY_CEILING = 5.0
+
+
+# Contraction suffixes to strip (with both straight and curly apostrophes).
+# Order matters: check longer suffixes first.
+_CONTRACTION_SUFFIXES = ("'ll", "\u2019ll", "'ve", "\u2019ve", "'re", "\u2019re",
+                         "'d", "\u2019d", "'t", "\u2019t",
+                         "'s", "\u2019s")
+
+# Contraction-only suffixes (excluding possessive 's).
+_CONTRACTION_ONLY_SUFFIXES = ("'ll", "\u2019ll", "'ve", "\u2019ve", "'re", "\u2019re",
+                              "'d", "\u2019d", "'t", "\u2019t")
+
+_VOWELS = frozenset('aeiouy')
+
+
+def _is_adjacent_to_separator(pos: int, raw_word: str, full_text: str) -> bool:
+    """Check if a word is adjacent to `.`, `@`, or `/` (email/URL context)."""
+    word_end = pos + len(raw_word)
+    if word_end < len(full_text) and full_text[word_end] in '.@/':
+        return True
+    if pos > 0 and full_text[pos - 1] in '.@/':
+        return True
+    return False
+
+
+def _clean_word(raw: str) -> str:
+    """Normalize a raw token for indexing.
+
+    Strips edge quotes, possessive suffixes (``'s``), and common
+    contraction endings (``'d``, ``'ll``, ``'ve``, ``'re``, ``'t``).
+    Works with both straight (') and curly (\u2019) apostrophes.
+
+    >>> _clean_word("Sorcha's")
+    'Sorcha'
+    >>> _clean_word("It'd")
+    'It'
+    >>> _clean_word("we'll")
+    'we'
+    """
+    # Strip leading/trailing apostrophes and curly quotes
+    w = raw.strip("'\u2019")
+    # Strip contraction / possessive suffixes
+    for suffix in _CONTRACTION_SUFFIXES:
+        if w.endswith(suffix):
+            w = w[:-len(suffix)]
+            break
+    return w
+
+
+@dataclass
+class CandidateWord:
+    """A candidate rare word recorded during pass 1."""
+    word: str           # cleaned surface form (e.g. "gossamer")
+    lower: str          # lowered form
+    stem: str           # snowball-stemmed form
+    zipf: float         # wordfreq zipf_frequency score (0–8)
+    chapter_idx: int    # which chapter it appeared in
+    position: int       # character offset in un-escaped text
+
+
+class IndexTracker:
+    """Tracks index state and identifies interesting words during Typst generation.
+
+    Uses a unified two-pass approach:
+    - Pass 1 (during HTML→Typst conversion): collects proper noun and rare word
+      candidates.  Scene and chapter markers are inserted inline.
+      annotate_text() returns escaped text UNCHANGED (no noun markers inline).
+    - Scoring: after all chapters, scores all candidates (nouns + rare words)
+      in a unified pool, selects top N (--index-size).
+    - Pass 2 (post-processing): inserts #index[] markers for ALL selected
+      entries into the Typst source.
+    """
+
+    def __init__(self):
+        from wordfreq import zipf_frequency
+        from nltk.stem.snowball import SnowballStemmer
+        self._zipf = zipf_frequency
+        self._stemmer = SnowballStemmer('english')
+        # Proper noun collection (two-pass)
+        self.noun_candidates: dict[str, set[int]] = {}   # word → {chapter_idxs}
+        self._noun_chapter_seen: set[str] = set()        # per-chapter dedup
+        self._chapter_idx = -1
+        # Rare word two-pass state
+        self.rare_candidates: list[CandidateWord] = []
+        self.stem_counts: dict[str, Counter[str]] = {}  # stem → {surface_form: count}
+
+    def new_chapter(self) -> None:
+        """Reset per-chapter state, increment chapter index."""
+        self._noun_chapter_seen = set()
+        self._chapter_idx += 1
+
+    def check_scene_signals(self, plain_text: str) -> list[str]:
+        """Check if a paragraph contains a cluster of scene signal words.
+
+        Returns list of matched category names (e.g. ["Intimate", "Violence"]).
+        """
+        words_lower = set(re.findall(r"[a-z]+", plain_text.lower()))
+        results = []
+        for category, signals in SCENE_SIGNALS.items():
+            hits = words_lower & signals
+            if len(hits) >= SCENE_SIGNAL_THRESHOLD:
+                results.append(category)
+        return results
+
+    def annotate_text(self, text: str, escaped: str) -> str:
+        """Collect index candidates from text (pass 1 — no modification).
+
+        Scans text for proper nouns and rare words, recording them as
+        candidates.  Returns escaped unchanged; actual #index[] markers
+        are inserted in pass 2 by postprocess_index_markers().
+
+        Args:
+            text: original plain text (for word detection).
+            escaped: Typst-escaped version (returned unchanged).
+
+        Returns:
+            The escaped string, unchanged.
+        """
+        if not text or not text.strip():
+            return escaped
+
+        for match in re.finditer(r"[A-Za-z'\u2019]+", text):
+            raw_word = match.group()
+            word_start = match.start()
+
+            is_noun = self._check_proper_noun(raw_word, word_start, text)
+            if not is_noun:
+                self.collect_word(raw_word, word_start, text)
+
+        return escaped
+
+    def collect_word(self, raw_word: str, pos: int, full_text: str) -> None:
+        """Record a candidate rare word if it passes basic filters (pass 1).
+
+        Casts a wide net: alphabetic, 4+ chars, zipf < 4.0.
+        Actual selection happens in select_all().
+        """
+        # Skip contraction fragments: if the raw token ends with a
+        # contraction suffix, the cleaned result (Hadn, Couldn, etc.)
+        # is a meaningless fragment, not a real word.
+        stripped = raw_word.strip("'\u2019")
+        for suffix in _CONTRACTION_ONLY_SUFFIXES:
+            if stripped.endswith(suffix):
+                return  # contraction fragment
+
+        clean = _clean_word(raw_word)
+        lower = clean.lower()
+
+        if len(clean) < 4 or not clean.isalpha():
+            return
+        if _is_adjacent_to_separator(pos, raw_word, full_text):
+            return
+
+        zipf = self._zipf(lower, 'en')
+        if zipf >= 4.0:
+            return  # too common
+
+        stem = self._stemmer.stem(lower)
+
+        # Track stem → surface form counts
+        if stem not in self.stem_counts:
+            self.stem_counts[stem] = Counter()
+        self.stem_counts[stem][lower] += 1
+
+        self.rare_candidates.append(CandidateWord(
+            word=clean,
+            lower=lower,
+            stem=stem,
+            zipf=zipf,
+            chapter_idx=self._chapter_idx,
+            position=pos,
+        ))
+
+    def _check_proper_noun(self, raw_word: str, pos: int, full_text: str) -> bool:
+        """Check if a word is a proper noun and record it as a candidate.
+
+        Collects proper noun candidates for later scoring.  No zipf ceiling;
+        scoring in select_all() handles ranking naturally.
+
+        Returns True if the word was recorded as a noun candidate.
+        """
+        # Strip edge quotes
+        word = raw_word.strip("'\u2019")
+
+        # If the word is a contraction (Don't, I'll, etc.), skip entirely
+        for suffix in _CONTRACTION_ONLY_SUFFIXES:
+            if word.endswith(suffix):
+                return False
+
+        # Strip possessive 's / \u2019s
+        for suffix in ("'s", "\u2019s"):
+            if word.endswith(suffix):
+                word = word[:-len(suffix)]
+                break
+
+        if len(word) < 3:
+            return False
+        # Must be purely alphabetic (filters C'mon, O'Brien-style words)
+        if not word.isalpha():
+            return False
+        if _is_adjacent_to_separator(pos, raw_word, full_text):
+            return False
+
+        # Must be Title-case (not ALL CAPS)
+        if not (word[0].isupper() and (len(word) == 1 or not word[1:].isupper())):
+            return False
+
+        # Must contain at least one vowel (filters interjections: Mmhmm, Pfft, Hmph)
+        if not any(c in _VOWELS for c in word.lower()):
+            return False
+
+        if not self._is_mid_sentence(pos, full_text):
+            return False
+
+        # Deduplicate: record each noun once per chapter
+        if word in self._noun_chapter_seen:
+            return True  # already collected this chapter, still a noun
+        self._noun_chapter_seen.add(word)
+
+        # Record candidate
+        if word not in self.noun_candidates:
+            self.noun_candidates[word] = set()
+        self.noun_candidates[word].add(self._chapter_idx)
+        return True
+
+    def select_all(
+        self, budget: int = 120,
+    ) -> tuple[dict[str, tuple[str, set[int]]], list[tuple[float, str, str, str, float, int]]]:
+        """Score and select the top index entries (nouns + rare words).
+
+        Returns:
+            selected: {lowercase_word: (DisplayForm, {chapter_indices})}
+                for the top *budget* entries.
+            all_scored: full scored list for printing, each entry is
+                (score, category, display_word, lower, zipf, spread).
+        """
+        all_scored: list[tuple[float, str, str, str, float, int]] = []
+
+        # --- Score rare words (grouped by stem) ---
+        if self.rare_candidates:
+            stem_groups: dict[str, list[CandidateWord]] = {}
+            for cand in self.rare_candidates:
+                stem_groups.setdefault(cand.stem, []).append(cand)
+
+            for stem, candidates in stem_groups.items():
+                form_counts = self.stem_counts.get(stem, Counter())
+                display_lower = (
+                    form_counts.most_common(1)[0][0]
+                    if form_counts else candidates[0].lower
+                )
+                display_word = display_lower.capitalize()
+
+                zipf = self._zipf(display_lower, 'en')
+                rarity = max(0.0, 4.0 - zipf)
+                if rarity == 0:
+                    continue
+
+                chapters = {c.chapter_idx for c in candidates}
+                spread = len(chapters)
+                count = sum(form_counts.values())
+                usedness = min(math.log2(count + 1), 3.0)
+                score = rarity * usedness * (1 + 0.2 * min(spread, 5))
+
+                all_scored.append(
+                    (score, "word", display_word, display_lower, zipf, spread)
+                )
+
+        # --- Score proper nouns ---
+        for word, chapter_idxs in self.noun_candidates.items():
+            zipf = self._zipf(word.lower(), 'en')
+            rarity = max(0.0, _PROPER_NOUN_RARITY_CEILING - zipf)
+            if rarity == 0:
+                continue
+            spread = len(chapter_idxs)
+            score = rarity * (1 + 0.2 * min(spread, 5))
+            all_scored.append(
+                (score, "noun", word, word.lower(), zipf, spread)
+            )
+
+        # --- Deduplicate: same lowercase → keep higher score ---
+        best_by_lower: dict[str, tuple[float, str, str, str, float, int]] = {}
+        for entry in all_scored:
+            lower = entry[3]
+            if lower not in best_by_lower or entry[0] > best_by_lower[lower][0]:
+                best_by_lower[lower] = entry
+        all_scored = sorted(best_by_lower.values(), key=lambda x: x[0], reverse=True)
+
+        # --- Select top N ---
+        selected: dict[str, tuple[str, set[int]]] = {}
+        for i, (score, cat, display, lower, zipf, spread) in enumerate(all_scored):
+            if i >= budget:
+                break
+            if cat == "noun":
+                # Cap proper nouns at 3 chapters (first 3 in reading order)
+                chapter_idxs = self.noun_candidates.get(display, set())
+                chapters = set(sorted(chapter_idxs)[:3])
+            else:
+                # Rare words: find all chapters from candidates
+                chapters: set[int] = set()
+                for cand in self.rare_candidates:
+                    if cand.lower == lower:
+                        chapters.add(cand.chapter_idx)
+            selected[lower] = (display, chapters)
+
+        return selected, all_scored
+
+    def _is_mid_sentence(self, pos: int, text: str) -> bool:
+        """Check if position is mid-sentence (not after sentence-ending punctuation)."""
+        if pos == 0:
+            return False
+        i = pos - 1
+        while i >= 0 and text[i] in ' \t\n\r':
+            i -= 1
+        if i < 0:
+            return False
+        if text[i] in '.!?:;\u2014\u2026':
+            return False
+        if text[i] in '"\u201d\u2019\u201c\'' and i > 0 and text[i-1] in '.!?':
+            return False
+        return True
+
+    def heading_marker(self, title: str) -> str:
+        """Return an #index marker for a chapter heading (bold page number)."""
+        safe = title.replace('"', '\\"')
+        return f'#index(fmt: strong, [{safe}])'
+
+
+def print_index_scores(
+    all_scored: list[tuple[float, str, str, str, float, int]],
+    budget: int,
+) -> None:
+    """Print the full scored index list showing what's selected vs excluded."""
+    if not all_scored:
+        print("  No index candidates found.")
+        return
+
+    print(f"  Index: {len(all_scored)} candidates scored, selecting top {budget}")
+    print(f"  {'Score':>7s}  {'Cat':<4s}  {'Word':<20s}  {'Zipf':>4s}  {'Spread':>6s}")
+    for i, (score, cat, display, lower, zipf, spread) in enumerate(all_scored):
+        if i == budget:
+            print(f"  {'---- index-size cutoff (' + str(budget) + ') ----':^53s}")
+        print(f"  {score:7.2f}  {cat:<4s}  {display:<20s}  {zipf:4.2f}  {spread:6d}")
+
+
+def postprocess_index_markers(
+    chapters: list['Chapter'],
+    selected: dict[str, tuple[str, set[int]]],
+) -> None:
+    """Insert #index[] markers for selected entries into chapter Typst content.
+
+    Pass 2: for each selected entry (proper noun or rare word), finds its
+    first occurrence in each chapter and inserts #index[Display] after it.
+    Modifies chapters in place.
+
+    Args:
+        chapters: List of Chapter objects with Typst content.
+        selected: {lowercase_word: (DisplayForm, {chapter_indices})} from
+                  IndexTracker.select_all().
+    """
+    if not selected:
+        return
+
+    for word_lower, (display, chapter_idxs) in selected.items():
+        # Match the word at a word boundary, but not inside existing
+        # #index[...] blocks or other Typst markup.
+        pattern = re.compile(
+            rf'(?<![#\[])(\b{re.escape(word_lower)}\b)(?![^\[]*\])',
+            re.IGNORECASE,
+        )
+        for ch_idx in chapter_idxs:
+            if ch_idx < 0 or ch_idx >= len(chapters):
+                continue
+            chapter = chapters[ch_idx]
+            m = pattern.search(chapter.content)
+            if m:
+                insert_pos = m.end()
+                chapter.content = (
+                    chapter.content[:insert_pos]
+                    + f"#index[{display}]"
+                    + chapter.content[insert_pos:]
+                )
 
 
 # Namespaces used in EPUB/XHTML
@@ -76,8 +500,10 @@ class Book:
 class EPUBParser:
     """Parses EPUB files and extracts content."""
 
-    def __init__(self, epub_path: Path, max_ink: float | None = None):
+    def __init__(self, epub_path: Path, max_ink: float | None = None,
+                 index_tracker: IndexTracker | None = None):
         self.epub_path = epub_path
+        self.index_tracker = index_tracker
         self.zip = zipfile.ZipFile(epub_path, "r")
         self.opf_path: str = ""
         self.opf_dir: str = ""
@@ -97,7 +523,7 @@ class EPUBParser:
             # Convert to grayscale
             gray = img.convert("L")
             # Get pixel data
-            pixels = list(gray.get_flattened_data())
+            pixels = list(gray.getdata())
             # Calculate average darkness (0=black, 255=white)
             # Invert so 0=white, 1=black (ink coverage)
             avg_brightness = sum(pixels) / len(pixels)
@@ -342,7 +768,6 @@ class EPUBParser:
         # Convert body to Typst, passing the TOC title so bare-number
         # paragraphs can be replaced with the proper chapter name
         images = {}
-        toc_title = self.toc_titles.get(href, "")
         typst_content = self._element_to_typst(body, href, images, toc_title=toc_title)
 
         return Chapter(title=title, content=typst_content), images
@@ -430,8 +855,11 @@ class EPUBParser:
         # Handle different element types
         if tag in ("h1", "h2"):
             text = self._extract_text(elem).strip()
-            text = self._escape_typst(text)
-            result.append(f"\n= {text}\n")
+            escaped = self._escape_typst(text)
+            result.append(f"\n= {escaped}\n")
+            if self.index_tracker:
+                self.index_tracker.new_chapter()
+                result.append(self.index_tracker.heading_marker(text))
             return ""
 
         elif tag == "h3":
@@ -458,8 +886,17 @@ class EPUBParser:
                     heading_text = raw_text
                 escaped = self._escape_typst(heading_text)
                 result.append(f"\n= {escaped}\n")
+                if self.index_tracker:
+                    self.index_tracker.new_chapter()
+                    result.append(self.index_tracker.heading_marker(heading_text))
                 return ""
             
+            # Check for scene signals before converting the paragraph
+            if self.index_tracker:
+                scenes = self.index_tracker.check_scene_signals(raw_text)
+                for scene in scenes:
+                    result.append(f'#index("Scenes", "{scene}")')
+
             content = self._convert_children(elem, doc_href, images, result)
             if content.strip():
                 result.append(f"\n{content}\n")
@@ -601,7 +1038,7 @@ class EPUBParser:
         """Convert all children of an element, returning inline content."""
         parts = []
         if elem.text:
-            parts.append(self._escape_typst(elem.text))
+            parts.append(self._escape_and_index(elem.text))
 
         for child in elem:
             inline = self._convert_element(child, doc_href, images, result,
@@ -609,9 +1046,16 @@ class EPUBParser:
             if inline:
                 parts.append(inline)
             if child.tail:
-                parts.append(self._escape_typst(child.tail))
+                parts.append(self._escape_and_index(child.tail))
 
         return "".join(parts)
+
+    def _escape_and_index(self, text: str) -> str:
+        """Escape text for Typst and optionally insert index markers."""
+        escaped = self._escape_typst(text)
+        if self.index_tracker:
+            return self.index_tracker.annotate_text(text, escaped)
+        return escaped
 
     def _escape_typst(self, text: str) -> str:
         """Escape special Typst characters."""
@@ -659,11 +1103,13 @@ class TypstGenerator:
     """Generates Typst source from a Book."""
 
     def __init__(
-        self, book: Book, font_path: Path | None = None, page_size: str = "a5"
+        self, book: Book, font_path: Path | None = None, page_size: str = "a5",
+        generate_index: bool = False,
     ):
         self.book = book
         self.font_path = font_path
         self.page_size = page_size
+        self.generate_index = generate_index
 
     def generate(self) -> str:
         """Generate complete Typst source."""
@@ -681,6 +1127,10 @@ class TypstGenerator:
         # Chapters
         for chapter in self.book.chapters:
             parts.append(self._generate_chapter(chapter))
+
+        # Index page (if enabled)
+        if self.generate_index:
+            parts.append(self._generate_index_page())
 
         return "\n".join(parts)
 
@@ -708,7 +1158,9 @@ class TypstGenerator:
             font_name = self._get_font_family_name(self.font_path)
             font_config = f'#set text(font: "{font_name}")'
 
-        return f'''// Document setup
+        index_import = '\n#import "@preview/in-dexter:0.7.2": *\n' if self.generate_index else ''
+
+        return f'''{index_import}// Document setup
 #set document(title: "{self._escape_string(self.book.title)}", author: "{self._escape_string(self.book.author)}")
 
 #set page(
@@ -815,6 +1267,21 @@ class TypstGenerator:
     def _generate_chapter(self, chapter: Chapter) -> str:
         """Generate chapter content."""
         return f"\n{chapter.content}\n"
+
+    def _generate_index_page(self) -> str:
+        """Generate the back-of-book index page using in-dexter."""
+        return r'''
+// Index
+#pagebreak()
+#page(header: none)[
+  #heading(outlined: true)[Index]
+  #v(0.3cm)
+  #set text(size: 8pt)
+  #columns(2, gutter: 0.5cm)[
+    #make-index(title: none)
+  ]
+]
+'''
 
     def _escape_string(self, text: str) -> str:
         """Escape a string for use in Typst string literals."""
@@ -1006,18 +1473,38 @@ def convert_epub_to_pdf(
     a3_mode: bool = False,
     wait: bool = False,
     max_ink: float | None = None,
+    generate_index: bool = False,
+    index_size: int = 120,
 ) -> None:
     """Convert an EPUB to a print-ready PDF."""
 
+    # Set up index tracker if requested
+    index_tracker = None
+    if generate_index:
+        print("Index generation enabled")
+        index_tracker = IndexTracker()
+
     # Parse EPUB
     print(f"Parsing {epub_path}...")
-    parser = EPUBParser(epub_path, max_ink=max_ink)
+    parser = EPUBParser(epub_path, max_ink=max_ink, index_tracker=index_tracker)
     book = parser.parse()
     print(f"  Found {len(book.chapters)} chapters")
 
+    if index_tracker:
+        noun_count = len(index_tracker.noun_candidates)
+        candidate_count = len(index_tracker.rare_candidates)
+        print(f"  Collected {noun_count} proper nouns, {candidate_count} rare word candidates")
+
+        # Score and select top entries, print scored list
+        selected, all_scored = index_tracker.select_all(budget=index_size)
+        print_index_scores(all_scored, index_size)
+        if selected:
+            postprocess_index_markers(book.chapters, selected)
+            print(f"  Selected {len(selected)} entries for index")
+
     # Generate Typst source
     print("Generating Typst source...")
-    generator = TypstGenerator(book, font_path, page_size)
+    generator = TypstGenerator(book, font_path, page_size, generate_index=generate_index)
     typst_source = generator.generate()
 
     # Create temp directory for Typst compilation
@@ -1048,7 +1535,11 @@ def convert_epub_to_pdf(
             cwd=tmppath,
         )
         if result.returncode != 0:
-            print("Typst compilation failed:")
+            # Save the .typ source next to the output for debugging
+            debug_typ = output_pdf.with_suffix('.typ')
+            import shutil
+            shutil.copy2(typst_file, debug_typ)
+            print(f"Typst compilation failed (source saved to {debug_typ}):")
             print(result.stderr)
             raise RuntimeError("Typst compilation failed")
 
@@ -1076,8 +1567,6 @@ def convert_epub_to_pdf(
             input("Press Enter to exit...")
 
 
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Convert EPUB to print-ready PDF",
@@ -1093,6 +1582,8 @@ def main():
     parser.add_argument( "--a3-mode", action="store_true", help="Use A5-to-A3 duplex imposition mode", )
     parser.add_argument( "--wait", action="store_true", help="Wait for user input before exiting (for debugging)", )
     parser.add_argument( "--max-ink", type=float, default=0.4, help="Exclude images with ink coverage above this threshold (0.0-1.0, e.g., 0.3 for 30%%)", )
+    parser.add_argument( "--index", action="store_true", help="Generate a back-of-book index (proper nouns, rare words, scene markers)", )
+    parser.add_argument( "--index-size", type=int, default=40, help="Number of scored index entries (proper nouns + rare words) to include", )
 
     args = parser.parse_args()
 
@@ -1111,6 +1602,8 @@ def main():
         a3_mode=args.a3_mode,
         wait=args.wait,
         max_ink=args.max_ink,
+        generate_index=args.index,
+        index_size=args.index_size,
     )
 
 if __name__ == "__main__":
