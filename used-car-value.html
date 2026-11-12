@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Used Car Value</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.2/dist/d3.min.js"></script>
+    <style>
+      :root {
+        --bg: #f7f8fb;
+        --card: #ffffff;
+        --text: #131c2e;
+        --muted: #64748b;
+        --border: #e5e9f0;
+        --grid: #e9edf4;
+        --track: #e2e8f0;
+        --accent: #4f46e5;
+        --accent-soft: #eef0ff;
+        --good: #15803d;
+        --good-soft: #dcfce7;
+        --warn: #b45309;
+        --warn-soft: #fef3c7;
+        --bad: #b91c1c;
+        --bad-soft: #fee2e2;
+        --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px -20px rgba(16, 24, 40, 0.3);
+        --radius: 16px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --card: #131c2e;
+          --text: #e8edf7;
+          --muted: #94a3b8;
+          --border: #24314a;
+          --grid: #1c2740;
+          --track: #24314a;
+          --accent: #818cf8;
+          --accent-soft: #1e2547;
+          --good: #4ade80;
+          --good-soft: #11301f;
+          --warn: #fbbf24;
+          --warn-soft: #3a2a08;
+          --bad: #f87171;
+          --bad-soft: #3d1418;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -22px rgba(0, 0, 0, 0.8);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 28px 20px 64px;
+        background:
+          radial-gradient(1100px 520px at 12% -12%, rgba(79, 70, 229, 0.12), transparent 62%),
+          radial-gradient(900px 480px at 88% -4%, rgba(14, 165, 233, 0.09), transparent 58%), var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      /* ---- header ---- */
+      .page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: clamp(1.6rem, 4.4vw, 2.1rem);
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+
+      .subtitle {
+        margin: 0;
+        max-width: 62ch;
+        color: var(--muted);
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .controls label {
+        display: grid;
+        gap: 4px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .controls select {
+        padding: 7px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      /* ---- cards ---- */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        margin: 0 0 16px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .card-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      .card-head h2 {
+        margin: 0;
+      }
+
+      .caption {
+        margin: 10px 0 0;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ---- hero ---- */
+      .hero {
+        padding: 26px 24px 20px;
+        background:
+          linear-gradient(180deg, var(--accent-soft), transparent 120%),
+          var(--card);
+      }
+
+      .eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: var(--muted);
+      }
+
+      .hero .eyebrow {
+        margin-bottom: 6px;
+      }
+
+      .hero-top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+
+      .hero-value {
+        font-size: clamp(2.4rem, 9vw, 3.6rem);
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.05;
+        font-variant-numeric: tabular-nums;
+        margin: 2px 0;
+      }
+
+      .hero-range {
+        color: var(--muted);
+        font-size: 0.92rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .verdict-wrap {
+        display: grid;
+        gap: 8px;
+        justify-items: start;
+        min-width: 220px;
+        max-width: 330px;
+      }
+
+      .verdict {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        background: var(--track);
+        color: var(--text);
+      }
+
+      .verdict .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .verdict.good {
+        background: var(--good-soft);
+        color: var(--good);
+      }
+
+      .verdict.warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .verdict.bad {
+        background: var(--bad-soft);
+        color: var(--bad);
+      }
+
+      .verdict.neutral {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .verdict-note {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .meter {
+        margin-top: 22px;
+      }
+
+      .meter-track {
+        position: relative;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--track);
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        border-radius: 999px;
+        transition:
+          left 0.25s ease,
+          width 0.25s ease,
+          background-color 0.25s ease;
+      }
+
+      .meter-center {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        margin-left: -1px;
+        background: var(--muted);
+        opacity: 0.35;
+      }
+
+      .meter-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+
+      /* ---- price tiles ---- */
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .tile {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .tile.featured {
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+        background: linear-gradient(180deg, var(--accent-soft), var(--card) 90%);
+      }
+
+      .tile-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+      }
+
+      .tile-value {
+        font-size: 1.45rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        margin: 2px 0;
+      }
+
+      .tile-hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* ---- stats ---- */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+      }
+
+      .stat-hint {
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+
+      /* ---- chart ---- */
+      .chart {
+        position: relative;
+      }
+
+      .chart svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      .axis text {
+        fill: var(--muted);
+        font-size: 11px;
+      }
+
+      .axis path,
+      .axis line {
+        stroke: var(--border);
+      }
+
+      .chart-tooltip {
+        position: absolute;
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, -100%);
+        transition: opacity 0.12s ease;
+        background: var(--text);
+        color: var(--card);
+        padding: 7px 10px;
+        border-radius: 9px;
+        font-size: 0.74rem;
+        line-height: 1.35;
+        white-space: nowrap;
+        box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45);
+        z-index: 3;
+      }
+
+      .chart-tooltip.visible {
+        opacity: 1;
+      }
+
+      .chart-tooltip .tt-value {
+        font-weight: 700;
+        font-size: 0.86rem;
+      }
+
+      .chart-tooltip .tt-sub {
+        opacity: 0.7;
+      }
+
+      .legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-size: 0.74rem;
+        color: var(--muted);
+        align-items: center;
+      }
+
+      .legend span.key {
+        display: inline-block;
+        width: 18px;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--accent);
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .legend span.key.band {
+        height: 10px;
+        border-radius: 3px;
+        background: var(--accent);
+        opacity: 0.16;
+      }
+
+      .legend span.key.dash {
+        background: repeating-linear-gradient(90deg, var(--muted) 0 5px, transparent 5px 9px);
+        height: 2px;
+      }
+
+      .chart-fallback {
+        margin: 0;
+        padding: 28px 0;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      /* ---- forms ---- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 16px;
+        align-items: start;
+      }
+
+      .grid > .card {
+        margin-bottom: 0;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .field-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .field label {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .slider-value {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type='number'],
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.92rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type='number']:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input-wrap .prefix {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        font-size: 0.9rem;
+        pointer-events: none;
+      }
+
+      .input-wrap.has-prefix input {
+        padding-left: 34px;
+      }
+
+      .hint {
+        margin: 0;
+        font-size: 0.74rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .hint-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+
+      input[type='range'] {
+        width: 100%;
+        height: 8px;
+        margin: 6px 0 2px;
+        border-radius: 4px;
+        background: var(--track);
+        -webkit-appearance: none;
+        appearance: none;
+        outline: none;
+      }
+
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--accent);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+        border: 2px solid var(--card);
+      }
+
+      input[type='range']::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        cursor: pointer;
+        border: 2px solid var(--card);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+      }
+
+      /* ---- collapsible ---- */
+      .card h2.collapse-head {
+        margin: 0;
+      }
+
+      .collapse-head button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .chev {
+        width: 9px;
+        height: 9px;
+        border-right: 2px solid var(--muted);
+        border-bottom: 2px solid var(--muted);
+        transform: rotate(45deg);
+        transition: transform 0.2s ease;
+        flex: none;
+        margin-right: 4px;
+      }
+
+      .collapse-head button[aria-expanded='true'] .chev {
+        transform: rotate(225deg);
+      }
+
+      .collapse-body {
+        margin-top: 18px;
+      }
+
+      .collapse-body[hidden] {
+        display: none;
+      }
+
+      /* ---- rows / factors ---- */
+      .rows {
+        margin: 0;
+      }
+
+      .row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 9px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .row dt {
+        font-size: 0.85rem;
+        color: var(--text);
+      }
+
+      .row dd {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+
+      .row .row-sub {
+        display: block;
+        font-weight: 400;
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+
+      .chip {
+        display: inline-block;
+        min-width: 54px;
+        text-align: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        background: var(--track);
+        color: var(--muted);
+      }
+
+      .chip.up {
+        background: var(--good-soft);
+        color: var(--good);
+      }
+
+      .chip.down {
+        background: var(--bad-soft);
+        color: var(--bad);
+      }
+
+      .chip.flat {
+        background: var(--track);
+        color: var(--muted);
+      }
+
+      ul.notes {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      ul.notes li {
+        margin-bottom: 7px;
+      }
+
+      ul.notes li:last-child {
+        margin-bottom: 0;
+      }
+
+      ul.notes strong {
+        color: var(--text);
+      }
+
+      /* ---- explainer ---- */
+      a {
+        color: var(--accent);
+        text-underline-offset: 2px;
+        text-decoration-thickness: 1px;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .explain p {
+        font-size: 0.86rem;
+      }
+
+      .explain-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin: 16px 0;
+        align-items: start;
+      }
+
+      .explain .muted {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .calc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.84rem;
+        margin-bottom: 8px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .calc-table th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 5px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .calc-table td {
+        padding: 5px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+
+      .calc-table td:last-child,
+      .calc-table th:last-child {
+        text-align: right;
+      }
+
+      .formula {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.78rem;
+        line-height: 1.75;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        color: var(--text);
+      }
+
+      .explain ul.notes {
+        font-size: 0.8rem;
+        padding-left: 18px;
+      }
+
+      .link-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        font-size: 0.82rem;
+      }
+
+      .footnote {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 24px 0 0;
+      }
+
+      @media (max-width: 560px) {
+        body {
+          padding: 18px 14px 48px;
+        }
+        .card {
+          padding: 16px;
+        }
+        .hero {
+          padding: 20px 16px 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="page-head">
+        <div>
+          <h1>What's this used car worth?</h1>
+          <p class="subtitle">
+            A depreciation-based ballpark from age, odometer and condition — plus whether the asking price stacks up.
+          </p>
+        </div>
+        <div class="controls">
+          <label>
+            Currency
+            <select id="currency">
+              <option value="$">$ USD</option>
+              <option value="£">£ GBP</option>
+              <option value="€">€ EUR</option>
+              <option value="A$">A$ AUD</option>
+              <option value="C$">C$ CAD</option>
+              <option value="NZ$">NZ$ NZD</option>
+              <option value="R">R ZAR</option>
+              <option value="₹">₹ INR</option>
+            </select>
+          </label>
+          <label>
+            Distance
+            <select id="unit">
+              <option value="km">Kilometres</option>
+              <option value="mi">Miles</option>
+            </select>
+          </label>
+        </div>
+      </header>
+
+      <section class="hero card" aria-labelledby="heroHeading">
+        <div class="eyebrow" id="heroHeading">Estimated private-sale value</div>
+        <div class="hero-top">
+          <div>
+            <div class="hero-value" id="heroValue">—</div>
+            <div class="hero-range" id="heroRange">—</div>
+          </div>
+          <div class="verdict-wrap">
+            <div class="verdict neutral" id="verdict"><span class="dot"></span><span id="verdictLabel">—</span></div>
+            <p class="verdict-note" id="verdictNote"></p>
+          </div>
+        </div>
+        <div class="meter" aria-hidden="true">
+          <div class="meter-track">
+            <div class="meter-fill" id="meterFill"></div>
+            <div class="meter-center"></div>
+          </div>
+          <div class="meter-labels"><span>25% under</span><span>asking vs fair value</span><span>25% over</span></div>
+        </div>
+      </section>
+
+      <div class="tiles">
+        <div class="tile">
+          <div class="tile-label">Trade-in</div>
+          <div class="tile-value" id="tradeInValue">—</div>
+          <div class="tile-hint">what a dealer would pay you</div>
+        </div>
+        <div class="tile featured">
+          <div class="tile-label">Private sale</div>
+          <div class="tile-value" id="privateValue">—</div>
+          <div class="tile-hint">you sell, you deal with the buyers</div>
+        </div>
+        <div class="tile">
+          <div class="tile-label">Dealer retail</div>
+          <div class="tile-value" id="retailValue">—</div>
+          <div class="tile-hint">what a lot would sticker it at</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Depreciation, next 12 months</div>
+          <div class="stat-value" id="statDep">—</div>
+          <div class="stat-hint" id="statDepHint"></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Value in 3 years</div>
+          <div class="stat-value" id="statIn3">—</div>
+          <div class="stat-hint" id="statIn3Hint"></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Running costs, per year</div>
+          <div class="stat-value" id="statRunning">—</div>
+          <div class="stat-hint">fuel, insurance, rego, servicing</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">All-in cost</div>
+          <div class="stat-value" id="statPerKm">—</div>
+          <div class="stat-hint" id="statPerKmHint"></div>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Value over the car's life</h2>
+          <div class="legend">
+            <span><span class="key line"></span> estimate</span>
+            <span><span class="key band"></span> likely range</span>
+            <span><span class="key dash"></span> asking price</span>
+          </div>
+        </div>
+        <div class="chart" id="chart">
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <p class="caption">
+          All values are in today's money. The band widens with age because old cars are harder to price — a 12-year-old
+          estimate is a guess, not a quote.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 class="collapse-head">
+          <button data-collapse aria-expanded="true" aria-controls="methodBody">
+            <span>How the curve is calculated</span>
+            <span class="chev" aria-hidden="true"></span>
+          </button>
+        </h2>
+        <div class="collapse-body explain" id="methodBody">
+          <p>
+            The line is a <strong>depreciation rule of thumb</strong>, not a market dataset. It applies a retention curve
+            to the price the car was new, then adjusts that for mileage and history.
+          </p>
+          <div class="explain-grid">
+            <div>
+              <table class="calc-table">
+                <thead>
+                  <tr>
+                    <th>Age of car</th>
+                    <th>Value kept per year</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Year 1</td>
+                    <td>82%</td>
+                  </tr>
+                  <tr>
+                    <td>Years 2–3</td>
+                    <td>88%</td>
+                  </tr>
+                  <tr>
+                    <td>Years 4–6</td>
+                    <td>90%</td>
+                  </tr>
+                  <tr>
+                    <td>Years 7–10</td>
+                    <td>91%</td>
+                  </tr>
+                  <tr>
+                    <td>11 years and older</td>
+                    <td>93%</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="muted">
+                Compounding those rates leaves about 38% of the original price at 8 years and 15% at 20. Electric cars
+                use 98% of each rate; hybrids 100.5%.
+              </p>
+            </div>
+            <div>
+              <div class="formula">
+                value(age) = priceWhenNew × retention(age) × mileageFactor × condition × history × (1 + marketAdjust) ×
+                inflationAdjust(age)
+              </div>
+              <ul class="notes">
+                <li>
+                  <strong>priceWhenNew</strong> is your optional override. Otherwise it is today's new price divided by
+                  (1 + inflation)<sup>age</sup> — that is why a car is never valued against a sticker it was never sold
+                  at.
+                </li>
+                <li>
+                  <strong>mileageFactor</strong> is 1 − 3.5% per 10,000 km above average (age × typical km per year),
+                  floored at 55%. Below average it is 1 + 2.8% per 10,000 km, capped at 125%.
+                </li>
+                <li>
+                  <strong>inflationAdjust</strong> scales points before today so the whole curve reads in today's money.
+                </li>
+                <li><strong>Band</strong> is ±(5.5% + 1.3% per year), capped at ±20%.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="muted">
+            Not fitted to transaction data: the brackets approximate the shape of published residual-value curves, and
+            the condition and history multipliers are judgement calls. Five comparable local listings will beat this
+            every time.
+          </p>
+          <div class="link-row">
+            <a href="https://github.com/jnnnnn/jnnnnn.github.io/blob/master/used-car-value.html">Source code for this page</a> <a href="https://github.com/jnnnnn/jnnnnn.github.io/blob/master/used-car-value.html#L1241-L1410">The model itself</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>The basics</h2>
+          <div class="field">
+            <label for="newPrice">New price of an equivalent car today</label>
+            <div class="input-wrap has-prefix">
+              <span class="prefix" data-currency>$</span>
+              <input id="newPrice" type="number" min="0" step="500" value="32000" inputmode="numeric" />
+            </div>
+            <p class="hint">A current model year, same body and roughly the same trim. Not the sticker of the car you're buying.</p>
+          </div>
+          <div class="field">
+            <label for="modelYear">Model year</label>
+            <input id="modelYear" type="number" min="1950" max="2027" step="1" value="2018" inputmode="numeric" />
+            <p class="hint">The year it was built or sold as, not the year it was first registered.</p>
+          </div>
+          <div class="field">
+            <label for="odometer">Odometer (<span data-unit="abbr">km</span>)</label>
+            <input id="odometer" type="number" min="0" step="1000" value="95000" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="askingPrice">Asking price</label>
+            <div class="input-wrap has-prefix">
+              <span class="prefix" data-currency>$</span>
+              <input id="askingPrice" type="number" min="0" step="100" value="12500" inputmode="numeric" />
+            </div>
+            <p class="hint">Set it to 0 if you're only valuing the car.</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Condition and history</h2>
+          <div class="field">
+            <label for="condition">Overall condition</label>
+            <select id="condition">
+              <option value="excellent">Excellent — near showroom, no faults</option>
+              <option value="good" selected>Good — normal wear, everything works</option>
+              <option value="fair">Fair — visible wear, minor faults</option>
+              <option value="poor">Poor — rough, needs work</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="service">Service history</label>
+            <select id="service">
+              <option value="full" selected>Full, stamped, receipts</option>
+              <option value="partial">Partial or patchy</option>
+              <option value="none">None or unknown</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="owners">Previous owners</label>
+            <select id="owners">
+              <option value="1">One</option>
+              <option value="2" selected>Two</option>
+              <option value="3">Three</option>
+              <option value="4">Four or more</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="accidents">Accident or repair history</label>
+            <select id="accidents">
+              <option value="none" selected>None reported</option>
+              <option value="minor">Minor repair, now fixed</option>
+              <option value="major">Major structural repair</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="seller">Where you're buying</label>
+            <select id="seller">
+              <option value="private" selected>Private seller</option>
+              <option value="dealer">Dealer or used-car lot</option>
+            </select>
+            <p class="hint">Dealer prices run about 12% higher for the same car — you pay for prep, warranty and recourse.</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="collapse-head">
+            <button data-collapse aria-expanded="false" aria-controls="advancedBody">
+              <span>Advanced assumptions</span>
+              <span class="chev" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="collapse-body" id="advancedBody" hidden>
+            <div class="field">
+              <label for="vehicleType">Drivetrain or fuel</label>
+              <select id="vehicleType">
+                <option value="petrol" selected>Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="electric">Electric</option>
+              </select>
+              <p class="hint">Electric cars lose value faster once the battery warranty ends; hybrids hold a little better.</p>
+            </div>
+            <div class="field">
+              <label for="priceWhenNew">Price paid when new (optional)</label>
+              <div class="input-wrap has-prefix">
+                <span class="prefix" data-currency>$</span>
+                <input id="priceWhenNew" type="number" min="0" step="500" placeholder="back-calculated" inputmode="numeric" />
+              </div>
+              <p class="hint">
+                Leave blank to back-calculate it. If you know the real original price, use it — trims and spec change, so
+                today's equivalent can be a poor stand-in.
+              </p>
+            </div>
+            <div class="field">
+              <div class="field-head">
+                <label for="priceInflation">New-car price inflation since new</label>
+                <span class="slider-value" data-slider-value="priceInflation">+2%</span>
+              </div>
+              <input id="priceInflation" type="range" data-slider min="0" max="6" step="0.5" value="2" />
+              <div class="hint-row"><span>flat prices</span><span>+6% a year</span></div>
+            </div>
+            <div class="field">
+              <label for="kmPerYear">Typical driving per year (<span data-unit="abbr">km</span>)</label>
+              <input id="kmPerYear" type="number" min="1000" step="1000" value="14000" inputmode="numeric" />
+              <p class="hint">Judges whether this odometer is high or low for its age.</p>
+            </div>
+            <div class="field">
+              <div class="field-head">
+                <label for="marketAdjust">Local market adjustment</label>
+                <span class="slider-value" data-slider-value="marketAdjust">0%</span>
+              </div>
+              <input id="marketAdjust" type="range" data-slider min="-15" max="15" step="1" value="0" />
+              <div class="hint-row"><span>cheap locally</span><span>pricier locally</span></div>
+              <p class="hint">Use a handful of real local listings to calibrate this one.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2 class="collapse-head">
+            <button data-collapse aria-expanded="true" aria-controls="costsBody">
+              <span>Running costs</span>
+              <span class="chev" aria-hidden="true"></span>
+            </button>
+          </h2>
+          <div class="collapse-body" id="costsBody">
+            <div class="field">
+              <label for="annualDriving">Distance you drive per year (<span data-unit="abbr">km</span>)</label>
+              <input id="annualDriving" type="number" min="1000" step="1000" value="14000" inputmode="numeric" />
+            </div>
+            <div class="field">
+              <label for="fuelCost">Fuel or charging, per year</label>
+              <div class="input-wrap has-prefix">
+                <span class="prefix" data-currency>$</span>
+                <input id="fuelCost" type="number" min="0" step="100" value="2000" inputmode="numeric" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="fixedCost">Insurance and registration, per year</label>
+              <div class="input-wrap has-prefix">
+                <span class="prefix" data-currency>$</span>
+                <input id="fixedCost" type="number" min="0" step="100" value="1400" inputmode="numeric" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="maintCost">Servicing, tyres and repairs, per year</label>
+              <div class="input-wrap has-prefix">
+                <span class="prefix" data-currency>$</span>
+                <input id="maintCost" type="number" min="0" step="100" value="800" inputmode="numeric" />
+              </div>
+              <p class="hint">Add a buffer here for older cars — this is where surprises live.</p>
+            </div>
+            <p class="hint">These affect the cost of ownership, not the car's value.</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top: 16px">
+        <h2>What's moving the number</h2>
+        <dl class="rows" id="factorRows"></dl>
+      </section>
+
+      <section class="card">
+        <h2>Deal check</h2>
+        <dl class="rows" id="dealRows"></dl>
+      </section>
+
+      <section class="card">
+        <h2>Where this estimate falls down</h2>
+        <ul class="notes">
+          <li>
+            <strong>Three inputs are not enough for a valuation.</strong> Age, distance and a new price get you within
+            maybe ±15% on a common car. Two cars with identical numbers can differ by thousands on history, spec and
+            local supply. This page is a sanity check, not an appraisal.
+          </li>
+          <li>
+            <strong>"Current new price" is the weakest input.</strong> If the new price rose 25% while this car sat in a
+            driveway, valuing against today's sticker overstates it. The model back-inflates the original price, and you
+            can override it — but if the model was replaced or re-specced, that number is fiction.
+          </li>
+          <li>
+            <strong>Odometer without service history is a half-truth.</strong> A 200,000 km highway car with full records
+            is often a better buy than a 90,000 km city car with none. The model prices the history; only an inspection
+            confirms it.
+          </li>
+          <li>
+            <strong>Not modelled at all:</strong> reputation for reliability, rare trims and colours, modifications,
+            import duties, remaining warranty, tyre and brake life, EV battery state of health, supply shortages, and how
+            well you negotiate.
+          </li>
+          <li>
+            <strong>What actually settles a price:</strong> five comparable local listings with similar age, odometer and
+            spec. If this page and the market disagree, trust the market and adjust your assumptions.
+          </li>
+        </ul>
+      </section>
+
+      <p class="footnote">
+        Nothing leaves this page — the model and your inputs stay in your browser. Estimates are rules of thumb, not
+        financial or mechanical advice.
+      </p>
+    </div>
+
+    <script>
+      // ========== THE MODEL ==========
+      // Depreciation is stored as the share of value kept in each year of life:
+      // steep in year one, flattening as a car bottoms out. These brackets give
+      // roughly 64% retention at 3 years, 33% at 10 and 15% at 20, close to the
+      // shape of published residual-value curves for mainstream cars.
+      const RETENTION_BRACKETS = [
+        [1, 0.82],
+        [3, 0.88],
+        [6, 0.9],
+        [10, 0.91],
+        [Infinity, 0.93],
+      ];
+
+      // Multiplies the annual retention rate, so below 1 means faster depreciation.
+      const TYPE_EXTRA = { petrol: 1, diesel: 1, hybrid: 1.005, electric: 0.98 };
+      const CONDITION_MULT = { excellent: 1.08, good: 1, fair: 0.87, poor: 0.72 };
+      const SERVICE_MULT = { full: 1.06, partial: 1, none: 0.9 };
+      const OWNERS_MULT = { 1: 1.03, 2: 1, 3: 0.96, 4: 0.91 };
+      const ACCIDENT_MULT = { none: 1, minor: 0.92, major: 0.74 };
+
+      const NOW_YEAR = new Date().getFullYear();
+      const KM_PER_MILE = 1.609344;
+      const STORAGE_KEY = 'used-car-value-v1';
+
+      let unit = 'km';
+
+      function retentionFactor(age, typeExtra) {
+        let factor = 1;
+        let from = 0;
+        for (const [upTo, rate] of RETENTION_BRACKETS) {
+          const span = Math.min(age, upTo) - from;
+          if (span > 0) factor *= Math.pow(rate * typeExtra, span);
+          from = upTo;
+          if (age <= upTo) break;
+        }
+        return factor;
+      }
+
+      // Distance matters relative to age. The penalty per 10,000 km above average
+      // is steeper than the bonus for being under it, because buyers discount
+      // unknowns more heavily than they pay a premium for low mileage.
+      function kmPenalty(actualKm, expectedKm) {
+        const diff = actualKm - expectedKm;
+        if (diff > 0) return Math.max(0.55, 1 - (diff / 10000) * 0.035);
+        return Math.min(1.25, 1 + (-diff / 10000) * 0.028);
+      }
+
+      function computeModel(inp) {
+        const typeExtra = TYPE_EXTRA[inp.vehicleType] || 1;
+
+        // Condition and history describe a used car, so they fade in over the first
+        // year. Applied flat, the curve would start above the new price.
+        const conditionMult = CONDITION_MULT[inp.condition] || 1;
+        const serviceMult = SERVICE_MULT[inp.service] || 1;
+        const ownersMult = OWNERS_MULT[inp.owners] || 1;
+        const accidentMult = ACCIDENT_MULT[inp.accidents] || 1;
+        const historyMult = conditionMult * serviceMult * ownersMult * accidentMult;
+        const historyWeight = Math.min(1, Math.max(0, inp.age));
+
+        // The car's price when it was new. Valuing against today's new price would
+        // compare an old car to a number it was never sold at, so unless the user
+        // supplies the real figure we back it out using new-price inflation.
+        const originalPrice = inp.priceWhenNew || inp.newPrice / Math.pow(1 + inp.priceInflation, inp.age);
+
+        const kmAtAge = (age) => {
+          if (age <= 0) return 0;
+          if (age < inp.age) return inp.odometerKm * (age / inp.age);
+          return inp.odometerKm + (age - inp.age) * inp.kmPerYearKm;
+        };
+
+        // Nominal value at a given age, i.e. in the money of that year.
+        const nominalValueAt = (age) =>
+          originalPrice *
+          retentionFactor(age, typeExtra) *
+          kmPenalty(kmAtAge(age), age * inp.kmPerYearKm) *
+          Math.pow(historyMult, Math.min(1, Math.max(0, age))) *
+          (1 + inp.marketAdjust);
+
+        // Everything is shown in today's money: historical points are inflated by
+        // new-price inflation, future points are left at today's prices.
+        const valueAt = (age) => nominalValueAt(age) * (age < inp.age ? Math.pow(1 + inp.priceInflation, inp.age - age) : 1);
+
+        const estimate = valueAt(inp.age);
+        const band = Math.min(0.2, 0.055 + 0.013 * inp.age);
+        const nextYear = valueAt(inp.age + 1);
+        const in3 = valueAt(inp.age + 3);
+        const in5 = valueAt(inp.age + 5);
+
+        const tradeIn = estimate * 0.8;
+        const dealerRetail = estimate * 1.12;
+        const reference = inp.seller === 'dealer' ? dealerRetail : estimate;
+        const delta = inp.asking > 0 ? (inp.asking - reference) / reference : null;
+
+        const annualRunning = inp.fuelCost + inp.fixedCost + inp.maintCost;
+        const annualDepreciation = estimate - nextYear;
+        const annualTotal = annualRunning + Math.max(0, annualDepreciation);
+        const displayAnnualDistance = fromKm(inp.annualDrivingKm);
+        const per1000 = displayAnnualDistance > 0 ? (annualTotal / displayAnnualDistance) * 1000 : 0;
+
+        const expectedKm = inp.age * inp.kmPerYearKm;
+        const kmRatio = kmPenalty(inp.odometerKm, expectedKm);
+
+        return {
+          age: inp.age,
+          originalPrice,
+          estimate,
+          band,
+          low: estimate * (1 - band),
+          high: estimate * (1 + band),
+          nextYear,
+          in3,
+          in5,
+          tradeIn,
+          dealerRetail,
+          reference,
+          delta,
+          targetOffer: reference * (inp.seller === 'dealer' ? 0.93 : 0.95),
+          walkAway: reference * 1.06,
+          annualRunning,
+          annualDepreciation,
+          annualTotal,
+          per1000,
+          fiveYearTotal: Math.max(0, estimate - in5) + annualRunning * 5,
+          averageLossPerYear: inp.age > 0 ? (inp.newPrice - estimate) / inp.age : 0,
+          retainedOfNew: inp.newPrice > 0 ? estimate / inp.newPrice : 0,
+          expectedKm,
+          kmRatio,
+          factors: [
+            {
+              key: 'age',
+              label: `Age — ${inp.age} ${inp.age === 1 ? 'year' : 'years'} old`,
+              detail: `keeps ${fmtPercent(retentionFactor(inp.age, typeExtra))} of what it cost new`,
+              mult: retentionFactor(inp.age, typeExtra),
+            },
+            { key: 'km', label: 'Odometer vs the average for its age', detail: '', mult: kmRatio },
+            {
+              key: 'condition',
+              label: 'Condition',
+              detail: labelOf('condition', inp.condition),
+              mult: Math.pow(conditionMult, historyWeight),
+            },
+            {
+              key: 'service',
+              label: 'Service history',
+              detail: labelOf('service', inp.service),
+              mult: Math.pow(serviceMult, historyWeight),
+            },
+            {
+              key: 'owners',
+              label: 'Previous owners',
+              detail: labelOf('owners', inp.owners),
+              mult: Math.pow(ownersMult, historyWeight),
+            },
+            {
+              key: 'accidents',
+              label: 'Accident history',
+              detail: labelOf('accidents', inp.accidents),
+              mult: Math.pow(accidentMult, historyWeight),
+            },
+            {
+              key: 'market',
+              label: 'Local market',
+              detail: inp.marketAdjust === 0 ? 'no adjustment' : `${inp.marketAdjust > 0 ? '+' : ''}${Math.round(inp.marketAdjust * 100)}%`,
+              mult: 1 + inp.marketAdjust,
+            },
+          ],
+          valueAt,
+        };
+      }
+
+      // ========== FORMATTING ==========
+      function currencySymbol() {
+        return document.getElementById('currency').value;
+      }
+
+      function fmtMoney(n, digits = 0) {
+        if (!isFinite(n)) return '—';
+        const sign = n < 0 ? '−' : '';
+        return sign + currencySymbol() + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+      }
+
+      function fmtMoneyShort(n) {
+        if (Math.abs(n) >= 1000) {
+          const thousands = Math.round(n / 100) / 10;
+          return (n < 0 ? '−' : '') + currencySymbol() + (Number.isInteger(thousands) ? thousands : thousands.toFixed(1)) + 'k';
+        }
+        return fmtMoney(n);
+      }
+
+      function fmtPercent(fraction) {
+        return `${Math.round(fraction * 100)}%`;
+      }
+
+      function toKm(value) {
+        return unit === 'mi' ? value * KM_PER_MILE : value;
+      }
+
+      function fromKm(km) {
+        return unit === 'mi' ? km / KM_PER_MILE : km;
+      }
+
+      function fmtDistance(km) {
+        return `${Math.round(fromKm(km)).toLocaleString('en-US')} ${unit === 'mi' ? 'mi' : 'km'}`;
+      }
+
+      function shortUnit() {
+        return unit === 'mi' ? 'mi' : 'km';
+      }
+
+      function labelOf(id, value) {
+        const select = document.getElementById(id);
+        const option = select && select.querySelector(`option[value="${value}"]`);
+        return option ? option.textContent.trim() : '';
+      }
+
+      function roundTo(n, step) {
+        return Math.round(n / step) * step;
+      }
+
+      function readVar(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+      }
+
+      // ========== INPUTS ==========
+      function readInputs() {
+        const num = (id) => {
+          const value = parseFloat(document.getElementById(id).value);
+          return isFinite(value) ? value : 0;
+        };
+        const text = (id) => document.getElementById(id).value;
+        const yearRaw = num('modelYear');
+        const modelYear = yearRaw > 1950 ? Math.min(yearRaw, NOW_YEAR + 1) : NOW_YEAR;
+        const priceWhenNew = num('priceWhenNew');
+
+        return {
+          newPrice: Math.max(0, num('newPrice')),
+          modelYear,
+          age: Math.max(0, NOW_YEAR - modelYear),
+          odometerKm: Math.max(0, toKm(num('odometer'))),
+          asking: Math.max(0, num('askingPrice')),
+          condition: text('condition'),
+          service: text('service'),
+          owners: text('owners'),
+          accidents: text('accidents'),
+          seller: text('seller'),
+          vehicleType: text('vehicleType'),
+          priceWhenNew: priceWhenNew > 0 ? priceWhenNew : null,
+          priceInflation: num('priceInflation') / 100,
+          kmPerYearKm: Math.max(1, toKm(num('kmPerYear'))),
+          marketAdjust: num('marketAdjust') / 100,
+          annualDrivingKm: Math.max(1, toKm(num('annualDriving'))),
+          fuelCost: Math.max(0, num('fuelCost')),
+          fixedCost: Math.max(0, num('fixedCost')),
+          maintCost: Math.max(0, num('maintCost')),
+        };
+      }
+
+      // ========== RENDER: HERO ==========
+      function verdictFor(delta, targetOffer) {
+        if (delta === null) {
+          return {
+            cls: 'neutral',
+            label: 'Add an asking price',
+            note: "Type the seller's price to see how it compares with the estimate.",
+            color: readVar('--accent'),
+          };
+        }
+        const pct = Math.round(Math.abs(delta) * 100);
+        if (delta <= -0.15) {
+          return {
+            cls: 'good',
+            label: 'Well under the estimate',
+            note: `${pct}% below what we'd expect. Worth finding out why — a pre-purchase inspection is not optional.`,
+            color: readVar('--good'),
+          };
+        }
+        if (delta <= -0.05) {
+          return {
+            cls: 'good',
+            label: 'Good deal',
+            note: `${pct}% under our estimate. Still get an independent inspection before you pay.`,
+            color: readVar('--good'),
+          };
+        }
+        if (delta < 0.05) {
+          return {
+            cls: 'neutral',
+            label: 'Fair price',
+            note: `Within ${Math.max(pct, 1)}% of our estimate. Condition and history should decide it from here.`,
+            color: readVar('--accent'),
+          };
+        }
+        if (delta < 0.15) {
+          return {
+            cls: 'warn',
+            label: 'A bit high',
+            note: `${pct}% above our estimate. Aim for ${fmtMoney(targetOffer)} and be ready to walk.`,
+            color: readVar('--warn'),
+          };
+        }
+        return {
+          cls: 'bad',
+          label: 'Overpriced',
+          note: `${pct}% above our estimate. Unless the history is exceptional, keep looking or offer near ${fmtMoney(targetOffer)}.`,
+          color: readVar('--bad'),
+        };
+      }
+
+      function renderHero(inp, m) {
+        const heroValue = document.getElementById('heroValue');
+        const heroRange = document.getElementById('heroRange');
+        const verdictEl = document.getElementById('verdict');
+        const verdictLabel = document.getElementById('verdictLabel');
+        const verdictNote = document.getElementById('verdictNote');
+        const meterFill = document.getElementById('meterFill');
+
+        if (inp.newPrice <= 0) {
+          heroValue.textContent = '—';
+          heroRange.textContent = 'Enter an equivalent new price to start.';
+          verdictEl.className = 'verdict neutral';
+          verdictLabel.textContent = 'Waiting for a new price';
+          verdictNote.textContent = '';
+          meterFill.style.width = '0';
+          return;
+        }
+
+        const step = m.estimate >= 20000 ? 100 : 50;
+        heroValue.textContent = fmtMoney(roundTo(m.estimate, step));
+        heroRange.textContent = `Likely ${fmtMoney(roundTo(m.low, step))} – ${fmtMoney(roundTo(m.high, step))} · ±${Math.round(m.band * 100)}%`;
+
+        const verdict = verdictFor(m.delta, m.targetOffer);
+        verdictEl.className = `verdict ${verdict.cls}`;
+        verdictLabel.textContent = verdict.label;
+        verdictNote.textContent = verdict.note;
+
+        if (m.delta === null) {
+          meterFill.style.width = '0';
+          meterFill.style.background = verdict.color;
+          return;
+        }
+        const pos = Math.max(0, Math.min(100, ((m.delta + 0.25) / 0.5) * 100));
+        meterFill.style.left = `${Math.min(50, pos)}%`;
+        meterFill.style.width = `${Math.abs(pos - 50)}%`;
+        meterFill.style.background = verdict.color;
+      }
+
+      function renderTiles(inp, m) {
+        const valid = inp.newPrice > 0;
+        document.getElementById('tradeInValue').textContent = valid ? fmtMoney(roundTo(m.tradeIn, 50)) : '—';
+        document.getElementById('privateValue').textContent = valid ? fmtMoney(roundTo(m.estimate, 50)) : '—';
+        document.getElementById('retailValue').textContent = valid ? fmtMoney(roundTo(m.dealerRetail, 50)) : '—';
+      }
+
+      function renderStats(inp, m) {
+        const valid = inp.newPrice > 0;
+        document.getElementById('statDep').textContent = valid ? fmtMoney(roundTo(m.annualDepreciation, 10)) : '—';
+        document.getElementById('statDepHint').textContent = valid
+          ? `${Math.round((m.annualDepreciation / Math.max(m.estimate, 1)) * 100)}% of today's value, at ${fmtDistance(inp.kmPerYearKm)} a year`
+          : '';
+
+        document.getElementById('statIn3').textContent = valid ? fmtMoney(roundTo(m.in3, 50)) : '—';
+        document.getElementById('statIn3Hint').textContent = valid ? "in today's money, if you keep driving" : '';
+
+        document.getElementById('statRunning').textContent = fmtMoney(m.annualRunning);
+        document.getElementById('statPerKm').textContent = fmtMoney(m.per1000);
+        document.getElementById('statPerKmHint').textContent = `per 1,000 ${shortUnit()}, including depreciation`;
+      }
+
+      function odometerDetail(inp, m) {
+        if (m.expectedKm <= 0) return 'no average to compare against yet';
+        const diff = inp.odometerKm - m.expectedKm;
+        if (Math.abs(diff) < 500) return 'right on the average';
+        return `${fmtDistance(Math.abs(diff))} ${diff > 0 ? 'above' : 'below'} average (${fmtDistance(m.expectedKm)})`;
+      }
+
+      function renderFactorRows(inp, m) {
+        document.getElementById('factorRows').innerHTML = m.factors
+          .map((factor) => {
+            const change = (factor.mult - 1) * 100;
+            const cls = change > 0.5 ? 'up' : change < -0.5 ? 'down' : 'flat';
+            const sign = change > 0 ? '+' : change < 0 ? '−' : '±';
+            const detail = factor.key === 'km' ? odometerDetail(inp, m) : factor.detail;
+            return (
+              `<div class="row"><dt>${factor.label}<span class="row-sub">${detail}</span></dt>` +
+              `<dd><span class="chip ${cls}">${sign}${Math.abs(Math.round(change))}%</span></dd></div>`
+            );
+          })
+          .join('');
+      }
+
+      function renderDealRows(inp, m) {
+        const valid = inp.newPrice > 0;
+        const rows = [
+          ['Target offer', valid ? fmtMoney(roundTo(m.targetOffer, 50)) : '—', 'a sensible opening number'],
+          ['Walk away above', valid ? fmtMoney(roundTo(m.walkAway, 50)) : '—', 'better cars exist at this price'],
+          ['5-year cost of ownership', valid ? fmtMoney(roundTo(m.fiveYearTotal, 50)) : '—', 'depreciation plus running costs'],
+          [
+            'Share of new price kept',
+            valid ? `${Math.round(m.retainedOfNew * 100)}%` : '—',
+            inp.priceWhenNew ? `against ${fmtMoney(inp.priceWhenNew)} when new` : 'against an equivalent new car today',
+          ],
+          [
+            'Average loss per year so far',
+            valid ? fmtMoney(roundTo(m.averageLossPerYear, 50)) : '—',
+            inp.age > 0 ? `over ${inp.age} ${inp.age === 1 ? 'year' : 'years'}` : 'not owned long enough to lose value',
+          ],
+          ['Odometer', fmtDistance(inp.odometerKm), `${fmtDistance(m.expectedKm)} would be average for its age`],
+        ];
+
+        document.getElementById('dealRows').innerHTML = rows
+          .map(([label, value, sub]) => `<div class="row"><dt>${label}<span class="row-sub">${sub}</span></dt><dd>${value}</dd></div>`)
+          .join('');
+      }
+
+      // ========== RENDER: CHART ==========
+      function renderChart(inp, m) {
+        const host = document.getElementById('chart');
+        const tooltip = document.getElementById('chartTooltip');
+
+        if (!window.d3) {
+          if (!host.querySelector('.chart-fallback')) {
+            host.querySelectorAll('svg').forEach((svg) => svg.remove());
+            const message = document.createElement('p');
+            message.className = 'chart-fallback';
+            message.textContent = 'The chart needs d3, which did not load. The numbers above still work.';
+            host.appendChild(message);
+          }
+          return;
+        }
+
+        host.querySelector('.chart-fallback')?.remove();
+        tooltip.classList.remove('visible');
+        d3.select(host).selectAll('svg').remove();
+
+        const width = Math.max(300, host.clientWidth);
+        const height = Math.max(240, Math.min(400, Math.round(width * 0.52)));
+        const margin = { top: 20, right: 16, bottom: 38, left: 58 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const maxAge = Math.max(12, Math.ceil(m.age) + 5);
+        const data = d3.range(0, maxAge + 1e-9, 0.25).map((age) => {
+          const value = m.valueAt(age);
+          const ageBand = Math.min(0.2, 0.055 + 0.013 * age);
+          return { age, value, low: value * (1 - ageBand), high: value * (1 + ageBand) };
+        });
+
+        const yMax = Math.max(d3.max(data, (d) => d.high) || 0, inp.asking || 0) * 1.06 || 1;
+        const x = d3.scaleLinear().domain([0, maxAge]).range([0, innerWidth]);
+        const y = d3.scaleLinear().domain([0, yMax]).nice().range([innerHeight, 0]);
+
+        const accent = readVar('--accent');
+        const muted = readVar('--muted');
+        const textColor = readVar('--text');
+        const gridColor = readVar('--grid');
+        const cardColor = readVar('--card');
+
+        const svg = d3
+          .select(host)
+          .append('svg')
+          .attr('viewBox', `0 0 ${width} ${height}`)
+          .attr('role', 'img')
+          .attr('aria-label', 'Estimated value of the car as it ages');
+
+        const root = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+        const yTicks = y.ticks(Math.max(3, Math.round(innerHeight / 68)));
+
+        root
+          .append('g')
+          .selectAll('line')
+          .data(yTicks)
+          .join('line')
+          .attr('x1', 0)
+          .attr('x2', innerWidth)
+          .attr('y1', (d) => y(d))
+          .attr('y2', (d) => y(d))
+          .attr('stroke', gridColor)
+          .attr('stroke-dasharray', '3 4');
+
+        const area = d3
+          .area()
+          .x((d) => x(d.age))
+          .y0((d) => y(d.low))
+          .y1((d) => y(d.high));
+
+        root.append('path').datum(data).attr('d', area).attr('fill', accent).attr('fill-opacity', 0.13).attr('stroke', 'none');
+
+        const line = d3
+          .line()
+          .x((d) => x(d.age))
+          .y((d) => y(d.value));
+
+        root
+          .append('path')
+          .datum(data)
+          .attr('d', line)
+          .attr('fill', 'none')
+          .attr('stroke', accent)
+          .attr('stroke-width', 2.5)
+          .attr('stroke-linejoin', 'round')
+          .attr('stroke-linecap', 'round');
+
+        const tickStep = maxAge > 18 ? 5 : maxAge > 10 ? 2 : 1;
+        const xTicks = d3.range(0, maxAge + 0.01, tickStep);
+
+        root
+          .append('g')
+          .attr('class', 'axis')
+          .attr('transform', `translate(0,${innerHeight})`)
+          .call(
+            d3
+              .axisBottom(x)
+              .tickValues(xTicks)
+              .tickFormat((d) => `${d}`)
+              .tickSizeOuter(0)
+          );
+
+        root.append('g').attr('class', 'axis').call(d3.axisLeft(y).tickValues(yTicks).tickFormat(fmtMoneyShort).tickSizeOuter(0));
+
+        root
+          .append('text')
+          .attr('x', innerWidth / 2)
+          .attr('y', innerHeight + 32)
+          .attr('text-anchor', 'middle')
+          .attr('fill', muted)
+          .attr('font-size', 11)
+          .text('age of the car (years)');
+
+        // Asking price, so the gap is visible instead of a mental subtraction.
+        if (inp.asking > 0) {
+          const askingColor = m.delta > 0.05 ? readVar('--bad') : m.delta < -0.05 ? readVar('--good') : muted;
+          const askingY = y(inp.asking);
+          root
+            .append('line')
+            .attr('x1', 0)
+            .attr('x2', innerWidth)
+            .attr('y1', askingY)
+            .attr('y2', askingY)
+            .attr('stroke', askingColor)
+            .attr('stroke-width', 1.5)
+            .attr('stroke-dasharray', '5 4');
+          root
+            .append('text')
+            .attr('x', innerWidth)
+            .attr('y', askingY - 7)
+            .attr('text-anchor', 'end')
+            .attr('font-size', 11)
+            .attr('font-weight', 600)
+            .attr('fill', askingColor)
+            .text(`asking ${fmtMoney(inp.asking)}`);
+        }
+
+        // "You are here" marker.
+        const markerX = x(m.age);
+        root
+          .append('line')
+          .attr('x1', markerX)
+          .attr('x2', markerX)
+          .attr('y1', 0)
+          .attr('y2', innerHeight)
+          .attr('stroke', muted)
+          .attr('stroke-dasharray', '2 3')
+          .attr('opacity', 0.6);
+
+        root
+          .append('circle')
+          .attr('cx', markerX)
+          .attr('cy', y(m.estimate))
+          .attr('r', 5.5)
+          .attr('fill', accent)
+          .attr('stroke', cardColor)
+          .attr('stroke-width', 2.5);
+
+        root
+          .append('text')
+          .attr('x', markerX + (markerX > innerWidth * 0.7 ? -11 : 11))
+          .attr('y', y(m.estimate) - 11)
+          .attr('text-anchor', markerX > innerWidth * 0.7 ? 'end' : 'start')
+          .attr('font-size', 12)
+          .attr('font-weight', 700)
+          .attr('fill', textColor)
+          .text(`now · ${fmtMoney(m.estimate)}`);
+
+        // Hover crosshair.
+        const hoverLine = root
+          .append('line')
+          .attr('stroke', muted)
+          .attr('stroke-dasharray', '2 3')
+          .attr('opacity', 0)
+          .attr('y1', 0)
+          .attr('y2', innerHeight);
+
+        const hoverDot = root
+          .append('circle')
+          .attr('r', 4.5)
+          .attr('fill', accent)
+          .attr('stroke', cardColor)
+          .attr('stroke-width', 2)
+          .attr('opacity', 0);
+
+        const bisect = d3.bisector((d) => d.age).center;
+
+        root
+          .append('rect')
+          .attr('width', innerWidth)
+          .attr('height', innerHeight)
+          .attr('fill', 'transparent')
+          .on('mousemove', function (event) {
+            const [pointerX] = d3.pointer(event, this);
+            const nearest = data[bisect(data, Math.max(0, Math.min(maxAge, x.invert(pointerX))))];
+            hoverLine.attr('x1', x(nearest.age)).attr('x2', x(nearest.age)).attr('opacity', 0.8);
+            hoverDot.attr('cx', x(nearest.age)).attr('cy', y(nearest.value)).attr('opacity', 1);
+
+            const years = Math.round(nearest.age);
+            tooltip.innerHTML =
+              `<div>${years} ${years === 1 ? 'year' : 'years'} old<span class="tt-sub"> · ${NOW_YEAR - years} model</span></div>` +
+              `<div class="tt-value">${fmtMoney(nearest.value)}</div>` +
+              `<div class="tt-sub">${fmtMoney(nearest.low)} – ${fmtMoney(nearest.high)}</div>`;
+            tooltip.style.left = `${margin.left + x(nearest.age)}px`;
+            tooltip.style.top = `${margin.top + y(nearest.high) - 8}px`;
+            tooltip.classList.add('visible');
+          })
+          .on('mouseleave', () => {
+            hoverLine.attr('opacity', 0);
+            hoverDot.attr('opacity', 0);
+            tooltip.classList.remove('visible');
+          });
+      }
+
+      // ========== RENDER: ALL ==========
+      function syncLabels() {
+        document.querySelectorAll('[data-unit="abbr"]').forEach((el) => {
+          el.textContent = shortUnit();
+        });
+
+        const symbol = currencySymbol();
+        document.querySelectorAll('[data-currency]').forEach((el) => {
+          el.textContent = symbol;
+        });
+
+        // Prefixes differ in width ("$" vs "A$"), so nudge the input padding.
+        document.querySelectorAll('.input-wrap.has-prefix').forEach((wrap) => {
+          const prefix = wrap.querySelector('.prefix');
+          const input = wrap.querySelector('input');
+          if (!prefix || !input) return;
+          input.style.paddingLeft = `${Math.max(30, prefix.textContent.length * 9 + 16)}px`;
+        });
+      }
+
+      function update() {
+        syncLabels();
+        const inp = readInputs();
+        const m = computeModel(inp);
+        renderHero(inp, m);
+        renderTiles(inp, m);
+        renderStats(inp, m);
+        renderFactorRows(inp, m);
+        renderDealRows(inp, m);
+        renderChart(inp, m);
+        persist();
+      }
+
+      // ========== PERSISTENCE ==========
+      function persist() {
+        const data = {};
+        document.querySelectorAll('input, select').forEach((el) => {
+          if (el.id) data[el.id] = el.value;
+        });
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          /* private mode or a full quota — the page works fine without saving */
+        }
+      }
+
+      function restore() {
+        let data;
+        try {
+          data = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        } catch (e) {
+          return;
+        }
+        if (!data) return;
+
+        Object.entries(data).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (el && typeof value === 'string') el.value = value;
+        });
+      }
+
+      // ========== WIRING ==========
+      function toggleCollapse(button) {
+        const expanded = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!expanded));
+        const body = document.getElementById(button.getAttribute('aria-controls'));
+        if (body) body.hidden = expanded;
+      }
+
+      function init() {
+        const yearInput = document.getElementById('modelYear');
+        yearInput.max = String(NOW_YEAR + 1);
+        yearInput.min = '1950';
+
+        restore();
+        unit = document.getElementById('unit').value || 'km';
+
+        document.querySelectorAll('[data-collapse]').forEach((button) => {
+          button.addEventListener('click', () => toggleCollapse(button));
+        });
+
+        document.querySelectorAll('[data-slider]').forEach((slider) => {
+          const out = document.querySelector(`[data-slider-value="${slider.id}"]`);
+          const paint = () => {
+            if (!out) return;
+            const value = Number(slider.value);
+            out.textContent = `${value > 0 ? '+' : ''}${value}%`;
+          };
+          slider.addEventListener('input', paint);
+          paint();
+        });
+
+        document.getElementById('unit').addEventListener('change', () => {
+          const next = document.getElementById('unit').value;
+          if (next !== unit) {
+            // Convert the entered distances so the numbers keep meaning something.
+            const factor = next === 'mi' ? 1 / KM_PER_MILE : KM_PER_MILE;
+            ['odometer', 'kmPerYear', 'annualDriving'].forEach((id) => {
+              const el = document.getElementById(id);
+              el.value = String(Math.round((parseFloat(el.value) || 0) * factor));
+            });
+            unit = next;
+          }
+          update();
+        });
+
+        document.addEventListener('input', (event) => {
+          if (event.target.matches('input, select')) update();
+        });
+
+        document.addEventListener('change', (event) => {
+          if (event.target.matches('select')) update();
+        });
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(update, 150);
+        });
+
+        const dark = window.matchMedia('(prefers-color-scheme: dark)');
+        if (dark.addEventListener) dark.addEventListener('change', update);
+
+        update();
+      }
+
+      init();
+    </script>
+  </body>
+</html>
